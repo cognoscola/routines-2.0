@@ -50,7 +50,16 @@ class TimerView : View {
         val cy = pt + usableHeight / 2
 
         paint!!.color = this.circleColor
-        canvas.drawCircle(cx.toFloat(), cy.toFloat(), radius.toFloat(), paint!!)
+//        canvas.drawCircle(cx.toFloat(), cy.toFloat(), radius.toFloat(), paint!!)
+        canvas.drawArc(
+                (cx - radius).toFloat(),
+                (cy - radius).toFloat(),
+                (cx+radius).toFloat(),
+                (cy + radius).toFloat(),
+                0.0f,
+                30.0f,
+                false,
+                paint!!)
     }
 
     companion object {
