@@ -14,7 +14,22 @@ class TimerView : View {
             field = circleColor
             invalidate()
         }
+
     private var paint: Paint? = null
+
+    var elapsedTimeSecond = 40
+        set(value){
+
+        }
+
+    val startAngle = -90.0f
+    var sweepAngle = 0f
+
+    public fun setTime(value:Float){
+        sweepAngle = (value / 60) * 360.0f
+        invalidate()
+    }
+
 
     constructor(context: Context) : super(context) {
         init(context, null)
@@ -56,8 +71,8 @@ class TimerView : View {
                 (cy - radius).toFloat(),
                 (cx+radius).toFloat(),
                 (cy + radius).toFloat(),
-                0.0f,
-                30.0f,
+                startAngle,
+                sweepAngle,
                 false,
                 paint!!)
     }
