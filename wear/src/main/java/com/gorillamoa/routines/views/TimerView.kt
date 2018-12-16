@@ -6,8 +6,15 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
+import android.widget.Toast
 
 class TimerView : View {
+
+    public enum class ClockState{
+        undefined,
+        set,
+        running
+    }
 
     var circleColor = DEFAULT_CIRCLE_COLOR
         set(circleColor) {
@@ -16,18 +23,32 @@ class TimerView : View {
         }
 
     private var paint: Paint? = null
+    private var clockState:ClockState = ClockState.undefined
+
 
     var elapsedTimeSecond = 40
         set(value){
 
         }
 
+
+    fun getState():ClockState {
+        return this.clockState
+    }
+
+
     val startAngle = -90.0f
     var sweepAngle = 0f
 
-    public fun setTime(value:Float){
+    public fun setCountdownSeconds(value:Float){
+        clockState = ClockState.set
+        Toast.makeText(this.context, "armed", Toast.LENGTH_SHORT).show()
         sweepAngle = (value / 60) * 360.0f
         invalidate()
+    }
+
+    public fun start(){
+        Toast.makeText(this.context, "running",Toast.LENGTH_SHORT).show()
     }
 
 
@@ -76,6 +97,9 @@ class TimerView : View {
                 false,
                 paint!!)
     }
+
+
+
 
     companion object {
         private val DEFAULT_CIRCLE_COLOR = Color.RED
