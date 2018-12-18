@@ -5,6 +5,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Handler
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
@@ -155,6 +157,15 @@ class TimerView : View {
 
         this@TimerView.invalidate()
 
+
+        if(counter < 3){
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                val vibratorService = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                vibratorService.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+
+            }
+        }
 
         if(counter > 0){
             tick()
