@@ -162,7 +162,22 @@ class TimerView : View {
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 val vibratorService = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                vibratorService.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+
+
+
+                if (counter == 0) {
+                    val longArray = LongArray(6)
+                    longArray[0] = 200
+                    longArray[1] = 200
+                    longArray[2] = 200
+                    longArray[3] = 200
+                    longArray[4] = 200
+                    longArray[5] = 400
+                    vibratorService.vibrate(VibrationEffect.createWaveform(longArray, -1))
+                }else{
+
+                    vibratorService.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                }
 
             }
         }
@@ -172,6 +187,7 @@ class TimerView : View {
             counter--
         }else{
             Toast.makeText(this.context, "Done", Toast.LENGTH_SHORT).show()
+            clockState = ClockState.undefined
         }
 
     }
