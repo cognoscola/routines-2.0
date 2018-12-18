@@ -9,14 +9,17 @@ import com.gorillamoa.routines.views.TimerView
 class WearRunnerActivity : WearableActivity() {
 
     private lateinit var timerView:TimerView
+    private lateinit var updateText:TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wear_runner)
 
-        timerView = findViewById<TimerView>(R.id.timerView)
+        timerView = findViewById(R.id.timerView)
 
-        findViewById<TextView>(R.id.text).setOnClickListener {
+        updateText = findViewById(R.id.statusView)
+
+        updateText.setOnClickListener {
 
             when(timerView.getState()){
                 TimerView.ClockState.undefined -> {
@@ -24,13 +27,21 @@ class WearRunnerActivity : WearableActivity() {
                 }
                 TimerView.ClockState.set -> {
                     timerView.start()
-
                 }
                 TimerView.ClockState.running -> {
 
                 }
             }
         }
+
+        timerView.setTextUpdateCallback { text ->
+            runOnUiThread {
+                updateText.text = text
+            }
+        }
+
+
+
 
         // Enables Always-on
         setAmbientEnabled()

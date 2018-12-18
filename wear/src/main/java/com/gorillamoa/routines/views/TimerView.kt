@@ -26,6 +26,12 @@ class TimerView : View {
             invalidate()
         }
 
+
+    private var textUpdateCallback:((String)->Unit)? = null
+    public fun setTextUpdateCallback(writer:(String)->Unit){
+       textUpdateCallback = writer
+    }
+
     private var grayLine: Paint? = null
     private var greenLine: Paint? = null
     private var counter = 0
@@ -41,7 +47,6 @@ class TimerView : View {
 
         }
 
-
     fun getState():ClockState {
         return this.clockState
     }
@@ -52,23 +57,18 @@ class TimerView : View {
 
     public fun setCountdownSeconds(value:Int){
         clockState = ClockState.set
-        Toast.makeText(this.context, "armed", Toast.LENGTH_SHORT).show()
+        textUpdateCallback?.invoke("Click to Start")
         sweepAngle = (60 / 60) * 360.0f
 
         maxTime = value
         counter = value
         recalculateAngle()
-
-
-
-
-
         invalidate()
     }
 
     public fun start(){
         tick()
-        Toast.makeText(this.context, "running",Toast.LENGTH_SHORT).show()
+
     }
 
 
@@ -93,10 +93,10 @@ class TimerView : View {
         greenLine!!.strokeWidth = 3f
         greenLine!!.color = COMPLETED_CIRCLE_COLOR
 
-
         threadHandler = Handler()
 
         setWillNotDraw(false)
+
 
     }
 
@@ -155,6 +155,7 @@ class TimerView : View {
     val runnable:Runnable = Runnable {
         recalculateAngle()
 
+        textUpdateCallback?.invoke("$counter")
         this@TimerView.invalidate()
 
 
@@ -164,16 +165,18 @@ class TimerView : View {
                 val vibratorService = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
 
-
                 if (counter == 0) {
-                    val longArray = LongArray(6)
-                    longArray[0] = 200
+                    /*val longArray = LongArray(6)
+                    longArray[0] = 0
                     longArray[1] = 200
                     longArray[2] = 200
                     longArray[3] = 200
                     longArray[4] = 200
                     longArray[5] = 400
-                    vibratorService.vibrate(VibrationEffect.createWaveform(longArray, -1))
+                    vibratorService.vibrate(VibrationEffect.createWaveform(longArray, -1))*/
+
+                    //1 longer vibrate on the last beep of the timer while on Workout mode
+                    vibratorService.vibrate(VibrationEffect.createOneShot(600, VibrationEffect.DEFAULT_AMPLITUDE))
                 }else{
 
                     vibratorService.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -186,10 +189,9 @@ class TimerView : View {
             tick()
             counter--
         }else{
-            Toast.makeText(this.context, "Done", Toast.LENGTH_SHORT).show()
+            textUpdateCallback?.invoke("Done")
             clockState = ClockState.undefined
         }
-
     }
 
     fun tick(){
