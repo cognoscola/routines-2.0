@@ -4,7 +4,9 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.os.Handler
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 
@@ -22,9 +24,15 @@ class TimerView : View {
             invalidate()
         }
 
-    private var paint: Paint? = null
+    private var grayLine: Paint? = null
+    private var greenLine: Paint? = null
+    private var counter = 0
+    private var maxTime = 0
     private var clockState:ClockState = ClockState.undefined
 
+    private var angleIncrement = 0.0f
+
+    private  var threadHandler:Handler = Handler()
 
     var elapsedTimeSecond = 40
         set(value){
@@ -40,14 +48,24 @@ class TimerView : View {
     val startAngle = -90.0f
     var sweepAngle = 0f
 
-    public fun setCountdownSeconds(value:Float){
+    public fun setCountdownSeconds(value:Int){
         clockState = ClockState.set
         Toast.makeText(this.context, "armed", Toast.LENGTH_SHORT).show()
-        sweepAngle = (value / 60) * 360.0f
+        sweepAngle = (60 / 60) * 360.0f
+
+        maxTime = value
+        counter = value
+        recalculateAngle()
+
+
+
+
+
         invalidate()
     }
 
     public fun start(){
+        tick()
         Toast.makeText(this.context, "running",Toast.LENGTH_SHORT).show()
     }
 
@@ -61,10 +79,23 @@ class TimerView : View {
     }
 
     private fun init(context: Context, attrs: AttributeSet?) {
-        paint = Paint()
-        paint!!.isAntiAlias = true
-        paint!!.style = Paint.Style.STROKE
-        paint!!.strokeWidth = 3f
+        grayLine = Paint()
+        grayLine!!.isAntiAlias = true
+        grayLine!!.style = Paint.Style.STROKE
+        grayLine!!.strokeWidth = 3f
+        grayLine!!.color = this.circleColor
+
+        greenLine = Paint()
+        greenLine!!.isAntiAlias = true
+        greenLine!!.style = Paint.Style.STROKE
+        greenLine!!.strokeWidth = 3f
+        greenLine!!.color = COMPLETED_CIRCLE_COLOR
+
+
+        threadHandler = Handler()
+
+        setWillNotDraw(false)
+
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -85,8 +116,9 @@ class TimerView : View {
         val cx = pl + usableWidth / 2
         val cy = pt + usableHeight / 2
 
-        paint!!.color = this.circleColor
-//        canvas.drawCircle(cx.toFloat(), cy.toFloat(), radius.toFloat(), paint!!)
+
+        grayLine!!.color = this.circleColor
+//        canvas.drawCircle(cx.toFloat(), cy.toFloat(), radius.toFloat(), grayLine!!)
         canvas.drawArc(
                 (cx - radius).toFloat(),
                 (cy - radius).toFloat(),
@@ -95,13 +127,55 @@ class TimerView : View {
                 startAngle,
                 sweepAngle,
                 false,
-                paint!!)
+                grayLine!!)
+
+        greenLine!!.color = COMPLETED_CIRCLE_COLOR
+        canvas.drawArc(
+                (cx - radius).toFloat(),
+                (cy - radius).toFloat(),
+                (cx+radius).toFloat(),
+                (cy + radius).toFloat(),
+                startAngle,
+                angleIncrement,
+                false,
+                greenLine!!)
+    }
+
+    private fun recalculateAngle(){
+        val temp = ((maxTime.toFloat() - counter.toFloat()).div(maxTime))
+        Log.d("recalculateAngle","diffence= ${maxTime - counter} temp = $temp")
+        angleIncrement = 360.0f * temp
+
+        Log.d("recalculateAngle","counter= $counter maxtime = ${maxTime} angle = ${angleIncrement}")
+
+    }
+
+    val runnable:Runnable = Runnable {
+        recalculateAngle()
+
+        this@TimerView.invalidate()
+
+
+        if(counter > 0){
+            tick()
+            counter--
+        }else{
+            Toast.makeText(this.context, "Done", Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+    fun tick(){
+        threadHandler.postDelayed(runnable,1000)
     }
 
 
 
 
     companion object {
-        private val DEFAULT_CIRCLE_COLOR = Color.RED
+        private val DEFAULT_CIRCLE_COLOR = Color.GRAY
+        private val COMPLETED_CIRCLE_COLOR = Color.GREEN
     }
+
+
 }

@@ -20,7 +20,7 @@ class WearRunnerActivity : WearableActivity() {
 
             when(timerView.getState()){
                 TimerView.ClockState.undefined -> {
-                    timerView.setCountdownSeconds(30.0f)
+                    timerView.setCountdownSeconds(10)
                 }
                 TimerView.ClockState.set -> {
                     timerView.start()
