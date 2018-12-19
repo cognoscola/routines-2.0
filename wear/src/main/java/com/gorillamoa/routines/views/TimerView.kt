@@ -71,7 +71,7 @@ class TimerView : View {
         invalidate()
     }
 
-    public fun start(finishCallback:(()->Unit)?){
+    fun start(finishCallback:(()->Unit)?){
         this@TimerView.finishCallback = finishCallback
         tick()
     }
@@ -193,6 +193,7 @@ class TimerView : View {
             counter--
         }else{
             textUpdateCallback?.invoke("Done")
+            finishCallback?.invoke()
             clockState = ClockState.undefined
         }
     }

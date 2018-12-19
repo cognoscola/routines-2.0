@@ -2,6 +2,7 @@ package com.gorillamoa.routines
 
 import android.os.Bundle
 import android.support.wearable.activity.WearableActivity
+import android.util.Log
 import android.widget.TextView
 import com.gorillamoa.routines.views.TimerView
 
@@ -74,25 +75,56 @@ class WearRunnerActivity : WearableActivity() {
         enum class RunnerState{
             unprepared,
             prepared,
-            runnning,
+            starting, //countdown timer for start operation is running
+            runnning, //running an exercise
+            holding, //running a hold operation
             finished
         }
 
         private var state:RunnerState = RunnerState.unprepared
 
         //progress
-        var currentSet:Int = 0
+        var currentSet:Int = 1
         var currentRep: Int = 0
 
         public fun getState():RunnerState = state
 
+        var callbackCount:Int = 0 //number of times the callback got called
+
 
         var finishCallback:()->Unit ={
 
-            while(currentSet < exercise.sets){
-                currentSet++
-            }
+            callbackCount++  //should
+            Log.d("FinishCall", "Set:$currentSet Rep:$currentRep Callback Count:$callbackCount")
+            run()
+        }
 
+        /**
+         * Appropriately handles the next rep
+         */
+        private fun progressRep(){
+            if(currentRep < exercise.reps){
+                currentRep++
+                runRep()
+            }else{
+                progressSet()
+            }
+        }
+
+        // checks progress on a set level
+        private fun progressSet(){
+
+            if (currentSet < exercise.sets) {
+                currentSet++
+                currentRep = 0
+                runRep()
+            }else{
+                printFinished()
+            }
+        }
+
+        private fun printFinished(){
+            Log.d("FinishCall", "Finished Everything")
         }
 
 
@@ -112,13 +144,18 @@ class WearRunnerActivity : WearableActivity() {
 
         }
 
-
-        fun runRep(){
-            timerView.setCountdownSeconds(5)
+        fun runCounter(time:Int){
+            timerView.setCountdownSeconds(time)
             timerView.start(finishCallback)
         }
 
-        fun runHold(){
+        fun runRep(){
+            runCounter(exercise.holdSeconds)
+
+        }
+
+        fun runRest(){
+            runCounter(exercise.restSeconds)
 
         }
 
@@ -128,23 +165,44 @@ class WearRunnerActivity : WearableActivity() {
          */
         fun run(){
 
-            if (state == RunnerState.prepared) {
+            when(state){
+                RunnerState.prepared ->{ //we're prepared so being the runner start countdown
 
-                //insert a start-countdown
-                statusTextView.text = "Next: ${exercise.name} in"
-                timerView.setCountdownSeconds(5)
-                timerView.start(finishCallback)
+                    statusTextView.text = "Next: ${exercise.name} in"
+                    timerView.setCountdownSeconds(5)
+                    timerView.start(finishCallback)
 
-                //for each set, run the timer reps number of times.
-                //if automatic is enabled, don't wait for user input
-                //if hold is on, insert an extra timer run in between reps
+                    state = RunnerState.starting
 
+                }
 
-            }else{
+                RunnerState.starting ->{
+
+                    progressRep()
+                    state = RunnerState.runnning
+                }
+
+                RunnerState.runnning->{
+
+                    if (isFinished()) {
+                        printFinished()
+                    }else{
+                        runRest()
+                    }
+                    state =RunnerState.holding
+                }
+
+                RunnerState.holding ->{
+
+                    progressRep()
+                    state =RunnerState.runnning
+                }
 
             }
+            Log.d("Wear Run","State:$state")
         }
-    }
+        private fun isFinished():Boolean = (currentSet == exercise.sets) and (currentRep == exercise.reps)
 
+    }
 
 }
