@@ -17,7 +17,6 @@ class WearRunnerActivity : WearableActivity() {
         setContentView(R.layout.activity_wear_runner)
 
         timerView = findViewById(R.id.timerView)
-
         timeCounter = findViewById(R.id.timeCounterTextView)
         statusTextView = findViewById(R.id.statusTextView)
 
@@ -81,7 +80,21 @@ class WearRunnerActivity : WearableActivity() {
 
         private var state:RunnerState = RunnerState.unprepared
 
+        //progress
+        var currentSet:Int = 0
+        var currentRep: Int = 0
+
         public fun getState():RunnerState = state
+
+
+        var finishCallback:()->Unit ={
+
+            while(currentSet < exercise.sets){
+                currentSet++
+            }
+
+        }
+
 
         /**
          * the runner will prepare the view for start
@@ -100,6 +113,14 @@ class WearRunnerActivity : WearableActivity() {
         }
 
 
+        fun runRep(){
+            timerView.setCountdownSeconds(5)
+            timerView.start(finishCallback)
+        }
+
+        fun runHold(){
+
+        }
 
         /**
          * Will execute the timed exercises if it isn't already running and
@@ -112,7 +133,7 @@ class WearRunnerActivity : WearableActivity() {
                 //insert a start-countdown
                 statusTextView.text = "Next: ${exercise.name} in"
                 timerView.setCountdownSeconds(5)
-                timerView.start()
+                timerView.start(finishCallback)
 
                 //for each set, run the timer reps number of times.
                 //if automatic is enabled, don't wait for user input

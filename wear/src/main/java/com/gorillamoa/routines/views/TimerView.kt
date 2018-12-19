@@ -32,6 +32,7 @@ class TimerView : View {
         }
 
 
+    private var finishCallback:(()->Unit)? = null
     private var textUpdateCallback:((String)->Unit)? = null
     public fun setTextUpdateCallback(writer:(String)->Unit){
        textUpdateCallback = writer
@@ -70,7 +71,8 @@ class TimerView : View {
         invalidate()
     }
 
-    public fun start(){
+    public fun start(finishCallback:(()->Unit)?){
+        this@TimerView.finishCallback = finishCallback
         tick()
     }
 
