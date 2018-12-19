@@ -12,9 +12,14 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 
+
+/**
+ * A view for the timer. It is a Circle
+ */
 class TimerView : View {
 
-    public enum class ClockState{
+
+    enum class ClockState{
         undefined,
         set,
         running
@@ -51,13 +56,12 @@ class TimerView : View {
         return this.clockState
     }
 
-
     val startAngle = -90.0f
     var sweepAngle = 0f
 
     public fun setCountdownSeconds(value:Int){
         clockState = ClockState.set
-        textUpdateCallback?.invoke("Click to Start")
+
         sweepAngle = (60 / 60) * 360.0f
 
         maxTime = value
@@ -68,7 +72,6 @@ class TimerView : View {
 
     public fun start(){
         tick()
-
     }
 
 
@@ -96,8 +99,6 @@ class TimerView : View {
         threadHandler = Handler()
 
         setWillNotDraw(false)
-
-
     }
 
     override fun onDraw(canvas: Canvas) {
