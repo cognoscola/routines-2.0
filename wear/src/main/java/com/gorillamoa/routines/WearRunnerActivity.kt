@@ -9,7 +9,14 @@ class WearRunnerActivity : WearableActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wear_runner)
 
+
+
         // Enables Always-on
         setAmbientEnabled()
+
+
+
+
+
     }
 }

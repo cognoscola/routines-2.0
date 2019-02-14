@@ -1,3 +1,4 @@
 <resources>
-    <string name="hello_world">Hello Round World!</string>
+    <string name="enable_button_text">Enable</string>
+    <string name="disable_button_text">Disable</string>
 </resources>
