@@ -4,29 +4,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark_grey"
+    android:background="@color/black_86p"
     android:padding="@dimen/box_inset_layout_padding"
-    tools:context=".activity.ServiceControllerActivity"
+    tools:context=".activity.OnboardActivity"
     tools:deviceIds="wear">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="center"
         android:padding="@dimen/inner_frame_layout_padding"
         android:orientation="vertical"
         >
 
-        <Button
+        <TextView
             android:id="@+id/enableServiceButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/enable_button_text" />
+            android:text="@string/onboard_wake_up_text" />
 
-        <Button
-            android:id="@+id/disableServiceButton"
+        <TimePicker
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/disable_button_text" />
+            android:id="@+id/wakeuptTimePicker"
+            android:timePickerMode="spinner"
+            />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/onboard_next_button"
+            android:id="@+id/nextButton"/>
 
     </LinearLayout>
 </android.support.wear.widget.BoxInsetLayout>

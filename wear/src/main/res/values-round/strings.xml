@@ -1,4 +1,9 @@
 <resources>
     <string name="enable_button_text">Enable</string>
     <string name="disable_button_text">Disable</string>
+
+    <string name="onboard_wake_up_text">What time do you wake up?</string>
+    <string name="onboard_sleep_text">What time do you sleep ?</string>
+
+    <string name="onboard_next_button">Next</string>
 </resources>

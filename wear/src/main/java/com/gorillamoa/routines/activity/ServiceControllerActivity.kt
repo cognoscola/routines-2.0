@@ -1,4 +1,4 @@
-package com.gorillamoa.routines
+package com.gorillamoa.routines.activity
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -13,6 +13,7 @@ import android.os.IBinder
 import android.support.wearable.activity.WearableActivity
 import android.widget.Button
 import android.widget.Toast
+import com.gorillamoa.routines.R
 
 class ServiceControllerActivity : WearableActivity(), ServiceConnection {
 
@@ -21,7 +22,7 @@ class ServiceControllerActivity : WearableActivity(), ServiceConnection {
     private val notication_id = 5001
     private val ROUTINES_TAG ="routines"
 
-    private var mgr:NotificationManager? = null
+    private var notificationManager:NotificationManager? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +30,7 @@ class ServiceControllerActivity : WearableActivity(), ServiceConnection {
         setContentView(R.layout.activity_service_controller)
 
 
-        mgr = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         findViewById<Button>(R.id.enableServiceButton).setOnClickListener {
 
@@ -38,24 +39,9 @@ class ServiceControllerActivity : WearableActivity(), ServiceConnection {
             //for now we'll just show or hide a notification
 
 
-            val channelID = "routine_channel_id"
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Create notifØication
 
-                val channelName = "Routine Notifications"
-                val channelDescriptorText = "Routines Tasks for Channel"
-
-                val notificationChannel = NotificationChannel(channelID,channelName,NotificationManager.IMPORTANCE_DEFAULT)
-                notificationChannel.enableLights(true)
-                notificationChannel.lightColor = Color.RED
-                notificationChannel.enableVibration(true)
-                notificationChannel.description = channelDescriptorText
-                notificationChannel.vibrationPattern = longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400)
-                mgr?.createNotificationChannel(notificationChannel)
-            }
-
-            // Create notification
-
-            val builder = Notification.Builder(applicationContext,channelID)
+            val builder = Notification.Builder(applicationContext,this.resources.getString(R.string.notificationchannel_one))
             //val notificationIntent = Intent(applicationContext, EmotionPickerActivity::class.java)
           //  val pickerIntent = PendingIntent.getActivity(applicationContext, 0, notificationIntent, 0)
 
@@ -64,18 +50,16 @@ class ServiceControllerActivity : WearableActivity(), ServiceConnection {
                     .setContentText("Task B in Progress")
                    // .setContentIntent(pickerIntent)
                     .setAutoCancel(true)
-                    .setChannelId(channelID)
 
-
-            mgr?.notify(ROUTINES_TAG,notication_id, builder.build())
+            notificationManager?.notify(ROUTINES_TAG,notication_id, builder.build())
 
         }
 
         findViewById<Button>(R.id.disableServiceButton).setOnClickListener {
 
             //disable alarms
-            mgr?.cancel(ROUTINES_TAG,notication_id)
-           // mgr?.cancelAll()
+            notificationManager?.cancel(ROUTINES_TAG,notication_id)
+           // notificationManager?.cancelAll()
 
         }
 
