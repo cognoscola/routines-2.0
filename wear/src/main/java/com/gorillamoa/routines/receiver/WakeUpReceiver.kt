@@ -39,8 +39,9 @@ class WakeUpReceiver:BroadcastReceiver(){
 
             /** Prepare the intent for when user dismisses the notification **/
             val dismissIntent = Intent(context, NotificationDismissReceiver::class.java)
-            dismissIntent.putExtra("com.my.app.notificationId", wakeUpNotificationId)
-            val dismissPendingIntent = PendingIntent.getBroadcast(context.applicationContext, 0, dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+            //TODO obfuscate strings later using obfuscation library
+            dismissIntent.putExtra("com.gorillamoa.routines.notificationId",wakeUpNotificationId)
+            val dismissPendingIntent = PendingIntent.getBroadcast(context.applicationContext, 22, dismissIntent, PendingIntent.FLAG_ONE_SHOT)
 
             //TODO we need to have a task retriever method
             val stringBuilder = StringBuilder()

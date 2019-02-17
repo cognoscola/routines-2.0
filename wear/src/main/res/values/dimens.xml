@@ -13,6 +13,6 @@
     -->
     <dimen name="inner_frame_layout_padding">5dp</dimen>
 
-    <integer name="wakeup_notification_id">0</integer>
+    <integer name="wakeup_notification_id">1</integer>
     <integer name="sleep_notification_id">65535</integer>
 </resources>

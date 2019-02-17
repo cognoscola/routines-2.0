@@ -29,8 +29,9 @@ class NotificationDismissReceiver:BroadcastReceiver() {
         Log.d("onReceive","Well... then..")
 
         val notificationId = intent?.extras?.getInt("com.gorillamoa.routines.notificationId")
+        Log.d("onReceive","ID:${notificationId}")
 
-        when (notificationId?:0) {
+        when (notificationId) {
 
             //NOTIFICATION_TYPE_WAKEUP
             context.resources.getInteger(R.integer.wakeup_notification_id) -> {
