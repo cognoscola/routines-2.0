@@ -54,10 +54,14 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".receiver.WakeUpReceiver">
-            <intent-filter>
-                <action android:name="routines.wakeup"></action>
-            </intent-filter>
+        <receiver android:name=".receiver.WakeUpReceiver"
+            android:exported="false">
+
+        </receiver>
+
+        <receiver
+            android:name=".receiver.NotificationDismissReceiver"
+            android:exported="false" >
         </receiver>
 
     </application>
