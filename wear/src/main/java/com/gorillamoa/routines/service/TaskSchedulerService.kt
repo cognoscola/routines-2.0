@@ -31,8 +31,6 @@ class TaskSchedulerService: Service(),ScheduleServiceInterface{
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         return Service.START_NOT_STICKY
-
-
     }
 
     override fun onCreate() {

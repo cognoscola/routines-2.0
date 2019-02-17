@@ -19,7 +19,6 @@ class App:Application(){
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-
             /** channel for the wake up / sleep notifications */
             val channelName = "Routine Notifications"
             val channelDescriptorText = "Routines Tasks for Channel"
@@ -34,4 +33,22 @@ class App:Application(){
             }
         }
     }
+
+    //TODO Create options menu
+    //TODO In options menu create Notifications Behaviour sections
+    //TODO Dismiss behaviour - cannot dismiss, finish task, do nothing, snooze
+    //TODO Get statistic to see what people choose best.
+
+    //TODO wake up options :
+    //TODO 1. Pick as you go
+    //TODO 2. In order
+    //TODO 3. Random
+    //TODO 4. Change order
+
+    //TODO ADD LIST OF HABITS - to form tasks that are recurrent forever
+    //TODO ADD LIST OF GOALS - to form tasks that are recurrent until deadline or specified
+    //TODO ADD LIST OF UNKNOWN TASKS - no deadline, so it probably wasn't important
+    //TODO the system should generate a list of tasks, for these goals and habits depending on frequency specified
+    //TODO and deadline, tasks closer to deadline should appear more frequently.
+
 }
