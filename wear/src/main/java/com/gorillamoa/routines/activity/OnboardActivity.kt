@@ -1,18 +1,14 @@
 package com.gorillamoa.routines.activity
 
 import android.app.AlarmManager
-import android.app.Notification
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.NotificationCompat
+
 import android.support.wearable.activity.WearableActivity
-import android.text.SpannableString
-import android.util.Log
+
 import android.widget.Button
-import android.widget.TimePicker
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.receiver.WakeUpReceiver
 import java.util.*
@@ -40,7 +36,7 @@ class OnboardActivity:WearableActivity(){
     private lateinit var alarmIntent: PendingIntent
 
 
-    private val WAKEUP_REQUESTCODE = 0
+    private val WAKEUP_REQUESTCODE_TEST = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,12 +45,13 @@ class OnboardActivity:WearableActivity(){
 
         setContentView(R.layout.activity_onboard)
 
-        val timePicker = findViewById<TimePicker>(R.id.wakeuptTimePicker)
+//        val timePicker = findViewById<TimePicker>(R.id.wakeuptTimePicker)
         alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmIntent = Intent(this, WakeUpReceiver::class.java).let { intent ->
-            PendingIntent.getBroadcast(this, WAKEUP_REQUESTCODE, intent, 0)
+            PendingIntent.getBroadcast(this, WAKEUP_REQUESTCODE_TEST, intent, 0)
         }
 
+        //TODO create a better time picker than what cucrently exists
 
         /** Get the wake up and sleep times of the user, via the time picker*/
         findViewById<Button>(R.id.nextButton).setOnClickListener {

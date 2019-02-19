@@ -36,7 +36,7 @@ enum class TaskType{
      * task. Or not really that important. There is no deadline or expectation formed from the user
      * so we don't really need to worry about rescheduling these tasks.
      * We should, however, encourage the user to upgrade this task to a habit or goal, in case
-     * they wrote it down in a hurry in hopes that. If they do nothing, it was probably negligible.
+     * they wrote it down in a hurry.. If they do nothing, it was probably negligible.
      * (not that important to them)
      */
     TYPE_UNKNOWN

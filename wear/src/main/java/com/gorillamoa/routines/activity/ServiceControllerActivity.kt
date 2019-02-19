@@ -1,19 +1,18 @@
 package com.gorillamoa.routines.activity
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.app.*
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.content.ServiceConnection
-import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.support.wearable.activity.WearableActivity
 import android.widget.Button
 import android.widget.Toast
 import com.gorillamoa.routines.R
+import com.gorillamoa.routines.receiver.WakeUpReceiver
+import java.util.*
 
 class ServiceControllerActivity : WearableActivity(), ServiceConnection {
 
@@ -24,43 +23,49 @@ class ServiceControllerActivity : WearableActivity(), ServiceConnection {
 
     private var notificationManager:NotificationManager? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_service_controller)
 
 
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val alarmIntent = Intent(this, WakeUpReceiver::class.java).let { intent ->
+            PendingIntent.getBroadcast(
+                    this,
+                    this.resources.getInteger(R.integer.wakeup_alarm_pendingintent_code),
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         findViewById<Button>(R.id.enableServiceButton).setOnClickListener {
 
-            //set repeating alarms
+            //for now just enable/ disable alarm
 
-            //for now we'll just show or hide a notification
+            //we don't really need to cancel anything. If we use the
+            //same request code, the current alarm will be overridden
+
+            // Set the alarm to start at approximately the time the user indicated
+            val calendar: Calendar = Calendar.getInstance().apply {
+                timeInMillis = System.currentTimeMillis()
+                set(Calendar.HOUR_OF_DAY, 8)
+                set(Calendar.MINUTE,15)
+            }
 
 
-            // Create notifØication
-
-            val builder = Notification.Builder(applicationContext,this.resources.getString(R.string.notificationchannel_one))
-            //val notificationIntent = Intent(applicationContext, EmotionPickerActivity::class.java)
-          //  val pickerIntent = PendingIntent.getActivity(applicationContext, 0, notificationIntent, 0)
-
-            builder.setContentTitle("Today's Schedule")
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setContentText("Task B in Progress")
-                   // .setContentIntent(pickerIntent)
-                    .setAutoCancel(true)
-
-            notificationManager?.notify(ROUTINES_TAG,notication_id, builder.build())
-
+            // With setInexactRepeating(), you have to use one of the AlarmManager interval
+            // constants--in this case, AlarmManager.INTERVAL_DAY.
+            alarmManager?.setInexactRepeating(
+                    AlarmManager.RTC_WAKEUP,
+                    calendar.timeInMillis,
+                    AlarmManager.INTERVAL_DAY,
+                    alarmIntent
+            )
         }
 
         findViewById<Button>(R.id.disableServiceButton).setOnClickListener {
-
-            //disable alarms
-            notificationManager?.cancel(ROUTINES_TAG,notication_id)
-           // notificationManager?.cancelAll()
-
+            alarmManager.cancel(alarmIntent)
         }
 
         // Enables Always-on

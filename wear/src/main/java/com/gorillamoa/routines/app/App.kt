@@ -7,12 +7,23 @@ import android.content.Context
 import android.graphics.Color
 import android.os.Build
 import com.gorillamoa.routines.R
+import com.gorillamoa.routines.provider.TaskProvider
 
 
 /**
  * We'll configure notification channels every time the app starts
  */
 class App:Application(){
+
+    //TODO use dagger to inject a Provider
+    var taskProvider:TaskProvider?= null
+
+    fun getTasksProvider():TaskProvider{
+        if (taskProvider == null) {
+            taskProvider = TaskProvider()
+        }
+        return taskProvider!!
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -51,4 +62,8 @@ class App:Application(){
     //TODO the system should generate a list of tasks, for these goals and habits depending on frequency specified
     //TODO and deadline, tasks closer to deadline should appear more frequently.
 
+}
+
+fun Context.getTaskPRovider():TaskProvider{
+    return (applicationContext as App).getTasksProvider()
 }
