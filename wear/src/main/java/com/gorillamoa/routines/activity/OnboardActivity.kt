@@ -10,7 +10,12 @@ import android.support.wearable.activity.WearableActivity
 
 import android.widget.Button
 import com.gorillamoa.routines.R
+import com.gorillamoa.routines.fragment.SplashFragment
+import com.gorillamoa.routines.fragment.TimePickerFragment
 import com.gorillamoa.routines.receiver.WakeUpReceiver
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 
 /**
@@ -45,6 +50,21 @@ class OnboardActivity:WearableActivity(){
 
         setContentView(R.layout.activity_onboard)
 
+        fragmentManager.beginTransaction()
+                .add(R.id.fragmentContainerInsetLayout, SplashFragment())
+                .commit()
+
+        GlobalScope.launch {
+
+            delay(2000)
+            fragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainerInsetLayout, TimePickerFragment())
+                    .commit()
+
+        }
+
+       //TODO move this stuff elsewhere
+
 //        val timePicker = findViewById<TimePicker>(R.id.wakeuptTimePicker)
         alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmIntent = Intent(this, WakeUpReceiver::class.java).let { intent ->
@@ -70,7 +90,8 @@ class OnboardActivity:WearableActivity(){
                 }
 
 
-                // With setInexactRepeating(), you have to use one of the AlarmManager interval
+                // With setInexactset(Calendar.HOUR_OF_DAY, 14)
+                //                }Repeating(), you have to use one of the AlarmManager interval
                 // constants--in this case, AlarmManager.INTERVAL_DAY.
                 alarmManager?.set(
                         AlarmManager.RTC_WAKEUP,

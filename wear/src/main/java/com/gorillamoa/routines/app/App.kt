@@ -61,6 +61,7 @@ class App:Application(){
     //TODO ADD LIST OF UNKNOWN TASKS - no deadline, so it probably wasn't important
     //TODO the system should generate a list of tasks, for these goals and habits depending on frequency specified
     //TODO and deadline, tasks closer to deadline should appear more frequently.
+    //TODO Add feature so that we LIMIT a task
 
 }
 

@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/black_86p"
     android:padding="@dimen/box_inset_layout_padding"
+    android:id="@+id/fragmentContainerInsetLayout"
     tools:context=".activity.OnboardActivity"
     tools:deviceIds="wear">
 
@@ -15,6 +16,8 @@
         android:gravity="center"
         android:padding="@dimen/inner_frame_layout_padding"
         android:orientation="vertical"
+        tools:visibility="gone"
+        android:visibility="gone"
         >
 
         <TextView
