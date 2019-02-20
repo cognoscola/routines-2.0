@@ -63,6 +63,9 @@ class App:Application(){
     //TODO and deadline, tasks closer to deadline should appear more frequently.
     //TODO Add feature so that we LIMIT a task
 
+
+    //TODO TASKS should have option of snoozing (15min, 30min, 1HR, tomorrow) etc.
+
 }
 
 fun Context.getTaskPRovider():TaskProvider{

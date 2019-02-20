@@ -10,9 +10,11 @@ import android.support.wearable.activity.WearableActivity
 
 import android.widget.Button
 import com.gorillamoa.routines.R
+import com.gorillamoa.routines.fragment.InformationFragment
 import com.gorillamoa.routines.fragment.SplashFragment
 import com.gorillamoa.routines.fragment.TimePickerFragment
 import com.gorillamoa.routines.receiver.WakeUpReceiver
+import kotlinx.android.synthetic.main.activity_onboard.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -39,10 +41,7 @@ class OnboardActivity:WearableActivity(){
 
     private var alarmManager: AlarmManager? = null
     private lateinit var alarmIntent: PendingIntent
-
-
     private val WAKEUP_REQUESTCODE_TEST = 0
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -58,9 +57,15 @@ class OnboardActivity:WearableActivity(){
 
             delay(2000)
             fragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainerInsetLayout, InformationFragment())
+                    .commit()
+        }
+
+        fragmentContainerInsetLayout.setOnClickListener {
+
+            fragmentManager.beginTransaction()
                     .replace(R.id.fragmentContainerInsetLayout, TimePickerFragment())
                     .commit()
-
         }
 
        //TODO move this stuff elsewhere

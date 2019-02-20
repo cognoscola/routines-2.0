@@ -24,4 +24,8 @@
 
     <string name="test_html_markup">"A set of tasks in a  <b>list</b> format. <br/>Lets use HTML formatting to format these texts"</string>
 
+    <!-- onboarding -->
+    <string name="onboard_welcome_text">Welcome!\n The first step of any successful routine is proper planning. To begin lets create your first and most important task of the day!</string>
+
+
 </resources>

@@ -10,34 +10,4 @@
     tools:context=".activity.OnboardActivity"
     tools:deviceIds="wear">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:padding="@dimen/inner_frame_layout_padding"
-        android:orientation="vertical"
-        tools:visibility="gone"
-        android:visibility="gone"
-        >
-
-        <TextView
-            android:id="@+id/enableServiceButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/onboard_wake_up_text" />
-
-        <TimePicker
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/wakeuptTimePicker"
-            android:timePickerMode="spinner"
-            />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/onboard_next_button"
-            android:id="@+id/nextButton"/>
-
-    </LinearLayout>
 </android.support.wear.widget.BoxInsetLayout>
