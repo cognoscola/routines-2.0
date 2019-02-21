@@ -64,6 +64,11 @@ class App:Application(){
     //TODO Add feature so that we LIMIT a task
 
 
+    //TODO since you can't use custom UIs on notifications, try image generation.
+    //make seamless backgrounds, text, etc. through image generation.
+
+
+
     //TODO TASKS should have option of snoozing (15min, 30min, 1HR, tomorrow) etc.
 
 }

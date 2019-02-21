@@ -27,5 +27,11 @@
     <!-- onboarding -->
     <string name="onboard_welcome_text">Welcome!\n The first step of any successful routine is proper planning. To begin lets create your first and most important task of the day!</string>
 
+    <string name="onboard_wake_up_text">I wake up at:</string>
+
+    <string name="onboard_seed">"Great! Your first daily task, the most important task, is to plan your day. Let's do a test run. "</string>
+
+    <string name="info_oops_string">We made an oopsy! Try again?</string>
+    <string name="info_argument_key">info_text</string>
 
 </resources>
