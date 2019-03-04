@@ -6,8 +6,6 @@
     android:layout_height="match_parent"
     android:layout_gravity="center"
     android:gravity="center"
-    android:text="@string/onboard_welcome_text"
-
     tools:background="#000000"
     android:id="@+id/infoTextView"
     >

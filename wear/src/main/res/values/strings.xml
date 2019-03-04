@@ -25,7 +25,11 @@
     <string name="test_html_markup">"A set of tasks in a  <b>list</b> format. <br/>Lets use HTML formatting to format these texts"</string>
 
     <!-- onboarding -->
-    <string name="onboard_welcome_text">Welcome!\n The first step of any successful routine is proper planning. To begin lets create your first and most important task of the day!</string>
+    <string name="onboard_welcome_text_01">Welcome!\n Routines is an app that will help you establish and solidify life-changing habits.</string>
+    <string name="onboard_welcome_text_02">Understand that they take patience, persistence and commitment.</string>
+    <string name="onboard_welcome_text_03">Don\'t worry, just sit back and we will easy you into it. You are well on your way.</string>
+    <string name="onboard_welcome_text_04"> The first step of any successful routine is proper planning. To begin lets create your first and most important task of the day!</string>
+
 
     <string name="onboard_wake_up_text">I wake up at:</string>
 

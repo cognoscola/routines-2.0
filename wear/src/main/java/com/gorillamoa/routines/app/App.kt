@@ -56,6 +56,8 @@ class App:Application(){
     //TODO 3. Random
     //TODO 4. Change order
 
+    //TODO add time tracker.
+
     //TODO ADD LIST OF HABITS - to form tasks that are recurrent forever
     //TODO ADD LIST OF GOALS - to form tasks that are recurrent until deadline or specified
     //TODO ADD LIST OF UNKNOWN TASKS - no deadline, so it probably wasn't important
@@ -67,6 +69,7 @@ class App:Application(){
     //TODO since you can't use custom UIs on notifications, try image generation.
     //make seamless backgrounds, text, etc. through image generation.
 
+    //TODO build addons, and charge for them, etc. tracking friends, exercises, work tasks, etc.
 
 
     //TODO TASKS should have option of snoozing (15min, 30min, 1HR, tomorrow) etc.

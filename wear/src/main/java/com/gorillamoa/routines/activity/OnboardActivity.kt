@@ -1,10 +1,9 @@
 package com.gorillamoa.routines.activity
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.os.Bundle
 
 import android.support.wearable.activity.WearableActivity
+import android.util.Log
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.fragment.InformationFragment
 import com.gorillamoa.routines.fragment.SplashFragment
@@ -32,6 +31,17 @@ class OnboardActivity:WearableActivity(){
 
     //TODO change the activity launcher name (what the user sees)
 
+    val TEXT_FRAGMENT_TAG = "textfrag"
+
+    enum class OnboardState{
+        other,
+        text_1,
+        text_2,
+        text_3,
+        text_4
+    }
+
+    private var state:OnboardState = OnboardState.other
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -44,27 +54,70 @@ class OnboardActivity:WearableActivity(){
                 .commit()
 
         GlobalScope.launch {
-
             delay(2000)
-
-            val arguments = Bundle().apply {
-                putString(
-                        resources.getString(R.string.info_argument_key),
-                        resources.getString(R.string.onboard_welcome_text))
-            }
-            fragmentManager.beginTransaction()
-                    .replace(R.id.fragmentContainerInsetLayout, InformationFragment().apply {
-                        setArguments(arguments)
-                    } )
-                    .commit()
+            setNextFragment(state)
         }
 
         fragmentContainerInsetLayout.setOnClickListener {
+            setNextFragment(state)
+        }
+    }
 
-            fragmentContainerInsetLayout.setOnClickListener(null)
+    /**
+     * Determine which fragment to show next depending on the view state.
+     * @param currentState is the current state which is visible right now.
+     */
+    private fun setNextFragment(currentState:OnboardState){
+        when (currentState) {
+            OnboardState.other ->{
+                setTextFragment(R.string.onboard_welcome_text_01)
+                state = OnboardState.text_1
+            }
+            OnboardState.text_1 -> {
+                setTextFragment(R.string.onboard_welcome_text_02)
+                state = OnboardState.text_2
+            }
+            OnboardState.text_2 -> {
+                setTextFragment(R.string.onboard_welcome_text_03)
+                state = OnboardState.text_3
+            }
+            OnboardState.text_3 -> {
+                setTextFragment(R.string.onboard_welcome_text_04)
+                state = OnboardState.text_4
+            }
+
+            OnboardState.text_4 -> {
+                fragmentContainerInsetLayout.setOnClickListener(null)
+                fragmentManager.beginTransaction()
+                        .replace(R.id.fragmentContainerInsetLayout, TimePickerFragment())
+                        .commit()
+            }
+        }
+    }
+
+    /**
+     * Show a fragment that contains a single text
+     * @param textAddress is the ID of the string of text to display
+     */
+    private fun setTextFragment(textAddress:Int){
+
+        /** check if we're not already displaying the fragment, if yes just update the text,
+         * otherwise pass the address to its arguments**/
+        val textFrag = fragmentManager.findFragmentByTag(TEXT_FRAGMENT_TAG)
+        Log.d("setTextFragment","checking existence")
+        if ((textFrag != null)) {
+            if (textFrag.isVisible) {
+                Log.d("setTextFragment","Fragment was found")
+                (textFrag as InformationFragment).updateText(textAddress)
+            }
+        }else{
+
+            Log.d("setTextFragment","making new fragment")
             fragmentManager.beginTransaction()
-                    .replace(R.id.fragmentContainerInsetLayout, TimePickerFragment())
+                    .replace(R.id.fragmentContainerInsetLayout,InformationFragment.newInstance(textAddress,this) ,TEXT_FRAGMENT_TAG)
                     .commit()
+
+
         }
     }
 

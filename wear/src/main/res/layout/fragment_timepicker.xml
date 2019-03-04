@@ -8,10 +8,19 @@
     android:orientation="vertical"
     tools:background="#000000">
 
+
+        <android.support.wear.widget.WearableRecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/buttonRecyclerView">
+
+        </android.support.wear.widget.WearableRecyclerView>
         <android.support.wearable.view.ObservableScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="true">
+            android:nestedScrollingEnabled="true"
+            tools:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
