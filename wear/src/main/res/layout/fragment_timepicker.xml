@@ -17,23 +17,49 @@
         <android.support.wear.widget.WearableRecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            tools:layout_height="100dp"
+            tools:background="#222222"
             android:orientation="horizontal"
             android:id="@+id/buttonRecyclerView"
             android:nestedScrollingEnabled="true"
             android:layout_gravity="center">
 
+
         </android.support.wear.widget.WearableRecyclerView>
 
 
-        <TextView
-            android:id="@+id/timeTextView"
-            android:layout_width="60dp"
-            android:layout_height="30dp"
-            android:textAlignment="center"
-            android:gravity="center"
-            android:visibility="invisible"
-            tools:text="12"
-            android:background="@drawable/timepicker_button_background"/>
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+                <ImageView
+                    android:background="@drawable/picker_button_selector"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:padding="11dp"
+                    android:src="@drawable/ic_clear_red_24dp"
+                    android:id="@+id/backwardButton"
+                    android:visibility="invisible"/>
+
+                <View
+                    android:layout_width="5dp"
+                    android:layout_height="match_parent"/>
+
+                <TextView
+                    android:id="@+id/timeTextView"
+                    android:layout_width="65dp"
+                    android:layout_height="45dp"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:visibility="invisible"
+                    tools:visibility="visible"
+                    tools:text="12:54"
+                    android:background="@drawable/picker_button_selector"
+                    android:drawableEnd="@drawable/ic_done_black_24dp"/>
+
+
+        </LinearLayout>
 
 </LinearLayout>
 

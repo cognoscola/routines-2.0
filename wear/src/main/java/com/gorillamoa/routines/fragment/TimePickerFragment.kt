@@ -78,14 +78,22 @@ class TimePickerFragment: Fragment(){
                 }
 
 
-                val textToShow = "$hour:$minute"
+                val textToShow = "$hour:${String.format("%02d", minute)}"
                 timeTextView.text =  textToShow
                 readyButtonForClick()
             }
         }
 
+        backwardButton.setOnClickListener {
 
-
+            if (hour != -1) {
+                hour = -1
+                minute = 0
+                timeTextView.visibility = View.INVISIBLE
+                backwardButton.visibility = View.INVISIBLE
+                (buttonRecyclerView.adapter as TimePickerAdapter).setHourState()
+            }
+        }
 
         /** Get the wake up and sleep times of the user, via the time picker*/
 /*
@@ -113,6 +121,7 @@ class TimePickerFragment: Fragment(){
 
     private fun readyButtonForClick(){
 
+        backwardButton.visibility = View.VISIBLE
         timeTextView.visibility = View.VISIBLE
         timeTextView.setOnClickListener {
             Toast.makeText(context,"Alarm set: $hour:$minute",Toast.LENGTH_SHORT).show()

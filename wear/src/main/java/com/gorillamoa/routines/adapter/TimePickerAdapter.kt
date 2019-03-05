@@ -82,7 +82,7 @@ class TimePickerAdapter(private val maxNumber:Int):RecyclerView.Adapter<TimePick
     }
 
     fun setHourState(){
-        pickerState = TimeState.Minute
+        pickerState = TimeState.Hour
         notifyDataSetChanged()
     }
 

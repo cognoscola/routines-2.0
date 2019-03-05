@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="picker_stroke">#AAAAAA</color>
+    <color name="picker_press_fill">#888888</color>
+</resources>

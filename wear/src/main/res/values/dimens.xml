@@ -19,4 +19,6 @@
     <!-- Pending intent request codes -->
     <integer name="wakeup_alarm_pendingintent_code">1</integer>
 
+    <dimen name="picker_button_stroke_radius">10dp</dimen>
+
 </resources>
