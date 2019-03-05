@@ -24,6 +24,7 @@
 
         </android.support.wear.widget.WearableRecyclerView>
 
+
         <TextView
             android:id="@+id/timeTextView"
             android:layout_width="60dp"

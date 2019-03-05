@@ -2,9 +2,9 @@
 <Button xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="60dp"
-    android:layout_height="60dp"
+    android:layout_height="55dp"
     android:layout_margin="3dp"
-    android:background="@drawable/timepicker_button_background"
+    android:background="@drawable/picker_button_selector"
     android:textAlignment="center"
     android:id="@+id/timeButton"
 
