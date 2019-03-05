@@ -8,140 +8,31 @@
     android:orientation="vertical"
     tools:background="#000000">
 
-
-        <android.support.wear.widget.WearableRecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:id="@+id/buttonRecyclerView">
-
-        </android.support.wear.widget.WearableRecyclerView>
-        <android.support.wearable.view.ObservableScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="true"
-            tools:visibility="gone">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center">
-
-                                <Button
-                                    android:layout_margin="3dp"
-                                    android:layout_width="60dp"
-                                    android:layout_height="wrap_content"
-                                    android:text="2"
-                                    android:background="@drawable/timepicker_button_background"
-                                    />
-                                <Button
-                                    android:layout_margin="3dp"
-                                    android:layout_width="60dp"
-                                    android:layout_height="wrap_content"
-                                    android:text="3"
-                                    android:background="@drawable/timepicker_button_background"
-                                    />
-
-                                <Button
-                                    android:layout_margin="3dp"
-                                    android:layout_width="60dp"
-                                    android:layout_height="wrap_content"
-                                    android:text="6"
-                                    android:background="@drawable/timepicker_button_background"
-                                    />
-                                <Button
-                                    android:layout_margin="3dp"
-                                    android:layout_width="60dp"
-                                    android:layout_height="wrap_content"
-                                    android:text="7"
-                                    android:background="@drawable/timepicker_button_background"
-                                    />
-
-                                <Button
-                                    android:layout_margin="3dp"
-                                    android:layout_width="60dp"
-                                    android:layout_height="wrap_content"
-                                    android:text="10"
-                                    android:background="@drawable/timepicker_button_background"
-                                    />
-
-                                <Button
-                                    android:layout_margin="3dp"
-                                    android:layout_width="60dp"
-                                    android:layout_height="wrap_content"
-                                    android:text="11"
-                                    android:background="@drawable/timepicker_button_background"
-                                    />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center">
-
-                                <Button
-                                    android:layout_margin="3dp"
-                                    android:layout_width="60dp"
-                                    android:layout_height="wrap_content"
-                                    android:text="4"
-                                    android:background="@drawable/timepicker_button_background"
-                                    />
-
-                                <Button
-                                    android:layout_margin="3dp"
-                                    android:layout_width="60dp"
-                                    android:layout_height="wrap_content"
-                                    android:text="5"
-                                    android:background="@drawable/timepicker_button_background"
-                                    />
-
-                                <Button
-                                    android:layout_margin="3dp"
-                                    android:layout_width="60dp"
-                                    android:layout_height="wrap_content"
-                                    android:text="8"
-                                    android:background="@drawable/timepicker_button_background"
-                                    />
-
-                                <Button
-                                    android:layout_margin="3dp"
-                                    android:layout_width="60dp"
-                                    android:layout_height="wrap_content"
-                                    android:text="9"
-                                    android:background="@drawable/timepicker_button_background"
-                                    />
-                                <Button
-                                    android:layout_margin="3dp"
-                                    android:layout_width="60dp"
-                                    android:layout_height="wrap_content"
-                                    android:text="12"
-                                    android:background="@drawable/timepicker_button_background"
-                                    />
-
-                                <Button
-                                    android:layout_margin="3dp"
-                                    android:layout_width="60dp"
-                                    android:layout_height="wrap_content"
-                                    android:text="1"
-                                    android:background="@drawable/timepicker_button_background"
-                                    />
-                        </LinearLayout>
-                </LinearLayout>
-
-        </android.support.wearable.view.ObservableScrollView>
-
         <TextView
             android:id="@+id/enableServiceButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/onboard_wake_up_text" />
+
+        <android.support.wear.widget.WearableRecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/buttonRecyclerView"
+            android:nestedScrollingEnabled="true"
+            android:layout_gravity="center">
+
+        </android.support.wear.widget.WearableRecyclerView>
+
+        <TextView
+            android:id="@+id/timeTextView"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:textAlignment="center"
+            android:gravity="center"
+
+            tools:text="12"
+            tools:background="@drawable/timepicker_button_background"/>
 
 </LinearLayout>
 
