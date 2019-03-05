@@ -25,7 +25,7 @@ class TimePickerFragment: Fragment(){
      * all other values means that the user has picked a time
      */
     private var hour = -1
-    private var minute = -1
+    private var minute = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_timepicker,container,false)
@@ -64,7 +64,7 @@ class TimePickerFragment: Fragment(){
                  */
                 if (hour == -1) {
                     hour = it
-                    minute = -1
+                    minute = 0
                     timeTextView.text = "$it"
                     setMinuteState()
                 }
@@ -73,27 +73,14 @@ class TimePickerFragment: Fragment(){
                  * Hour is picked, but minutes isn't, which means this
                  * incoming value is a minute value.
                  */
-                if (hour != -1 && minute == -1) {
+                 else if (hour != -1) {
                     minute = it
-
-                    val textToShow = "$hour:$it"
-                    timeTextView.text =  textToShow
-                    readyButtonForClick()
-
-                    //TODO make time picked text view pressable
                 }
 
-                /**
-                 * User may have changed the value of minutes
-                 */
-                if (hour != -1 && minute != -1) {
-                    minute = it
-                    val textToShow = "$hour:$it"
-                    timeTextView.text =  textToShow
-                    readyButtonForClick()
-                    //TODO make time picked text view pressable
-                }
 
+                val textToShow = "$hour:$minute"
+                timeTextView.text =  textToShow
+                readyButtonForClick()
             }
         }
 
@@ -122,12 +109,11 @@ class TimePickerFragment: Fragment(){
         }
 */
 
-
     }
 
     private fun readyButtonForClick(){
 
-        timeTextView.setBackgroundResource(R.drawable.timepicker_button_background)
+        timeTextView.visibility = View.VISIBLE
         timeTextView.setOnClickListener {
             Toast.makeText(context,"Alarm set: $hour:$minute",Toast.LENGTH_SHORT).show()
         }

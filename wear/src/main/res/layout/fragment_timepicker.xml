@@ -30,9 +30,9 @@
             android:layout_height="30dp"
             android:textAlignment="center"
             android:gravity="center"
-
+            android:visibility="invisible"
             tools:text="12"
-            tools:background="@drawable/timepicker_button_background"/>
+            android:background="@drawable/timepicker_button_background"/>
 
 </LinearLayout>
 

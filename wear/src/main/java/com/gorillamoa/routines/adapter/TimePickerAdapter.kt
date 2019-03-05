@@ -4,8 +4,11 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
 import android.widget.Button
 import com.gorillamoa.routines.R
+import kotlinx.coroutines.delay
+import kotlin.random.Random
 
 /**
  * An adapter which will hold maxNumber of items
@@ -66,6 +69,16 @@ class TimePickerAdapter(private val maxNumber:Int):RecyclerView.Adapter<TimePick
         holder.button.setOnClickListener {
             optionClickedCallback.invoke(value)
         }
+
+
+        /** for this button we'll animate alpha randomly **/
+
+        holder.button.startAnimation(AlphaAnimation(0.0f,1.0f).apply {
+            duration = 500
+            startOffset = (position * 100).toLong()
+        })
+
+
     }
 
     fun setHourState(){
