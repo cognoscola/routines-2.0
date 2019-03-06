@@ -1,5 +1,9 @@
 package com.gorillamoa.routines.activity
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 
 import android.support.wearable.activity.WearableActivity
@@ -8,10 +12,12 @@ import com.gorillamoa.routines.R
 import com.gorillamoa.routines.fragment.InformationFragment
 import com.gorillamoa.routines.fragment.SplashFragment
 import com.gorillamoa.routines.fragment.TimePickerFragment
+import com.gorillamoa.routines.receiver.WakeUpReceiver
 import kotlinx.android.synthetic.main.activity_onboard.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
 
 
 /**
@@ -94,6 +100,18 @@ class OnboardActivity:WearableActivity(){
             OnboardState.PickTime -> {
                 setTextFragment(R.string.onboard_welcome_text_04)
                 state = OnboardState.text_4
+            }
+
+            OnboardState.text_4 -> {
+
+                //TODO save state
+                //TODO exit activity
+
+                finish()
+                GlobalScope.launch {
+                    delay(1500)
+                    sendBroadcast(Intent(this@OnboardActivity, WakeUpReceiver::class.java))
+                }
             }
         }
     }

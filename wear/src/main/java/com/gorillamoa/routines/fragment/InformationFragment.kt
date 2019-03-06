@@ -1,6 +1,5 @@
 package com.gorillamoa.routines.fragment
 
-
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -30,8 +29,6 @@ class InformationFragment: OnboardFragment(){
         infoTextView.text = resources.getString(IDofValue)?:
                 resources.getString(R.string.info_oops_string)
     }
-
-
 
     companion object {
 

@@ -16,6 +16,7 @@ import com.gorillamoa.routines.adapter.TimePickerAdapter
 
 import com.gorillamoa.routines.receiver.WakeUpReceiver
 import kotlinx.android.synthetic.main.fragment_timepicker.*
+import java.util.*
 
 class TimePickerFragment: OnboardFragment(){
 
@@ -34,14 +35,6 @@ class TimePickerFragment: OnboardFragment(){
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //        val timePicker = findViewById<TimePicker>(R.id.wakeuptTimePicker)
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val alarmIntent:PendingIntent = Intent(context, WakeUpReceiver::class.java).let { intent ->
-            PendingIntent.getBroadcast(context,
-                    this.resources.getInteger(R.integer.wakeup_alarm_pendingintent_code),
-                    intent,
-                    0)
-        }
 
         /** populate the recycler view*/
         buttonRecyclerView.adapter = TimePickerAdapter(12)
@@ -94,16 +87,35 @@ class TimePickerFragment: OnboardFragment(){
                 (buttonRecyclerView.adapter as TimePickerAdapter).setHourState()
             }
         }
+    }
 
-        /** Get the wake up and sleep times of the user, via the time picker*/
-/*
-        nextButton.setOnClickListener {
+    /**
+     * Prepare the button so that when it is clicked it will
+     * set an alarm.
+     */
+    private fun readyButtonForClick(){
+
+        backwardButton.visibility = View.VISIBLE
+        timeTextView.visibility = View.VISIBLE
+        timeTextView.setOnClickListener {
+            Toast.makeText(context,"Alarm set: $hour:$minute",Toast.LENGTH_SHORT).show()
+            forwardFunction?.invoke()
+
+
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val alarmIntent:PendingIntent = Intent(context, WakeUpReceiver::class.java).let { intent ->
+                PendingIntent.getBroadcast(context,
+                        this.resources.getInteger(R.integer.wakeup_alarm_pendingintent_code),
+                        intent,
+                        0)
+            }
+
 
             // Set the alarm to start at approximately the time the user indicated
             val calendar: Calendar = Calendar.getInstance().apply {
                 timeInMillis = System.currentTimeMillis()
-                set(Calendar.HOUR_OF_DAY, 8)
-                set(Calendar.MINUTE,15)
+                set(Calendar.HOUR_OF_DAY, hour )
+                set(Calendar.MINUTE,minute)
             }
 
             // With setInexactRepeating(), you have to use one of the AlarmManager interval
@@ -114,19 +126,6 @@ class TimePickerFragment: OnboardFragment(){
                     AlarmManager.INTERVAL_DAY,
                     alarmIntent
             )
-        }
-*/
-
-    }
-
-    private fun readyButtonForClick(){
-
-        backwardButton.visibility = View.VISIBLE
-        timeTextView.visibility = View.VISIBLE
-        timeTextView.setOnClickListener {
-            Toast.makeText(context,"Alarm set: $hour:$minute",Toast.LENGTH_SHORT).show()
-            forwardFunction?.invoke()
-
         }
     }
 
