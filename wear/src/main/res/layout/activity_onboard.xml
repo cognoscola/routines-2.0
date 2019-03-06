@@ -8,6 +8,17 @@
     android:padding="@dimen/box_inset_layout_padding"
     android:id="@+id/fragmentContainerInsetLayout"
     tools:context=".activity.OnboardActivity"
-    tools:deviceIds="wear">
+    tools:deviceIds="wear"
+    tools:background="#9A4AEB"
+    app:layout_box="all">
+
+    <!--<TextView
+        app:boxedEdges="all"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:text="A siupe rlong text that doesn't seem to be boxed in.."
+        android:visibility="gone"
+        />-->
+
 
 </android.support.wear.widget.BoxInsetLayout>

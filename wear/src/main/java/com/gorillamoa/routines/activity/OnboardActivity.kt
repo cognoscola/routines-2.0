@@ -38,6 +38,7 @@ class OnboardActivity:WearableActivity(){
         text_1,
         text_2,
         text_3,
+        PickTime,
         text_4
     }
 
@@ -56,12 +57,11 @@ class OnboardActivity:WearableActivity(){
         GlobalScope.launch {
             delay(2000)
             setNextFragment(state)
-        }
 
-        fragmentContainerInsetLayout.setOnClickListener {
-            setNextFragment(state)
         }
     }
+
+
 
     /**
      * Determine which fragment to show next depending on the view state.
@@ -82,15 +82,18 @@ class OnboardActivity:WearableActivity(){
                 state = OnboardState.text_3
             }
             OnboardState.text_3 -> {
-                setTextFragment(R.string.onboard_welcome_text_04)
-                state = OnboardState.text_4
-            }
 
-            OnboardState.text_4 -> {
                 fragmentContainerInsetLayout.setOnClickListener(null)
                 fragmentManager.beginTransaction()
                         .replace(R.id.fragmentContainerInsetLayout, TimePickerFragment())
                         .commit()
+                state = OnboardState.PickTime
+
+            }
+
+            OnboardState.PickTime -> {
+                setTextFragment(R.string.onboard_welcome_text_04)
+                state = OnboardState.text_4
             }
         }
     }
@@ -116,9 +119,12 @@ class OnboardActivity:WearableActivity(){
             fragmentManager.beginTransaction()
                     .replace(R.id.fragmentContainerInsetLayout,InformationFragment.newInstance(textAddress,this) ,TEXT_FRAGMENT_TAG)
                     .commit()
-
-
         }
     }
 
+    private fun nextState(){
+        setNextFragment(state)
+    }
+
+    fun getForwardFunction() = { nextState() }
 }

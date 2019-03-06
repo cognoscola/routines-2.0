@@ -1,7 +1,6 @@
 package com.gorillamoa.routines.fragment
 
 import android.app.AlarmManager
-import android.app.Fragment
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -18,7 +17,7 @@ import com.gorillamoa.routines.adapter.TimePickerAdapter
 import com.gorillamoa.routines.receiver.WakeUpReceiver
 import kotlinx.android.synthetic.main.fragment_timepicker.*
 
-class TimePickerFragment: Fragment(){
+class TimePickerFragment: OnboardFragment(){
 
     /**
      * If the value is -1 it means the user hasn't chosen yet or undid his choice
@@ -26,6 +25,7 @@ class TimePickerFragment: Fragment(){
      */
     private var hour = -1
     private var minute = 0
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_timepicker,container,false)
@@ -125,6 +125,9 @@ class TimePickerFragment: Fragment(){
         timeTextView.visibility = View.VISIBLE
         timeTextView.setOnClickListener {
             Toast.makeText(context,"Alarm set: $hour:$minute",Toast.LENGTH_SHORT).show()
+            forwardFunction?.invoke()
+
         }
     }
+
 }
