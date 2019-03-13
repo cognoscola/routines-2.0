@@ -1,7 +1,6 @@
 package com.gorillamoa.routines.receiver
 
 import android.app.Notification
-import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -12,6 +11,7 @@ import android.util.Log
 import com.gorillamoa.routines.R
 
 import com.gorillamoa.routines.activity.OnboardActivity
+import com.gorillamoa.routines.extensions.getNotificationManager
 
 
 /**
@@ -22,54 +22,143 @@ import com.gorillamoa.routines.activity.OnboardActivity
  */
 class WakeUpReceiver:BroadcastReceiver(){
 
-    val MAX_NOTIFICATION_LINE_LENGTH = 23
+    companion object {
 
-    override fun onReceive(context: Context?, intent: Intent?) {
-        Log.d("onReceive","Woken up twice...")
+        const val MAX_NOTIFICATION_LINE_LENGTH = 23
 
-        (context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
+        /**
+         * When this receiver has an intent with a type TYPE_ON_BOARD
+         * it means that it should execute in a manner in line with on-boarding
+         * the user. That is, generate a notification with the user's first task
+         */
+        const val TYPE_ON_BOARD = 0
 
-            //TODO ENSURE 1.0+ compatibility, right now it only works on 2.0
+        /**
+         * When the receiver has an intent with a type TYPE_DEFAULT, it
+         * means that the receiver should process the intent normal.
+         * I.e. schedule tasks as normal
+         */
+        const val TYPE_DEFAULT  = 1
 
-            val wakeUpNotificationId = context.resources.getInteger(R.integer.wakeup_notification_id)
 
-            /** Prepare the intent for when user decides click Open (Wear) or the notification (Phone) **/
-            val mainIntent = Intent(context, OnboardActivity::class.java)
-            val mainPendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        /**
+         * Key for access the wake up type
+         */
+        const val WAKE_UP_KEY = "WAKEUPKEY"
+    }
 
-            /** Prepare the intent for when user dismisses the notification **/
-            val dismissIntent = Intent(context, NotificationDismissReceiver::class.java)
-            //TODO obfuscate strings later using obfuscation library
-            dismissIntent.putExtra("com.gorillamoa.routines.notificationId",wakeUpNotificationId)
-            val dismissPendingIntent = PendingIntent.getBroadcast(context.applicationContext, 22, dismissIntent, PendingIntent.FLAG_ONE_SHOT)
+    override fun onReceive(context: Context, intent: Intent?) {
+        Log.d("onReceive","Woken up...")
+        
+        intent?.let {
 
-            //TODO we need to have a task retriever method
-            val stringBuilder = StringBuilder()
-            buildLine("meditate","1hr",stringBuilder)
-            buildLine("Meeting with John again twice","9min",stringBuilder)
-            buildLine("Ultra super short","1reps",stringBuilder)
-            buildLine("Dod","4catches",stringBuilder)
-            buildLine("pick kids up from school","2p",stringBuilder)
-            buildEndLine(20,stringBuilder)
+            if (intent.hasExtra("ByAlarm")) {
+                Log.d("onReceive","woken up by the alarm, ${intent.extras.getBoolean("ByAlarm")}")
+            }
+            
+            when (it.extras.getInt(WAKE_UP_KEY)) {
 
-            val bigTextStyle = Notification.BigTextStyle()
-                    .setBigContentTitle(Html.fromHtml("Today's tasks &#128170;",Html.FROM_HTML_MODE_COMPACT))
-                    .bigText(Html.fromHtml(stringBuilder.toString(),Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST))
-                    .setSummaryText("+3 more")
+                TYPE_ON_BOARD ->{
 
-            val mainBuilder = Notification.Builder(context,context.resources.getString(R.string.notificationchannel_one))
-            mainBuilder
-                    .setStyle(bigTextStyle)
-                    //TODO show weather in one icon in the notification title
-                    .setContentTitle(Html.fromHtml("Good morning! &#127780",Html.FROM_HTML_MODE_COMPACT))
-                    .setSmallIcon(com.gorillamoa.routines.R.mipmap.ic_launcher)
-                    .setContentText("See today's schedule")
-                    .setAutoCancel(true)
-                    .setCategory(Notification.CATEGORY_REMINDER)
-                    .setContentIntent(mainPendingIntent)
-                    .setDeleteIntent(dismissPendingIntent)
+                    Log.d("onReceive","TYPE_ON_BOARD!")
+                    getNotificationManager(context).apply {
+                        //TODO ENSURE 1.0+ compatibility, right now it only works on 2.0
 
-            notify(context.resources.getString(R.string.notification_tag),wakeUpNotificationId, mainBuilder.build())
+                        val wakeUpNotificationId = context.resources.getInteger(R.integer.wakeup_notification_id)
+
+                        /** Prepare the intent for when user decides click Open (Wear) or the notification (Phone) **/
+                        val mainIntent = Intent(context, OnboardActivity::class.java)
+                        mainIntent.action = OnboardActivity.ACTION_TEST_WAKE_UP
+                        val mainPendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_ONE_SHOT)
+
+                        /** Prepare the intent for when user dismisses the notification **/
+                     /*   val dismissIntent = Intent(context, NotificationDismissReceiver::class.java)
+                        //TODO obfuscate strings later using obfuscation library
+                        dismissIntent.putExtra("com.gorillamoa.routines.notificationId",wakeUpNotificationId)
+                        val dismissPendingIntent = PendingIntent.getBroadcast(context.applicationContext, 22, dismissIntent, PendingIntent.FLAG_ONE_SHOT)*/
+
+                        //TODO we need to have a task retriever method
+                        val stringBuilder = StringBuilder()
+                        buildLine("Drink Water","1cup",stringBuilder)
+//                        buildEndLine(20,stringBuilder)
+
+                        val bigTextStyle = Notification.BigTextStyle()
+                                .setBigContentTitle(Html.fromHtml("Today's tasks &#128170;",Html.FROM_HTML_MODE_COMPACT))
+                                .bigText(Html.fromHtml(stringBuilder.toString(),Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST))
+
+                        val mainBuilder = Notification.Builder(context,context.resources.getString(R.string.notificationchannel_one))
+                        mainBuilder
+                                .setStyle(bigTextStyle)
+                                //TODO show weather in one icon in the notification title
+                                .setContentTitle(Html.fromHtml("Good morning! &#127780",Html.FROM_HTML_MODE_COMPACT))
+                                .setSmallIcon(com.gorillamoa.routines.R.mipmap.ic_launcher)
+                                .setContentText("See today's schedule")
+                                .setAutoCancel(true)
+                                .setCategory(Notification.CATEGORY_REMINDER)
+                                .setContentIntent(mainPendingIntent)
+//                                .setDeleteIntent(dismissPendingIntent)
+
+
+                        notify(context.resources.getString(R.string.notification_tag),wakeUpNotificationId, mainBuilder.build())
+
+                    }
+                }
+
+                TYPE_DEFAULT ->{
+                    
+                    Log.d("onReceive","TYPE_DEFAULT")
+                    getNotificationManager(context).apply {
+
+                        //TODO ENSURE 1.0+ compatibility, right now it only works on 2.0
+
+                        val wakeUpNotificationId = context.resources.getInteger(R.integer.wakeup_notification_id)
+
+                        /** Prepare the intent for when user decides click Open (Wear) or the notification (Phone) **/
+                        val mainIntent = Intent(context, OnboardActivity::class.java)
+                        val mainPendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+                        /** Prepare the intent for when user dismisses the notification **/
+                    /*    val dismissIntent = Intent(context, NotificationDismissReceiver::class.java)
+                        //TODO obfuscate strings later using obfuscation library
+                        dismissIntent.putExtra("com.gorillamoa.routines.notificationId",wakeUpNotificationId)
+                        val dismissPendingIntent = PendingIntent.getBroadcast(context.applicationContext, 22, dismissIntent, PendingIntent.FLAG_ONE_SHOT)*/
+
+                        //TODO we need to have a task retriever method
+                        val stringBuilder = StringBuilder()
+                        buildLine("meditate","1hr",stringBuilder)
+                        buildLine("Meeting with John again twice","9min",stringBuilder)
+                        buildLine("Ultra super short","1reps",stringBuilder)
+                        buildLine("Dod","4catches",stringBuilder)
+                        buildLine("pick kids up from school","2p",stringBuilder)
+                        buildEndLine(20,stringBuilder)
+
+                        val bigTextStyle = Notification.BigTextStyle()
+                                .setBigContentTitle(Html.fromHtml("Today's tasks &#128170;",Html.FROM_HTML_MODE_COMPACT))
+                                .bigText(Html.fromHtml(stringBuilder.toString(),Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST))
+
+
+                        val mainBuilder = Notification.Builder(context,context.resources.getString(R.string.notificationchannel_one))
+                        mainBuilder
+                                .setStyle(bigTextStyle)
+                                //TODO show weather in one icon in the notification title
+                                .setContentTitle(Html.fromHtml("Good morning! &#127780",Html.FROM_HTML_MODE_COMPACT))
+                                .setSmallIcon(com.gorillamoa.routines.R.mipmap.ic_launcher)
+                                .setContentText("See today's schedule")
+                                .setAutoCancel(true)
+                                .setCategory(Notification.CATEGORY_REMINDER)
+                                .setContentIntent(mainPendingIntent)
+//                                .setDeleteIntent(dismissPendingIntent)
+
+                        notify(context.resources.getString(R.string.notification_tag),wakeUpNotificationId, mainBuilder.build())
+                    }
+
+                }
+                else ->{
+
+                    //Log.d("onReceive","else")
+                    //TODO create a notification that something went wrong
+                }
+            }
         }
     }
 

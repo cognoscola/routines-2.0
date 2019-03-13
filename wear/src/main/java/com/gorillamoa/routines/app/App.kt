@@ -34,7 +34,7 @@ class App:Application(){
             val channelName = "Routine Notifications"
             val channelDescriptorText = "Routines Tasks for Channel"
 
-            NotificationChannel(this.resources.getString(R.string.notificationchannel_one),channelName, NotificationManager.IMPORTANCE_DEFAULT).apply {
+            NotificationChannel(this.resources.getString(R.string.notificationchannel_one),channelName, NotificationManager.IMPORTANCE_HIGH).apply {
                 enableLights(true)
                 lightColor = Color.RED
                 enableVibration(true)

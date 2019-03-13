@@ -103,6 +103,7 @@ class TimePickerAdapter(private val maxNumber:Int):RecyclerView.Adapter<TimePick
         return TimeItem(inflater.inflate(R.layout.item_timepicker,parent,false))
     }
 
+    //TODO make sure no memory leak
     class TimeItem(view:View):RecyclerView.ViewHolder(view){
 
         var button:Button =view.findViewById(R.id.timeButton)

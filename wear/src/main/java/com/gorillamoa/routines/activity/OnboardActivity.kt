@@ -1,8 +1,5 @@
 package com.gorillamoa.routines.activity
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 
@@ -17,7 +14,6 @@ import kotlinx.android.synthetic.main.activity_onboard.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.*
 
 
 /**
@@ -37,18 +33,28 @@ class OnboardActivity:WearableActivity(){
 
     //TODO change the activity launcher name (what the user sees)
 
-    val TEXT_FRAGMENT_TAG = "textfrag"
+    private val TEXT_FRAGMENT_TAG = "textfrag"
 
     enum class OnboardState{
-        other,
+        Other,
         text_1,
         text_2,
         text_3,
         PickTime,
-        text_4
+        text_4,
+        Text_5,
+        Text_6
     }
 
-    private var state:OnboardState = OnboardState.other
+    private var state:OnboardState = OnboardState.Other
+
+    companion object {
+        /**
+         * The user is coming from a notification. This notification is a wake-up attempt from
+         * the onboard process.
+         */
+        const val ACTION_TEST_WAKE_UP="N0"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -61,12 +67,16 @@ class OnboardActivity:WearableActivity(){
                 .commit()
 
         GlobalScope.launch {
-            delay(2000)
-            setNextFragment(state)
 
+            delay(2000)
+
+            //TODO check if intent is null
+            if (intent?.action == ACTION_TEST_WAKE_UP) {
+                state = OnboardState.Text_5
+            }
+            setNextFragment(state)
         }
     }
-
 
 
     /**
@@ -75,7 +85,7 @@ class OnboardActivity:WearableActivity(){
      */
     private fun setNextFragment(currentState:OnboardState){
         when (currentState) {
-            OnboardState.other ->{
+            OnboardState.Other ->{
                 setTextFragment(R.string.onboard_welcome_text_01)
                 state = OnboardState.text_1
             }
@@ -98,20 +108,28 @@ class OnboardActivity:WearableActivity(){
             }
 
             OnboardState.PickTime -> {
+
+                GlobalScope.launch {
+
+                    delay(1000)
+                    sendBroadcast(Intent(this@OnboardActivity, WakeUpReceiver::class.java)
+
+
+                            /** We indicate that the receiver should treat the intent as
+                             * part of the on-board process
+                             */
+                            .putExtra(WakeUpReceiver.WAKE_UP_KEY, WakeUpReceiver.TYPE_ON_BOARD))
+
+                }
                 setTextFragment(R.string.onboard_welcome_text_04)
-                state = OnboardState.text_4
+                state = OnboardState.Text_5
             }
 
-            OnboardState.text_4 -> {
+            OnboardState.Text_5 -> {
 
+                setTextFragment(R.string.onboard_welcome_text_06)
+                state = OnboardState.Text_6
                 //TODO save state
-                //TODO exit activity
-
-                finish()
-                GlobalScope.launch {
-                    delay(1500)
-                    sendBroadcast(Intent(this@OnboardActivity, WakeUpReceiver::class.java))
-                }
             }
         }
     }

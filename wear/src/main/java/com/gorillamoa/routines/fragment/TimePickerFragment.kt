@@ -10,7 +10,6 @@ import android.support.v7.widget.LinearSnapHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.adapter.TimePickerAdapter
 
@@ -22,7 +21,7 @@ class TimePickerFragment: OnboardFragment(){
 
     /**
      * If the value is -1 it means the user hasn't chosen yet or undid his choice
-     * all other values means that the user has picked a time
+     * all Other values means that the user has picked a time
      */
     private var hour = -1
     private var minute = 0
@@ -98,16 +97,17 @@ class TimePickerFragment: OnboardFragment(){
         backwardButton.visibility = View.VISIBLE
         timeTextView.visibility = View.VISIBLE
         timeTextView.setOnClickListener {
-            Toast.makeText(context,"Alarm set: $hour:$minute",Toast.LENGTH_SHORT).show()
             forwardFunction?.invoke()
 
 
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             val alarmIntent:PendingIntent = Intent(context, WakeUpReceiver::class.java).let { intent ->
+                intent.putExtra(WakeUpReceiver.WAKE_UP_KEY,WakeUpReceiver.TYPE_DEFAULT)
+                intent.putExtra("ByAlarm",true)
                 PendingIntent.getBroadcast(context,
                         this.resources.getInteger(R.integer.wakeup_alarm_pendingintent_code),
                         intent,
-                        0)
+                        PendingIntent.FLAG_UPDATE_CURRENT)
             }
 
 
@@ -116,11 +116,12 @@ class TimePickerFragment: OnboardFragment(){
                 timeInMillis = System.currentTimeMillis()
                 set(Calendar.HOUR_OF_DAY, hour )
                 set(Calendar.MINUTE,minute)
+                add(Calendar.DATE,1) //specify to fire TOMORROW
             }
 
-            // With setInexactRepeating(), you have to use one of the AlarmManager interval
-            // constants--in this case, AlarmManager.INTERVAL_DAY.
+
             alarmManager.setInexactRepeating(
+
                     AlarmManager.RTC_WAKEUP,
                     calendar.timeInMillis,
                     AlarmManager.INTERVAL_DAY,
