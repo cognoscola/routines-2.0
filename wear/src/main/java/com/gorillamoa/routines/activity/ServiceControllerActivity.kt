@@ -28,12 +28,11 @@ class ServiceControllerActivity : WearableActivity(), ServiceConnection {
 
         //TODO migrate enable/disable of wake up alarm function elsewhere,
         //TODO connect enable/disable alarm function function to toggle UI
-
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
         /** get our local settings*/
         wakeUpAlarmToggle.apply {
-            isEnabled = isAlarmSet()
+
+            isChecked = isAlarmSet()
+
 
             setOnCheckedChangeListener { buttonView, isChecked ->
                 if (isChecked) {

@@ -61,7 +61,7 @@ fun Context.isAlarmSet():Boolean{
 fun Context.saveAlarmStatus(isAlarmSet:Boolean){
     val prefs = getLocalSettings()
     prefs.edit()
-            .putBoolean(isAlarmActive,true)
+            .putBoolean(isAlarmActive,isAlarmSet)
             .apply()
 }
 
