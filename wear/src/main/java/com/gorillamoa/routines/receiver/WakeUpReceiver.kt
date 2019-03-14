@@ -19,6 +19,11 @@ import com.gorillamoa.routines.extensions.getNotificationManager
  * Again, this alarm is not a "wake from human sleep" alarm. Instead
  * it lets the user know, via some UI, notifications probably, that they
  * should prepare the day's tasks.
+ *
+ * There are two types of "Wake up" Alarms:
+ * ACTION_ONBOARD - fires once when we are onboarding the user
+ * ACTION_WAKEUP - fires every morning at the specified time
+ *
  */
 class WakeUpReceiver:BroadcastReceiver(){
 
@@ -27,24 +32,20 @@ class WakeUpReceiver:BroadcastReceiver(){
         const val MAX_NOTIFICATION_LINE_LENGTH = 23
 
         /**
-         * When this receiver has an intent with a type TYPE_ON_BOARD
+         * When this receiver has an intent with a type ACTION_ONBOARD
          * it means that it should execute in a manner in line with on-boarding
          * the user. That is, generate a notification with the user's first task
          */
-        const val TYPE_ON_BOARD = 0
+        const val ACTION_ONBOARD = "W0"
 
         /**
-         * When the receiver has an intent with a type TYPE_DEFAULT, it
-         * means that the receiver should process the intent normal.
+         * When the receiver has an intent with a type ACTION_DEFAULT, it
+         * means that the receiver should process the intent normally.
          * I.e. schedule tasks as normal
          */
-        const val TYPE_DEFAULT  = 1
+        const val ACTION_DEFAULT  = "W1"
 
-
-        /**
-         * Key for access the wake up type
-         */
-        const val WAKE_UP_KEY = "WAKEUPKEY"
+        const val KEY_ALARM = "A"
     }
 
     override fun onReceive(context: Context, intent: Intent?) {
@@ -52,15 +53,15 @@ class WakeUpReceiver:BroadcastReceiver(){
         
         intent?.let {
 
-            if (intent.hasExtra("ByAlarm")) {
-                Log.d("onReceive","woken up by the alarm, ${intent.extras.getBoolean("ByAlarm")}")
+            if (intent.hasExtra(KEY_ALARM)) {
+                Log.d("onReceive","By Alarm")
             }
             
-            when (it.extras.getInt(WAKE_UP_KEY)) {
+            when (it.action) {
 
-                TYPE_ON_BOARD ->{
+                ACTION_ONBOARD ->{
 
-                    Log.d("onReceive","TYPE_ON_BOARD!")
+                    Log.d("onReceive","ACTION_ONBOARD!")
                     getNotificationManager(context).apply {
                         //TODO ENSURE 1.0+ compatibility, right now it only works on 2.0
 
@@ -104,9 +105,9 @@ class WakeUpReceiver:BroadcastReceiver(){
                     }
                 }
 
-                TYPE_DEFAULT ->{
+                ACTION_DEFAULT ->{
                     
-                    Log.d("onReceive","TYPE_DEFAULT")
+                    Log.d("onReceive","ACTION_DEFAULT")
                     getNotificationManager(context).apply {
 
                         //TODO ENSURE 1.0+ compatibility, right now it only works on 2.0
@@ -155,7 +156,7 @@ class WakeUpReceiver:BroadcastReceiver(){
                 }
                 else ->{
 
-                    //Log.d("onReceive","else")
+                    throw Exception("This wake up alarm did not receive instructions!")
                     //TODO create a notification that something went wrong
                 }
             }

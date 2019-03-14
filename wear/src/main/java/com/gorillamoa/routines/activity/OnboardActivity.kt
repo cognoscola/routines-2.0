@@ -37,13 +37,13 @@ class OnboardActivity:WearableActivity(){
 
     enum class OnboardState{
         Other,
-        text_1,
-        text_2,
-        text_3,
+        TEXT1,
+        TEXT2,
+        TEXT3,
         PickTime,
-        text_4,
-        Text_5,
-        Text_6
+        TEXT4,
+        TEXT5,
+        Text6
     }
 
     private var state:OnboardState = OnboardState.Other
@@ -72,7 +72,7 @@ class OnboardActivity:WearableActivity(){
 
             //TODO check if intent is null
             if (intent?.action == ACTION_TEST_WAKE_UP) {
-                state = OnboardState.Text_5
+                state = OnboardState.TEXT5
             }
             setNextFragment(state)
         }
@@ -87,17 +87,17 @@ class OnboardActivity:WearableActivity(){
         when (currentState) {
             OnboardState.Other ->{
                 setTextFragment(R.string.onboard_welcome_text_01)
-                state = OnboardState.text_1
+                state = OnboardState.TEXT1
             }
-            OnboardState.text_1 -> {
+            OnboardState.TEXT1 -> {
                 setTextFragment(R.string.onboard_welcome_text_02)
-                state = OnboardState.text_2
+                state = OnboardState.TEXT2
             }
-            OnboardState.text_2 -> {
+            OnboardState.TEXT2 -> {
                 setTextFragment(R.string.onboard_welcome_text_03)
-                state = OnboardState.text_3
+                state = OnboardState.TEXT3
             }
-            OnboardState.text_3 -> {
+            OnboardState.TEXT3 -> {
 
                 fragmentContainerInsetLayout.setOnClickListener(null)
                 fragmentManager.beginTransaction()
@@ -114,21 +114,19 @@ class OnboardActivity:WearableActivity(){
                     delay(1000)
                     sendBroadcast(Intent(this@OnboardActivity, WakeUpReceiver::class.java)
 
-
                             /** We indicate that the receiver should treat the intent as
                              * part of the on-board process
                              */
-                            .putExtra(WakeUpReceiver.WAKE_UP_KEY, WakeUpReceiver.TYPE_ON_BOARD))
-
+                            .setAction(WakeUpReceiver.ACTION_ONBOARD))
                 }
                 setTextFragment(R.string.onboard_welcome_text_04)
-                state = OnboardState.Text_5
+                state = OnboardState.TEXT5
             }
 
-            OnboardState.Text_5 -> {
+            OnboardState.TEXT5 -> {
 
-                setTextFragment(R.string.onboard_welcome_text_06)
-                state = OnboardState.Text_6
+                setTextFragment(R.string.onboard_welcome_text_05)
+                state = OnboardState.Text6
                 //TODO save state
             }
         }

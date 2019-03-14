@@ -102,14 +102,13 @@ class TimePickerFragment: OnboardFragment(){
 
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             val alarmIntent:PendingIntent = Intent(context, WakeUpReceiver::class.java).let { intent ->
-                intent.putExtra(WakeUpReceiver.WAKE_UP_KEY,WakeUpReceiver.TYPE_DEFAULT)
-                intent.putExtra("ByAlarm",true)
+                intent.action = WakeUpReceiver.ACTION_DEFAULT
+                intent.putExtra(WakeUpReceiver.KEY_ALARM,true) //indicate that intent came from an alarm trigger
                 PendingIntent.getBroadcast(context,
                         this.resources.getInteger(R.integer.wakeup_alarm_pendingintent_code),
                         intent,
                         PendingIntent.FLAG_UPDATE_CURRENT)
             }
-
 
             // Set the alarm to start at approximately the time the user indicated
             val calendar: Calendar = Calendar.getInstance().apply {

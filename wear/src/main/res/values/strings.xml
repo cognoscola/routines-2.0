@@ -29,7 +29,7 @@
     <string name="onboard_welcome_text_02">By getting started, you have picked up your seed and shovel. </string>
     <string name="onboard_welcome_text_03">Now lets plant that seed.</string>
     <string name="onboard_welcome_text_04">The first and most important task of the day is proper planning. Lets try it.\n (Check your Notifications)</string>
-    <string name="onboard_welcome_text_06">You have just watered your new seed. Do not neglect it or it will never grow.   </string>
+    <string name="onboard_welcome_text_05">You have just watered your new seed. Do not neglect it or it will never grow.   </string>
 
     <string name="onboard_wake_up_text">I wake up at:</string>
 
