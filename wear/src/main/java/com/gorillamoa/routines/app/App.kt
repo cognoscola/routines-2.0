@@ -15,7 +15,6 @@ import com.gorillamoa.routines.provider.TaskProvider
  */
 class App:Application(){
 
-
     //TODO use dagger to inject a Provider
     var taskProvider:TaskProvider?= null
 
@@ -72,8 +71,9 @@ class App:Application(){
 
     //TODO build addons, and charge for them, etc. tracking friends, exercises, work tasks, etc.
 
-
     //TODO TASKS should have option of snoozing (15min, 30min, 1HR, tomorrow) etc.
+
+    //later CREATE A BUG CHART
 
 }
 

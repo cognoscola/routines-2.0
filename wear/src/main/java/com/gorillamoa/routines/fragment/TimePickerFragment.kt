@@ -1,9 +1,5 @@
 package com.gorillamoa.routines.fragment
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearSnapHelper
@@ -12,8 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.adapter.TimePickerAdapter
+import com.gorillamoa.routines.extensions.alarmEnableWakeUp
+import com.gorillamoa.routines.extensions.alarmSetRepeatWithCal
+import com.gorillamoa.routines.extensions.setTimeToCalendarAndStore
 
-import com.gorillamoa.routines.receiver.WakeUpReceiver
 import kotlinx.android.synthetic.main.fragment_timepicker.*
 import java.util.*
 
@@ -99,35 +97,10 @@ class TimePickerFragment: OnboardFragment(){
         timeTextView.setOnClickListener {
             forwardFunction?.invoke()
 
+            val cal= Calendar.getInstance()
+            context.setTimeToCalendarAndStore(cal,hour,minute)
+            context.alarmSetRepeatWithCal(cal)
 
-            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            val alarmIntent:PendingIntent = Intent(context, WakeUpReceiver::class.java).let { intent ->
-                intent.action = WakeUpReceiver.ACTION_DEFAULT
-                intent.putExtra(WakeUpReceiver.KEY_ALARM,true) //indicate that intent came from an alarm trigger
-                PendingIntent.getBroadcast(context,
-                        this.resources.getInteger(R.integer.wakeup_alarm_pendingintent_code),
-                        intent,
-                        PendingIntent.FLAG_UPDATE_CURRENT)
-            }
-
-
-            // Set the alarm to start at approximately the time the user indicated
-            //TODO use convenience method to set time
-            val calendar: Calendar = Calendar.getInstance().apply {
-                timeInMillis = System.currentTimeMillis()
-                set(Calendar.HOUR_OF_DAY, hour )
-                set(Calendar.MINUTE,minute)
-                add(Calendar.DATE,1) //specify to fire TOMORROW
-            }
-
-
-            alarmManager.setInexactRepeating(
-
-                    AlarmManager.RTC_WAKEUP,
-                    calendar.timeInMillis,
-                    AlarmManager.INTERVAL_DAY,
-                    alarmIntent
-            )
         }
     }
 
