@@ -46,6 +46,10 @@ class WakeUpReceiver:BroadcastReceiver(){
         const val ACTION_DEFAULT  = "W1"
 
         const val KEY_ALARM = "A"
+
+        const val WAKE_UP_INTENT_CODE = 1
+
+
     }
 
     override fun onReceive(context: Context, intent: Intent?) {

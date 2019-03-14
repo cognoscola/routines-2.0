@@ -110,7 +110,9 @@ class TimePickerFragment: OnboardFragment(){
                         PendingIntent.FLAG_UPDATE_CURRENT)
             }
 
+
             // Set the alarm to start at approximately the time the user indicated
+            //TODO use convenience method to set time
             val calendar: Calendar = Calendar.getInstance().apply {
                 timeInMillis = System.currentTimeMillis()
                 set(Calendar.HOUR_OF_DAY, hour )

@@ -15,6 +15,7 @@ import com.gorillamoa.routines.provider.TaskProvider
  */
 class App:Application(){
 
+
     //TODO use dagger to inject a Provider
     var taskProvider:TaskProvider?= null
 

@@ -1,25 +1,25 @@
 package com.gorillamoa.routines.activity
 
+import android.annotation.SuppressLint
 import android.app.*
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
 import android.os.Bundle
 import android.os.IBinder
 import android.support.wearable.activity.WearableActivity
-import android.widget.Button
 import android.widget.Toast
 import com.gorillamoa.routines.R
+import com.gorillamoa.routines.provider.isAlarmSet
+import com.gorillamoa.routines.provider.applySavedTimeToCalendar
 import com.gorillamoa.routines.receiver.WakeUpReceiver
+import kotlinx.android.synthetic.main.activity_service_controller.*
 import java.util.*
 
 class ServiceControllerActivity : WearableActivity(), ServiceConnection {
 
-    private val TAG = ServiceControllerActivity::class.java.name
+    @Suppress("unused")
+    private val tag = ServiceControllerActivity::class.java.name
 
-    private val notication_id = 5001
-    private val ROUTINES_TAG ="routines"
+
 
     private var notificationManager:NotificationManager? = null
 
@@ -27,46 +27,61 @@ class ServiceControllerActivity : WearableActivity(), ServiceConnection {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_service_controller)
 
+        //TODO migrate enable/disable of wake up alarm function elsewhere,
+        //TODO connect enable/disable alarm function function to toggle UI
 
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val alarmIntent = Intent(this, WakeUpReceiver::class.java).let { intent ->
-            PendingIntent.getBroadcast(
-                    this,
-                    this.resources.getInteger(R.integer.wakeup_alarm_pendingintent_code),
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT)
+
+        /** get our local settings*/
+        wakeUpAlarmToggle.apply {
+            isEnabled = isAlarmSet()
+
+            setOnCheckedChangeListener { buttonView, isChecked ->
+                if (isChecked) {
+                    //enable alarm
+
+                    val alarmIntent = Intent(this@ServiceControllerActivity, WakeUpReceiver::class.java).let { intent:Intent ->
+                        PendingIntent.getBroadcast(
+                                this@ServiceControllerActivity,
+                                WakeUpReceiver.WAKE_UP_INTENT_CODE,
+                                intent,
+                                PendingIntent.FLAG_UPDATE_CURRENT)
+                    }
+                    val calendar: Calendar = Calendar.getInstance().apply {
+                        timeInMillis = System.currentTimeMillis()
+                        add(Calendar.DATE,1)
+                        applySavedTimeToCalendar(this)
+                    }
+
+
+                    alarmManager.setInexactRepeating(
+                            AlarmManager.RTC_WAKEUP,
+                            calendar.timeInMillis,
+                            AlarmManager.INTERVAL_DAY,
+                            alarmIntent
+                    )
+
+
+                }else{
+                    //disable alarm
+                    alarmManager.cancel(PendingIntent.getBroadcast(
+                            this@ServiceControllerActivity,
+                            WakeUpReceiver.WAKE_UP_INTENT_CODE,
+                            intent,
+                            PendingIntent.FLAG_UPDATE_CURRENT)
+                    )
+                }
+            }
         }
+
+
+        //TODO Launch wake up notification from UI
+        //TODO Launch task notification from UI
+
+
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        findViewById<Button>(R.id.enableServiceButton).setOnClickListener {
-
-            //for now just enable/ disable alarm
-
-            //we don't really need to cancel anything. If we use the
-            //same request code, the current alarm will be overridden
-
-            // Set the alarm to start at approximately the time the user indicated
-            val calendar: Calendar = Calendar.getInstance().apply {
-                timeInMillis = System.currentTimeMillis()
-                set(Calendar.HOUR_OF_DAY, 8)
-                set(Calendar.MINUTE,15)
-            }
-
-
-            // With setInexactRepeating(), you have to use one of the AlarmManager interval
-            // constants--in this case, AlarmManager.INTERVAL_DAY.
-            alarmManager?.setInexactRepeating(
-                    AlarmManager.RTC_WAKEUP,
-                    calendar.timeInMillis,
-                    AlarmManager.INTERVAL_DAY,
-                    alarmIntent
-            )
-        }
-
-        findViewById<Button>(R.id.disableServiceButton).setOnClickListener {
-            alarmManager.cancel(alarmIntent)
-        }
 
         // Enables Always-on
         setAmbientEnabled()
