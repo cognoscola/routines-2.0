@@ -7,12 +7,7 @@
     <string name="receiver_wakeup">routines.wakeup</string>
 
 
-    <!-- notifications tag -->
-    <string name="notification_tag">routines</string>
 
-
-    <!-- notification channel ids -->
-    <string name="notificationchannel_one">channel</string>
 
     <!--
 

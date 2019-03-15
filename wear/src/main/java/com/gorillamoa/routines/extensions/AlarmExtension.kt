@@ -1,16 +1,14 @@
 package com.gorillamoa.routines.extensions
 
 import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
-import com.gorillamoa.routines.receiver.WakeUpReceiver
 import java.util.*
 
 /**
  * A place where we can keep extensions regarding alarm
  * setting
  */
+
 
 /**
  * Convenience method to enable the alarm.

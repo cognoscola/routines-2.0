@@ -10,6 +10,7 @@ import android.util.Log
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.activity.OnboardActivity
 import com.gorillamoa.routines.app.getTaskPRovider
+import com.gorillamoa.routines.extensions.WAKE_UP_NOTIFICATION_ID
 
 
 /**
@@ -44,7 +45,7 @@ class NotificationDismissReceiver:BroadcastReceiver() {
         when (notificationId) {
 
             //NOTIFICATION_TYPE_WAKEUP
-            context.resources.getInteger(R.integer.wakeup_notification_id) -> {
+            WAKE_UP_NOTIFICATION_ID -> {
                 Log.d("onReceive","We have a wakeup notification dismissal")
                 makeTaskNotification(context)
 
@@ -64,11 +65,14 @@ class NotificationDismissReceiver:BroadcastReceiver() {
             val mainIntent = Intent(context, OnboardActivity::class.java)
             val mainPendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-            val mainBuilder = Notification.Builder(context,context.resources.getString(R.string.notificationchannel_one))
+            //FIXME important
+//            val mainBuilder = Notification.Builder(context,Notification.)
 
             //Get the task info
             val taskInfo = context.getTaskPRovider().getNextTask()
 
+            //FIXME
+/*
             mainBuilder
 //                    .setStyle(bigTextStyle)
                     //TODO show weather in one icon in the notification title
@@ -80,8 +84,10 @@ class NotificationDismissReceiver:BroadcastReceiver() {
                     .setContentIntent(mainPendingIntent)
                     //TODO set dismiss intent for a NOTIFICATION_TYPE_TASK
 //                    .setDeleteIntent(dismissPendingIntent)
+*/
 
-            notify(context.resources.getString(R.string.notification_tag),taskNotificationId, mainBuilder.build())
+            //FIXME
+//            notify(context.resources.getString(R.string.notification_tag),taskNotificationId, mainBuilder.build())
         }
     }
 }

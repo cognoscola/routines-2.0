@@ -16,6 +16,7 @@ class TaskProvider(){
 
         return Task(TaskType.TYPE_HABIT, "Meditate","")
         //TODO task scheduler should get the next task
+
     }
 
     /**
@@ -24,6 +25,8 @@ class TaskProvider(){
     fun getWakeUpTasks(){
 
         //TODO use a scheduler to get these task
+
+
     }
 
 }

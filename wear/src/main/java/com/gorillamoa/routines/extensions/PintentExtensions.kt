@@ -1,15 +1,13 @@
 package com.gorillamoa.routines.extensions
 
-
 import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import com.gorillamoa.routines.activity.OnboardActivity
 
 /**
  * A place to store all the Intent and PendingIntent extensions
- *
  */
-
-
 fun Context.createWakeUpPendingIntent():PendingIntent{
     return android.content.Intent(this, com.gorillamoa.routines.receiver.WakeUpReceiver::class.java).let { intent ->
         intent.action = com.gorillamoa.routines.receiver.WakeUpReceiver.ACTION_DEFAULT
@@ -19,5 +17,24 @@ fun Context.createWakeUpPendingIntent():PendingIntent{
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT)
     }
+}
 
+/**
+ * creates the notification's main intent (when the notification is clicked)
+ * such that we are directed to the onboard
+ */
+fun Context.createNotificationMainIntentForOnboarding():PendingIntent{
+    val mainIntent = Intent(this, OnboardActivity::class.java)
+    mainIntent.action = OnboardActivity.ACTION_TEST_WAKE_UP
+    return PendingIntent.getActivity(this, 0, mainIntent, PendingIntent.FLAG_ONE_SHOT)
+}
+
+/**
+ * create the notification's main intent
+ * when user clicks on a wake up notification
+ */
+//TODO redirect to another activity
+fun Context.createNotificationMainIntentForWakeUp():PendingIntent{
+    val mainIntent = Intent(this, OnboardActivity::class.java)
+    return PendingIntent.getActivity(this, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 }

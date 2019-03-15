@@ -20,27 +20,7 @@ fun Context.getLocalSettings():SharedPreferences{
 fun Context.getWakeUpHour():Int = getLocalSettings().getInt(WAKE_UP_HOUR,-1)
 fun Context.getWakeUpMinute():Int = getLocalSettings().getInt(WAKE_UP_MINUTE,-1)
 
-/**
- * Convenient method for setting the HOUR and MINUTE to a calendar
- * @param cal is the calendar to set
- */
-fun Context.setSavedTimeToCalendar(cal:Calendar){
 
-    val prefs = getLocalSettings()
-    cal.timeInMillis = System.currentTimeMillis()
-    cal.set(Calendar.HOUR_OF_DAY, prefs.getInt(WAKE_UP_HOUR,-1))
-    cal.set(Calendar.MINUTE,prefs.getInt(WAKE_UP_MINUTE,-1))
-    cal.add(Calendar.DATE,1) //specify to fire TOMORROW
-}
-
-fun Context.setTimeToCalendarAndStore(cal:Calendar,hour:Int,minute:Int){
-
-    cal.timeInMillis = System.currentTimeMillis()
-    cal.set(Calendar.HOUR_OF_DAY, hour)
-    cal.set(Calendar.MINUTE,minute)
-    cal.add(Calendar.DATE,1) //specify to fire TOMORROW
-    saveAlarmTime(hour,minute)
-}
 
 /**
  * Convenient method save into preferences the alarm time

@@ -6,7 +6,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
-import com.gorillamoa.routines.R
+import com.gorillamoa.routines.extensions.NOTIFICATION_CHANNEL_ONE
 import com.gorillamoa.routines.provider.TaskProvider
 
 
@@ -34,7 +34,7 @@ class App:Application(){
             val channelName = "Routine Notifications"
             val channelDescriptorText = "Routines Tasks for Channel"
 
-            NotificationChannel(this.resources.getString(R.string.notificationchannel_one),channelName, NotificationManager.IMPORTANCE_HIGH).apply {
+            NotificationChannel(NOTIFICATION_CHANNEL_ONE,channelName, NotificationManager.IMPORTANCE_HIGH).apply {
                 enableLights(true)
                 lightColor = Color.RED
                 enableVibration(true)

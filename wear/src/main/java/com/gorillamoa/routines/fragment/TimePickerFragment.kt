@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.adapter.TimePickerAdapter
-import com.gorillamoa.routines.extensions.alarmEnableWakeUp
 import com.gorillamoa.routines.extensions.alarmSetRepeatWithCal
 import com.gorillamoa.routines.extensions.setTimeToCalendarAndStore
 

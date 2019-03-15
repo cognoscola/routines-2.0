@@ -26,8 +26,6 @@ class ServiceControllerActivity : WearableActivity(), ServiceConnection {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_service_controller)
 
-        //TODO migrate enable/disable of wake up alarm function elsewhere,
-        //TODO connect enable/disable alarm function function to toggle UI
         /** get our local settings*/
         wakeUpAlarmToggle.apply {
 
@@ -45,7 +43,6 @@ class ServiceControllerActivity : WearableActivity(), ServiceConnection {
 
         //TODO Launch wake up notification from UI
         //TODO Launch task notification from UI
-
 
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
