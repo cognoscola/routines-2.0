@@ -60,6 +60,12 @@
                 android:layout_height="40dp"
                 android:text="Ran Task Noti" />
 
+            <Button
+                android:id="@+id/createTask"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Create Task" />
+
         </LinearLayout>
 
 

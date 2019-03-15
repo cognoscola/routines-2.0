@@ -1,6 +1,5 @@
 package com.gorillamoa.routines.activity
 
-import android.app.*
 import android.content.*
 import android.os.Bundle
 import android.os.IBinder
@@ -14,7 +13,6 @@ class ServiceControllerActivity : WearableActivity(), ServiceConnection {
 
     @Suppress("unused")
     private val tag = ServiceControllerActivity::class.java.name
-    private var notificationManager:NotificationManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,7 +23,7 @@ class ServiceControllerActivity : WearableActivity(), ServiceConnection {
 
             isChecked = isAlarmSet()
 
-            setOnCheckedChangeListener { buttonView, isChecked ->
+            setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     alarmEnableWakeUp()
                 }else{
@@ -34,17 +32,20 @@ class ServiceControllerActivity : WearableActivity(), ServiceConnection {
         }
 
 
-        //TODO Launch wake up notification from UI
         enableServiceButton?.setOnClickListener {
             broadcastShowWakeUp()
         }
 
-        //TODO Launch task notification from UI
+
         disableServiceButton?.setOnClickListener {
             broadcastShowRandomTask()
         }
 
-        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        createTask?.setOnClickListener {
+
+        }
+
+
 
 
         // Enables Always-on

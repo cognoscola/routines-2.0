@@ -6,6 +6,8 @@ import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
+import com.gorillamoa.routines.data.TaskDao
+import com.gorillamoa.routines.data.TaskDatabase
 import com.gorillamoa.routines.extensions.NOTIFICATION_CHANNEL_ONE
 import com.gorillamoa.routines.provider.TaskProvider
 
@@ -44,6 +46,7 @@ class App:Application(){
             }
         }
     }
+
 
     //TODO Create options menu
     //TODO In options menu create Notifications Behaviour sections
