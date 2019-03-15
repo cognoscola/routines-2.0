@@ -13,7 +13,7 @@ fun Context.setSavedTimeToCalendar(cal: Calendar){
     cal.timeInMillis = System.currentTimeMillis()
     cal.set(Calendar.HOUR_OF_DAY, prefs.getInt(WAKE_UP_HOUR,-1))
     cal.set(Calendar.MINUTE,prefs.getInt(WAKE_UP_MINUTE,-1))
-//    cal.add(Calendar.DATE,1) //specify to fire TOMORROW
+    cal.add(Calendar.DATE,1) //specify to fire TOMORROW
 }
 
 fun Context.setTimeToCalendarAndStore(cal: Calendar, hour:Int, minute:Int){
@@ -21,6 +21,6 @@ fun Context.setTimeToCalendarAndStore(cal: Calendar, hour:Int, minute:Int){
     cal.timeInMillis = System.currentTimeMillis()
     cal.set(Calendar.HOUR_OF_DAY, hour)
     cal.set(Calendar.MINUTE,minute)
-//    cal.add(Calendar.DATE,1) //specify to fire TOMORROW
+    cal.add(Calendar.DATE,1) //specify to fire TOMORROW
     saveAlarmTime(hour,minute)
 }

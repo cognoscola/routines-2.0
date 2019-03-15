@@ -67,11 +67,11 @@ class WakeUpReceiver:BroadcastReceiver(){
                     Log.d("onReceive", "ACTION_DEFAULT")
                     context.notificationShowWakeUp(StringBuilder().apply {
                             addTaskLine("meditate","1hr")
-                            addTaskLine("Meeting with John again twice","9min")
+                            /*addTaskLine("Meeting with John again twice","9min")
                             addTaskLine("Ultra super short","1reps")
                             addTaskLine("Dod","4catches")
                             addTaskLine("pick kids up from school","2p")
-                            buildEndLine(20)
+                            buildEndLine(20)*/
                     }.toString()
                     ,context.createNotificationMainIntentForWakeUp())
                 }

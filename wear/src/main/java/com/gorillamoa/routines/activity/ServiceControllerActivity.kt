@@ -7,19 +7,13 @@ import android.os.IBinder
 import android.support.wearable.activity.WearableActivity
 import android.widget.Toast
 import com.gorillamoa.routines.R
-import com.gorillamoa.routines.extensions.alarmDisableWakeUp
-import com.gorillamoa.routines.extensions.alarmEnableWakeUp
-import com.gorillamoa.routines.extensions.isAlarmSet
-import com.gorillamoa.routines.receiver.WakeUpReceiver
+import com.gorillamoa.routines.extensions.*
 import kotlinx.android.synthetic.main.activity_service_controller.*
 
 class ServiceControllerActivity : WearableActivity(), ServiceConnection {
 
     @Suppress("unused")
     private val tag = ServiceControllerActivity::class.java.name
-
-
-
     private var notificationManager:NotificationManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,7 +25,6 @@ class ServiceControllerActivity : WearableActivity(), ServiceConnection {
 
             isChecked = isAlarmSet()
 
-
             setOnCheckedChangeListener { buttonView, isChecked ->
                 if (isChecked) {
                     alarmEnableWakeUp()
@@ -42,8 +35,14 @@ class ServiceControllerActivity : WearableActivity(), ServiceConnection {
 
 
         //TODO Launch wake up notification from UI
-        //TODO Launch task notification from UI
+        enableServiceButton?.setOnClickListener {
+            broadcastShowWakeUp()
+        }
 
+        //TODO Launch task notification from UI
+        disableServiceButton?.setOnClickListener {
+            broadcastShowRandomTask()
+        }
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 

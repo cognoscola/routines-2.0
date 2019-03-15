@@ -51,7 +51,8 @@
                 android:id="@+id/enableServiceButton"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:text="Wake Up Noti" />
+                android:text="Wake Up Noti"
+                />
 
             <Button
                 android:id="@+id/disableServiceButton"

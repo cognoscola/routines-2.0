@@ -1,5 +1,8 @@
 package com.gorillamoa.routines.data
 
+import androidx.room.Entity
+
+@Entity(tableName = "tasks")
 data class Task(
 
         val type:TaskType = TaskType.TYPE_UNKNOWN,

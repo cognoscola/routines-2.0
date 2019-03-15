@@ -24,8 +24,8 @@ class TaskProvider(){
      */
     fun getWakeUpTasks(){
 
-        //TODO use a scheduler to get these task
-
+        //TODO GET STORED TASKS
+        //GET SCHEDULER TO SCHEDULE TASKS FOR THE DAY
 
     }
 

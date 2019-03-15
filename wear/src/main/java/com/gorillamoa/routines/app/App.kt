@@ -65,7 +65,6 @@ class App:Application(){
     //TODO and deadline, tasks closer to deadline should appear more frequently.
     //TODO Add feature so that we LIMIT a task
 
-
     //TODO since you can't use custom UIs on notifications, try image generation.
     //make seamless backgrounds, text, etc. through image generation.
 

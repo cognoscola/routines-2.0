@@ -22,7 +22,6 @@ const val NOTIFICATION_TAG = "routines"
     val dismissPendingIntent = PendingIntent.getBroadcast(context.applicationContext, 22, dismissIntent, PendingIntent.FLAG_ONE_SHOT)*/
 
 
-
 fun Context.notificationShowWakeUp(tasks:String, mainPendingIntent: PendingIntent){
 
         //TODO ENSURE 1.0+ compatibility, right now it only works on 2.0

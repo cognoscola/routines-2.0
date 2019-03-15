@@ -17,7 +17,6 @@ class InformationFragment: OnboardFragment(){
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         infoTextView.text = arguments?.getString(resources.getString(R.string.info_argument_key))?:
                 resources.getString(R.string.info_oops_string)
         view?.setOnClickListener {

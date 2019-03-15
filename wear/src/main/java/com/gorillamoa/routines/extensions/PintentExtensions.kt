@@ -4,9 +4,14 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import com.gorillamoa.routines.activity.OnboardActivity
+import com.gorillamoa.routines.receiver.WakeUpReceiver
 
 /**
  * A place to store all the Intent and PendingIntent extensions
+ */
+
+/**
+ * Creates a PendingIntent for the WakeUpReceiver
  */
 fun Context.createWakeUpPendingIntent():PendingIntent{
     return android.content.Intent(this, com.gorillamoa.routines.receiver.WakeUpReceiver::class.java).let { intent ->
@@ -27,6 +32,11 @@ fun Context.createNotificationMainIntentForOnboarding():PendingIntent{
     val mainIntent = Intent(this, OnboardActivity::class.java)
     mainIntent.action = OnboardActivity.ACTION_TEST_WAKE_UP
     return PendingIntent.getActivity(this, 0, mainIntent, PendingIntent.FLAG_ONE_SHOT)
+}
+
+
+fun Context.createWakeUpRecieverIntent():Intent{
+    return Intent(this, WakeUpReceiver::class.java)
 }
 
 /**
