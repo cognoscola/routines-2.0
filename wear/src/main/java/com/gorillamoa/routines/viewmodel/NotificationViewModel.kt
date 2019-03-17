@@ -1,8 +1,8 @@
 package com.gorillamoa.routines.viewmodel
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 
 import com.gorillamoa.routines.data.Task
 import com.gorillamoa.routines.data.TaskDatabase
@@ -24,12 +24,14 @@ class TaskViewModel(application: Application): AndroidViewModel(application){
     private val scope = CoroutineScope(coroutineContext)
     private val repository:TaskRepository
 
-    val allTasks: LiveData<List<Task>>
+    private var allTasks: List<Task>? = null
 
     init{
         val taskDao = TaskDatabase.getDatabase(application,scope).taskDao()
         repository = TaskRepository(taskDao)
-        allTasks = repository.allTasks
+        scope.launch(Dispatchers.IO){
+            allTasks = repository.getTasks()
+        }
     }
 
     fun insert(task:Task) = scope.launch(Dispatchers.IO){

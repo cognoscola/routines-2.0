@@ -14,7 +14,7 @@
             android:layout_height="wrap_content"
             android:text="@string/onboard_wake_up_text" />
 
-        <android.support.wear.widget.WearableRecyclerView
+        <androidx.wear.widget.WearableRecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:layout_height="100dp"
@@ -25,7 +25,7 @@
             android:layout_gravity="center">
 
 
-        </android.support.wear.widget.WearableRecyclerView>
+        </androidx.wear.widget.WearableRecyclerView>
 
 
         <LinearLayout

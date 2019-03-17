@@ -1,7 +1,7 @@
 package com.gorillamoa.routines.data
 
 
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -11,7 +11,7 @@ import androidx.room.Query
 interface TaskDao{
 
     @Query("SELECT * FROM Task")
-    suspend fun getTasks(): LiveData<List<Task>>
+    suspend fun getTasks(): List<Task>
 
     @Insert
     suspend fun insertTask(task:Task)

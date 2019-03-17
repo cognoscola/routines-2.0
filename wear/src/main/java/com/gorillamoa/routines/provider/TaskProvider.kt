@@ -14,7 +14,7 @@ class TaskProvider(){
      */
     fun getNextTask(): Task {
 
-        return Task(TaskType.TYPE_HABIT, "Meditate","")
+        return Task(1,"type1","task01","description")
         //TODO task scheduler should get the next task
 
     }

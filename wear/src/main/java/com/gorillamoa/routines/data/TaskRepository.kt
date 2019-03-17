@@ -1,8 +1,8 @@
 package com.gorillamoa.routines.data
 
 
-import android.arch.lifecycle.LiveData
-import android.support.annotation.WorkerThread
+import androidx.lifecycle.LiveData
+import androidx.annotation.WorkerThread
 
 
 //TODO decide wether to fetch from network or not.
@@ -13,7 +13,10 @@ import android.support.annotation.WorkerThread
  */
 class TaskRepository(private val taskdao:TaskDao){
 
-    val allTasks: LiveData<List<Task>> = taskdao.getTasks()
+    @WorkerThread
+    suspend fun getTasks():List<Task>{
+        return taskdao.getTasks()
+    }
 
     @WorkerThread
     suspend fun insert(task: Task) {

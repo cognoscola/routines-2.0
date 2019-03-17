@@ -1,16 +1,15 @@
 package com.gorillamoa.routines.activity
 
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v4.app.FragmentActivity
-import android.support.wear.ambient.AmbientModeSupport
+import androidx.fragment.app.FragmentActivity
+import androidx.wear.ambient.AmbientModeSupport
 import android.util.Log
 
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.extensions.*
 import com.gorillamoa.routines.viewmodel.TaskViewModel
 import kotlinx.android.synthetic.main.activity_service_controller.*
-
 
 /**
  * A few notes on this class.
@@ -36,7 +35,6 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_service_controller)
-
 
         mAmbientController = AmbientModeSupport.attach(this@ServiceControllerActivity)
         taskViewModel = ViewModelProviders.of(this@ServiceControllerActivity).get(TaskViewModel::class.java)

@@ -1,6 +1,6 @@
 package com.gorillamoa.routines.adapter
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +12,7 @@ import com.gorillamoa.routines.R
  * An adapter which will hold maxNumber of items
  * @param maxNumber the number of buttons to create
  */
-class TimePickerAdapter(private val maxNumber:Int):RecyclerView.Adapter<TimePickerAdapter.TimeItem>(){
+class TimePickerAdapter(private val maxNumber:Int): RecyclerView.Adapter<TimePickerAdapter.TimeItem>(){
 
     enum class TimeState{
         Minute,
@@ -104,7 +104,7 @@ class TimePickerAdapter(private val maxNumber:Int):RecyclerView.Adapter<TimePick
     }
 
     //TODO make sure no memory leak
-    class TimeItem(view:View):RecyclerView.ViewHolder(view){
+    class TimeItem(view:View): RecyclerView.ViewHolder(view){
 
         var button:Button =view.findViewById(R.id.timeButton)
     }

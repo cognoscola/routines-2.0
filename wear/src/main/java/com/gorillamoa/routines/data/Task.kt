@@ -9,9 +9,9 @@ data class Task(
         @PrimaryKey
         val tid:Int,
 
-        val type:TaskType = TaskType.TYPE_UNKNOWN,
+        val type:String,
 
-        val name:String = "A task",
+        val name:String,
 
         var description:String? = null
 
