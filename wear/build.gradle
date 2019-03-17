@@ -34,6 +34,12 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
+    testImplementation "androidx.room:room-testing:$room_version"
+
+    // Lifecycle components
+    implementation "android.arch.lifecycle:extensions:1.1.1"
+    kapt "android.arch.lifecycle:compiler:2.0.0"
+    testImplementation "androidx.arch.core:core-testing:2.0.0"
 
     implementation 'com.google.android.support:wearable:2.4.0'
     implementation 'com.google.android.gms:play-services-wearable:16.0.1'
@@ -43,6 +49,5 @@ dependencies {
     implementation 'com.android.support:wear:27.1.1'
     compileOnly 'com.google.android.wearable:wearable:2.4.0'
 
-    // Test helpers
-    testImplementation "androidx.room:room-testing:$room_version"
+
 }
