@@ -37,7 +37,8 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
         setContentView(R.layout.activity_service_controller)
 
         mAmbientController = AmbientModeSupport.attach(this@ServiceControllerActivity)
-        taskViewModel = ViewModelProviders.of(this@ServiceControllerActivity).get(TaskViewModel::class.java)
+
+//        taskViewModel = ViewModelProviders.of(this@ServiceControllerActivity).get(TaskViewModel::class.java)
 
 
         /**get the view model object */
