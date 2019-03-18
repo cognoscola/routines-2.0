@@ -11,10 +11,10 @@ import androidx.room.Query
 interface TaskDao{
 
     @Query("SELECT * FROM Task")
-    suspend fun getTasks(): List<Task>
+    fun getTasks(): List<Task>
 
     @Insert
-    suspend fun insertTask(task:Task)
+    fun insertTask(task:Task)
 
 /*    @Query("UPDATE users SET age = age + 1 WHERE userId = :userId")
     suspend fun incrementUserAge(userId: String)*/
@@ -23,6 +23,6 @@ interface TaskDao{
     suspend fun updateUser(user: User)*/
 
     @Delete
-    suspend fun deleteTask(task: Task)
+    fun deleteTask(task: Task)
 
 }

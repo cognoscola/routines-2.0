@@ -12,9 +12,9 @@ class TaskProvider(){
     /**
      * get the next task for the user to perform
      */
-    fun getNextTask(): Task {
+    fun getNextTask() {
 
-        return Task(1,"type1","task01","description")
+//        return Task(1,"type1","task01","description")
         //TODO task scheduler should get the next task
 
     }

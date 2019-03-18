@@ -67,7 +67,8 @@ class NotificationDismissReceiver:BroadcastReceiver() {
 //            val mainBuilder = Notification.Builder(context,Notification.)
 
             //Get the task info
-            val taskInfo = context.getTaskPRovider().getNextTask()
+            //TODO
+//            val taskInfo = context.getTaskPRovider().getNextTask()
 
             //FIXME
 /*

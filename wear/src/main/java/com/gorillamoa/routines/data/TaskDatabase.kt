@@ -6,8 +6,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Database(entities = [Task::class], version = 1)
 abstract class TaskDatabase:RoomDatabase(){
@@ -18,7 +16,8 @@ abstract class TaskDatabase:RoomDatabase(){
         @Volatile
         private var INSTANCE: TaskDatabase? = null
 
-        fun getDatabase(context: Context, scope:CoroutineScope): TaskDatabase {
+//        fun getDatabase(context: Context, scope:CoroutineScope): TaskDatabase {
+        fun getDatabase(context: Context): TaskDatabase {
             val tempInstance = INSTANCE
             if (tempInstance != null) {
                 return tempInstance
@@ -28,7 +27,8 @@ abstract class TaskDatabase:RoomDatabase(){
                         context.applicationContext,
                         TaskDatabase::class.java,
                         "Task_database"
-                )       .addCallback(TaskDatabaseCallback(scope))
+                )
+//                        .addCallback(TaskDatabaseCallback(scope))
                         .build()
                 INSTANCE = instance
                 return instance
@@ -39,19 +39,23 @@ abstract class TaskDatabase:RoomDatabase(){
     class TaskDatabaseCallback(private val scope:CoroutineScope):RoomDatabase.Callback(){
         override fun onOpen(db: SupportSQLiteDatabase) {
             super.onOpen(db)
+/*
             INSTANCE?.let {
                 scope.launch(Dispatchers.IO) {
                     //STUFF is happening when we open
-                  /*
+                  */
+/*
                     wordDao.deleteAll()
 
                     var word = Word("Hello")
                     wordDao.insert(word)
                     word = Word("World!")
                     wordDao.insert(word)
- */
+ *//*
+
                 }
             }
+*/
         }
 
     }

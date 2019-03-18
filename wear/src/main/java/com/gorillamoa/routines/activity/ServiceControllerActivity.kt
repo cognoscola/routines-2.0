@@ -5,11 +5,14 @@ import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import androidx.wear.ambient.AmbientModeSupport
 import android.util.Log
+import androidx.lifecycle.Observer
 
 import com.gorillamoa.routines.R
+import com.gorillamoa.routines.data.Task
 import com.gorillamoa.routines.extensions.*
 import com.gorillamoa.routines.viewmodel.TaskViewModel
 import kotlinx.android.synthetic.main.activity_service_controller.*
+import java.util.*
 
 /**
  * A few notes on this class.
@@ -32,14 +35,22 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
     private var mAmbientController: AmbientModeSupport.AmbientController? = null
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_service_controller)
 
         mAmbientController = AmbientModeSupport.attach(this@ServiceControllerActivity)
 
-//        taskViewModel = ViewModelProviders.of(this@ServiceControllerActivity).get(TaskViewModel::class.java)
+        taskViewModel = ViewModelProviders.of(this@ServiceControllerActivity).get(TaskViewModel::class.java)
+        taskViewModel.loadTasks()
+        taskViewModel.tasks.observe(this, Observer {
 
+
+            it.forEach {
+                Log.d("onCreate","A task ${it.name} was inserted")
+            }
+        })
 
         /**get the view model object */
 
@@ -71,8 +82,10 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
         createTask?.setOnClickListener {
 
+            val cal =Calendar.getInstance()
+            cal.timeInMillis = System.currentTimeMillis()
+            taskViewModel.insert(Task(name = "Task:${cal.get(Calendar.HOUR)}:${cal.get(Calendar.MINUTE)}:${cal.get(Calendar.SECOND)}"))
         }
-
     }
 
 

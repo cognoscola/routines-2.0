@@ -14,12 +14,12 @@ import androidx.annotation.WorkerThread
 class TaskRepository(private val taskdao:TaskDao){
 
     @WorkerThread
-    suspend fun getTasks():List<Task>{
+     fun getTasks():List<Task>{
         return taskdao.getTasks()
     }
 
     @WorkerThread
-    suspend fun insert(task: Task) {
+    fun insert(task: Task) {
         taskdao.insertTask(task)
     }
 }
