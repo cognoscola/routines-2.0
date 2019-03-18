@@ -12,6 +12,7 @@ import com.gorillamoa.routines.data.Task
 import com.gorillamoa.routines.extensions.*
 import com.gorillamoa.routines.viewmodel.TaskViewModel
 import kotlinx.android.synthetic.main.activity_service_controller.*
+import java.lang.StringBuilder
 import java.util.*
 
 /**
@@ -46,10 +47,11 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
         taskViewModel.loadTasks()
         taskViewModel.tasks.observe(this, Observer {
 
-
+            val stringBuilder = StringBuilder()
             it.forEach {
-                Log.d("onCreate","A task ${it.name} was inserted")
+                stringBuilder.addTaskLine(it.name,"${it.id}")
             }
+            notificationShowWakeUp(stringBuilder.toString(),createNotificationMainIntentForWakeUp())
         })
 
         /**get the view model object */
@@ -82,9 +84,15 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
         createTask?.setOnClickListener {
 
+            //TODO show on notification updated tasks
             val cal =Calendar.getInstance()
             cal.timeInMillis = System.currentTimeMillis()
             taskViewModel.insert(Task(name = "Task:${cal.get(Calendar.HOUR)}:${cal.get(Calendar.MINUTE)}:${cal.get(Calendar.SECOND)}"))
+        }
+
+        clearTask?.setOnClickListener {
+            //TODO show on notification empty tasks
+            taskViewModel.clear()
         }
     }
 

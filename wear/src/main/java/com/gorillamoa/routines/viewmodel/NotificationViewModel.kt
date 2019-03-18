@@ -56,6 +56,12 @@ class TaskViewModel(application: Application): AndroidViewModel(application){
         }
     }
 
+    fun clear(){
+        Coroutines.io {
+            repository.clearAll()
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
 //        parentJob.cancel()

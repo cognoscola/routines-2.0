@@ -1,6 +1,5 @@
 package com.gorillamoa.routines.data
 
-
 import androidx.lifecycle.LiveData
 import androidx.annotation.WorkerThread
 
@@ -21,5 +20,10 @@ class TaskRepository(private val taskdao:TaskDao){
     @WorkerThread
     fun insert(task: Task) {
         taskdao.insertTask(task)
+    }
+
+    @WorkerThread
+    fun clearAll(){
+        taskdao.clearAll()
     }
 }

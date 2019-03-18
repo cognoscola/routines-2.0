@@ -66,6 +66,13 @@
                 android:layout_height="40dp"
                 android:text="Create Task" />
 
+            <Button
+                android:id="@+id/clearTask"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="clear Task" />
+
+
         </LinearLayout>
 
         <!--<FrameLayout
