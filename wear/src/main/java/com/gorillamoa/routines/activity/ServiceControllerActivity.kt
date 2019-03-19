@@ -47,10 +47,18 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
         taskViewModel.loadTasks()
         taskViewModel.tasks.observe(this, Observer {
 
+
             val stringBuilder = StringBuilder()
-            it.forEach {
-                stringBuilder.addTaskLine(it.name,"${it.id}")
+            if (it.isEmpty()) {
+
+                stringBuilder.addTaskLine("There are no tasks","yea")
+            }else{
+
+                it.forEach {
+                    stringBuilder.addTaskLine(it.name,"${it.id}")
+                }
             }
+
             notificationShowWakeUp(stringBuilder.toString(),createNotificationMainIntentForWakeUp())
         })
 
@@ -87,12 +95,13 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
             //TODO show on notification updated tasks
             val cal =Calendar.getInstance()
             cal.timeInMillis = System.currentTimeMillis()
-            taskViewModel.insert(Task(name = "Task:${cal.get(Calendar.HOUR)}:${cal.get(Calendar.MINUTE)}:${cal.get(Calendar.SECOND)}"))
+            taskViewModel.insertAndReturnList(Task(name = "Task:${cal.get(Calendar.HOUR)}:${cal.get(Calendar.MINUTE)}:${cal.get(Calendar.SECOND)}"))
+//            taskViewModel.insert()
         }
 
         clearTask?.setOnClickListener {
             //TODO show on notification empty tasks
-            taskViewModel.clear()
+            taskViewModel.clearReturnList()
         }
     }
 

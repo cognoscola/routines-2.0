@@ -26,12 +26,13 @@ class TaskViewModel(application: Application): AndroidViewModel(application){
         get() = parentJob + Dispatchers.Main
     private val scope = CoroutineScope(coroutineContext)*/
 
-
-
     private val repository:TaskRepository
-    private val _tasks = MutableLiveData<List<Task>>()
-    val tasks: LiveData<List<Task>> get() = _tasks
 
+
+    private val _tasks = MutableLiveData<List<Task>>()
+
+    //the object on which we can observe changes
+    val tasks: LiveData<List<Task>> get() = _tasks
 
     init{
 
@@ -49,8 +50,24 @@ class TaskViewModel(application: Application): AndroidViewModel(application){
         return tasks
     }
 
+    @UiThread
+    fun insertAndReturnList(task:Task):LiveData<List<Task>>{
+        Coroutines.ioThenMain({repository.insertAndReturnList(task)}){
+            _tasks.value = it
+        }
+        return tasks
+    }
+
+    @UiThread
+    fun clearReturnList(){
+        Coroutines.ioThenMain({repository.clearAndReturnList()}){
+            _tasks.value = it
+        }
+    }
 
     fun insert(task:Task){
+        //Update the change in memory. The LiveData structure will report a change
+
         Coroutines.io{
             repository.insert(task)
         }
@@ -62,6 +79,9 @@ class TaskViewModel(application: Application): AndroidViewModel(application){
         }
     }
 
+    /**
+     * as in this class' memory was cleared
+     */
     override fun onCleared() {
         super.onCleared()
 //        parentJob.cancel()

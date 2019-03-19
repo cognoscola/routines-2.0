@@ -23,6 +23,18 @@ class TaskRepository(private val taskdao:TaskDao){
     }
 
     @WorkerThread
+    fun insertAndReturnList(task:Task):List<Task>{
+        insert(task)
+        return taskdao.getTasks()
+    }
+
+    @WorkerThread
+    fun clearAndReturnList():List<Task>{
+        clearAll()
+        return taskdao.getTasks()
+    }
+
+    @WorkerThread
     fun clearAll(){
         taskdao.clearAll()
     }
