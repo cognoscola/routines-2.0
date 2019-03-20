@@ -8,7 +8,9 @@ import android.content.Intent
 import android.util.Log
 import com.gorillamoa.routines.activity.OnboardActivity
 import com.gorillamoa.routines.app.getTaskPRovider
+import com.gorillamoa.routines.data.Task
 import com.gorillamoa.routines.extensions.WAKE_UP_NOTIFICATION_ID
+import com.gorillamoa.routines.extensions.notificationShowTask
 
 
 /**
@@ -17,36 +19,49 @@ import com.gorillamoa.routines.extensions.WAKE_UP_NOTIFICATION_ID
  */
 class NotificationDismissReceiver:BroadcastReceiver() {
 
-    /**
-     * If a notification is dismissed, it could be for a variety of reasons.
-     * First, we need to consider what type of notification was dismissed.
-     *
-     * Types:
-     *
-     * NOTIFICATION_TYPE_WAKEUP - the user receives at beginning of each day.
-     * NOTIFICATION_TYPE_TASK - the user receives when a new task is present
-     * NOTIFICATION_TYPE_SLEEP - the user receives when its time to end the day.
-     *
-     * Next we should consider why the notification dismissed:
-     * - the user clicked on the notification, and it went into the app.
-     * - the user swiped, if so, why did they swipe?
-     *
-     *
-     */
+    companion object {
+        /**
+         * If a notification is dismissed, it could be for a variety of reasons.
+         * First, we need to consider what type of notification was dismissed.
+         *
+         * Types:
+         *
+         * NOTIFICATION_TYPE_WAKEUP - the user receives at beginning of each day. */
+        const val TYPE_WAKE_UP = "wakeup"
+        /**
+         * NOTIFICATION_TYPE_TASK - the user receives when a new task is present */
+        const val TYPE_TASK = "task"
+        /**
+         *
+         * NOTIFICATION_TYPE_SLEEP - the user receives when its time to end the day. */
+         const val TYPE_SLEEP = "sleep"
+         /**
+         * Next we should consider why the notification dismissed:
+         * - the user clicked on the notification, and it went into the app.
+         * - the user swiped, if so, why did they swipe?
+         *
+         */
+    }
 
     override fun onReceive(context: Context, intent: Intent?) {
-        Log.d("onReceive","Well... then..")
 
-        val notificationId = intent?.extras?.getInt("com.gorillamoa.routines.notificationId")
-        Log.d("onReceive","ID:$notificationId")
+        intent?.let {
 
-        when (notificationId) {
-
-            //NOTIFICATION_TYPE_WAKEUP
-            WAKE_UP_NOTIFICATION_ID -> {
-                Log.d("onReceive","We have a wakeup notification dismissal")
-                makeTaskNotification(context)
-
+            when (intent.action) {
+                TYPE_SLEEP -> {
+                    Log.d("onReceive","Sleep Dismissal")
+                }
+                TYPE_TASK -> {
+                    Log.d("onReceive","Task Dismissal")
+                }
+                TYPE_WAKE_UP -> {
+                    Log.d("onReceive","Wake Up Dismissal")
+                    //TODO fetch from database
+                    context.notificationShowTask(Task(23,"Sample Task","Sample Description"))
+                }
+                else ->{
+                    Log.d("onReceive","Unknown Dimissal Type")
+                }
             }
         }
     }

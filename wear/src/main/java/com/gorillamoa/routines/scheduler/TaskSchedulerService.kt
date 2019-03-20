@@ -4,8 +4,10 @@ import android.content.Context
 import com.gorillamoa.routines.coroutines.Coroutines
 
 import com.gorillamoa.routines.extensions.getDataRepository
+import com.gorillamoa.routines.extensions.saveTaskList
 import com.gorillamoa.routines.extensions.stringifyTasks
 import java.lang.StringBuilder
+import java.util.*
 
 /**
  * Is in charge of scheduling tasks. Scheduling usually
@@ -37,22 +39,33 @@ class TaskScheduler{
         /**
          * Using the context, we'll fetch task data
          * and return the string version of it.
+         * @param context is the application context
+         * @param scheduleCallback is a function to execute since we require
+         * fetching from a database, we need to asynchronously execute this function
+         *
+         * TaskString - is the list of tasks for the day as a string
+         * tid - is the first task to start
          */
-        fun schedule(context: Context, scheduleCallback: (taskString: String)->Any){
+        fun schedule(context: Context, scheduleCallback: (taskString: String, tid:Int)->Any){
 
 
             val repository = context.getDataRepository()
 
             //For now we'll get all tasks
             Coroutines.ioThenMain({repository.getTasks()})
-            {
-                scheduleCallback.invoke(StringBuilder().stringifyTasks(it))
+            { taskList ->
+
+                //We'll need to record the order so that we can fetch these scheduled tasks
+                //throughout the day
+
+                val queue = ArrayDeque<Int>()
+
+                taskList?.forEach {
+                    queue.push(it.id)
+                }
+                context.saveTaskList(queue)
+                scheduleCallback.invoke(StringBuilder().stringifyTasks(taskList),queue.first)
             }
-
-            //We'll need to record the order so that we can fetch these scheduled tasks
-            //throughout the day
-            //todo record today's schedule in the preferences
         }
-
     }
 }

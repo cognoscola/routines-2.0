@@ -4,11 +4,15 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import com.gorillamoa.routines.activity.OnboardActivity
+import com.gorillamoa.routines.receiver.NotificationDismissReceiver
 import com.gorillamoa.routines.receiver.WakeUpReceiver
 
 /**
  * A place to store all the Intent and PendingIntent extensions
  */
+
+private const val TASK_ID ="TaskId"
+
 
 /**
  * Creates a PendingIntent for the WakeUpReceiver
@@ -47,4 +51,19 @@ fun Context.createWakeUpRecieverIntent():Intent{
 fun Context.createNotificationMainIntentForWakeUp():PendingIntent{
     val mainIntent = Intent(this, OnboardActivity::class.java)
     return PendingIntent.getActivity(this, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+}
+
+/**
+ * The user dismisses a Wake Up Intent. System needs to take an action
+ * For now We'll just launch the first task.
+ * @param tid is the task id of the first task
+ */
+fun Context.createNotificationDeleteIntentForWakeUp(tid:Int):PendingIntent{
+    val dismissIntent = Intent(this, NotificationDismissReceiver::class.java)
+    //signal the receiver that it came from a wake up notification
+    dismissIntent.action = NotificationDismissReceiver.TYPE_WAKE_UP
+    //we're passing in the tid
+    dismissIntent.putExtra(TASK_ID,tid)
+    return PendingIntent.getBroadcast(this,0, dismissIntent,PendingIntent.FLAG_ONE_SHOT)
+
 }

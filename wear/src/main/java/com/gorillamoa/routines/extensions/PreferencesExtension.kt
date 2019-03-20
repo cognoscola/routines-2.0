@@ -10,6 +10,7 @@ private const val isAlarmActive= "isAlarmActive"
 
 private const val WAKE_UP_HOUR = "wake_up_hour"
 private const val WAKE_UP_MINUTE = "wake_up_minute"
+private const val TASK_ORDER = "task_order"
 
 fun Context.getLocalSettings():SharedPreferences{
 
@@ -43,6 +44,16 @@ fun Context.saveAlarmStatus(isAlarmSet:Boolean){
     prefs.edit()
             .putBoolean(isAlarmActive,isAlarmSet)
             .apply()
+}
+
+fun Context.saveTaskList(queue:ArrayDeque<Int>){
+    if (queue.size > 0) {
+
+        val prefs = getLocalSettings()
+        prefs.edit()
+            .putString(TASK_ORDER,queue.joinToString(","))
+            .apply()
+    }
 }
 
 

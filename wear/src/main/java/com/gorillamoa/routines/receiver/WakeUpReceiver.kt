@@ -74,10 +74,13 @@ class WakeUpReceiver:BroadcastReceiver(){
 
                     Log.d("onReceive", "ACTION_DEFAULT")
 
-                    TaskScheduler.schedule(context){ taskString ->
+                    TaskScheduler.schedule(context){ taskString, firstTaskId ->
+
                         context.notificationShowWakeUp(
                                 taskString,
-                                context.createNotificationMainIntentForWakeUp())
+                                context.createNotificationMainIntentForWakeUp(),
+                                context.createNotificationDeleteIntentForWakeUp(firstTaskId)
+                        )
                     }
                 }
                 else ->{
