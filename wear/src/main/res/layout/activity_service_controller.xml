@@ -72,6 +72,12 @@
                 android:layout_height="40dp"
                 android:text="clear Task" />
 
+            <Button
+                android:id="@+id/dummy"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Dummy" />
+
 
         </LinearLayout>
 

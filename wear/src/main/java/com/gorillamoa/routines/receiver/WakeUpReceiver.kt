@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.gorillamoa.routines.extensions.*
+import com.gorillamoa.routines.scheduler.TaskScheduler
 
 /**
  * What to do when our app sounds the "wake up" alarm.
@@ -64,16 +65,20 @@ class WakeUpReceiver:BroadcastReceiver(){
 
                 ACTION_DEFAULT -> {
 
+
+                    //TODO get scheduler to decide which tasks to fetch for the day
+
+                    //TODO get scheduler to decide the order of tasks to perform
+
+                    //TODO after getting tasks and their order, create a String out of them
+
                     Log.d("onReceive", "ACTION_DEFAULT")
-                    context.notificationShowWakeUp(StringBuilder().apply {
-                            addTaskLine("meditate","1hr")
-                            /*addTaskLine("Meeting with John again twice","9min")
-                            addTaskLine("Ultra super short","1reps")
-                            addTaskLine("Dod","4catches")
-                            addTaskLine("pick kids up from school","2p")
-                            buildEndLine(20)*/
-                    }.toString()
-                    ,context.createNotificationMainIntentForWakeUp())
+
+                    TaskScheduler.schedule(context){ taskString ->
+                        context.notificationShowWakeUp(
+                                taskString,
+                                context.createNotificationMainIntentForWakeUp())
+                    }
                 }
                 else ->{
 

@@ -79,6 +79,12 @@ class TaskViewModel(application: Application): AndroidViewModel(application){
         }
     }
 
+    fun dummy(){
+        Coroutines.io{
+            repository.dummy()
+        }
+    }
+
     /**
      * as in this class' memory was cleared
      */

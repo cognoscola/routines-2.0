@@ -20,6 +20,9 @@ interface TaskDao{
     /*@Update
     suspend fun updateUser(user: User)*/
 
+    @Insert
+    fun insertTasks(vararg task:Task)
+
     @Delete
     fun deleteTask(task: Task)
 

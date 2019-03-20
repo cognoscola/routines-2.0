@@ -36,7 +36,6 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
     private var mAmbientController: AmbientModeSupport.AmbientController? = null
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_service_controller)
@@ -47,19 +46,9 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
         taskViewModel.loadTasks()
         taskViewModel.tasks.observe(this, Observer {
 
-
-            val stringBuilder = StringBuilder()
-            if (it.isEmpty()) {
-
-                stringBuilder.addTaskLine("There are no tasks","yea")
-            }else{
-
-                it.forEach {
-                    stringBuilder.addTaskLine(it.name,"${it.id}")
-                }
-            }
-
-            notificationShowWakeUp(stringBuilder.toString(),createNotificationMainIntentForWakeUp())
+            notificationShowWakeUp(
+                    StringBuilder().stringifyTasks(it),
+                    createNotificationMainIntentForWakeUp())
         })
 
         /**get the view model object */
@@ -102,6 +91,13 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
         clearTask?.setOnClickListener {
             //TODO show on notification empty tasks
             taskViewModel.clearReturnList()
+        }
+
+        dummy?.setOnClickListener {
+
+            //We'll create several dummy tasks on to which we can test things
+            taskViewModel.dummy()
+
         }
     }
 

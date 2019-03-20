@@ -38,4 +38,15 @@ class TaskRepository(private val taskdao:TaskDao){
     fun clearAll(){
         taskdao.clearAll()
     }
+
+    @WorkerThread
+    fun dummy(){
+        taskdao.insertTasks(
+                Task(name = "Meditate Morn",description = "First thing in the morning"),
+                Task(name = "Cold Shower",description = "after meditation"),
+                Task(name = "Mobilize",description = "in the day"),
+                Task(name = "French Practice",description = "For 1 hour "),
+                Task(name = "Exercises",description = "Climbing Drills")
+        )
+    }
 }
