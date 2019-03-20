@@ -13,6 +13,11 @@ import androidx.annotation.WorkerThread
 class TaskRepository(private val taskdao:TaskDao){
 
     @WorkerThread
+    fun getTaskById(tid:Int):Task{
+        return taskdao.getTask(tid)
+    }
+
+    @WorkerThread
      fun getTasks():List<Task>{
         return taskdao.getTasks()
     }

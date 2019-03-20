@@ -9,8 +9,11 @@ import android.util.Log
 import com.gorillamoa.routines.activity.OnboardActivity
 import com.gorillamoa.routines.app.getTaskPRovider
 import com.gorillamoa.routines.data.Task
+import com.gorillamoa.routines.data.TaskRepository
+import com.gorillamoa.routines.extensions.TASK_ID
 import com.gorillamoa.routines.extensions.WAKE_UP_NOTIFICATION_ID
 import com.gorillamoa.routines.extensions.notificationShowTask
+import com.gorillamoa.routines.scheduler.TaskScheduler
 
 
 /**
@@ -56,8 +59,13 @@ class NotificationDismissReceiver:BroadcastReceiver() {
                 }
                 TYPE_WAKE_UP -> {
                     Log.d("onReceive","Wake Up Dismissal")
-                    //TODO fetch from database
-                    context.notificationShowTask(Task(23,"Sample Task","Sample Description"))
+
+                    TaskScheduler.getTask(context,intent.getIntExtra(TASK_ID,-1)){task ->
+
+                        task?.let {
+                            context.notificationShowTask(it)
+                        }
+                    }
                 }
                 else ->{
                     Log.d("onReceive","Unknown Dimissal Type")

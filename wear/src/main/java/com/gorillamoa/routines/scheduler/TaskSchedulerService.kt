@@ -2,6 +2,7 @@ package com.gorillamoa.routines.scheduler
 
 import android.content.Context
 import com.gorillamoa.routines.coroutines.Coroutines
+import com.gorillamoa.routines.data.Task
 
 import com.gorillamoa.routines.extensions.getDataRepository
 import com.gorillamoa.routines.extensions.saveTaskList
@@ -48,8 +49,8 @@ class TaskScheduler{
          */
         fun schedule(context: Context, scheduleCallback: (taskString: String, tid:Int)->Any){
 
-
             val repository = context.getDataRepository()
+
 
             //For now we'll get all tasks
             Coroutines.ioThenMain({repository.getTasks()})
@@ -65,6 +66,15 @@ class TaskScheduler{
                 }
                 context.saveTaskList(queue)
                 scheduleCallback.invoke(StringBuilder().stringifyTasks(taskList),queue.first)
+            }
+        }
+
+        fun getTask(context:Context, tid:Int, scheduleCallback: (task:Task?) -> Any?){
+
+
+            val repository = context.getDataRepository()
+            Coroutines.ioThenMain({repository.getTaskById(tid)}){
+                scheduleCallback.invoke(it)
             }
         }
     }

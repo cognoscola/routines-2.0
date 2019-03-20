@@ -11,7 +11,7 @@ import com.gorillamoa.routines.receiver.WakeUpReceiver
  * A place to store all the Intent and PendingIntent extensions
  */
 
-private const val TASK_ID ="TaskId"
+public const val TASK_ID ="TaskId"
 
 
 /**
