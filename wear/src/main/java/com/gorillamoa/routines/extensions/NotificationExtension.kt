@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.text.Html
 import com.gorillamoa.routines.data.Task
-import com.gorillamoa.routines.receiver.WakeUpReceiver
 
 const val WAKE_UP_NOTIFICATION_ID =1
 const val SLEEP_NOTIFICATION_ID =65535
@@ -53,7 +52,7 @@ fun Context.notificationShowTask(task: Task,
         getBuilder().apply {
 
                 setContentTitle(task.name)
-                setContentText("This is a sample task")
+                setContentText(task.description)
                 setAutoCancel(true)
                 setCategory(Notification.CATEGORY_REMINDER)
                 setDeleteIntent(dimissPendingIntent)
@@ -64,6 +63,32 @@ fun Context.notificationShowTask(task: Task,
                         build()
                         )
         }
+}
+
+fun Context.notificationShowSleep(){
+
+        val manager = getNotificationManager()
+        getBuilder().apply {
+
+                //TODO launch with alarm OR with task completion
+
+                //TODO change text depending on above condition
+                setContentTitle(Html.fromHtml("All done! &#127881", Html.FROM_HTML_MODE_COMPACT))
+//                setContentTitle(Html.fromHtml("All done! &#127769", Html.FROM_HTML_MODE_COMPACT))
+                //TODO change text depending on above conditions
+                setContentText("See Today's Accomplishments ")
+                setAutoCancel(true)
+                setCategory(Notification.CATEGORY_SOCIAL)
+//                setDeleteIntent(dimissPendingIntent)
+
+                manager.notify(
+                        NOTIFICATION_TAG,
+                        SLEEP_NOTIFICATION_ID,
+                        build()
+                )
+        }
+
+
 }
 
 

@@ -65,21 +65,14 @@ class WakeUpReceiver:BroadcastReceiver(){
 
                 ACTION_DEFAULT -> {
 
-
-                    //TODO get scheduler to decide which tasks to fetch for the day
-
-                    //TODO get scheduler to decide the order of tasks to perform
-
-                    //TODO after getting tasks and their order, create a String out of them
-
                     Log.d("onReceive", "ACTION_DEFAULT")
 
-                    TaskScheduler.schedule(context){ taskString, firstTaskId ->
+                    TaskScheduler.schedule(context){ taskString ->
 
                         context.notificationShowWakeUp(
                                 taskString,
                                 context.createNotificationMainIntentForWakeUp(),
-                                context.createNotificationDeleteIntentForWakeUp(firstTaskId)
+                                context.createNotificationDeleteIntentForWakeUp()
                         )
                     }
                 }

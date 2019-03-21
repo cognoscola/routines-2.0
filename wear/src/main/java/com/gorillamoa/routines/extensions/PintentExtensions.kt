@@ -56,11 +56,8 @@ fun Context.createNotificationMainIntentForWakeUp():PendingIntent{
 /**
  * The user dismisses a Wake Up Intent. System needs to take an action
  * For now We'll just launch the first task.
- * @param tid is the task id of the first task. Notice that for a wake up notification,
- * this is usually the next task to start, while on a task notification it is the id
- * id of the task being dismissed
  */
-fun Context.createNotificationDeleteIntentForWakeUp(tid:Int):PendingIntent{
+fun Context.createNotificationDeleteIntentForWakeUp():PendingIntent{
     val dismissIntent = Intent(this, NotificationDismissReceiver::class.java)
     //signal the receiver that it came from a wake up notification
     dismissIntent.action = NotificationDismissReceiver.TYPE_WAKE_UP

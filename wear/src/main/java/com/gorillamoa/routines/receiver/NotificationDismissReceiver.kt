@@ -51,10 +51,6 @@ class NotificationDismissReceiver:BroadcastReceiver() {
                     //we dismissed a task. Check its data to see that it matches the current
                     //data at the front.
 
-
-
-
-
                     TaskScheduler.getNextTask(context,intent.getIntExtra(TASK_ID,-1)){ task ->
 
                         task?.let {

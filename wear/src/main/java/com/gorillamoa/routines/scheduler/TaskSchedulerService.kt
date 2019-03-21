@@ -27,6 +27,8 @@ import java.util.*
  */
 class TaskScheduler{
 
+    //TODO account for day's progress. For now we'll just try to see # of tasks completed
+    //TODO reset at the wake up alarm
 
     /**
      * Has the scheduler already scheduled tasks?
@@ -49,7 +51,7 @@ class TaskScheduler{
          * TaskString - is the list of tasks for the day as a string
          * tid - is the first task to start
          */
-        fun schedule(context: Context, scheduleCallback: (taskString: String, tid:Int)->Any){
+        fun schedule(context: Context, scheduleCallback: (taskString: String)->Any){
 
             val repository = context.getDataRepository()
 
@@ -67,7 +69,7 @@ class TaskScheduler{
                     queue.push(it.id)
                 }
                 context.saveTaskList(queue)
-                scheduleCallback.invoke(StringBuilder().stringifyTasks(taskList),queue.first)
+                scheduleCallback.invoke(StringBuilder().stringifyTasks(taskList))
             }
         }
 
@@ -104,6 +106,11 @@ class TaskScheduler{
                 }
             }else{
                 Log.d("getNextTask","Out of tasks!")
+                //TODO check if any tasks were completed, if not don't show sleep notification
+
+                //TODO else show sleep notification
+                //TODO schedule alarm at some point S
+                //scheduleCallback.invoke(Task(name = "D"))
             }
 
 
