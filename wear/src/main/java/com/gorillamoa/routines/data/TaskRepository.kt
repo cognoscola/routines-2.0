@@ -1,6 +1,6 @@
 package com.gorillamoa.routines.data
 
-import androidx.lifecycle.LiveData
+
 import androidx.annotation.WorkerThread
 
 
@@ -47,11 +47,11 @@ class TaskRepository(private val taskdao:TaskDao){
     @WorkerThread
     fun dummy(){
         taskdao.insertTasks(
-                Task(name = "Meditate Morn",description = "First thing in the morning"),
+                Task(name = "Meditate Morn",description = "First thing in the morning, Remember to be equanimous"),
                 Task(name = "Cold Shower",description = "after meditation"),
                 Task(name = "Mobilize",description = "in the day"),
-                Task(name = "French Practice",description = "For 1 hour "),
-                Task(name = "Exercises",description = "Climbing Drills")
+                Task(name = "French Practice",description = "For 1 hour. Verbs. Nouns "),
+                Task(name = "Exercises",description = "Climbing Drills, stretching, ")
         )
     }
 }

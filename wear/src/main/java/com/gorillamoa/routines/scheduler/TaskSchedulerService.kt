@@ -1,10 +1,12 @@
 package com.gorillamoa.routines.scheduler
 
 import android.content.Context
+import android.util.Log
 import com.gorillamoa.routines.coroutines.Coroutines
 import com.gorillamoa.routines.data.Task
 
 import com.gorillamoa.routines.extensions.getDataRepository
+import com.gorillamoa.routines.extensions.getDayTaskList
 import com.gorillamoa.routines.extensions.saveTaskList
 import com.gorillamoa.routines.extensions.stringifyTasks
 import java.lang.StringBuilder
@@ -69,13 +71,42 @@ class TaskScheduler{
             }
         }
 
-        fun getTask(context:Context, tid:Int, scheduleCallback: (task:Task?) -> Any?){
+        /**
+         * Will fetch the next task which the scheduler thinks should be fetched
+         * @param context is the application context
+         * @param currentTid is the current task id (which the user is currently doing
+         * @param scheduleCallback is the call back function to fetch the next task
+         */
+        fun getNextTask(context:Context, currentTid:Int, scheduleCallback: (task:Task?) -> Any?){
 
+            var nextTid:Int =-1
+            val taskList = context.getDayTaskList()
+            if (currentTid != -1) {
+                //we'll fetch the next tid from prefs
 
-            val repository = context.getDataRepository()
-            Coroutines.ioThenMain({repository.getTaskById(tid)}){
-                scheduleCallback.invoke(it)
+                taskList.removeFirstOccurrence(currentTid)
+                context.saveTaskList(taskList)
+                //TODO update the task history in the DB
+
             }
+
+            //always fetch from the end of the list
+            if (taskList.size >= 1) {
+                nextTid = taskList.first
+            }
+
+            if (nextTid != -1) {
+
+                val repository = context.getDataRepository()
+                Log.d("getNextTask","Will show Task:$nextTid")
+                Coroutines.ioThenMain({repository.getTaskById(nextTid)}){
+                    scheduleCallback.invoke(it)
+                }
+            }else{
+                Log.d("getNextTask","Out of tasks!")
+            }
+
+
         }
     }
 }

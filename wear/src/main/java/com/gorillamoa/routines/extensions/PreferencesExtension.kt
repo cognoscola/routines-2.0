@@ -3,6 +3,7 @@ package com.gorillamoa.routines.extensions
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import java.util.*
 
 private const val LOCAL_SETTINGS ="local_app_settings"
@@ -50,11 +51,51 @@ fun Context.saveTaskList(queue:ArrayDeque<Int>){
     if (queue.size > 0) {
 
         val prefs = getLocalSettings()
+        val taskString = queue.joinToString(",")
+        Log.d("saveTaskList","Scheduled Tasks: $taskString")
         prefs.edit()
-            .putString(TASK_ORDER,queue.joinToString(","))
+            .putString(TASK_ORDER,taskString)
             .apply()
     }
 }
 
+/**
+ * We get the task list, if there is any.
+ */
+fun Context.getDayTaskList():ArrayDeque<Int>{
 
+    val prefs = getLocalSettings()
+    val taskString = prefs.getString(TASK_ORDER,"-1")
+    if (taskString != "-1") {
+        val deque = ArrayDeque<Int>()
+        if (taskString!!.contains(",")) {
+
+            try {
+                val sequence = taskString.split(",")
+                sequence.forEach {
+                    try {
+                        deque.add(it.toInt())
+                    } catch (e: IllegalArgumentException) {
+                        Log.d("getDayTaskList", "Tried to convert numbers", e)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.d("getDayTaskList","",e)
+                return ArrayDeque<Int>().apply { add(-1) }
+            }
+        }else{
+            //only one task today
+            deque.add(taskString.toInt())
+        }
+        return deque
+    }else{
+        return ArrayDeque<Int>().apply {
+          add(-1)
+        }
+    }
+}
+
+fun Context.getCurrentTask():Int{
+    return getDayTaskList().first
+}
 

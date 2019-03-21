@@ -1,18 +1,10 @@
 package com.gorillamoa.routines.receiver
 
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.gorillamoa.routines.activity.OnboardActivity
-import com.gorillamoa.routines.app.getTaskPRovider
-import com.gorillamoa.routines.data.Task
-import com.gorillamoa.routines.data.TaskRepository
-import com.gorillamoa.routines.extensions.TASK_ID
-import com.gorillamoa.routines.extensions.WAKE_UP_NOTIFICATION_ID
-import com.gorillamoa.routines.extensions.notificationShowTask
+import com.gorillamoa.routines.extensions.*
 import com.gorillamoa.routines.scheduler.TaskScheduler
 
 
@@ -56,14 +48,36 @@ class NotificationDismissReceiver:BroadcastReceiver() {
                 }
                 TYPE_TASK -> {
                     Log.d("onReceive","Task Dismissal")
+                    //we dismissed a task. Check its data to see that it matches the current
+                    //data at the front.
+
+
+
+
+
+                    TaskScheduler.getNextTask(context,intent.getIntExtra(TASK_ID,-1)){ task ->
+
+                        task?.let {
+                            context.notificationShowTask(
+                                    it,
+                                    dimissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!)
+                            )
+                        }
+                    }
+
+
+
                 }
                 TYPE_WAKE_UP -> {
                     Log.d("onReceive","Wake Up Dismissal")
 
-                    TaskScheduler.getTask(context,intent.getIntExtra(TASK_ID,-1)){task ->
+                    TaskScheduler.getNextTask(context,-1){ task ->
 
                         task?.let {
-                            context.notificationShowTask(it)
+                            context.notificationShowTask(
+                                    it,
+                                    dimissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!)
+                            )
                         }
                     }
                 }
@@ -71,45 +85,6 @@ class NotificationDismissReceiver:BroadcastReceiver() {
                     Log.d("onReceive","Unknown Dimissal Type")
                 }
             }
-        }
-    }
-
-    private fun makeTaskNotification(context:Context){
-
-        (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
-
-            //TODO ENSURE 1.0+ compatibility, right now it only works on 2.0
-
-            val taskNotificationId = 22
-
-            /** Prepare the intent for when user decides click Open (Wear) or the notification (Phone) **/
-            val mainIntent = Intent(context, OnboardActivity::class.java)
-            val mainPendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-            //FIXME important
-//            val mainBuilder = Notification.Builder(context,Notification.)
-
-            //Get the task info
-            //TODO
-//            val taskInfo = context.getTaskPRovider().getNextTask()
-
-            //FIXME
-/*
-            mainBuilder
-//                    .setStyle(bigTextStyle)
-                    //TODO show weather in one icon in the notification title
-                    .setContentTitle(taskInfo.name)
-                    .setSmallIcon(com.gorillamoa.routines.R.mipmap.ic_launcher)
-                    //TODO set the auto cancel configurable by the user.
-                    .setAutoCancel(true)
-                    .setCategory(Notification.CATEGORY_REMINDER)
-                    .setContentIntent(mainPendingIntent)
-                    //TODO set dismiss intent for a NOTIFICATION_TYPE_TASK
-//                    .setDeleteIntent(dismissPendingIntent)
-*/
-
-            //FIXME
-//            notify(context.resources.getString(R.string.notification_tag),taskNotificationId, mainBuilder.build())
         }
     }
 }

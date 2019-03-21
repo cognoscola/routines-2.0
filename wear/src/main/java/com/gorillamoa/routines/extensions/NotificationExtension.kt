@@ -56,6 +56,7 @@ fun Context.notificationShowTask(task: Task,
                 setContentText("This is a sample task")
                 setAutoCancel(true)
                 setCategory(Notification.CATEGORY_REMINDER)
+                setDeleteIntent(dimissPendingIntent)
 
                 manager.notify(
                         NOTIFICATION_TAG,
