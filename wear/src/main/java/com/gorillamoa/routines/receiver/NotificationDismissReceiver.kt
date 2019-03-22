@@ -53,16 +53,18 @@ class NotificationDismissReceiver:BroadcastReceiver() {
 
                     TaskScheduler.getNextTask(context,intent.getIntExtra(TASK_ID,-1)){ task ->
 
+
                         task?.let {
                             context.notificationShowTask(
                                     it,
                                     dimissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!)
                             )
-                        }
+
+                            //first time using this notation, so just to clarify. Since task was null the
+                            //commands on the right side of the elvis (?:) notation was executed
+
+                        } ?: context.notificationShowSleep()
                     }
-
-
-
                 }
                 TYPE_WAKE_UP -> {
                     Log.d("onReceive","Wake Up Dismissal")

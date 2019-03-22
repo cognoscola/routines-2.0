@@ -107,7 +107,7 @@ class TaskScheduler{
             }else{
                 Log.d("getNextTask","Out of tasks!")
                 //TODO check if any tasks were completed, if not don't show sleep notification
-
+                    scheduleCallback.invoke(null)
                 //TODO else show sleep notification
                 //TODO schedule alarm at some point S
                 //scheduleCallback.invoke(Task(name = "D"))
