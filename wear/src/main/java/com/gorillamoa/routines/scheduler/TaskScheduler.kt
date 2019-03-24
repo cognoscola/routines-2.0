@@ -4,11 +4,8 @@ import android.content.Context
 import android.util.Log
 import com.gorillamoa.routines.coroutines.Coroutines
 import com.gorillamoa.routines.data.Task
+import com.gorillamoa.routines.extensions.*
 
-import com.gorillamoa.routines.extensions.getDataRepository
-import com.gorillamoa.routines.extensions.getDayTaskList
-import com.gorillamoa.routines.extensions.saveTaskList
-import com.gorillamoa.routines.extensions.stringifyTasks
 import java.lang.StringBuilder
 import java.util.*
 
@@ -61,16 +58,26 @@ class TaskScheduler{
             { taskList ->
 
                 //We'll need to record the order so that we can fetch these scheduled tasks
-                //throughout the day
-
+                //throughout the day, for now just place them in the order that they appear
+                //TODO FETCH some habits
+                //TODO FETCH Some goals
                 val queue = ArrayDeque<Int>()
 
                 taskList?.forEach {
                     queue.push(it.id)
                 }
                 context.saveTaskList(queue)
+                context.setReadyToApprove()
                 scheduleCallback.invoke(StringBuilder().stringifyTasks(taskList))
             }
+        }
+
+        /**
+         * The user has approved the schedule and so now we can begin assigning tasks
+         */
+        fun approve(context:Context){
+            val taskList = context.getDayTaskList()
+            context.resetStats(taskList.size)
         }
 
         /**
@@ -83,18 +90,21 @@ class TaskScheduler{
 
             var nextTid:Int =-1
             val taskList = context.getDayTaskList()
+
             if (currentTid != -1) {
                 //we'll fetch the next tid from prefs
+                if(taskList.removeFirstOccurrence(currentTid)){
 
-                taskList.removeFirstOccurrence(currentTid)
-                context.saveTaskList(taskList)
+                    context.incrementCompletionCount()
+                    context.saveTaskList(taskList)
+                }
+
                 //TODO update the task history in the DB
-
             }
 
             //always fetch from the end of the list
             if (taskList.size >= 1) {
-                nextTid = taskList.first
+                nextTid = taskList.last
             }
 
             if (nextTid != -1) {
@@ -105,15 +115,24 @@ class TaskScheduler{
                     scheduleCallback.invoke(it)
                 }
             }else{
+
                 Log.d("getNextTask","Out of tasks!")
                 //TODO check if any tasks were completed, if not don't show sleep notification
                     scheduleCallback.invoke(null)
-                //TODO else show sleep notification
                 //TODO schedule alarm at some point S
-                //scheduleCallback.invoke(Task(name = "D"))
+
             }
 
 
+        }
+
+        /**
+         * The user may finish all his tasks, or they finish the day despite completing
+         * all tasks. Its time to reset everything
+         */
+        fun endDay(context: Context){
+            Log.d("endDay","The day is over")
+            context.cancelApproval()
         }
     }
 }

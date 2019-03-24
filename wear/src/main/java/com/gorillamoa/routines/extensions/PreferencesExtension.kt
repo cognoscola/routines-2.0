@@ -11,7 +11,22 @@ private const val isAlarmActive= "isAlarmActive"
 
 private const val WAKE_UP_HOUR = "wake_up_hour"
 private const val WAKE_UP_MINUTE = "wake_up_minute"
-private const val TASK_ORDER = "task_order"
+
+
+//Task related information
+private const val TASK_ORDER = "order"
+private const val TOTAL_ASSIGNED  = "assigned"
+
+
+private const val READY_TO_APPROVE = "ready"
+
+/**
+ * The number of tasks completed for the day. Note that this value is 'locked'
+ * if it is -1. Change it to another value to unlock it
+ */
+private const val TOTAL_COMPLETED  = "completed"
+
+
 
 fun Context.getLocalSettings():SharedPreferences{
 
@@ -47,6 +62,10 @@ fun Context.saveAlarmStatus(isAlarmSet:Boolean){
             .apply()
 }
 
+/**
+ * save task list
+ * @param queue is the task list
+ */
 fun Context.saveTaskList(queue:ArrayDeque<Int>){
     if (queue.size > 0) {
 
@@ -95,7 +114,43 @@ fun Context.getDayTaskList():ArrayDeque<Int>{
     }
 }
 
-fun Context.getCurrentTask():Int{
-    return getDayTaskList().first
+fun Context.isReadyToApprove():Boolean{
+    return getLocalSettings().getBoolean(READY_TO_APPROVE,false)
+}
+
+fun Context.setReadyToApprove(){
+    getLocalSettings().edit().putBoolean(READY_TO_APPROVE,true).apply()
+}
+
+fun Context.cancelApproval(){
+    getLocalSettings().edit().putBoolean(READY_TO_APPROVE,false).apply()
+}
+
+
+
+fun Context.resetStats(count:Int){
+    val settings = getLocalSettings()
+    settings.edit()
+            .putInt(TOTAL_ASSIGNED, count)
+            .putInt(TOTAL_COMPLETED, 0)
+            .apply()
+
+}
+
+fun Context.incrementCompletionCount(){
+    val settings = getLocalSettings()
+    var count = settings.getInt(TOTAL_COMPLETED,-1)
+    if (count != -1) {
+        count++
+        settings.edit().putInt(TOTAL_COMPLETED,count).apply()
+    }
+}
+
+
+fun Context.getCompletionCountToday():Int{
+    return getLocalSettings().getInt(TOTAL_COMPLETED,-1)
+}
+fun Context.getTotalAssignedToday():Int{
+    return getLocalSettings().getInt(TOTAL_ASSIGNED,-1)
 }
 

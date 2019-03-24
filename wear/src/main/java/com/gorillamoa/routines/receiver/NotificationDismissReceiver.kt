@@ -63,13 +63,22 @@ class NotificationDismissReceiver:BroadcastReceiver() {
                             //first time using this notation, so just to clarify. Since task was null the
                             //commands on the right side of the elvis (?:) notation was executed
 
-                        } ?: context.notificationShowSleep()
+                        } ?: run{
+                            context.notificationShowSleep()
+                            TaskScheduler.endDay(context)
+                        }
                     }
                 }
                 TYPE_WAKE_UP -> {
                     Log.d("onReceive","Wake Up Dismissal")
 
+                    //TODO we automatically approve the schedule on dismissa of notification, make this optional
+                    if (context.isReadyToApprove()) {
+                        TaskScheduler.approve(context)
+                    }
+
                     TaskScheduler.getNextTask(context,-1){ task ->
+
 
                         task?.let {
                             context.notificationShowTask(

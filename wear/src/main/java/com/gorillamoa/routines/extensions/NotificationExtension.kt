@@ -31,7 +31,7 @@ fun Context.notificationShowWakeUp(tasks:String,
 
         val manager = getNotificationManager()
         val mainBuilder = getBuilder()
-        mainBuilder.setStyle(prepareBigTextStyle(tasks))
+        mainBuilder.style =prepareBigTextStyle(tasks,"Today's tasks &#128170;")
         mainBuilder.setContentIntent(mainPendingIntent)
 
         //TODO make the dismiss action optional
@@ -77,6 +77,12 @@ fun Context.notificationShowSleep(){
 //                setContentTitle(Html.fromHtml("All done! &#127769", Html.FROM_HTML_MODE_COMPACT))
                 //TODO change text depending on above conditions
                 setContentText("See Today's Accomplishments ")
+
+                //TODO MOVE THIS ELSEWHERE
+                val completed = getCompletionCountToday()
+                val total = getTotalAssignedToday()
+
+                style =prepareBigTextStyle("$completed/$total Tasks Completed!","Results:")
                 setAutoCancel(true)
                 setCategory(Notification.CATEGORY_SOCIAL)
 //                setDeleteIntent(dimissPendingIntent)
@@ -92,9 +98,11 @@ fun Context.notificationShowSleep(){
 }
 
 
-fun Context.prepareBigTextStyle(tasks:String):Notification.BigTextStyle{
+
+
+fun Context.prepareBigTextStyle(tasks:String,title:String):Notification.BigTextStyle{
         return Notification.BigTextStyle()
-         .setBigContentTitle(Html.fromHtml("Today's tasks &#128170;", Html.FROM_HTML_MODE_COMPACT))
+         .setBigContentTitle(Html.fromHtml(title, Html.FROM_HTML_MODE_COMPACT))
          .bigText(Html.fromHtml(tasks, Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST))
 }
 
