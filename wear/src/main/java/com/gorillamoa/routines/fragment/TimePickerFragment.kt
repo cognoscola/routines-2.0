@@ -28,6 +28,8 @@ class TimePickerFragment: Fragment(){
 
     }
 
+    //TODO some how allow user to pick PM AM
+    //TODO fix display text error (not showing up)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_timepicker,container,false)
