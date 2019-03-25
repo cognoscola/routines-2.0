@@ -27,6 +27,8 @@
     <string name="onboard_welcome_text_05">You have just watered your new seed. Do not neglect it or it will never grow.   </string>
 
     <string name="onboard_wake_up_text">I wake up at:</string>
+    <string name="onboard_sleep_text">I sleep at:</string>
+    <string name="onboard_default_text">Pick a time:</string>
 
     <string name="onboard_seed">"Great! Your first daily task, the most important task, is to plan your day. Let's do a test run. "</string>
 

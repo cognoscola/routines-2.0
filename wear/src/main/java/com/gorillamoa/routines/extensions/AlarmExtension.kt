@@ -9,7 +9,7 @@ import java.util.*
  * setting
  */
 
-
+//TODO comment some things
 /**
  * Convenience method to enable the alarm.
  * The time to set alarm will be fetched from preferences
@@ -17,8 +17,8 @@ import java.util.*
 fun Context.alarmEnableWakeUp(){
 
     val cal = Calendar.getInstance()
-    setSavedTimeToCalendar(cal)
-    alarmSetRepeatWithCal(cal)
+    setSavedWakeTimeToCalendar(cal)
+    alarmSetRepeatWithCal(cal,true)
 }
 
 /**
@@ -26,23 +26,43 @@ fun Context.alarmEnableWakeUp(){
  */
 fun Context.alarmDisableWakeUp(){
     val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    alarmManager.cancel(createWakeUpPendingIntent())
-    saveAlarmStatus(false)
+    alarmManager.cancel(createWakeUpAlarmPendingIntent())
+    saveAlarmWakeStatus(false)
 }
+
+fun Context.alarmEnableSleep(){
+
+    val cal = Calendar.getInstance()
+    setSavedSleepTimeToCalendar(cal)
+    alarmSetRepeatWithCal(cal,false)
+}
+
+fun Context.alarmDisableSleep(){
+
+    val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    alarmManager.cancel(createWakeUpAlarmPendingIntent())
+    saveAlarmSleepStatus(false)
+}
+
+
 
 /**
  * Set the repeating alarm with the given calendar
+ * @param cal is the calendar object containing information about when to set alarm
+ * @param isWake determines wether this alarm will be a wake up or a sleep notification
  */
-fun Context.alarmSetRepeatWithCal(cal:Calendar){
+fun Context.alarmSetRepeatWithCal(cal:Calendar, isWake:Boolean){
     val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     alarmManager.setInexactRepeating(
             AlarmManager.RTC_WAKEUP,
             cal.timeInMillis,
             AlarmManager.INTERVAL_DAY,
-            createWakeUpPendingIntent()
+            if(isWake){createWakeUpAlarmPendingIntent()} else{ createSleepAlarmPendingIntent()}
+
+
     )
 
-    saveAlarmStatus(true)
+    saveAlarmWakeStatus(true)
 }
 

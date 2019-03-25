@@ -14,7 +14,7 @@ class InformationFragment: OnboardFragment(){
         return inflater.inflate(R.layout.fragment_information,container,false)
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         infoTextView.text = arguments?.getString(resources.getString(R.string.info_argument_key))?:

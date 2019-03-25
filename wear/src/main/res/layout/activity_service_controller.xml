@@ -28,17 +28,43 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView
+                <Button
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="Wake up"
+                    android:text="Wake T"
                     android:gravity="center"
+                    android:id="@+id/wakePickerButton"
                     />
 
                 <ToggleButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/wakeUpAlarmToggle"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:background="#333333"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Sleep T"
+                    android:gravity="center"
+                    android:id="@+id/sleepPickerButton"
+                    />
+
+                <ToggleButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/sleepAlarmToggle"/>
 
             </LinearLayout>
 
@@ -77,6 +103,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:text="Dummy" />
+
+
 
 
         </LinearLayout>

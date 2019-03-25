@@ -7,10 +7,14 @@ import android.util.Log
 import java.util.*
 
 private const val LOCAL_SETTINGS ="local_app_settings"
-private const val isAlarmActive= "isAlarmActive"
+private const val isWakeAlarmActive= "isWakeAlarmActive"
+private const val isSleepAlarmActive= "isSleepAlarmActive"
 
 private const val WAKE_UP_HOUR = "wake_up_hour"
 private const val WAKE_UP_MINUTE = "wake_up_minute"
+
+private const val SLEEP_HOUR = "slee_hour"
+private const val SLEEP_MINUTE = "sleep_minute"
 
 
 //Task related information
@@ -42,7 +46,7 @@ fun Context.getWakeUpMinute():Int = getLocalSettings().getInt(WAKE_UP_MINUTE,-1)
 /**
  * Convenient method save into preferences the alarm time
  */
-fun Context.saveAlarmTime(hour:Int,minute:Int){
+fun Context.saveWakeTime(hour:Int, minute:Int){
     val prefs= getLocalSettings()
     prefs
             .edit()
@@ -51,16 +55,38 @@ fun Context.saveAlarmTime(hour:Int,minute:Int){
             .apply()
 }
 
-fun Context.isAlarmSet():Boolean{
-    return getLocalSettings().getBoolean(isAlarmActive,false)
-}
-
-fun Context.saveAlarmStatus(isAlarmSet:Boolean){
-    val prefs = getLocalSettings()
-    prefs.edit()
-            .putBoolean(isAlarmActive,isAlarmSet)
+fun Context.saveSleepTime(hour:Int, minute:Int){
+    val prefs= getLocalSettings()
+    prefs
+            .edit()
+            .putInt(SLEEP_HOUR,hour)
+            .putInt(SLEEP_MINUTE,minute)
             .apply()
 }
+
+
+fun Context.isWakeAlarmSet():Boolean{
+    return getLocalSettings().getBoolean(isWakeAlarmActive,false)
+}
+
+fun Context.isSleepAlarmSet():Boolean{
+    return getLocalSettings().getBoolean(isSleepAlarmActive,false)
+}
+
+fun Context.saveAlarmWakeStatus(isAlarmSet:Boolean){
+    val prefs = getLocalSettings()
+    prefs.edit()
+            .putBoolean(isWakeAlarmActive,isAlarmSet)
+            .apply()
+}
+
+fun Context.saveAlarmSleepStatus(isAlarmSet:Boolean){
+    val prefs = getLocalSettings()
+    prefs.edit()
+            .putBoolean(isSleepAlarmActive,isAlarmSet)
+            .apply()
+}
+
 
 /**
  * save task list

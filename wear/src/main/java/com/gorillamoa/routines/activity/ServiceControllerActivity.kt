@@ -1,5 +1,7 @@
 package com.gorillamoa.routines.activity
 
+import android.app.Activity
+import android.content.Intent
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
@@ -10,6 +12,7 @@ import androidx.lifecycle.Observer
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.data.Task
 import com.gorillamoa.routines.extensions.*
+import com.gorillamoa.routines.fragment.TimePickerFragment
 import com.gorillamoa.routines.viewmodel.TaskViewModel
 import kotlinx.android.synthetic.main.activity_service_controller.*
 import java.lang.StringBuilder
@@ -28,6 +31,12 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
     private val tag = ServiceControllerActivity::class.java.name
 
     private lateinit var taskViewModel: TaskViewModel
+
+    companion object {
+
+        private const val PICKER_CODE_WAKE = 100
+        private const val PICKER_CODE_SLEEP = 101
+    }
 
     /**
      * Ambient mode controller attached to this display. Used by Activity to see if it is in ambient
@@ -55,10 +64,18 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
        // taskViewModel = ViewModelProviders.of(this)
 
+        wakePickerButton.setOnClickListener {
+
+            startActivityForResult(
+                    Intent(this,SettingsActivity::class.java).apply {
+                        putExtra(TimePickerFragment.DISPLAY_TEXT,getString(R.string.onboard_wake_up_text))
+            }, PICKER_CODE_WAKE)
+        }
+
         /** get our local settings*/
         wakeUpAlarmToggle.apply {
 
-            isChecked = isAlarmSet()
+            isChecked = isWakeAlarmSet()
 
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
@@ -69,6 +86,25 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
             }
         }
 
+        sleepPickerButton.setOnClickListener {
+            startActivityForResult(
+                    Intent(this,SettingsActivity::class.java).apply {
+                        putExtra(TimePickerFragment.DISPLAY_TEXT,getString(R.string.onboard_sleep_text))
+                    }, PICKER_CODE_SLEEP)
+        }
+
+        sleepAlarmToggle.apply {
+            isChecked = isSleepAlarmSet()
+
+            setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    alarmEnableSleep()
+                }else{
+                    alarmDisableWakeUp()
+                }
+
+            }
+        }
 
         enableServiceButton?.setOnClickListener {
             broadcastShowWakeUp()
@@ -89,7 +125,7 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
         }
 
         clearTask?.setOnClickListener {
-            //TODO show on notification empty tasks
+            //TODO show better notification on empty tasks
             taskViewModel.clearReturnList()
         }
 
@@ -101,6 +137,29 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if(resultCode == Activity.RESULT_OK){
+            when (requestCode) {
+                PICKER_CODE_WAKE -> {
+
+                    val cal = Calendar.getInstance()
+                    setSleepTimeToCalendarAndStore(cal,
+                            data?.getIntExtra(TimePickerFragment.HOUR,-1)?:-1,
+                            data?.getIntExtra(TimePickerFragment.MIN,-1)?:-1)
+                    alarmSetRepeatWithCal(cal,true)
+                }
+                PICKER_CODE_SLEEP -> {
+                    val cal = Calendar.getInstance()
+                    setWakeTimeToCalendarAndStore(cal,
+                            data?.getIntExtra(TimePickerFragment.HOUR,-1)?:-1,
+                            data?.getIntExtra(TimePickerFragment.MIN,-1)?:-1)
+                    alarmSetRepeatWithCal(cal,false)
+                }
+            }
+        }
+    }
 
 
     override fun getAmbientCallback(): AmbientModeSupport.AmbientCallback {

@@ -9,11 +9,9 @@ data class Task(
         @PrimaryKey(autoGenerate = true)
         var id:Int? = null,
 
-//        val type:String,
-
+        val type:TaskType = TaskType.TYPE_UNKNOWN,
         val name:String,
-        var description:String? = null
-
+        val description:String? = null
 
         //TODO add addittional options
         //TODO add history

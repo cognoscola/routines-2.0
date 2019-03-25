@@ -45,6 +45,11 @@
         </activity>
 
         <activity
+            android:name=".activity.SettingsActivity"
+            android:label="@string/onboard_app_name">
+        </activity>
+
+        <activity
             android:name=".activity.OnboardActivity"
             android:label="@string/onboard_app_name">
             <intent-filter>
@@ -54,7 +59,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".receiver.WakeUpReceiver"
+        <receiver android:name=".receiver.AlarmReceiver"
             android:exported="false">
 
         </receiver>

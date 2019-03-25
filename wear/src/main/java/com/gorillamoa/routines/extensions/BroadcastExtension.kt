@@ -3,7 +3,7 @@ package com.gorillamoa.routines.extensions
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.gorillamoa.routines.receiver.WakeUpReceiver
+import com.gorillamoa.routines.receiver.AlarmReceiver
 
 /**
  * Send a broadcast to the Wake up Receiver.
@@ -14,7 +14,7 @@ fun Context.broadcastShowWakeUp(){
     /** We indicate that the receiver should treat the intent as
      * part of a normal Wake up
      */
-    sendBroadcast(createWakeUpRecieverIntent().setAction(WakeUpReceiver.ACTION_DEFAULT))
+    sendBroadcast(createWakeUpRecieverIntent().setAction(AlarmReceiver.ACTION_DEFAULT))
 }
 
 /**
@@ -25,7 +25,7 @@ fun Context.broadcastShowWakeUpTest(){
     /** We indicate that the receiver should treat the intent as
      * part of the on-board process
      */
-    sendBroadcast(Intent(createWakeUpRecieverIntent()).setAction(WakeUpReceiver.ACTION_ONBOARD))
+    sendBroadcast(Intent(createWakeUpRecieverIntent()).setAction(AlarmReceiver.ACTION_ONBOARD))
 
 }
 //TODO Launch task notification from UI

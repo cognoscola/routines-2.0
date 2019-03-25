@@ -5,7 +5,11 @@ import android.content.Context
 import android.content.Intent
 import com.gorillamoa.routines.activity.OnboardActivity
 import com.gorillamoa.routines.receiver.NotificationDismissReceiver
-import com.gorillamoa.routines.receiver.WakeUpReceiver
+import com.gorillamoa.routines.receiver.AlarmReceiver
+import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_DEFAULT
+import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_SLEEP
+import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.SLEEP_INTENT_CODE
+import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.WAKE_UP_INTENT_CODE
 
 /**
  * A place to store all the Intent and PendingIntent extensions
@@ -13,20 +17,40 @@ import com.gorillamoa.routines.receiver.WakeUpReceiver
 
 public const val TASK_ID ="TaskId"
 
+//TODO COMMENT THIS PAGE
 
 /**
- * Creates a PendingIntent for the WakeUpReceiver
+ * Creates a PendingIntent for the AlarmReceiver
  */
-fun Context.createWakeUpPendingIntent():PendingIntent{
-    return android.content.Intent(this, com.gorillamoa.routines.receiver.WakeUpReceiver::class.java).let { intent ->
-        intent.action = com.gorillamoa.routines.receiver.WakeUpReceiver.ACTION_DEFAULT
-        intent.putExtra(com.gorillamoa.routines.receiver.WakeUpReceiver.KEY_ALARM,true) //indicate that intent came from an alarm trigger
-        PendingIntent.getBroadcast(this,
-                com.gorillamoa.routines.receiver.WakeUpReceiver.WAKE_UP_INTENT_CODE,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT)
+fun Context.createWakeUpAlarmPendingIntent():PendingIntent{
+
+    return createAlarmPendingIntent(createAlarmIntent()
+            .apply { action = ACTION_DEFAULT }, WAKE_UP_INTENT_CODE)
+}
+
+fun Context.createSleepAlarmPendingIntent():PendingIntent{
+
+    return createAlarmPendingIntent(createAlarmIntent()
+            .apply { action = ACTION_SLEEP }, SLEEP_INTENT_CODE)
+}
+
+fun Context.createAlarmPendingIntent(intent:Intent, code:Int):PendingIntent{
+    return PendingIntent.getBroadcast(this,
+            code,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT)
+}
+
+
+fun Context.createAlarmIntent():Intent{
+    return Intent(this, AlarmReceiver::class.java).apply {
+        putExtra(AlarmReceiver.KEY_ALARM,true)
     }
 }
+
+
+
+
 
 /**
  * creates the notification's main intent (when the notification is clicked)
@@ -40,7 +64,7 @@ fun Context.createNotificationMainIntentForOnboarding():PendingIntent{
 
 
 fun Context.createWakeUpRecieverIntent():Intent{
-    return Intent(this, WakeUpReceiver::class.java)
+    return Intent(this, AlarmReceiver::class.java)
 }
 
 /**

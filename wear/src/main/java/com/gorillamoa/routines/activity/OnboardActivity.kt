@@ -2,10 +2,12 @@ package com.gorillamoa.routines.activity
 
 import android.os.Bundle
 
-import android.support.wearable.activity.WearableActivity
 import android.util.Log
+import androidx.fragment.app.FragmentActivity
 import com.gorillamoa.routines.R
+import com.gorillamoa.routines.extensions.alarmSetRepeatWithCal
 import com.gorillamoa.routines.extensions.broadcastShowWakeUpTest
+import com.gorillamoa.routines.extensions.setWakeTimeToCalendarAndStore
 import com.gorillamoa.routines.fragment.InformationFragment
 import com.gorillamoa.routines.fragment.SplashFragment
 import com.gorillamoa.routines.fragment.TimePickerFragment
@@ -13,6 +15,7 @@ import kotlinx.android.synthetic.main.activity_onboard.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
 
 
 /**
@@ -28,7 +31,7 @@ import kotlinx.coroutines.launch
  * "Wake up from sleep" alarm.
  *
  */
-class OnboardActivity:WearableActivity(){
+class OnboardActivity:FragmentActivity(){
 
     //TODO change the activity launcher name (what the user sees)
 
@@ -99,8 +102,17 @@ class OnboardActivity:WearableActivity(){
             OnboardState.TEXT3 -> {
 
                 fragmentContainerInsetLayout.setOnClickListener(null)
-                fragmentManager.beginTransaction()
-                        .replace(R.id.fragmentContainerInsetLayout, TimePickerFragment())
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragmentContainerInsetLayout, TimePickerFragment().apply {
+
+                            setCallbackFunction { hour, minute ->
+
+                                getForwardFunction().invoke()
+                                val cal = Calendar.getInstance()
+                                setWakeTimeToCalendarAndStore(cal, hour, minute)
+                                alarmSetRepeatWithCal(cal,true)
+                            }
+                        })
                         .commit()
                 state = OnboardState.PickTime
 
@@ -143,7 +155,7 @@ class OnboardActivity:WearableActivity(){
         }else{
 
             Log.d("setTextFragment","making new fragment")
-            fragmentManager.beginTransaction()
+            supportFragmentManager.beginTransaction()
                     .replace(R.id.fragmentContainerInsetLayout,InformationFragment.newInstance(textAddress,this) ,TEXT_FRAGMENT_TAG)
                     .commit()
         }

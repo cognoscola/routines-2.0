@@ -18,11 +18,9 @@ import com.gorillamoa.routines.scheduler.TaskScheduler
  * ACTION_WAKEUP - fires every morning at the specified time
  *
  */
-class WakeUpReceiver:BroadcastReceiver(){
+class AlarmReceiver:BroadcastReceiver(){
 
     companion object {
-
-        const val MAX_NOTIFICATION_LINE_LENGTH = 23
 
         /**
          * When this receiver has an intent with a type ACTION_ONBOARD
@@ -39,8 +37,12 @@ class WakeUpReceiver:BroadcastReceiver(){
         const val ACTION_DEFAULT  = "W1"
 
 
+        const val ACTION_SLEEP = "S1"
+
+
         const val KEY_ALARM = "A"
         const val WAKE_UP_INTENT_CODE = 1
+        const val SLEEP_INTENT_CODE =2
 
     }
 
@@ -75,6 +77,16 @@ class WakeUpReceiver:BroadcastReceiver(){
                                 context.createNotificationDeleteIntentForWakeUp()
                         )
                     }
+                }
+
+                ACTION_SLEEP ->{
+
+                    Log.d("onReceive","Sleep Alarm went off!")
+                    //TODO dismiss other task notifications
+
+                    context.notificationShowSleep()
+                    TaskScheduler.endDay(context)
+
                 }
                 else ->{
 

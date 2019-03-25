@@ -1,12 +1,13 @@
 package com.gorillamoa.routines.fragment
 
-import android.app.Fragment
+
 import android.content.Context
 import android.util.Log
+import androidx.fragment.app.Fragment
 import com.gorillamoa.routines.activity.OnboardActivity
 import java.lang.Exception
 
-open class OnboardFragment:Fragment(){
+open class OnboardFragment: Fragment(){
     open var forwardFunction:(()->Unit)?=null
 
     override fun onAttach(context: Context?) {

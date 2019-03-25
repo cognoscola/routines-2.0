@@ -78,8 +78,6 @@ class NotificationDismissReceiver:BroadcastReceiver() {
                     }
 
                     TaskScheduler.getNextTask(context,-1){ task ->
-
-
                         task?.let {
                             context.notificationShowTask(
                                     it,

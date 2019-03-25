@@ -9,10 +9,10 @@
     tools:background="#000000">
 
         <TextView
-            android:id="@+id/enableServiceButton"
+            android:id="@+id/displayText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/onboard_wake_up_text" />
+            android:text="@string/onboard_default_text" />
 
         <androidx.wear.widget.WearableRecyclerView
             android:layout_width="match_parent"
@@ -23,7 +23,6 @@
             android:id="@+id/buttonRecyclerView"
             android:nestedScrollingEnabled="true"
             android:layout_gravity="center">
-
 
         </androidx.wear.widget.WearableRecyclerView>
 
@@ -58,9 +57,7 @@
                     android:background="@drawable/picker_button_selector"
                     android:drawableEnd="@drawable/ic_done_black_24dp"/>
 
-
         </LinearLayout>
-
 </LinearLayout>
 
 

@@ -1,8 +1,9 @@
 package com.gorillamoa.routines.extensions
 
 import com.gorillamoa.routines.data.Task
-import com.gorillamoa.routines.receiver.WakeUpReceiver
 
+
+const val MAX_NOTIFICATION_LINE_LENGTH = 23
 fun StringBuilder.stringifyTasks(tasks:List<Task>?):String{
 
     tasks?.let {
@@ -38,14 +39,14 @@ fun StringBuilder.addTaskLine(task:String,extra:String){
 
     //TODO predict relevant emoji for each task
     append("&#9999;&nbsp;")
-    if (task.length > WakeUpReceiver.MAX_NOTIFICATION_LINE_LENGTH) {
+    if (task.length > MAX_NOTIFICATION_LINE_LENGTH) {
 
-        append(task,0,(WakeUpReceiver.MAX_NOTIFICATION_LINE_LENGTH - 3 - Math.min(extra.length,5)))
+        append(task,0,(MAX_NOTIFICATION_LINE_LENGTH - 3 - Math.min(extra.length,5)))
         append("...")
 
     }else{
         append(task)
-        for (i in 0..(WakeUpReceiver.MAX_NOTIFICATION_LINE_LENGTH - task.length - Math.min(extra.length,5))) {
+        for (i in 0..(MAX_NOTIFICATION_LINE_LENGTH - task.length - Math.min(extra.length,5))) {
             append("&nbsp")
         }
     }

@@ -6,15 +6,13 @@ import androidx.recyclerview.widget.LinearSnapHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.adapter.TimePickerAdapter
-import com.gorillamoa.routines.extensions.alarmSetRepeatWithCal
-import com.gorillamoa.routines.extensions.setTimeToCalendarAndStore
 
 import kotlinx.android.synthetic.main.fragment_timepicker.*
-import java.util.*
 
-class TimePickerFragment: OnboardFragment(){
+class TimePickerFragment: Fragment(){
 
     /**
      * If the value is -1 it means the user hasn't chosen yet or undid his choice
@@ -23,14 +21,22 @@ class TimePickerFragment: OnboardFragment(){
     private var hour = -1
     private var minute = 0
 
+    companion object {
+        public const val DISPLAY_TEXT = "DPLTEXT"
+        public const val HOUR = "HOUR"
+        public const val MIN = "MIN"
+
+    }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_timepicker,container,false)
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        displayText?.text = arguments?.getString(DISPLAY_TEXT)
 
         /** populate the recycler view*/
         buttonRecyclerView.adapter = TimePickerAdapter(12)
@@ -85,6 +91,13 @@ class TimePickerFragment: OnboardFragment(){
         }
     }
 
+    private var callbackFunction:((Int,Int)->Any?)? = null
+
+    public fun setCallbackFunction(callback:(Int, Int) ->Any?){
+        callbackFunction = callback
+
+    }
+
     /**
      * Prepare the button so that when it is clicked it will
      * set an alarm.
@@ -94,11 +107,8 @@ class TimePickerFragment: OnboardFragment(){
         backwardButton.visibility = View.VISIBLE
         timeTextView.visibility = View.VISIBLE
         timeTextView.setOnClickListener {
-            forwardFunction?.invoke()
 
-            val cal= Calendar.getInstance()
-            context.setTimeToCalendarAndStore(cal,hour,minute)
-            context.alarmSetRepeatWithCal(cal)
+            callbackFunction?.invoke(hour,minute)
 
         }
     }
