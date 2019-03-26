@@ -34,7 +34,7 @@ fun Context.alarmEnableSleep(){
 
     val cal = Calendar.getInstance()
     setSavedSleepTimeToCalendar(cal)
-    alarmSetRepeatWithCal(cal,false)
+    alarmSetRepeatWithCal(cal,true)
 }
 
 fun Context.alarmDisableSleep(){
@@ -59,10 +59,9 @@ fun Context.alarmSetRepeatWithCal(cal:Calendar, isWake:Boolean){
             cal.timeInMillis,
             AlarmManager.INTERVAL_DAY,
             if(isWake){createWakeUpAlarmPendingIntent()} else{ createSleepAlarmPendingIntent()}
-
-
     )
 
-    saveAlarmWakeStatus(true)
+    //clean
+    if(isWake)saveAlarmWakeStatus(true)else saveAlarmSleepStatus(true)
 }
 

@@ -77,6 +77,8 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
             isChecked = isWakeAlarmSet()
 
+
+            //CLEAN
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     alarmEnableWakeUp()
@@ -100,9 +102,8 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
                 if (isChecked) {
                     alarmEnableSleep()
                 }else{
-                    alarmDisableWakeUp()
+                    alarmDisableSleep()
                 }
-
             }
         }
 
@@ -144,17 +145,22 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
             when (requestCode) {
                 PICKER_CODE_WAKE -> {
 
+                    //TODO truncate these codes
                     val cal = Calendar.getInstance()
                     setSleepTimeToCalendarAndStore(cal,
                             data?.getIntExtra(TimePickerFragment.HOUR,-1)?:-1,
-                            data?.getIntExtra(TimePickerFragment.MIN,-1)?:-1)
+                            data?.getIntExtra(TimePickerFragment.MIN,-1)?:-1,
+                            data?.getIntExtra(TimePickerFragment.PHASE,-1)?:-1)
                     alarmSetRepeatWithCal(cal,true)
+                    wakeUpAlarmToggle?.isChecked = true
                 }
                 PICKER_CODE_SLEEP -> {
                     val cal = Calendar.getInstance()
                     setWakeTimeToCalendarAndStore(cal,
                             data?.getIntExtra(TimePickerFragment.HOUR,-1)?:-1,
-                            data?.getIntExtra(TimePickerFragment.MIN,-1)?:-1)
+                            data?.getIntExtra(TimePickerFragment.MIN,-1)?:-1,
+                    data?.getIntExtra(TimePickerFragment.PHASE,-1)?:-1)
+                    sleepAlarmToggle?.isChecked = true
                     alarmSetRepeatWithCal(cal,false)
                 }
             }

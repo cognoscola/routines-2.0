@@ -27,6 +27,7 @@ class TimePickerFragment: Fragment(){
         const val DISPLAY_TEXT = "DPLTEXT"
         const val HOUR = "HOUR"
         const val MIN = "MIN"
+        const val PHASE =  "PHS"
 
     }
 
@@ -71,7 +72,7 @@ class TimePickerFragment: Fragment(){
             setMinuteClickedCallback {
 
                 minute = it
-                setPhaseState()
+                setPhaseState(phase)
 
                 updatePickedText()
             }
@@ -107,9 +108,9 @@ class TimePickerFragment: Fragment(){
         readyButtonForClick()
     }
 
-    private var callbackFunction:((Int,Int)->Any?)? = null
+    private var callbackFunction:((Int,Int,Int)->Any?)? = null
 
-    fun setCallbackFunction(callback:(Int, Int) ->Any?){
+    fun setCallbackFunction(callback:(Int, Int,Int) ->Any?){
         callbackFunction = callback
 
     }
@@ -124,7 +125,7 @@ class TimePickerFragment: Fragment(){
         timeTextView.visibility = View.VISIBLE
         timeTextView.setOnClickListener {
 
-            callbackFunction?.invoke(hour,minute)
+            callbackFunction?.invoke(hour,minute,phase)
 
         }
     }

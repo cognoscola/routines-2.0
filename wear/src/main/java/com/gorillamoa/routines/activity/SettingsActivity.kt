@@ -25,15 +25,15 @@ class SettingsActivity:FragmentActivity(){
                      arguments =  Bundle().apply {
                          putString(TimePickerFragment.DISPLAY_TEXT, intent?.getStringExtra(TimePickerFragment.DISPLAY_TEXT))
                      }
-                     setCallbackFunction { hour, minute ->
+                     setCallbackFunction { hour, minute,phase  ->
 
                          setResult(Activity.RESULT_OK, Intent().apply {
                              putExtra(TimePickerFragment.HOUR, hour)
                              putExtra(TimePickerFragment.MIN, minute)
+                             putExtra(TimePickerFragment.PHASE, phase)
                          })
                          finish()
                      }
-
                  })
                  .commit()
     }

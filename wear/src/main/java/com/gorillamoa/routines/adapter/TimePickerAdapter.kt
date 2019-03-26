@@ -107,7 +107,8 @@ class TimePickerAdapter(private val maxNumber:Int): RecyclerView.Adapter<TimePic
         //TODO move number across screen when clicked
     }
 
-    fun setPhaseState(){
+    //TODO show selected phase
+    fun setPhaseState(selectedPhase:Int){
         pickerState = TimeState.Phase
         notifyDataSetChanged()
     }

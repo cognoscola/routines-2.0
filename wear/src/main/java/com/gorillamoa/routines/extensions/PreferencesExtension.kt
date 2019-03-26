@@ -10,12 +10,16 @@ private const val LOCAL_SETTINGS ="local_app_settings"
 private const val isWakeAlarmActive= "isWakeAlarmActive"
 private const val isSleepAlarmActive= "isSleepAlarmActive"
 
+
+//TODO remove other copies of these values
 private const val WAKE_UP_HOUR = "wake_up_hour"
 private const val WAKE_UP_MINUTE = "wake_up_minute"
+private const val WAKE_PHASE = "wake_phase"
 
-private const val SLEEP_HOUR = "slee_hour"
+private const val SLEEP_HOUR = "sleep_hour"
 private const val SLEEP_MINUTE = "sleep_minute"
-
+private const val SLEEP_PHASE = "sleep_phase"
+//TODO END
 
 //Task related information
 private const val TASK_ORDER = "order"
@@ -38,29 +42,30 @@ fun Context.getLocalSettings():SharedPreferences{
     return getSharedPreferences(LOCAL_SETTINGS, Activity.MODE_PRIVATE)
 }
 
-fun Context.getWakeUpHour():Int = getLocalSettings().getInt(WAKE_UP_HOUR,-1)
-fun Context.getWakeUpMinute():Int = getLocalSettings().getInt(WAKE_UP_MINUTE,-1)
-
 
 
 /**
  * Convenient method save into preferences the alarm time
  */
-fun Context.saveWakeTime(hour:Int, minute:Int){
+
+//TODO Truncate these 2 methods below
+fun Context.saveWakeTime(hour:Int, minute:Int,phase:Int){
     val prefs= getLocalSettings()
     prefs
             .edit()
             .putInt(WAKE_UP_HOUR,hour)
             .putInt(WAKE_UP_MINUTE,minute)
+            .putInt(WAKE_PHASE,phase)
             .apply()
 }
 
-fun Context.saveSleepTime(hour:Int, minute:Int){
+fun Context.saveSleepTime(hour:Int, minute:Int,phase:Int){
     val prefs= getLocalSettings()
     prefs
             .edit()
             .putInt(SLEEP_HOUR,hour)
             .putInt(SLEEP_MINUTE,minute)
+            .putInt(SLEEP_PHASE,phase)
             .apply()
 }
 
