@@ -105,6 +105,7 @@ class OnboardActivity:FragmentActivity(){
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.fragmentContainerInsetLayout, TimePickerFragment().apply {
 
+                            arguments?.putString(TimePickerFragment.DISPLAY_TEXT,getString(R.string.onboard_wake_up_text))
                             setCallbackFunction { hour, minute ->
 
                                 getForwardFunction().invoke()

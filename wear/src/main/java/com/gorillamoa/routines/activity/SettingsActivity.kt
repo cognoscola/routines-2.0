@@ -3,6 +3,7 @@ package com.gorillamoa.routines.activity
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.fragment.TimePickerFragment
@@ -20,7 +21,10 @@ class SettingsActivity:FragmentActivity(){
          supportFragmentManager.beginTransaction()
                  .add(R.id.fragmentContainerInsetLayout,TimePickerFragment().apply {
 
-                     arguments?.putString(TimePickerFragment.DISPLAY_TEXT, intent?.getStringExtra(TimePickerFragment.DISPLAY_TEXT))
+                     Log.d("onCreate","Found Extra ${intent?.getStringExtra(TimePickerFragment.DISPLAY_TEXT)}")
+                     arguments =  Bundle().apply {
+                         putString(TimePickerFragment.DISPLAY_TEXT, intent?.getStringExtra(TimePickerFragment.DISPLAY_TEXT))
+                     }
                      setCallbackFunction { hour, minute ->
 
                          setResult(Activity.RESULT_OK, Intent().apply {

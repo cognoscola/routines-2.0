@@ -1,6 +1,7 @@
 package com.gorillamoa.routines.fragment
 
 import android.os.Bundle
+import android.util.Log
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import android.view.LayoutInflater
@@ -20,16 +21,14 @@ class TimePickerFragment: Fragment(){
      */
     private var hour = -1
     private var minute = 0
+    private var phase = 0 //0 means AM, 1 means PM
 
     companion object {
-        public const val DISPLAY_TEXT = "DPLTEXT"
-        public const val HOUR = "HOUR"
-        public const val MIN = "MIN"
+        const val DISPLAY_TEXT = "DPLTEXT"
+        const val HOUR = "HOUR"
+        const val MIN = "MIN"
 
     }
-
-    //TODO some how allow user to pick PM AM
-    //TODO fix display text error (not showing up)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_timepicker,container,false)
@@ -38,7 +37,8 @@ class TimePickerFragment: Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        displayText?.text = arguments?.getString(DISPLAY_TEXT)
+        displayText?.text = arguments?.getString(DISPLAY_TEXT)?: context?.getString(R.string.onboard_default_text)
+        Log.d("onViewCreated","Found Display Text ${arguments?.getString(DISPLAY_TEXT)}")
 
         /** populate the recycler view*/
         buttonRecyclerView.adapter = TimePickerAdapter(12)
@@ -52,7 +52,7 @@ class TimePickerFragment: Fragment(){
 
 
         (buttonRecyclerView.adapter as TimePickerAdapter).apply {
-            setOptionClickedCallBack {
+            setHourClickedCallback {
 
                 /**
                  * if hour is -1 it means the user has not picked an hour,
@@ -62,22 +62,23 @@ class TimePickerFragment: Fragment(){
                 if (hour == -1) {
                     hour = it
                     minute = 0
-                    timeTextView.text = "$it"
                     setMinuteState()
                 }
 
-                /**
-                 * Hour is picked, but minutes isn't, which means this
-                 * incoming value is a minute value.
-                 */
-                 else if (hour != -1) {
-                    minute = it
-                }
+                updatePickedText()
+            }
 
+            setMinuteClickedCallback {
 
-                val textToShow = "$hour:${String.format("%02d", minute)}"
-                timeTextView.text =  textToShow
-                readyButtonForClick()
+                minute = it
+                setPhaseState()
+
+                updatePickedText()
+            }
+
+            setPhaseClickedCallback {
+                phase = it
+                updatePickedText()
             }
         }
 
@@ -93,9 +94,22 @@ class TimePickerFragment: Fragment(){
         }
     }
 
+    private fun updatePickedText(){
+        val phase = if (phase == 0) "am" else "pm"
+
+        val textToShow = if (minute == 0) {
+            "$hour$phase"
+        }else{
+            "$hour:${String.format("%02d", minute)}$phase"
+        }
+
+        timeTextView.text =  textToShow
+        readyButtonForClick()
+    }
+
     private var callbackFunction:((Int,Int)->Any?)? = null
 
-    public fun setCallbackFunction(callback:(Int, Int) ->Any?){
+    fun setCallbackFunction(callback:(Int, Int) ->Any?){
         callbackFunction = callback
 
     }
