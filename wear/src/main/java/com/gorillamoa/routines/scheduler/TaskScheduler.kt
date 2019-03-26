@@ -143,7 +143,7 @@ class TaskScheduler{
                         taskList.add(current)
 
                         while (tempArray.isNotEmpty()) {
-                            taskList.add(tempArray.removeFirst())
+                            taskList.add(tempArray.removeLast())
                         }
 
                         context.saveTaskList(taskList)
