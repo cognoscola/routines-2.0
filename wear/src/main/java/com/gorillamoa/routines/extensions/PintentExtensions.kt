@@ -107,10 +107,10 @@ fun Context.createNotificationDeleteIntentForTask(tid: Int):PendingIntent{
  * create a notification action which will mark the displayed task as done
  * @param tid is the task id of the task currently being displayed
  */
-fun Context.createNotificationTaskDoneAction(tid:Int):PendingIntent{
+fun Context.createNotificationActionPendingIntent(tid:Int,action:String):PendingIntent{
 
     val doneIntent = Intent(this,TaskActionReceiver::class.java)
-    doneIntent.action = TaskActionReceiver.ACTION_DONE
+    doneIntent.action = action
     doneIntent.putExtra(TASK_ID,tid)
     return PendingIntent.getBroadcast(this, tid,doneIntent,PendingIntent.FLAG_ONE_SHOT)
 

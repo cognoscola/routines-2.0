@@ -81,15 +81,35 @@ class TaskScheduler{
             context.resetStats(taskList.size)
         }
 
+        //TODO come up with a scheme to schedule into the future
+        fun scheduleIntoUnknownFuture(){
+
+        }
+
+        /**
+         * Schedule the current visible task for another day.
+         * We don't know when to schedule yet but for now we'll just remove from the
+         * list
+         */
+        fun scheduleForNextAvaiableDay(context:Context, tid:Int){
+
+            val taskList = context.getDayTaskList()
+            if (taskList.contains(tid)) {
+                if (taskList.removeFirstOccurrence(tid)) {
+                    context.saveTaskList(taskList)
+                }
+            }
+        }
 
         /**
          * Reschedule the task a few hours into the future
          * @param context is the application context
          * @param tid is the task id
+         * @param count how many tasks ahead should we reschedule
          *
          */
         //TODO determine if we should skip all the way back or just a few tasks
-        fun rescheduleOneTask(context: Context, tid:Int){
+        fun scheduleNTasksForward(context: Context, tid:Int,steps:Int){
 
             if (tid != -1) {
 
@@ -109,11 +129,22 @@ class TaskScheduler{
 
                         //for now lets just move the 2nd one to the front
 
-                        val current = taskList.removeLast()
-                        val next = taskList.removeLast()
+                        var skipSteps = Math.min(taskList.size, steps)
+                        val tempArray = ArrayDeque<Int>(skipSteps)
 
-                        taskList.addLast(current)
-                        taskList.addLast(next)
+                        val current = taskList.removeLast()
+
+                        while (skipSteps != 0) {
+
+                            tempArray.add(taskList.removeLast())
+                            skipSteps--
+                        }
+
+                        taskList.add(current)
+
+                        while (tempArray.isNotEmpty()) {
+                            taskList.add(tempArray.removeFirst())
+                        }
 
                         context.saveTaskList(taskList)
 
@@ -122,10 +153,13 @@ class TaskScheduler{
                     }
                 }
             }
-
-
         }
 
+        /**
+         * We finished the task
+         * @param context is the application context
+         * @param tid is the id of the task completed
+         */
         fun completeTask(context: Context, tid: Int) {
 
             val taskList = context.getDayTaskList()
@@ -171,19 +205,18 @@ class TaskScheduler{
                 //TODO check if any tasks were completed, if not don't show sleep notification
                     scheduleCallback.invoke(null)
                 //TODO schedule alarm at some point S
-
             }
-
-
         }
 
         /**
          * The user may finish all his tasks, or they finish the day despite completing
          * all tasks. Its time to reset everything
          */
+        //TODO give user one more chance to finish a task
         fun endDay(context: Context){
             Log.d("endDay","The day is over")
             context.cancelApproval()
+
         }
     }
 }

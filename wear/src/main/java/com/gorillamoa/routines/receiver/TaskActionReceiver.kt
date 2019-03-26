@@ -17,6 +17,8 @@ class TaskActionReceiver:BroadcastReceiver(){
         const val ACTION_DONE = "task.done"
 
         const val ACTION_SKIP_TODAY = "task.skiptoday"
+
+        const val ACTION_INTO_FUTURE = "task.future"
     }
 
     override fun onReceive(context: Context, intent: Intent?) {

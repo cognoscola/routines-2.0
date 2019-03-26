@@ -52,9 +52,9 @@ class NotificationDismissReceiver:BroadcastReceiver() {
                     Log.d("onReceive","Task Dismissal")
                     //we dismissed a task. We'll fetch a future task, while pushing the task back
 
-                    TaskScheduler.rescheduleOneTask(context,tid)
+                    //TODO come up with algorithm to determine how far into future to schedule ahead, for now just 2
+                    TaskScheduler.scheduleNTasksForward(context,tid,2)
                     TaskScheduler.getNextTask(context,tid){ task ->
-
 
                         task?.let {
                             context.notificationShowTask(

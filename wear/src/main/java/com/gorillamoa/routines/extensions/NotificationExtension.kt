@@ -8,6 +8,8 @@ import android.graphics.drawable.Icon
 import android.text.Html
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.data.Task
+import com.gorillamoa.routines.receiver.TaskActionReceiver.Companion.ACTION_DONE
+import com.gorillamoa.routines.receiver.TaskActionReceiver.Companion.ACTION_INTO_FUTURE
 
 const val WAKE_UP_NOTIFICATION_ID =1
 const val SLEEP_NOTIFICATION_ID =65535
@@ -59,13 +61,10 @@ fun Context.notificationShowTask(task: Task,
         setCategory(Notification.CATEGORY_REMINDER)
         setDeleteIntent(dimissPendingIntent)
 
-        addAction(Notification.Action.Builder(
-                Icon.createWithResource(this@notificationShowTask ,R.mipmap.ic_launcher),
-                "Done",
-                createNotificationTaskDoneAction(task.id!!)).build())
 
-
-
+        addTaskAction(this@notificationShowTask,"Done", ACTION_DONE,task.id!!)
+        addTaskAction(this@notificationShowTask,"Skip Today", ACTION_DONE,task.id!!)
+        addTaskAction(this@notificationShowTask,"Future", ACTION_INTO_FUTURE,task.id!!)
 
         manager.notify(
                 NOTIFICATION_TAG,
@@ -73,6 +72,15 @@ fun Context.notificationShowTask(task: Task,
                 build()
         )
     }
+}
+
+fun Notification.Builder.addTaskAction(context: Context,actionText:String, action:String,tid:Int){
+
+    addAction(Notification.Action.Builder(
+            Icon.createWithResource(context ,R.mipmap.ic_launcher),
+            actionText,
+            context.createNotificationActionPendingIntent(tid,action)
+    ).build())
 }
 
 fun Context.notificationShowSleep(){
