@@ -69,6 +69,11 @@
             android:exported="false" >
         </receiver>
 
+        <receiver
+            android:name=".receiver.TaskActionReceiver"
+            android:exported="false" >
+        </receiver>
+
     </application>
 
 </manifest>

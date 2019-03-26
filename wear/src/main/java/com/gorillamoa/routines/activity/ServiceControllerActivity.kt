@@ -13,6 +13,7 @@ import com.gorillamoa.routines.R
 import com.gorillamoa.routines.data.Task
 import com.gorillamoa.routines.extensions.*
 import com.gorillamoa.routines.fragment.TimePickerFragment
+import com.gorillamoa.routines.scheduler.TaskScheduler
 import com.gorillamoa.routines.viewmodel.TaskViewModel
 import kotlinx.android.synthetic.main.activity_service_controller.*
 import java.lang.StringBuilder
@@ -111,9 +112,16 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
             broadcastShowWakeUp()
         }
 
-
-        disableServiceButton?.setOnClickListener {
-            broadcastShowRandomTask()
+        //clean truncate notificationShowTask function
+        runTaskNotification?.setOnClickListener {
+            TaskScheduler.getNextTask(this, -1) { task ->
+                task?.let {
+                    notificationShowTask(
+                            it,
+                            dimissPendingIntent = createNotificationDeleteIntentForTask(task.id!!)
+                    )
+                }
+            }
         }
 
         createTask?.setOnClickListener {

@@ -4,7 +4,9 @@ import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
+import android.graphics.drawable.Icon
 import android.text.Html
+import com.gorillamoa.routines.R
 import com.gorillamoa.routines.data.Task
 
 const val WAKE_UP_NOTIFICATION_ID =1
@@ -46,23 +48,31 @@ fun Context.notificationShowWakeUp(tasks:String,
 
 fun Context.notificationShowTask(task: Task,
                                   mainPendingIntent: PendingIntent? = null,
-                                  dimissPendingIntent: PendingIntent? = null){
+                                  dimissPendingIntent: PendingIntent? = null) {
 
-        val manager = getNotificationManager()
-        getBuilder().apply {
+    val manager = getNotificationManager()
+    getBuilder().apply {
 
-                setContentTitle(task.name)
-                setContentText(task.description)
-                setAutoCancel(true)
-                setCategory(Notification.CATEGORY_REMINDER)
-                setDeleteIntent(dimissPendingIntent)
+        setContentTitle(task.name)
+        setContentText(task.description)
+        setAutoCancel(true)
+        setCategory(Notification.CATEGORY_REMINDER)
+        setDeleteIntent(dimissPendingIntent)
 
-                manager.notify(
-                        NOTIFICATION_TAG,
-                        task.id!!,
-                        build()
-                        )
-        }
+        addAction(Notification.Action.Builder(
+                Icon.createWithResource(this@notificationShowTask ,R.mipmap.ic_launcher),
+                "Done",
+                createNotificationTaskDoneAction(task.id!!)).build())
+
+
+
+
+        manager.notify(
+                NOTIFICATION_TAG,
+                task.id!!,
+                build()
+        )
+    }
 }
 
 fun Context.notificationShowSleep(){

@@ -10,6 +10,7 @@ import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_DEFAULT
 import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_SLEEP
 import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.SLEEP_INTENT_CODE
 import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.WAKE_UP_INTENT_CODE
+import com.gorillamoa.routines.receiver.TaskActionReceiver
 
 /**
  * A place to store all the Intent and PendingIntent extensions
@@ -18,6 +19,7 @@ import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.WAKE_UP_INTENT_C
 public const val TASK_ID ="TaskId"
 
 //TODO COMMENT THIS PAGE
+
 
 /**
  * Creates a PendingIntent for the AlarmReceiver
@@ -47,8 +49,6 @@ fun Context.createAlarmIntent():Intent{
         putExtra(AlarmReceiver.KEY_ALARM,true)
     }
 }
-
-
 
 
 
@@ -99,5 +99,19 @@ fun Context.createNotificationDeleteIntentForTask(tid: Int):PendingIntent{
     dismissIntent.action = NotificationDismissReceiver.TYPE_TASK
     dismissIntent.putExtra(TASK_ID,tid)
     return PendingIntent.getBroadcast(this,tid, dismissIntent,PendingIntent.FLAG_ONE_SHOT)
+
+}
+
+
+/**
+ * create a notification action which will mark the displayed task as done
+ * @param tid is the task id of the task currently being displayed
+ */
+fun Context.createNotificationTaskDoneAction(tid:Int):PendingIntent{
+
+    val doneIntent = Intent(this,TaskActionReceiver::class.java)
+    doneIntent.action = TaskActionReceiver.ACTION_DONE
+    doneIntent.putExtra(TASK_ID,tid)
+    return PendingIntent.getBroadcast(this, tid,doneIntent,PendingIntent.FLAG_ONE_SHOT)
 
 }

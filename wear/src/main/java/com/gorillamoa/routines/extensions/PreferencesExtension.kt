@@ -104,8 +104,7 @@ fun Context.saveTaskList(queue:ArrayDeque<Int>){
         val taskString = queue.joinToString(",")
         Log.d("saveTaskList","Scheduled Tasks: $taskString")
         prefs.edit()
-            .putString(TASK_ORDER,taskString)
-            .apply()
+            .putString(TASK_ORDER,taskString).apply()
     }
 }
 

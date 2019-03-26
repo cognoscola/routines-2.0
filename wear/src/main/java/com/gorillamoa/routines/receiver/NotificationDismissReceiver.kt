@@ -42,16 +42,18 @@ class NotificationDismissReceiver:BroadcastReceiver() {
 
         intent?.let {
 
+            val tid = it.getIntExtra(TASK_ID,-1)
+
             when (intent.action) {
                 TYPE_SLEEP -> {
                     Log.d("onReceive","Sleep Dismissal")
                 }
                 TYPE_TASK -> {
                     Log.d("onReceive","Task Dismissal")
-                    //we dismissed a task. Check its data to see that it matches the current
-                    //data at the front.
+                    //we dismissed a task. We'll fetch a future task, while pushing the task back
 
-                    TaskScheduler.getNextTask(context,intent.getIntExtra(TASK_ID,-1)){ task ->
+                    TaskScheduler.rescheduleOneTask(context,tid)
+                    TaskScheduler.getNextTask(context,tid){ task ->
 
 
                         task?.let {
@@ -72,7 +74,7 @@ class NotificationDismissReceiver:BroadcastReceiver() {
                 TYPE_WAKE_UP -> {
                     Log.d("onReceive","Wake Up Dismissal")
 
-                    //TODO we automatically approve the schedule on dismissa of notification, make this optional
+                    //TODO we automatically approve the schedule on dismissal of notification, make this optional
                     if (context.isReadyToApprove()) {
                         TaskScheduler.approve(context)
                     }

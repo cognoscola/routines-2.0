@@ -5,6 +5,7 @@ import android.util.Log
 import com.gorillamoa.routines.coroutines.Coroutines
 import com.gorillamoa.routines.data.Task
 import com.gorillamoa.routines.extensions.*
+import java.lang.Exception
 
 import java.lang.StringBuilder
 import java.util.*
@@ -80,6 +81,67 @@ class TaskScheduler{
             context.resetStats(taskList.size)
         }
 
+
+        /**
+         * Reschedule the task a few hours into the future
+         * @param context is the application context
+         * @param tid is the task id
+         *
+         */
+        //TODO determine if we should skip all the way back or just a few tasks
+        fun rescheduleOneTask(context: Context, tid:Int){
+
+            if (tid != -1) {
+
+                val taskList = context.getDayTaskList()
+                //does this task exist in the list?
+                if (taskList.contains(tid)) {
+
+                    if (taskList.size == 1) {
+                        //we can't do anything, we can't skip
+                        //TODO only make skipable if there are 2 ore more tasks
+                    }
+
+                    //to make things easier for us, WE NEED to assume that
+                    //tid is the Last element, if not throw an error
+
+                    if (tid == taskList.last) {
+
+                        //for now lets just move the 2nd one to the front
+
+                        val current = taskList.removeLast()
+                        val next = taskList.removeLast()
+
+                        taskList.addLast(current)
+                        taskList.addLast(next)
+
+                        context.saveTaskList(taskList)
+
+                    } else {
+                        throw Exception("Not last Exception!")
+                    }
+                }
+            }
+
+
+        }
+
+        fun completeTask(context: Context, tid: Int) {
+
+            val taskList = context.getDayTaskList()
+
+            if (tid != -1) {
+                //we'll fetch the next tid from prefs
+                if(taskList.removeFirstOccurrence(tid)){
+
+                    context.incrementCompletionCount()
+                    context.saveTaskList(taskList)
+                }
+                //TODO update the task history in the DB
+            }
+        }
+
+
         /**
          * Will fetch the next task which the scheduler thinks should be fetched
          * @param context is the application context
@@ -90,17 +152,6 @@ class TaskScheduler{
 
             var nextTid:Int =-1
             val taskList = context.getDayTaskList()
-
-            if (currentTid != -1) {
-                //we'll fetch the next tid from prefs
-                if(taskList.removeFirstOccurrence(currentTid)){
-
-                    context.incrementCompletionCount()
-                    context.saveTaskList(taskList)
-                }
-
-                //TODO update the task history in the DB
-            }
 
             //always fetch from the end of the list
             if (taskList.size >= 1) {
