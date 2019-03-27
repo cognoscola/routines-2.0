@@ -73,18 +73,40 @@
                 android:layout_height="1dp"
                 android:background="#333333"/>
 
-            <Button
-                android:id="@+id/enableServiceButton"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:text="Wake Up Noti"
-                />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/runTaskNotification"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:text="Ran Task Noti" />
+                <Button
+                    android:id="@+id/wakeNotificationButton"
+                    android:layout_width="48dp"
+                    android:layout_height="40dp"
+                    android:paddingEnd="-10dp"
+                    android:paddingStart="-10dp"
+                    android:text="W NT"
+                    />
+
+                <Button
+                    android:id="@+id/sleepNotificationButton"
+                    android:layout_width="48dp"
+                    android:layout_height="40dp"
+                    android:paddingEnd="-10dp"
+                    android:paddingStart="-10dp"
+                    android:text="S NT"
+                    />
+
+                <Button
+                    android:id="@+id/taskNotificationButton"
+                    android:layout_width="48dp"
+                    android:layout_height="40dp"
+                    android:paddingEnd="-10dp"
+                    android:paddingStart="-10dp"
+                    android:text="T NT" />
+
+            </LinearLayout>
+
+
 
             <Button
                 android:id="@+id/createTask"

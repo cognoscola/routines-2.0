@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.gorillamoa.routines.receiver.AlarmReceiver
-import com.gorillamoa.routines.receiver.NotificationDismissReceiver
 
 /**
  * Send a broadcast to the Wake up Receiver.

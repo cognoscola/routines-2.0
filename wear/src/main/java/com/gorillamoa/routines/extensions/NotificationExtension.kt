@@ -61,7 +61,6 @@ fun Context.notificationShowTask(task: Task,
         setCategory(Notification.CATEGORY_REMINDER)
         setDeleteIntent(dimissPendingIntent)
 
-
         addTaskAction(this@notificationShowTask,"Done", ACTION_DONE,task.id!!)
         addTaskAction(this@notificationShowTask,"Skip Today", ACTION_DONE,task.id!!)
         addTaskAction(this@notificationShowTask,"Future", ACTION_INTO_FUTURE,task.id!!)

@@ -108,18 +108,20 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
             }
         }
 
-        enableServiceButton?.setOnClickListener {
+        wakeNotificationButton?.setOnClickListener {
             broadcastShowWakeUp()
         }
 
+        //Show the sleep notification
+        sleepNotificationButton?.setOnClickListener {
+            notificationShowSleep()
+        }
+
         //clean truncate notificationShowTask function
-        runTaskNotification?.setOnClickListener {
-            TaskScheduler.getNextTask(this, -1) { task ->
+        taskNotificationButton?.setOnClickListener {
+            TaskScheduler.getNextTask(this) { task ->
                 task?.let {
-                    notificationShowTask(
-                            it,
-                            dimissPendingIntent = createNotificationDeleteIntentForTask(task.id!!)
-                    )
+                    notificationShowTask(it)
                 }
             }
         }

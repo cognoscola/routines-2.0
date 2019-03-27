@@ -182,7 +182,7 @@ class TaskScheduler{
          * @param currentTid is the current task id (which the user is currently doing
          * @param scheduleCallback is the call back function to fetch the next task
          */
-        fun getNextTask(context:Context, currentTid:Int, scheduleCallback: (task:Task?) -> Any?){
+        fun getNextTask(context:Context, scheduleCallback: (task:Task?) -> Any?){
 
             var nextTid:Int =-1
             val taskList = context.getDayTaskList()
