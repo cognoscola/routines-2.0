@@ -16,11 +16,13 @@ import java.util.*
  *
  * Steps for Scheduling:
  *
+ * 1. Reset the day. - sets everything to 0
  * 1. Fetch And schedule a few tasks
  * 2. Receive approval or changes by user during the Wake Up Notification
  * 3. Maintain Order throughout the day
- *
- * 4. If the user wishes it, they can shift around the schedule throughout the day
+ * 4. If the user wishes it, they can shift around the schedule throughout the day by scheduling
+ * individual tasks as they come up.
+ * 5. Sleep notification comes up if - user finishes all tasks, or sleep alarm goes off
  *
  */
 class TaskScheduler{
@@ -67,7 +69,9 @@ class TaskScheduler{
                 taskList?.forEach {
                     queue.push(it.id)
                 }
+
                 context.saveTaskList(queue)
+                context.resetStats(taskList!!.size)
                 context.setReadyToApprove()
                 scheduleCallback.invoke(StringBuilder().stringifyTasks(taskList))
             }
@@ -78,7 +82,7 @@ class TaskScheduler{
          */
         fun approve(context:Context){
             val taskList = context.getDayTaskList()
-            context.resetStats(taskList.size)
+
         }
 
         //TODO come up with a scheme to schedule into the future

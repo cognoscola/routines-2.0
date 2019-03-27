@@ -48,9 +48,6 @@ class TaskActionReceiver:BroadcastReceiver(){
                             TaskScheduler.endDay(context)
                         }
                     }
-
-
-
                 }
                 else -> {
                     Log.d("onReceive","Unknown Action on Task ${intent.getIntExtra(TASK_ID,-1)}")

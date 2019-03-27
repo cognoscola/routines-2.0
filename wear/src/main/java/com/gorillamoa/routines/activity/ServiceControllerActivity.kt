@@ -78,7 +78,6 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
             isChecked = isWakeAlarmSet()
 
-
             //CLEAN
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
