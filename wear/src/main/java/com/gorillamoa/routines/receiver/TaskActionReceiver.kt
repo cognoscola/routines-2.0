@@ -32,7 +32,7 @@ class TaskActionReceiver:BroadcastReceiver(){
                     Log.d("onReceive","ACTION DONE")
                     //mark the task as done.
                     TaskScheduler.completeTask(context,tid)
-                    TaskScheduler.getNextTask(context,tid){ task ->
+                    TaskScheduler.getNextTask(context){ task ->
 
                         task?.let {
                             context.notificationShowTask(

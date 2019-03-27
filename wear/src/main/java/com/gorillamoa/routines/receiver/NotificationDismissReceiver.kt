@@ -54,7 +54,7 @@ class NotificationDismissReceiver:BroadcastReceiver() {
 
                     //TODO come up with algorithm to determine how far into future to schedule ahead, for now just 2
                     TaskScheduler.scheduleNTasksForward(context,tid,2)
-                    TaskScheduler.getNextTask(context,tid){ task ->
+                    TaskScheduler.getNextTask(context){ task ->
 
                         task?.let {
                             context.notificationShowTask(
@@ -79,7 +79,7 @@ class NotificationDismissReceiver:BroadcastReceiver() {
                         TaskScheduler.approve(context)
                     }
 
-                    TaskScheduler.getNextTask(context,-1){ task ->
+                    TaskScheduler.getNextTask(context){ task ->
                         task?.let {
                             context.notificationShowTask(
                                     it,
