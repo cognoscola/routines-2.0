@@ -47,7 +47,6 @@ class App:Application(){
         }
     }
 
-
     //TODO Create options menu
     //TODO In options menu create Notifications Behaviour sections
     //TODO Dismiss behaviour - cannot dismiss, finish task, do nothing, snooze
@@ -75,8 +74,14 @@ class App:Application(){
 
     //TODO TASKS should have option of snoozing (15min, 30min, 1HR, tomorrow) etc.
 
-    //later CREATE A BUG CHART
+    //TODO I finished a task but I am unable to check it off because notification is not there! It is showing a different task!
 
+    //TODO MAKE ABILITY TO SHOW TASK AND BROWSE ON WATCHFACE
+    //TODO MAKE ABILITY TO SHOW TASK AND BROWSE ON WATCH-APP
+    //TODO DISMISSAL AND ACTION INTENTS ARE GOING OFF!
+
+
+    //later CREATE A BUG CHART
 }
 
 fun Context.getTaskPRovider():TaskProvider{

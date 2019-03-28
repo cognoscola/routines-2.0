@@ -36,6 +36,8 @@ class NotificationDismissReceiver:BroadcastReceiver() {
          * - the user swiped, if so, why did they swipe?
          *
          */
+
+
     }
 
     override fun onReceive(context: Context, intent: Intent?) {
@@ -49,28 +51,12 @@ class NotificationDismissReceiver:BroadcastReceiver() {
                     Log.d("onReceive","Sleep Dismissal")
                 }
                 TYPE_TASK -> {
-                    Log.d("onReceive","Task Dismissal")
+                    Log.d("schedule:Dismiss","Task Dismissal")
                     //we dismissed a task. We'll fetch a future task, while pushing the task back
 
-                    //TODO come up with algorithm to determine how far into future to schedule ahead, for now just 2
-                    TaskScheduler.scheduleNTasksForward(context,tid,2)
-                    TaskScheduler.getNextTask(context){ task ->
-
-                        task?.let {
-                            context.notificationShowTask(
-                                    it,
-                                    dimissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!)
-                            )
-
-                            //first time using this notation, so just to clarify. Since task was null the
-                            //commands on the right side of the elvis (?:) notation was executed
-
-                        } ?: run{
-                            context.notificationShowSleep()
-                            TaskScheduler.endDay(context)
-                        }
-                    }
+                    TaskScheduler.skipAndShowNext(context,tid)
                 }
+
                 TYPE_WAKE_UP -> {
                     Log.d("onReceive","Wake Up Dismissal")
 

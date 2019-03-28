@@ -6,10 +6,13 @@ import android.app.PendingIntent
 import android.content.Context
 import android.graphics.drawable.Icon
 import android.text.Html
+import android.util.Log
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.data.Task
 import com.gorillamoa.routines.receiver.TaskActionReceiver.Companion.ACTION_DONE
 import com.gorillamoa.routines.receiver.TaskActionReceiver.Companion.ACTION_INTO_FUTURE
+import com.gorillamoa.routines.receiver.TaskActionReceiver.Companion.ACTION_SKIP_SHORT
+import com.gorillamoa.routines.receiver.TaskActionReceiver.Companion.ACTION_SKIP_TODAY
 
 const val WAKE_UP_NOTIFICATION_ID =1
 const val SLEEP_NOTIFICATION_ID =65535
@@ -61,9 +64,11 @@ fun Context.notificationShowTask(task: Task,
         setCategory(Notification.CATEGORY_REMINDER)
         setDeleteIntent(dimissPendingIntent)
 
-        addTaskAction(this@notificationShowTask,"Done", ACTION_DONE,task.id!!)
-        addTaskAction(this@notificationShowTask,"Skip Today", ACTION_DONE,task.id!!)
-        addTaskAction(this@notificationShowTask,"Future", ACTION_INTO_FUTURE,task.id!!)
+        Log.d("schedule","Showing Notification id: ${task.id}")
+
+        addTaskAction(this@notificationShowTask,"Done      ", ACTION_DONE,task.id!!)
+        addTaskAction(this@notificationShowTask,"Delay     ", ACTION_SKIP_SHORT,task.id!!)
+        addTaskAction(this@notificationShowTask,"Skip Today", ACTION_SKIP_TODAY,task.id!!)
 
         manager.notify(
                 NOTIFICATION_TAG,

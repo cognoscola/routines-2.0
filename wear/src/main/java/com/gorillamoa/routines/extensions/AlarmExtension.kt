@@ -45,7 +45,6 @@ fun Context.alarmDisableSleep(){
 }
 
 
-
 /**
  * Set the repeating alarm with the given calendar
  * @param cal is the calendar object containing information about when to set alarm

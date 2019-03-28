@@ -18,6 +18,12 @@ import com.gorillamoa.routines.viewmodel.TaskViewModel
 import kotlinx.android.synthetic.main.activity_service_controller.*
 import java.lang.StringBuilder
 import java.util.*
+import android.content.Context.SENSOR_SERVICE
+import androidx.core.content.ContextCompat.getSystemService
+import android.hardware.SensorManager
+
+
+
 
 /**
  * A few notes on this class.
@@ -145,6 +151,7 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
             taskViewModel.dummy()
 
         }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -156,19 +163,23 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
                     //TODO truncate these codes
                     val cal = Calendar.getInstance()
-                    setSleepTimeToCalendarAndStore(cal,
+
+                    setWakeTimeToCalendarAndStore(cal,
                             data?.getIntExtra(TimePickerFragment.HOUR,-1)?:-1,
                             data?.getIntExtra(TimePickerFragment.MIN,-1)?:-1,
                             data?.getIntExtra(TimePickerFragment.PHASE,-1)?:-1)
+
                     alarmSetRepeatWithCal(cal,true)
                     wakeUpAlarmToggle?.isChecked = true
                 }
                 PICKER_CODE_SLEEP -> {
                     val cal = Calendar.getInstance()
-                    setWakeTimeToCalendarAndStore(cal,
+
+                    setSleepTimeToCalendarAndStore(cal,
+
                             data?.getIntExtra(TimePickerFragment.HOUR,-1)?:-1,
                             data?.getIntExtra(TimePickerFragment.MIN,-1)?:-1,
-                    data?.getIntExtra(TimePickerFragment.PHASE,-1)?:-1)
+                            data?.getIntExtra(TimePickerFragment.PHASE,-1)?:-1)
                     sleepAlarmToggle?.isChecked = true
                     alarmSetRepeatWithCal(cal,false)
                 }

@@ -5,7 +5,6 @@ import android.util.Log
 import com.gorillamoa.routines.coroutines.Coroutines
 import com.gorillamoa.routines.data.Task
 import com.gorillamoa.routines.extensions.*
-import java.lang.Exception
 
 import java.lang.StringBuilder
 import java.util.*
@@ -113,7 +112,7 @@ class TaskScheduler{
          *
          */
         //TODO determine if we should skip all the way back or just a few tasks
-        fun scheduleNTasksForward(context: Context, tid:Int,steps:Int){
+        fun scheduleNTasksForward(context: Context, tid:Int,steps:Int):Boolean{
 
             if (tid != -1) {
 
@@ -129,6 +128,8 @@ class TaskScheduler{
                     //to make things easier for us, WE NEED to assume that
                     //tid is the Last element, if not throw an error
 
+                    Log.d("scheduleNTasksForward","Checking TID:$tid vs last:${taskList.last}")
+                    //if false it usually means two intents went off! Both attempted to schedule
                     if (tid == taskList.last) {
 
                         //for now lets just move the 2nd one to the front
@@ -151,12 +152,13 @@ class TaskScheduler{
                         }
 
                         context.saveTaskList(taskList)
-
-                    } else {
-                        throw Exception("Not last Exception!")
+                        return true
                     }
+                    return false
                 }
+                return false
             }
+            return false
         }
 
         /**
@@ -164,7 +166,7 @@ class TaskScheduler{
          * @param context is the application context
          * @param tid is the id of the task completed
          */
-        fun completeTask(context: Context, tid: Int) {
+        fun completeTask(context: Context, tid: Int):Boolean {
 
             val taskList = context.getDayTaskList()
 
@@ -174,9 +176,11 @@ class TaskScheduler{
 
                     context.incrementCompletionCount()
                     context.saveTaskList(taskList)
+                    return true
                 }
                 //TODO update the task history in the DB
-            }
+            }else {return false}
+            return false
         }
 
 
@@ -220,7 +224,29 @@ class TaskScheduler{
         fun endDay(context: Context){
             Log.d("endDay","The day is over")
             context.cancelApproval()
+        }
 
+        fun skipAndShowNext(context: Context, currentTid: Int) {
+            if (TaskScheduler.scheduleNTasksForward(context, currentTid, 2)) {
+                TaskScheduler.getNextTask(context) { task ->
+
+                    task?.let {
+                        context.notificationShowTask(
+                                it,
+                                dimissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!)
+                        )
+
+                        //first time using this notation, so just to clarify. Since task was null the
+                        //commands on the right side of the elvis (?:) notation was executed
+
+                    } ?: run {
+                        context.notificationShowSleep()
+                        TaskScheduler.endDay(context)
+                    }
+                }
+            }else{
+                Log.e("skipAndShowNext","Something went wrong! Not able to schedule!")
+            }
         }
     }
 }

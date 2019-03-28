@@ -16,9 +16,11 @@ class TaskActionReceiver:BroadcastReceiver(){
         //clean comment
         const val ACTION_DONE = "task.done"
 
-        const val ACTION_SKIP_TODAY = "task.skiptoday"
+        const val ACTION_SKIP_SHORT = "task.skip.short"
 
-        const val ACTION_INTO_FUTURE = "task.future"
+        const val ACTION_SKIP_TODAY = "task.skip.today"
+
+        const val ACTION_INTO_FUTURE = "task.skip.long"
     }
 
     override fun onReceive(context: Context, intent: Intent?) {
@@ -31,24 +33,35 @@ class TaskActionReceiver:BroadcastReceiver(){
                 ACTION_DONE -> {
                     Log.d("onReceive","ACTION DONE")
                     //mark the task as done.
-                    TaskScheduler.completeTask(context,tid)
-                    TaskScheduler.getNextTask(context){ task ->
+                    if (TaskScheduler.completeTask(context, tid)) {
+                        TaskScheduler.getNextTask(context){ task ->
 
-                        task?.let {
-                            context.notificationShowTask(
-                                    it,
-                                    dimissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!)
-                            )
+                            task?.let {
+                                context.notificationShowTask(
+                                        it,
+                                        dimissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!)
+                                )
 
-                            //first time using this notation, so just to clarify. Since task was null the
-                            //commands on the right side of the elvis (?:) notation was executed
+                                //first time using this notation, so just to clarify. Since task was null the
+                                //commands on the right side of the elvis (?:) notation was executed
 
-                        } ?: run{
-                            context.notificationShowSleep()
-                            TaskScheduler.endDay(context)
+                            } ?: run{
+                                context.notificationShowSleep()
+                                TaskScheduler.endDay(context)
+                            }
                         }
+                    }else{
+                        Log.e("onReceive","Something wont wrong Completeing task! UH OH")
                     }
+
                 }
+
+                ACTION_SKIP_SHORT ->{
+                    Log.d("schedule:SKIP","receiver got id ${tid}")
+                    TaskScheduler.skipAndShowNext(context,tid)
+                }
+
+
                 else -> {
                     Log.d("onReceive","Unknown Action on Task ${intent.getIntExtra(TASK_ID,-1)}")
                 }
