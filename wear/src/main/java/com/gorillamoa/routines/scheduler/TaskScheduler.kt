@@ -93,15 +93,24 @@ class TaskScheduler{
          * Schedule the current visible task for another day.
          * We don't know when to schedule yet but for now we'll just remove from the
          * list
+         * @return true is we should fetch another task
          */
-        fun scheduleForNextAvaiableDay(context:Context, tid:Int){
+        fun scheduleForNextAvaiableDay(context:Context, tid:Int):Boolean{
 
+            var shouldFetch = false
             val taskList = context.getDayTaskList()
             if (taskList.contains(tid)) {
+
+                if (tid == taskList.last) {
+                    shouldFetch = true
+                }
+
                 if (taskList.removeFirstOccurrence(tid)) {
                     context.saveTaskList(taskList)
                 }
             }
+
+            return shouldFetch
         }
 
         /**
@@ -226,27 +235,31 @@ class TaskScheduler{
             context.cancelApproval()
         }
 
-        fun skipAndShowNext(context: Context, currentTid: Int) {
-            if (TaskScheduler.scheduleNTasksForward(context, currentTid, 2)) {
-                TaskScheduler.getNextTask(context) { task ->
+        fun showNext(context:Context){
+            TaskScheduler.getNextTask(context) { task ->
 
-                    task?.let {
-                        context.notificationShowTask(
-                                it,
-                                dimissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!)
-                        )
+                task?.let {
+                    context.notificationShowTask(
+                            it,
+                            dimissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!)
+                    )
 
-                        //first time using this notation, so just to clarify. Since task was null the
-                        //commands on the right side of the elvis (?:) notation was executed
+                    //first time using this notation, so just to clarify. Since task was null the
+                    //commands on the right side of the elvis (?:) notation was executed
 
-                    } ?: run {
-                        context.notificationShowSleep()
-                        TaskScheduler.endDay(context)
-                    }
+                } ?: run {
+                    context.notificationShowSleep()
+                    TaskScheduler.endDay(context)
                 }
-            }else{
-                Log.e("skipAndShowNext","Something went wrong! Not able to schedule!")
             }
         }
+
+        fun skipAndShowNext(context: Context, currentTid: Int) {
+            if (TaskScheduler.scheduleNTasksForward(context, currentTid, 2)) {
+                showNext(context)
+            }
+        }
+
+
     }
 }
