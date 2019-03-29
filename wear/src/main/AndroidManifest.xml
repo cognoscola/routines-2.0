@@ -7,12 +7,12 @@
     <uses-feature android:name="android.hardware.type.watch" />
 
     <application
+        android:name=".app.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.DeviceDefault"
-        android:name=".app.App">
+        android:theme="@android:style/Theme.DeviceDefault">
         <uses-library
             android:name="com.google.android.wearable"
             android:required="true" />
@@ -26,11 +26,21 @@
             android:value="true" />
 
         <activity
+            android:name=".activity.TaskListActivity"
+            android:label="@string/title_activity_task_list">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".activity.ServiceControllerActivity"
             android:label="@string/title_activity_service_controller">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -43,37 +53,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.SettingsActivity"
-            android:label="@string/onboard_app_name">
-        </activity>
-
+            android:label="@string/onboard_app_name"></activity>
         <activity
             android:name=".activity.OnboardActivity"
             android:label="@string/onboard_app_name">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <receiver android:name=".receiver.AlarmReceiver"
-            android:exported="false">
-
-        </receiver>
-
+        <receiver
+            android:name=".receiver.AlarmReceiver"
+            android:exported="false"></receiver>
         <receiver
             android:name=".receiver.NotificationDismissReceiver"
-            android:exported="false" >
-        </receiver>
-
+            android:exported="false"></receiver>
         <receiver
             android:name=".receiver.TaskActionReceiver"
-            android:exported="false" >
-        </receiver>
-
+            android:exported="false"></receiver>
     </application>
 
 </manifest>
