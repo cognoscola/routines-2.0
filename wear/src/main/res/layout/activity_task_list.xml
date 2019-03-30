@@ -15,8 +15,8 @@
         android:paddingStart="30dp"
         android:paddingEnd="30dp"
        android:id="@+id/taskListWearableRecyclerView"
-
         tools:background="#B95F5F">
+
 
     </androidx.wear.widget.WearableRecyclerView>
 </androidx.wear.widget.BoxInsetLayout>

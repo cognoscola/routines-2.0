@@ -1,6 +1,6 @@
 package com.gorillamoa.routines.adapter
 
-import android.graphics.Color
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.data.Task
-
 
 class TaskListAdapter(private val callback:(Int)->Unit): RecyclerView.Adapter<TaskListAdapter.TaskItemHolder>() {
 
@@ -18,7 +17,8 @@ class TaskListAdapter(private val callback:(Int)->Unit): RecyclerView.Adapter<Ta
             notifyDataSetChanged()
         }
 
-    val builder =StringBuilder()
+
+    val builder = StringBuilder()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskItemHolder {
         return TaskItemHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false))
@@ -31,18 +31,12 @@ class TaskListAdapter(private val callback:(Int)->Unit): RecyclerView.Adapter<Ta
     override fun onBindViewHolder(holder: TaskItemHolder, position: Int) {
         tasks?.let {
 
-            builder.clear()
-            //TODO add imageview to list items
             val task =  tasks!![position]
+            builder.clear()
             builder.append("&#9999;&nbsp;")
             builder.append(task.name)
-            holder.tasKTextView.text = builder.toString()
-            if (Math.floorMod(position, 2) == 0) {
-                holder.tasKTextView.setBackgroundColor(Color.GREEN)
-            } else {
-                holder.tasKTextView.setBackgroundColor(Color.MAGENTA)
-            }
 
+            holder.tasKTextView.text = Html.fromHtml(builder.toString(),Html.FROM_HTML_MODE_COMPACT)
             holder.tasKTextView.setOnClickListener {
                 callback.invoke(task.id?:-1)
             }

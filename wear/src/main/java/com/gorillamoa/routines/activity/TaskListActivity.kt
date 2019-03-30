@@ -12,6 +12,9 @@ import com.gorillamoa.routines.adapter.TaskListAdapter
 import com.gorillamoa.routines.viewmodel.TaskViewModel
 import kotlinx.android.synthetic.main.activity_task_list.*
 
+//TODO the listview doesn't stretch out to the end and start edges of the activity. Make it so.
+//TODO add Header Item for the list!
+
 class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider {
 
 
