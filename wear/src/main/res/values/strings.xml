@@ -34,4 +34,8 @@
     <string name="info_argument_key">info_text</string>
     <string name="title_activity_task_list">TaskListActivity</string>
 
+
+    <!--Task list -->
+
+    <string name="task_list_title">"Today's Tasks"</string>
 </resources>
