@@ -79,6 +79,8 @@ class App:Application(){
     //TODO MAKE ABILITY TO SHOW TASK AND BROWSE ON WATCHFACE
     //TODO MAKE ABILITY TO SHOW TASK AND BROWSE ON WATCH-APP
 
+    //TODO clear task notifications sometime between Sleep and Wake Notifications
+
     //later CREATE A BUG CHART
 }
 

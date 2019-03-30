@@ -1,36 +1,55 @@
 package com.gorillamoa.routines.adapter
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.gorillamoa.routines.R
+import com.gorillamoa.routines.data.Task
 
 
-/**
- * Provides a binding from [NotificationCompat.Style] data set to views displayed within the
- * [WearableRecyclerView].
- */
-class TaskListAdapter(val list: Array<String>, private val callback:()->Unit): RecyclerView.Adapter<TaskListAdapter.TaskItemHolder>() {
+class TaskListAdapter(private val callback:(Int)->Unit): RecyclerView.Adapter<TaskListAdapter.TaskItemHolder>() {
 
+     var tasks:List<Task>? = null
+        set(value) {
+            field =value
+            notifyDataSetChanged()
+        }
+
+    val builder =StringBuilder()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskItemHolder {
-        return TaskItemHolder(LayoutInflater.from(parent?.context).inflate(R.layout.item_task, parent, false))
+        return TaskItemHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false))
     }
 
     override fun getItemCount(): Int {
-        return list.size
+        return tasks?.size ?:0
     }
 
     override fun onBindViewHolder(holder: TaskItemHolder, position: Int) {
-        holder?.tastTextView?.text = list[position]
-        holder?.tastTextView?.setOnClickListener {
-            callback.invoke()
+        tasks?.let {
+
+            builder.clear()
+            //TODO add imageview to list items
+            val task =  tasks!![position]
+            builder.append("&#9999;&nbsp;")
+            builder.append(task.name)
+            holder.tasKTextView.text = builder.toString()
+            if (Math.floorMod(position, 2) == 0) {
+                holder.tasKTextView.setBackgroundColor(Color.GREEN)
+            } else {
+                holder.tasKTextView.setBackgroundColor(Color.MAGENTA)
+            }
+
+            holder.tasKTextView.setOnClickListener {
+                callback.invoke(task.id?:-1)
+            }
         }
     }
 
     inner class TaskItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        public var tastTextView: TextView = itemView.findViewById(R.id.taskNameTextView)
+         var tasKTextView: TextView = itemView.findViewById(R.id.taskNameTextView)
     }
 }
