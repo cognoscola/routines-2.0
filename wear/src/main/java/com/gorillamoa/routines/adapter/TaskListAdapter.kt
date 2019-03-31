@@ -2,6 +2,9 @@ package com.gorillamoa.routines.adapter
 
 import android.graphics.Typeface
 import android.text.Html
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,8 +21,11 @@ class TaskListAdapter(private val callback:(Int)->Unit): RecyclerView.Adapter<Re
             notifyDataSetChanged()
         }
 
-
     val builder = StringBuilder()
+
+    val defaultTaskSymbol:Spanned by lazy{
+         Html.fromHtml("&#9999;&nbsp;",Html.FROM_HTML_MODE_COMPACT)
+    }
 
     companion object {
         const val VIEW_TYPE_TASK = 0
@@ -52,11 +58,13 @@ class TaskListAdapter(private val callback:(Int)->Unit): RecyclerView.Adapter<Re
 
             if (holder is TaskItemHolder) {
                 val task =  tasks!![position - 1]
-                builder.clear()
-                builder.append("&#9999;&nbsp;")
-                builder.append(task.name)
+//                builder.clear()
+//                builder.append("&#9999;&nbsp;")
+//                builder.append(task.name)
 
-                holder.tasKTextView.text = Html.fromHtml(builder.toString(),Html.FROM_HTML_MODE_COMPACT)
+//                TextUtils.concat(defaultTaskSymbol,task.name)
+//                holder.tasKTextView.text = Html.fromHtml(builder.toString(),Html.FROM_HTML_MODE_COMPACT)
+                holder.tasKTextView.text = TextUtils.concat(defaultTaskSymbol,task.name)
                 holder.tasKTextView.setOnClickListener {
                     callback.invoke(task.id?:-1)
                 }
