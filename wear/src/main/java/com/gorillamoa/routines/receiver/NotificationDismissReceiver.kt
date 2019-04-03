@@ -61,9 +61,9 @@ class NotificationDismissReceiver:BroadcastReceiver() {
                     Log.d("onReceive","Wake Up Dismissal")
 
                     //TODO we automatically approve the schedule on dismissal of notification, make this optional
-                    if (context.isReadyToApprove()) {
+//                    if (context.EnableScheduler()) {
                         TaskScheduler.approve(context)
-                    }
+//                    }
 
                     TaskScheduler.getNextTask(context){ task ->
                         task?.let {

@@ -63,15 +63,16 @@ class TaskScheduler{
                 //TODO FETCH some habits
                 //TODO FETCH Some goals
                 val queue = ArrayDeque<Int>()
+                //save the empty list to the Completed list
 
                 taskList?.forEach {
                     queue.push(it.id)
                 }
 
-                context.saveTaskList(queue)
-                context.resetStats(taskList!!.size)
+                context.saveTaskLists(queue,ArrayDeque())
 
-                context.setReadyToApprove()
+                //TODO wait for approval of user
+                context.EnableScheduler()
                 scheduleCallback.invoke(StringBuilder().stringifyTasks(taskList))
             }
         }
@@ -80,7 +81,7 @@ class TaskScheduler{
          * The user has approved the schedule and so now we can begin assigning tasks
          */
         fun approve(context:Context){
-            val taskList = context.getDayTaskList()
+//            val taskList = context.getDayTaskList()
 
         }
 
@@ -188,7 +189,6 @@ class TaskScheduler{
 
                     //TODO retain the original order so that we know when to add this task
                     taskList.add(tid)
-                    context.decrementCompletionCount()
                     context.saveTaskLists(taskList,doneList)
                     return true
                 }
@@ -212,7 +212,6 @@ class TaskScheduler{
                 if(taskList.removeFirstOccurrence(tid)){
 
                     doneList.add(tid)
-                    context.incrementCompletionCount()
                     context.saveTaskLists(taskList,doneList)
                     return true
                 }
@@ -262,7 +261,9 @@ class TaskScheduler{
 
         fun endDay(context: Context){
             Log.d("endDay","The day is over")
-            context.cancelApproval()
+            context.DisableScheduler()
+
+
             val taskList = context.getDayTaskList()
             while (taskList.size > 0) {
                 taskList.remove()

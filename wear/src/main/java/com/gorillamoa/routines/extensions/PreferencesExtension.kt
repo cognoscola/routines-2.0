@@ -10,7 +10,6 @@ private const val LOCAL_SETTINGS ="local_app_settings"
 private const val isWakeAlarmActive= "isWakeAlarmActive"
 private const val isSleepAlarmActive= "isSleepAlarmActive"
 
-
 //TODO remove other copies of these values
 private const val WAKE_UP_HOUR = "wake_up_hour"
 private const val WAKE_UP_MINUTE = "wake_up_minute"
@@ -24,16 +23,9 @@ private const val SLEEP_PHASE = "sleep_phase"
 //Task related information
 private const val TASK_ORDER = "order" //also serves as tasks not yet completed
 private const val TASK_DONE = "done" //which tasks completed
-private const val TOTAL_ASSIGNED  = "assigned"
 
 
-private const val READY_TO_APPROVE = "ready"
-
-/**
- * The number of tasks completed for the day. Note that this value is 'locked'
- * if it is -1. Change it to another value to unlock it
- */
-private const val TOTAL_COMPLETED  = "completed"
+private const val IS_ACTIVE = "ready" //wether the app is currently working on not
 
 
 fun Context.getLocalSettings():SharedPreferences{
@@ -90,6 +82,7 @@ fun Context.saveAlarmSleepStatus(isAlarmSet:Boolean){
             .putBoolean(isSleepAlarmActive,isAlarmSet)
             .apply()
 }
+
 
 
 /**
@@ -168,53 +161,16 @@ fun Context.fetchArrayFromPreference(listName:String):ArrayDeque<Int>{
     }
 }
 
-fun Context.isReadyToApprove():Boolean{
-    return getLocalSettings().getBoolean(READY_TO_APPROVE,false)
+fun Context.isEnabled(){
+    getLocalSettings().getBoolean(IS_ACTIVE,false)
 }
 
-fun Context.setReadyToApprove(){
-    getLocalSettings().edit().putBoolean(READY_TO_APPROVE,true).apply()
+fun Context.EnableScheduler(){
+    getLocalSettings().edit().putBoolean(IS_ACTIVE,true).apply()
 }
 
-fun Context.cancelApproval(){
-    getLocalSettings().edit().putBoolean(READY_TO_APPROVE,false).apply()
+fun Context.DisableScheduler(){
+    getLocalSettings().edit().putBoolean(IS_ACTIVE,false).apply()
 }
 
-
-
-fun Context.resetStats(count:Int){
-    val settings = getLocalSettings()
-    settings.edit()
-            .putInt(TOTAL_ASSIGNED, count)
-            .putInt(TOTAL_COMPLETED, 0)
-            .apply()
-
-}
-
-fun Context.incrementCompletionCount(){
-    val settings = getLocalSettings()
-    var count = settings.getInt(TOTAL_COMPLETED,-1)
-    if (count != -1) {
-        count++
-        settings.edit().putInt(TOTAL_COMPLETED,count).apply()
-    }
-}
-
-fun Context.decrementCompletionCount(){
-    val settings = getLocalSettings()
-    var count = settings.getInt(TOTAL_COMPLETED,-1)
-    if (count != -1) {
-        count--
-        if(count < 0 ) count =0
-        settings.edit().putInt(TOTAL_COMPLETED,count).apply()
-    }
-}
-
-
-fun Context.getCompletionCountToday():Int{
-    return getLocalSettings().getInt(TOTAL_COMPLETED,-1)
-}
-fun Context.getTotalAssignedToday():Int{
-    return getLocalSettings().getInt(TOTAL_ASSIGNED,-1)
-}
 

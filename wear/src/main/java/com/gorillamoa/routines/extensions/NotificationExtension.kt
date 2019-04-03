@@ -101,8 +101,9 @@ fun Context.notificationShowSleep(){
                 setContentText("See Today's Accomplishments ")
 
                 //TODO MOVE THIS ELSEWHERE
-                val completed = getCompletionCountToday()
-                val total = getTotalAssignedToday()
+                val completed = getCompletedTaskList()
+                val uncompleted = getDayTaskList()
+                val total = completed.size + uncompleted.size
 
                 style =prepareBigTextStyle("$completed/$total Tasks Completed!","Results:")
                 setAutoCancel(true)
