@@ -1,5 +1,6 @@
 package com.gorillamoa.routines.adapter
 
+import android.content.Context
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.view.LayoutInflater
@@ -10,8 +11,15 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.data.Task
+import com.gorillamoa.routines.extensions.getCompletedTaskList
+import com.gorillamoa.routines.extensions.getDayTaskList
+import java.util.*
 
-class TaskListAdapter(private val callback:(Int)->Unit): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+//TODO Comment this shit
+class TaskListAdapter(
+        context: Context,
+        private val callback:(Int)->Unit,
+        private val statusCallback:(Int,Boolean)->Any?): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
      var tasks:List<Task>? = null
         set(value) {
@@ -19,11 +27,8 @@ class TaskListAdapter(private val callback:(Int)->Unit): RecyclerView.Adapter<Re
             notifyDataSetChanged()
         }
 
-    val builder = StringBuilder()
-
-
-
-
+    private val done:ArrayDeque<Int> =context.getCompletedTaskList()
+    private val remaining:ArrayDeque<Int> = context.getDayTaskList()
 
     companion object {
         const val VIEW_TYPE_TASK = 0
@@ -46,6 +51,8 @@ class TaskListAdapter(private val callback:(Int)->Unit): RecyclerView.Adapter<Re
         return (tasks?.size ?:0) + 1
     }
 
+
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         tasks?.let {
 
@@ -55,27 +62,59 @@ class TaskListAdapter(private val callback:(Int)->Unit): RecyclerView.Adapter<Re
             }
 
             if (holder is TaskItemHolder) {
-                val task =  tasks!![position - 1]
-//                builder.clear()
-//                builder.append("&#9999;&nbsp;")
-//                builder.append(task.name)
 
-//                TextUtils.concat(defaultTaskSymbol,task.name)
-//                holder.tasKTextView.text = Html.fromHtml(builder.toString(),Html.FROM_HTML_MODE_COMPACT)
-                holder.tasKTextView.text = task.name
-                holder.iconTextView.apply {
-                    setImageResource(R.drawable.ic_radio_button_unchecked_black_24dp)
-                    setOnClickListener {
-                        setImageResource(R.drawable.ic_done_black_24dp)
-                        holder.tasKTextView.paintFlags = holder.tasKTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                holder.apply {
+
+                    val task =  tasks!![position - 1]
+                    taskTextView.text = task.name
+
+                    if (done.contains(task.id)) {
+                        changeToDone(iconImageView,taskTextView)
+                        iconImageView.setOnClickListener {
+
+                            if (remaining.removeFirstOccurrence(task.id)) {
+                                done.add(task.id)
+                            }
+                            statusCallback.invoke(task.id?:-1, false)
+                            notifyItemChanged(position)
+                        }
+
+                    }else if (remaining.contains(task.id)){
+                        changeToUndone(iconImageView,taskTextView)
+                        iconImageView.setOnClickListener {
+
+                            if (done.removeFirstOccurrence(task.id)) {
+                                remaining.add(task.id)
+                            }
+                            statusCallback.invoke(task.id?:-1, true)
+                            notifyItemChanged(position)
+                        }
+
+                    }else{
+                        //we don't know if this task is done or not!
+                        changeToUnknown(iconImageView,taskTextView)
                     }
-                }
 
-                holder.tasKTextView.setOnClickListener {
-                    callback.invoke(task.id?:-1)
+                    taskTextView.setOnClickListener {
+                        callback.invoke(task.id?:-1)
+                    }
                 }
             }
         }
+    }
+
+    private fun changeToUnknown(iv:ImageView,tv:TextView){
+        iv.setImageResource(R.drawable.ic_priority_high_black_24dp)
+    }
+
+    private fun changeToDone(iv:ImageView, tv:TextView){
+        iv.setImageResource(R.drawable.ic_done_black_24dp)
+        tv.paintFlags = tv.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+    }
+
+    private fun changeToUndone(iv:ImageView, tv:TextView){
+        iv.setImageResource(R.drawable.ic_radio_button_unchecked_black_24dp)
+        tv.paintFlags = tv.paintFlags xor Paint.STRIKE_THRU_TEXT_FLAG
     }
 
 
@@ -84,8 +123,8 @@ class TaskListAdapter(private val callback:(Int)->Unit): RecyclerView.Adapter<Re
     }
 
     inner class TaskItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-         var tasKTextView: TextView = itemView.findViewById(R.id.taskNameTextView)
-        var iconTextView = itemView.findViewById<ImageView>(R.id.iconTextView)
+         var taskTextView: TextView = itemView.findViewById(R.id.taskNameTextView)
+        var iconImageView = itemView.findViewById<ImageView>(R.id.iconTextView)
     }
 
     inner class TitleViewHolder(item:View):RecyclerView.ViewHolder(item){

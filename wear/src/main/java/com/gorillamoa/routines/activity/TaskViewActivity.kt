@@ -5,6 +5,7 @@ import android.support.wearable.activity.WearableActivity
 import com.gorillamoa.routines.R
 
 //TODO create pager for tasks
+//TODO show some task history
 
 class TaskViewActivity:WearableActivity(){
 

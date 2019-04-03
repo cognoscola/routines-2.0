@@ -10,6 +10,7 @@ import androidx.wear.ambient.AmbientModeSupport
 import androidx.wear.widget.WearableLinearLayoutManager
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.adapter.TaskListAdapter
+import com.gorillamoa.routines.scheduler.TaskScheduler
 import com.gorillamoa.routines.viewmodel.TaskViewModel
 import kotlinx.android.synthetic.main.activity_task_list.*
 
@@ -17,7 +18,6 @@ import kotlinx.android.synthetic.main.activity_task_list.*
 //TODO handle use case where user interacts with notification, while on this app. One option is to remove the notification
 
 class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider {
-
 
     private lateinit var taskViewModel: TaskViewModel
 
@@ -31,15 +31,24 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
         taskViewModel.loadTasks()
         taskViewModel.tasks.observe(this, Observer {
 
+            //TODO fetch only scheduled tasks
             (taskListWearableRecyclerView?.adapter as TaskListAdapter).tasks = it
         })
 
         taskListWearableRecyclerView?.apply {
             isEdgeItemsCenteringEnabled = true
-            adapter = TaskListAdapter{
+            adapter = TaskListAdapter(this@TaskListActivity,{
 
                 Log.d("onCreate","Clicked task $it")
                 startActivity(Intent(this@TaskListActivity,TaskViewActivity::class.java))
+            }){tid, isDone ->
+
+                //TODO REMOVE THE NOTIFICATION IF IT EXISTS
+                if (isDone) {
+                    TaskScheduler.completeTask(context,tid)
+                }else{
+                    TaskScheduler.uncompleteTask(context,tid)
+                }
             }
             layoutManager = WearableLinearLayoutManager(this@TaskListActivity)
         }

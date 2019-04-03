@@ -193,7 +193,6 @@ class TaskScheduler{
             return false
         }
 
-
         /**
          * We finished the task
          * @param context is the application context
