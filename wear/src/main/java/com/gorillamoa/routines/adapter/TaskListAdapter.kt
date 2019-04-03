@@ -1,13 +1,7 @@
 package com.gorillamoa.routines.adapter
 
-import android.graphics.Bitmap
 import android.graphics.Paint
 import android.graphics.Typeface
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.VectorDrawable
-import android.text.Html
-import android.text.Spanned
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,14 +21,9 @@ class TaskListAdapter(private val callback:(Int)->Unit): RecyclerView.Adapter<Re
 
     val builder = StringBuilder()
 
-    /*val defaultTaskSymbol:Spanned by lazy{
-         Html.fromHtml("&#9999;",Html.FROM_HTML_MODE_COMPACT)
-    }
 
-    val doneSymbol:Spanned by lazy{
-        Html.fromHtml("&#9999;",Html.FROM_HTML_MODE_COMPACT)
-    }
-*/
+
+
 
     companion object {
         const val VIEW_TYPE_TASK = 0

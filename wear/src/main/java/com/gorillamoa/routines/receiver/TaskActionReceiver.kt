@@ -48,7 +48,7 @@ class TaskActionReceiver:BroadcastReceiver(){
 
                 ACTION_SKIP_TODAY ->{
 
-                    if (TaskScheduler.scheduleForNextAvaiableDay(context, tid)) {
+                    if (TaskScheduler.scheduleForNextAvailableDay(context, tid)) {
                         TaskScheduler.showNext(context)
                     }else{
                         Log.d("onReceive","ACTION_SKIP_TODAY")

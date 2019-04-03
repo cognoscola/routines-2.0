@@ -14,7 +14,7 @@ import com.gorillamoa.routines.viewmodel.TaskViewModel
 import kotlinx.android.synthetic.main.activity_task_list.*
 
 //TODO the listview doesn't stretch out to the end and start edges of the activity. Make it so.
-//TODO add Header Item for the list!
+//TODO handle use case where user interacts with notification, while on this app. One option is to remove the notification
 
 class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider {
 
@@ -71,6 +71,7 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
             Log.d("onUpdateAmbient","")
         }
     }
+
 
 
 }

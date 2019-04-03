@@ -22,7 +22,8 @@ private const val SLEEP_PHASE = "sleep_phase"
 //TODO END
 
 //Task related information
-private const val TASK_ORDER = "order"
+private const val TASK_ORDER = "order" //also serves as tasks not yet completed
+private const val TASK_DONE = "done" //which tasks completed
 private const val TOTAL_ASSIGNED  = "assigned"
 
 
@@ -35,9 +36,7 @@ private const val READY_TO_APPROVE = "ready"
 private const val TOTAL_COMPLETED  = "completed"
 
 
-
 fun Context.getLocalSettings():SharedPreferences{
-
     //later investigate cost of retrieving shared preferences
     return getSharedPreferences(LOCAL_SETTINGS, Activity.MODE_PRIVATE)
 }
@@ -108,13 +107,37 @@ fun Context.saveTaskList(queue:ArrayDeque<Int>){
     }
 }
 
+fun Context.saveTaskLists(queue:ArrayDeque<Int>,completed:ArrayDeque<Int>){
+    val prefs = getLocalSettings()
+    prefs.edit().apply{
+
+        var taskString = queue.joinToString(",")
+        Log.d("saveTaskList","Scheduled Tasks: $taskString")
+        putString(TASK_ORDER,taskString)
+
+        taskString = queue.joinToString(",")
+        Log.d("saveTaskList","Completed Tasks: $taskString")
+        putString(TASK_DONE,taskString)
+
+        apply()
+    }
+}
+
+
+fun Context.getCompletedTaskList():ArrayDeque<Int>{
+    return fetchArrayFromPreference(TASK_DONE)
+}
+
 /**
  * We get the task list, if there is any.
  */
 fun Context.getDayTaskList():ArrayDeque<Int>{
+    return fetchArrayFromPreference(TASK_ORDER)
+}
 
+fun Context.fetchArrayFromPreference(listName:String):ArrayDeque<Int>{
     val prefs = getLocalSettings()
-    val taskString = prefs.getString(TASK_ORDER,"-1")
+    val taskString = prefs.getString(listName,"-1")
     if (taskString != "-1") {
         val deque = ArrayDeque<Int>()
         if (taskString!!.contains(",")) {
@@ -139,7 +162,7 @@ fun Context.getDayTaskList():ArrayDeque<Int>{
         return deque
     }else{
         return ArrayDeque<Int>().apply {
-          add(-1)
+            add(-1)
         }
     }
 }
@@ -172,6 +195,16 @@ fun Context.incrementCompletionCount(){
     var count = settings.getInt(TOTAL_COMPLETED,-1)
     if (count != -1) {
         count++
+        settings.edit().putInt(TOTAL_COMPLETED,count).apply()
+    }
+}
+
+fun Context.decrementCompletionCount(){
+    val settings = getLocalSettings()
+    var count = settings.getInt(TOTAL_COMPLETED,-1)
+    if (count != -1) {
+        count--
+        if(count < 0 ) count =0
         settings.edit().putInt(TOTAL_COMPLETED,count).apply()
     }
 }

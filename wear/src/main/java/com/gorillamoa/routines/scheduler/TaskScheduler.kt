@@ -95,7 +95,7 @@ class TaskScheduler{
          * list
          * @return true is we should fetch another task
          */
-        fun scheduleForNextAvaiableDay(context:Context, tid:Int):Boolean{
+        fun scheduleForNextAvailableDay(context:Context, tid:Int):Boolean{
 
             var shouldFetch = false
             val taskList = context.getDayTaskList()
@@ -171,6 +171,30 @@ class TaskScheduler{
         }
 
         /**
+         * User may wish to mark a task as uncompleted for whatever reasons
+         */
+        fun uncompleteTask(context:Context, tid:Int):Boolean{
+
+            val taskList = context.getDayTaskList()
+            val doneList = context.getCompletedTaskList()
+
+            if (tid != -1) {
+                //we'll fetch the next tid from prefs
+                if(doneList.removeFirstOccurrence(tid)){
+
+                    //TODO retain the original order so that we know when to add this task
+                    taskList.addFirst(tid)
+                    context.decrementCompletionCount()
+                    context.saveTaskLists(taskList,doneList)
+                    return true
+                }
+                //TODO update the task history in the DB
+            }else {return false}
+            return false
+        }
+
+
+        /**
          * We finished the task
          * @param context is the application context
          * @param tid is the id of the task completed
@@ -178,13 +202,15 @@ class TaskScheduler{
         fun completeTask(context: Context, tid: Int):Boolean {
 
             val taskList = context.getDayTaskList()
+            val doneList = context.getCompletedTaskList()
 
             if (tid != -1) {
                 //we'll fetch the next tid from prefs
                 if(taskList.removeFirstOccurrence(tid)){
 
+                    doneList.add(tid)
                     context.incrementCompletionCount()
-                    context.saveTaskList(taskList)
+                    context.saveTaskLists(taskList,doneList)
                     return true
                 }
                 //TODO update the task history in the DB
@@ -227,7 +253,7 @@ class TaskScheduler{
 
         /**
          * The user may finish all his tasks, or they finish the day despite completing
-         * all tasks. Its time to reset everything
+         * all tasks. Its time to remove any lingering scheduled tasks
          */
         //TODO give user one more chance to finish a task
         fun endDay(context: Context){
