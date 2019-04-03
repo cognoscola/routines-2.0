@@ -178,12 +178,16 @@ class TaskScheduler{
             val taskList = context.getDayTaskList()
             val doneList = context.getCompletedTaskList()
 
+            Log.d("uncompleteTask","Before")
+            Log.d("uncompleteTask","Unfinished: ${taskList.joinToString(",")}")
+            Log.d("uncompleteTask","finished: ${doneList.joinToString(",")}")
+
             if (tid != -1) {
                 //we'll fetch the next tid from prefs
                 if(doneList.removeFirstOccurrence(tid)){
 
                     //TODO retain the original order so that we know when to add this task
-                    taskList.addFirst(tid)
+                    taskList.add(tid)
                     context.decrementCompletionCount()
                     context.saveTaskLists(taskList,doneList)
                     return true
@@ -255,15 +259,19 @@ class TaskScheduler{
          * all tasks. Its time to remove any lingering scheduled tasks
          */
         //TODO give user one more chance to finish a task
+
         fun endDay(context: Context){
             Log.d("endDay","The day is over")
             context.cancelApproval()
             val taskList = context.getDayTaskList()
             while (taskList.size > 0) {
                 taskList.remove()
+                //TODO DON"T CLEAR THIS LIST, instead use another flag to tell when we're scheduled or not
+                //call it a isScheduled Flag
                 context.saveTaskList(taskList)
             }
 
+            //TODO save statistics
             //TODO dismiss notifications
         }
 

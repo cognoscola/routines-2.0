@@ -18,11 +18,6 @@ import com.gorillamoa.routines.viewmodel.TaskViewModel
 import kotlinx.android.synthetic.main.activity_service_controller.*
 import java.lang.StringBuilder
 import java.util.*
-import android.content.Context.SENSOR_SERVICE
-import androidx.core.content.ContextCompat.getSystemService
-import android.hardware.SensorManager
-
-
 
 
 /**
@@ -32,7 +27,6 @@ import android.hardware.SensorManager
  * Note also that we must use  LiveData from android.arch.livecycle and NOT androidx
  */
 class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider {
-
 
     @Suppress("unused")
     private val tag = ServiceControllerActivity::class.java.name
@@ -130,6 +124,24 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
                 }
             }
         }
+
+        wakeUpButton?.setOnClickListener {
+            TaskScheduler.schedule(this){ taskString ->
+
+                notificationShowWakeUp(
+                        taskString,
+                         createNotificationMainIntentForWakeUp(),
+                         createNotificationDeleteIntentForWakeUp()
+                )
+            }
+        }
+
+        sleepButton?.setOnClickListener {
+            notificationShowSleep()
+            TaskScheduler.endDay(this)
+        }
+
+
 
         createTask?.setOnClickListener {
 

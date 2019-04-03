@@ -2,6 +2,7 @@ package com.gorillamoa.routines.data
 
 
 import androidx.annotation.WorkerThread
+import java.util.*
 
 //TODO decide wether to fetch from network or not.
 /**
@@ -14,6 +15,11 @@ class TaskRepository(private val taskdao:TaskDao){
     @WorkerThread
     fun getTaskById(tid:Int):Task{
         return taskdao.getTask(tid)
+    }
+
+    @WorkerThread
+    fun getTaskByIds(ids:ArrayDeque<Int>):List<Task>{
+        return taskdao.getTaskByIds(ids.toList())
     }
 
     @WorkerThread

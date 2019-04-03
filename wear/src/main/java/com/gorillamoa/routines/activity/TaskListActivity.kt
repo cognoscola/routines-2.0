@@ -10,12 +10,18 @@ import androidx.wear.ambient.AmbientModeSupport
 import androidx.wear.widget.WearableLinearLayoutManager
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.adapter.TaskListAdapter
+import com.gorillamoa.routines.extensions.getCompletedTaskList
+import com.gorillamoa.routines.extensions.getDayTaskList
 import com.gorillamoa.routines.scheduler.TaskScheduler
 import com.gorillamoa.routines.viewmodel.TaskViewModel
 import kotlinx.android.synthetic.main.activity_task_list.*
+import java.util.*
 
 //TODO the listview doesn't stretch out to the end and start edges of the activity. Make it so.
 //TODO handle use case where user interacts with notification, while on this app. One option is to remove the notification
+
+//TODO create a TASK EMPTY VIEW
+
 
 class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider {
 
@@ -26,13 +32,24 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
         setContentView(R.layout.activity_task_list)
 
         mAmbientController = AmbientModeSupport.attach(this@TaskListActivity)
-
         taskViewModel = ViewModelProviders.of(this@TaskListActivity).get(TaskViewModel::class.java)
-        taskViewModel.loadTasks()
+
+        val unfinished = getDayTaskList()
+        val finished = getCompletedTaskList()
+        val combined = ArrayDeque<Int>()
+
+        if(unfinished.isNotEmpty())unfinished.forEach { combined.add(it) }
+        if(finished.isNotEmpty())finished.forEach { combined.add(it) }
+
+        taskViewModel.loadTasks(combined)
         taskViewModel.tasks.observe(this, Observer {
 
-            //TODO fetch only scheduled tasks
-            (taskListWearableRecyclerView?.adapter as TaskListAdapter).tasks = it
+            //TODO fetch only scheduled tasks!!
+            (taskListWearableRecyclerView?.adapter as TaskListAdapter).setTaskData(
+                    it,
+                    unfinished,
+                    finished
+            )
         })
 
         taskListWearableRecyclerView?.apply {
@@ -51,6 +68,7 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
                 }
             }
             layoutManager = WearableLinearLayoutManager(this@TaskListActivity)
+
         }
 
         // Enables Always-on

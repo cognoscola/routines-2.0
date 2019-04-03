@@ -115,7 +115,7 @@ fun Context.saveTaskLists(queue:ArrayDeque<Int>,completed:ArrayDeque<Int>){
         Log.d("saveTaskList","Scheduled Tasks: $taskString")
         putString(TASK_ORDER,taskString)
 
-        taskString = queue.joinToString(",")
+        taskString = completed.joinToString(",")
         Log.d("saveTaskList","Completed Tasks: $taskString")
         putString(TASK_DONE,taskString)
 
@@ -153,17 +153,18 @@ fun Context.fetchArrayFromPreference(listName:String):ArrayDeque<Int>{
                 }
             } catch (e: Exception) {
                 Log.d("getDayTaskList","",e)
-                return ArrayDeque<Int>().apply { add(-1) }
+                return ArrayDeque()
             }
         }else{
-            //only one task today
-            deque.add(taskString.toInt())
+            //only one task today?
+
+            if (taskString.isNotEmpty()) {
+                deque.add(taskString.toInt())
+            }
         }
         return deque
     }else{
-        return ArrayDeque<Int>().apply {
-            add(-1)
-        }
+        return ArrayDeque()
     }
 }
 

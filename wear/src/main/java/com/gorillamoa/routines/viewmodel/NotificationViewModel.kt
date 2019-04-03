@@ -10,11 +10,7 @@ import com.gorillamoa.routines.coroutines.Coroutines
 import com.gorillamoa.routines.data.Task
 import com.gorillamoa.routines.data.TaskDatabase
 import com.gorillamoa.routines.data.TaskRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
+import java.util.*
 
 /**
  * This is how UI will interact with our application data (aka our tasks)
@@ -27,8 +23,6 @@ class TaskViewModel(application: Application): AndroidViewModel(application){
     private val scope = CoroutineScope(coroutineContext)*/
 
     private val repository:TaskRepository
-
-
     private val _tasks = MutableLiveData<List<Task>>()
 
     //the object on which we can observe changes
@@ -45,6 +39,15 @@ class TaskViewModel(application: Application): AndroidViewModel(application){
     @UiThread
     fun loadTasks():LiveData<List<Task>>{
         Coroutines.ioThenMain({repository.getTasks()}){
+            _tasks.value = it
+        }
+        return tasks
+    }
+
+    @UiThread
+    fun loadTasks(list:ArrayDeque<Int>):LiveData<List<Task>>{
+
+        Coroutines.ioThenMain({repository.getTaskByIds(list)}){
             _tasks.value = it
         }
         return tasks
