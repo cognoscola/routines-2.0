@@ -54,7 +54,6 @@ class TaskScheduler{
 
             val repository = context.getDataRepository()
 
-
             //For now we'll get all tasks
             Coroutines.ioThenMain({repository.getTasks()})
             { taskList ->
@@ -71,6 +70,7 @@ class TaskScheduler{
 
                 context.saveTaskList(queue)
                 context.resetStats(taskList!!.size)
+
                 context.setReadyToApprove()
                 scheduleCallback.invoke(StringBuilder().stringifyTasks(taskList))
             }
@@ -233,10 +233,18 @@ class TaskScheduler{
         fun endDay(context: Context){
             Log.d("endDay","The day is over")
             context.cancelApproval()
+            val taskList = context.getDayTaskList()
+            while (taskList.size > 0) {
+                taskList.remove()
+                context.saveTaskList(taskList)
+            }
+
+            //TODO dismiss notifications
         }
 
         fun showNext(context:Context){
             TaskScheduler.getNextTask(context) { task ->
+
 
                 task?.let {
                     context.notificationShowTask(

@@ -5,12 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="40dp"
     tools:layout_gravity="center"
+    android:paddingStart="6dp"
+    android:paddingEnd="0dp"
     >
-
     <ImageView
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_gravity="center_vertical"/>
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center_vertical"
+        tools:background="@drawable/ic_done_black_24dp"
+        android:id="@+id/iconTextView"
+        android:scaleType="fitCenter"
+        android:layout_margin="6dp"
+        android:scaleX="0.75"
+        android:scaleY="0.75"
+        />
 
     <TextView
         android:layout_width="match_parent"
@@ -21,8 +29,9 @@
         tools:text = "Early Meditation"
         android:lines="1"
         android:ellipsize="end"
-        android:paddingEnd="10dp"
-        android:paddingStart="10dp"
+        android:paddingEnd="0dp"
+        android:paddingStart="2dp"
+
         />
 
 </LinearLayout>

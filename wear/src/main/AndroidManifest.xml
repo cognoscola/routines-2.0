@@ -55,7 +55,7 @@
         </activity>
         <activity
             android:name=".activity.SettingsActivity"
-            android:label="@string/onboard_app_name"></activity>
+            android:label="@string/onboard_app_name"/>
         <activity
             android:name=".activity.OnboardActivity"
             android:label="@string/onboard_app_name">
@@ -67,15 +67,22 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".activity.TaskViewActivity">
+            <intent-filter>
+                <action android:name="gorillamoa.task.VIEW"/>
+            </intent-filter>
+        </activity>
+
+
         <receiver
             android:name=".receiver.AlarmReceiver"
-            android:exported="false"></receiver>
+            android:exported="false"/>
         <receiver
             android:name=".receiver.NotificationDismissReceiver"
-            android:exported="false"></receiver>
+            android:exported="false"/>
         <receiver
             android:name=".receiver.TaskActionReceiver"
-            android:exported="false"></receiver>
+            android:exported="false"/>
     </application>
 
 </manifest>

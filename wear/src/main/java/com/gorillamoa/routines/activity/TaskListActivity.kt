@@ -1,5 +1,6 @@
 package com.gorillamoa.routines.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
@@ -31,7 +32,6 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
         taskViewModel.tasks.observe(this, Observer {
 
             (taskListWearableRecyclerView?.adapter as TaskListAdapter).tasks = it
-
         })
 
         taskListWearableRecyclerView?.apply {
@@ -39,6 +39,7 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
             adapter = TaskListAdapter{
 
                 Log.d("onCreate","Clicked task $it")
+                startActivity(Intent(this@TaskListActivity,TaskViewActivity::class.java))
             }
             layoutManager = WearableLinearLayoutManager(this@TaskListActivity)
         }
