@@ -1,6 +1,5 @@
 package com.gorillamoa.routines.adapter
 
-import android.content.Context
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.util.Log
@@ -16,9 +15,9 @@ import java.util.*
 
 //TODO Comment this shit
 class TaskListAdapter(
-        context: Context,
         private val callback:(Int)->Unit,
-        private val statusCallback:(Int,Boolean)->Any?): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+        private val statusCallback:(Int,Boolean)->Any?,
+        private val addButtonCallback:(()->Any?)? = null): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var tasks:List<Task>? = null
     private var done:ArrayDeque<Int>? = null
@@ -60,6 +59,7 @@ class TaskListAdapter(
             if (holder is TitleViewHolder) {
                 holder.headerTextView.text = holder.headerTextView.context.getString(R.string.task_list_title)
                 holder.headerTextView.setTypeface(holder.headerTextView.typeface, Typeface.BOLD)
+                holder.addButton.setOnClickListener { addButtonCallback?.invoke() }
             }
 
             if (holder is TaskItemHolder) {
@@ -132,6 +132,7 @@ class TaskListAdapter(
     inner class TitleViewHolder(item:View):RecyclerView.ViewHolder(item){
 
         var headerTextView = item.findViewById<TextView>(R.id.headerTextView)
+        var addButton = item.findViewById<ImageView>(R.id.addButton)
 
     }
 }

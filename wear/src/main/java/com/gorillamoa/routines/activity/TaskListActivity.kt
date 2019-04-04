@@ -54,11 +54,11 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
 
         taskListWearableRecyclerView?.apply {
             isEdgeItemsCenteringEnabled = true
-            adapter = TaskListAdapter(this@TaskListActivity,{
+            adapter = TaskListAdapter({
 
                 Log.d("onCreate","Clicked task $it")
                 startActivity(Intent(this@TaskListActivity,TaskViewActivity::class.java))
-            }){tid, isDone ->
+            },{tid, isDone ->
 
                 //TODO REMOVE THE NOTIFICATION IF IT EXISTS
                 if (isDone) {
@@ -66,6 +66,12 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
                 }else{
                     TaskScheduler.uncompleteTask(context,tid)
                 }
+            }){
+
+                //add button call back
+                startActivity(Intent(this@TaskListActivity,TaskViewActivity::class.java))
+
+
             }
             layoutManager = WearableLinearLayoutManager(this@TaskListActivity)
 
