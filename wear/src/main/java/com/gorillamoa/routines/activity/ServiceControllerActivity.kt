@@ -81,9 +81,10 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
             //CLEAN
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
-                    alarmEnableWakeUp()
+                    alarmEnableWakeUpPersistent()
                 } else {
-                    alarmDisableWakeUp()
+                    alarmDisableWakePersistent()
+
                 }
             }
         }
@@ -100,9 +101,9 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
-                    alarmEnableSleep()
+                    alarmEnableSleepPersistent()
                 }else{
-                    alarmDisableSleep()
+                    alarmDisableSleepPersistent()
                 }
             }
         }

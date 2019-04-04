@@ -2,6 +2,7 @@ package com.gorillamoa.routines.extensions
 
 import android.app.AlarmManager
 import android.content.Context
+import com.gorillamoa.routines.receiver.SimpleBootReceiver
 import java.util.*
 
 /**
@@ -10,6 +11,35 @@ import java.util.*
  */
 
 //TODO comment some things
+
+/**
+ * Will enable the alarm to be set despite device shutdown
+ */
+fun Context.alarmEnableWakeUpPersistent(){
+
+    alarmEnableWakeUp()
+    SimpleBootReceiver.enableBootReceiver(this)
+}
+
+fun Context.alarmEnableSleepPersistent(){
+    alarmEnableSleep()
+    SimpleBootReceiver.enableBootReceiver(this)
+}
+
+fun Context.alarmDisableWakePersistent(){
+    alarmDisableWakeUp()
+    //don't forget to disable boot receiver
+    SimpleBootReceiver.disableBootReciver(this)
+}
+
+fun Context.alarmDisableSleepPersistent(){
+    alarmDisableSleep()
+    //don't forget to disable boot receiver
+    SimpleBootReceiver.disableBootReciver(this)
+}
+
+
+
 /**
  * Convenience method to enable the alarm.
  * The time to set alarm will be fetched from preferences
@@ -42,6 +72,8 @@ fun Context.alarmDisableSleep(){
     val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
     alarmManager.cancel(createWakeUpAlarmPendingIntent())
     saveAlarmSleepStatus(false)
+
+
 }
 
 

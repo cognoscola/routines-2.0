@@ -77,9 +77,11 @@ class App:Application(){
     //TODO I finished a task but I am unable to check it off because notification is not there! It is showing a different task!
 
     //TODO MAKE ABILITY TO SHOW TASK AND BROWSE ON WATCHFACE
-    //TODO MAKE ABILITY TO SHOW TASK AND BROWSE ON WATCH-APP
 
     //TODO clear task notifications sometime between Sleep and Wake Notifications
+
+    //TODO add progress bar around the circumference of the app
+
 
     //later CREATE A BUG CHART
 }
