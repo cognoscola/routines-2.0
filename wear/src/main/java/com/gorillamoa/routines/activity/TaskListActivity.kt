@@ -69,7 +69,7 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
             }){
 
                 //add button call back
-                startActivity(Intent(this@TaskListActivity,TaskViewActivity::class.java))
+                startActivity(Intent(this@TaskListActivity,TaskAddActivity::class.java))
 
 
             }

@@ -39,4 +39,15 @@
 
     <string name="task_list_title">"Today's Tasks"</string>
     <string name="title_activity_task_add">TaskAddActivity</string>
+
+    <!-- Add task -->
+    <string name="type_habit">Habit</string>
+    <string name="type_goal">Goal</string>
+    <string name="type_one">"Quick"</string>
+    <string name="select">"Select"</string>
+    <string name="name">Name</string>
+    <string name="Empty_error">This cannot be empty!</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+
 </resources>

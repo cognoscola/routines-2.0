@@ -13,7 +13,12 @@
     -->
     <dimen name="inner_frame_layout_padding">5dp</dimen>
 
-
     <dimen name="picker_button_stroke_radius">10dp</dimen>
+
+
+    <!-- add task dimens -->
+    <dimen name="add_buttons_width">60dp</dimen>
+    <dimen name="add_buttons_height">60dp</dimen>
+    <dimen name="picker_button_stroke_radius_addtask">40dp</dimen>
 
 </resources>

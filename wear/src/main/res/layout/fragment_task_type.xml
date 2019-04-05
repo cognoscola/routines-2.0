@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/select"
+        android:layout_gravity="center"
+        android:translationY="-72dp"/>
+
+    <LinearLayout
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+
+
+        <TextView
+            android:layout_width="@dimen/add_buttons_width"
+            android:layout_height="@dimen/add_buttons_height"
+            android:text="@string/type_habit"
+            android:background="@drawable/picker_button_selector_addtask"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:id="@+id/habitTextView"/>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <TextView
+                android:layout_width="@dimen/add_buttons_width"
+                android:layout_height="@dimen/add_buttons_height"
+                android:text="@string/type_goal"
+                android:gravity="center"
+                android:background="@drawable/picker_button_selector_addtask"
+                android:textAlignment="center"
+                android:id="@+id/goalTextview"/>
+
+            <TextView
+                android:layout_width="@dimen/add_buttons_width"
+                android:layout_height="@dimen/add_buttons_height"
+                android:background="@drawable/picker_button_selector_addtask"
+                android:lines="2"
+                android:text="@string/type_one"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:id="@+id/quickTextView"/>
+
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>
