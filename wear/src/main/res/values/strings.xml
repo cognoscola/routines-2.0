@@ -38,4 +38,5 @@
     <!--Task list -->
 
     <string name="task_list_title">"Today's Tasks"</string>
+    <string name="title_activity_task_add">TaskAddActivity</string>
 </resources>

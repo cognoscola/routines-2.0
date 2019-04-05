@@ -55,13 +55,14 @@ class TaskRepository(private val taskdao:TaskDao){
 
                 Task(name = "Early Mobilization",description = "Postural Exercises and Spine Stretch", type = TaskType.TYPE_HABIT),
                 Task(name = "Morning Meditation",description = "1 Hour, Remain Equanimous", type = TaskType.TYPE_HABIT),
+                Task(name = "WHM Breathing",description = "Take a cold shower", type = TaskType.TYPE_HABIT),
                 Task(name = "Exercises",description = "See exercise", type = TaskType.TYPE_HABIT),
-                Task(name = "Cold Shower",description = "Take a cold shower", type = TaskType.TYPE_HABIT),
-                Task(name = "Breath",description = "Focus on proper breathing through nose",type = TaskType.TYPE_HABIT),
                 Task(name = "French Practice",description = "For 1 hour. Verbs. Nouns", type = TaskType.TYPE_GOAL),
                 Task(name = "Food Log",description = "Log your food", type = TaskType.TYPE_HABIT),
-                Task(name = "Friend Log",description = "Log information about friends", type = TaskType.TYPE_HABIT),
+                Task(name = "Love Project",description = "Find someone cool", type = TaskType.TYPE_HABIT),
                 Task(name = "Sankara",description = "Work on Project Sankara", type = TaskType.TYPE_GOAL),
+                Task(name = "Food Log",description = "Log information about food", type = TaskType.TYPE_HABIT),
+                Task(name = "Friend Log",description = "Log information about friends", type = TaskType.TYPE_HABIT),
                 Task(name = "Late Mobilization",description = "1 Hour, Remain Equanimous", type = TaskType.TYPE_HABIT),
                 Task(name = "Late Meditation",description = "Postural Exercises and Spine Stretch", type = TaskType.TYPE_HABIT)
         )
