@@ -13,6 +13,7 @@ data class Task(
         val name:String,
         val description:String? = null
 
+
         //TODO add addittional options
         //TODO add history
 )

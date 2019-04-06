@@ -65,6 +65,7 @@ class TaskAddActivity : FragmentActivity() {
                 .replace(R.id.fragmentContainerFrameLayout,NamePickerFragment.newInstance {
                     name = it
                     Log.d("showNamePickFragment","Name is: $it")
+
                 } )
                 .commit()
 

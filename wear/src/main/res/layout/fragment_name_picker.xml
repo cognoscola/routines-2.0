@@ -21,6 +21,8 @@
         tools:hint="Meditate"
         android:gravity="center_horizontal"
         android:id="@+id/nameEditText"
+
+
         />
 
     <View
