@@ -48,6 +48,7 @@ dependencies {
     kapt 'androidx.lifecycle:lifecycle-compiler:2.1.0-alpha03'
     testImplementation "androidx.arch.core:core-testing:2.0.0"
 
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha4'
     implementation 'com.google.android.support:wearable:2.4.0'
     implementation 'com.google.android.gms:play-services-wearable:16.0.1'
     implementation 'androidx.percentlayout:percentlayout:1.0.0'

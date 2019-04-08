@@ -3,12 +3,16 @@ package com.gorillamoa.routines.activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.RecyclerView
 import androidx.wear.ambient.AmbientModeSupport
 import androidx.wear.widget.WearableLinearLayoutManager
+import androidx.wear.widget.drawer.WearableNavigationDrawerView
 import com.gorillamoa.routines.R
+import com.gorillamoa.routines.adapter.DrawerAdapter
 import com.gorillamoa.routines.adapter.TaskListAdapter
 import com.gorillamoa.routines.extensions.getCompletedTaskList
 import com.gorillamoa.routines.extensions.getDayTaskList
@@ -75,10 +79,24 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
             }
             layoutManager = WearableLinearLayoutManager(this@TaskListActivity)
 
+
+
+           //TODO make the navigation drawer open as the user finishes scrolling to the top
+
+        }
+
+        top_navigation_drawer.apply {
+
+            setAdapter(DrawerAdapter(this@TaskListActivity))
+            addOnItemSelectedListener { position ->
+
+                Log.d("NavigationDrawer","Clicked Position: $position")
+            }
+            controller.peekDrawer()
         }
 
         // Enables Always-on
-     //   setAmbientEnabled()
+        //setAmbientEnabled()
     }
 
     private var mAmbientController: AmbientModeSupport.AmbientController? = null

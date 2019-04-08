@@ -22,11 +22,16 @@
     <androidx.wear.widget.drawer.WearableNavigationDrawerView
         android:id="@+id/top_navigation_drawer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        app:navigationStyle="singlePage"
+/>
+<!--        app:peekView="@layout/drawer_peek_content"
+        app:peek_view="@layout/drawer_peek_content"-->
+          <!--/>-->
 
-    <androidx.wear.widget.drawer.WearableActionDrawerView
+   <!-- <androidx.wear.widget.drawer.WearableActionDrawerView
         android:id="@+id/bottom_action_drawer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"/>-->
         <!-- app:actionMenu="@menu/action_drawer_menu"/> -->
 </androidx.wear.widget.drawer.WearableDrawerLayout>
