@@ -2,6 +2,7 @@ package com.gorillamoa.routines.activity
 
 import android.os.Bundle
 import android.support.wearable.activity.WearableActivity
+import com.gorillamoa.routines.R
 
 class TaskAddActivity : WearableActivity() {
 

@@ -39,4 +39,6 @@
 
     <string name="task_list_title">"Today's Tasks"</string>
     <string name="title_activity_task_add">TaskAddActivity</string>
+    <string name="message">Watch face tapped</string>
+    <string name="my_analog_name">My Analog</string>
 </resources>
