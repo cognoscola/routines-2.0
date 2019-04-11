@@ -41,6 +41,7 @@ class AlarmReceiver:BroadcastReceiver(){
 
 
         const val KEY_ALARM = "A"
+        const val REST_ALARM = "R"
         const val WAKE_UP_INTENT_CODE = 1
         const val SLEEP_INTENT_CODE =2
 

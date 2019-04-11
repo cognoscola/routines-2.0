@@ -226,6 +226,41 @@ class TaskWatchService : CanvasWatchFaceService() {
             //60 minutes divided by this interval
             lines = 60 / breakInterval
             breakIntervalDegree = 6 * breakInterval.toFloat()
+
+            //Lets find out what our Alarm Intervals are
+
+            val intervals= ArrayList<Int>()
+            intervals.add(minute)
+
+            for (i in 1..(lines - 1)) {
+                intervals.add((selectedMinute + i*breakInterval).rem(60))
+            }
+
+            Log.d("initializeFeatures","Intervals: ${intervals.joinToString(",")}")
+
+
+            //The first alarm should go off on the next available interval.
+            //which one is the correct interval?
+            //if current minute is > latest inverval, alarm should go off in Min(intervals) + (60 - current) minutes
+            //else alarm should go off at the lowest of (intervali - current) that is possible
+
+
+            //current minutes
+            var minutesTilAlarm = 60
+            val cMinutes = mCalendar.get(Calendar.MINUTE)
+
+            if (cMinutes > intervals.max()?:0) { minutesTilAlarm = intervals.min()?:0 + (60 - cMinutes) }
+            else {
+                intervals.forEach {
+                    val tdiff = it - cMinutes
+                    if (tdiff > 0) {
+                        if(tdiff < minutesTilAlarm) minutesTilAlarm = tdiff
+                    }
+                }
+            }
+
+            Log.d("initializeFeatures","Next Alarm in $minutesTilAlarm minutes")
+
         }
 
         override fun onDestroy() {
@@ -390,9 +425,6 @@ class TaskWatchService : CanvasWatchFaceService() {
                 WatchFaceService.TAP_TYPE_TAP ->{
                     // The user has completed the tap gesture.
 
-                    Log.d("onTapCommand","X:$x Y:$y")
-//                    val xCentered = x - (mCenterX)
-
                     val radians = Math.atan2((x - mCenterX).toDouble(),-(y - mCenterY).toDouble())
                     val angle:Double =
 
@@ -401,16 +433,12 @@ class TaskWatchService : CanvasWatchFaceService() {
                         else -> 180 * (1 + (1 - Math.abs(radians)/Math.PI))
                     }
 
-                    Log.d("onTapCommand","angle:$angle")
-
                     selectedMinute = (angle / 6.0).roundToInt()
                     initializeFeatures(selectedMinute)
                 }
             }
             invalidate()
         }
-
-        private fun isLessThanZero(value:Double):Boolean {return value<0}
 
 
         override fun onDraw(canvas: Canvas, bounds: Rect) {
