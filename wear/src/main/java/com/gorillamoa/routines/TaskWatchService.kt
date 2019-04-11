@@ -1,5 +1,7 @@
 package com.gorillamoa.routines
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -21,6 +23,12 @@ import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
 import android.util.Log
 import android.view.SurfaceHolder
+import com.gorillamoa.routines.extensions.alarmEnableWakeUp
+import com.gorillamoa.routines.extensions.getAlarmService
+import com.gorillamoa.routines.extensions.isRestAlarmActive
+import com.gorillamoa.routines.extensions.saveAlarmRestStatus
+import com.gorillamoa.routines.receiver.AlarmReceiver
+import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_REST
 
 import java.lang.ref.WeakReference
 import java.util.Calendar
@@ -45,6 +53,7 @@ private const val SECOND_TICK_STROKE_WIDTH = 2f
 private const val CENTER_GAP_AND_CIRCLE_RADIUS = 4f
 
 private const val SHADOW_RADIUS = 6f
+
 
 /**
  * Analog watch face with a ticking second hand. In ambient mode, the second hand isn't
@@ -125,7 +134,7 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var breakIntervalDegree = 0f
         private var mSelectedMinuteDegree = 0f
         private var mBreakLineLength = 0f
-
+        private var isRestAlarmEnabled = false
 
 
         private val mTimeZoneReceiver = object : BroadcastReceiver() {
@@ -135,6 +144,8 @@ class TaskWatchService : CanvasWatchFaceService() {
             }
         }
 
+
+
         override fun onCreate(holder: SurfaceHolder) {
             super.onCreate(holder)
 
@@ -143,6 +154,8 @@ class TaskWatchService : CanvasWatchFaceService() {
                     .build())
 
             mCalendar = Calendar.getInstance()
+
+            isRestAlarmEnabled = applicationContext.isRestAlarmActive()
 
             initializeBackground()
             initializeWatchFace()
@@ -214,54 +227,71 @@ class TaskWatchService : CanvasWatchFaceService() {
                 strokeWidth = 3f
                 style = Paint.Style.STROKE
             }
-
-
         }
 
         private fun initializeFeatures(minute:Int){
 
-            mSelectedMinuteDegree = minute.times(6f)
+            if (isRestAlarmEnabled) {
 
-            //todo figure out # of lines to draw given arbitrary minutes
-            //60 minutes divided by this interval
-            lines = 60 / breakInterval
-            breakIntervalDegree = 6 * breakInterval.toFloat()
+                mSelectedMinuteDegree = minute.times(6f)
 
-            //Lets find out what our Alarm Intervals are
+                //todo figure out # of lines to draw given arbitrary minutes
+                //60 minutes divided by this interval
+                lines = 60 / breakInterval
+                breakIntervalDegree = 6 * breakInterval.toFloat()
 
-            val intervals= ArrayList<Int>()
-            intervals.add(minute)
+                //Lets find out what our Alarm Intervals are
 
-            for (i in 1..(lines - 1)) {
-                intervals.add((selectedMinute + i*breakInterval).rem(60))
-            }
+                val intervals= ArrayList<Int>()
+                intervals.add(minute)
 
-            Log.d("initializeFeatures","Intervals: ${intervals.joinToString(",")}")
+                for (i in 1..(lines - 1)) {
+                    intervals.add((selectedMinute + i*breakInterval).rem(60))
+                }
 
-
-            //The first alarm should go off on the next available interval.
-            //which one is the correct interval?
-            //if current minute is > latest inverval, alarm should go off in Min(intervals) + (60 - current) minutes
-            //else alarm should go off at the lowest of (intervali - current) that is possible
+                Log.d("initializeFeatures","Intervals: ${intervals.joinToString(",")}")
 
 
-            //current minutes
-            var minutesTilAlarm = 60
-            val cMinutes = mCalendar.get(Calendar.MINUTE)
+                //The first alarm should go off on the next available interval.
+                //which one is the correct interval?
+                //if current minute is > latest inverval, alarm should go off in Min(intervals) + (60 - current) minutes
+                //else alarm should go off at the lowest of (intervali - current) that is possible
 
-            if (cMinutes > intervals.max()?:0) { minutesTilAlarm = intervals.min()?:0 + (60 - cMinutes) }
-            else {
-                intervals.forEach {
-                    val tdiff = it - cMinutes
-                    if (tdiff > 0) {
-                        if(tdiff < minutesTilAlarm) minutesTilAlarm = tdiff
+
+                //current minutes
+                var minutesTilAlarm = 60
+                val cMinutes = mCalendar.get(Calendar.MINUTE)
+
+                if (cMinutes > intervals.max()?:0) { minutesTilAlarm = intervals.min()?:0 + (60 - cMinutes) }
+                else {
+                    intervals.forEach {
+                        val tdiff = it - cMinutes
+                        if (tdiff > 0) {
+                            if(tdiff < minutesTilAlarm) minutesTilAlarm = tdiff
+                        }
                     }
                 }
+
+                Log.d("initializeFeatures","Next Alarm in $minutesTilAlarm minutes")
+
+                val manager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                manager.setRepeating(
+                        AlarmManager.RTC_WAKEUP,
+                        //set the alarm to go off on the minute
+                        System.currentTimeMillis() + (minutesTilAlarm * 60 * 1000) - (mCalendar.get(Calendar.SECOND) * 1000),
+                        breakInterval.toLong() * 60L * 1000L,
+                        getRestPendingIntent()
+                )
             }
-
-            Log.d("initializeFeatures","Next Alarm in $minutesTilAlarm minutes")
-
         }
+
+        private fun getRestPendingIntent():PendingIntent{
+            return Intent(this@TaskWatchService, AlarmReceiver::class.java).let {
+                it.action = ACTION_REST
+                PendingIntent.getBroadcast(this@TaskWatchService, 0, it,PendingIntent.FLAG_UPDATE_CURRENT)
+            }
+        }
+
 
         override fun onDestroy() {
             mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME)
@@ -425,16 +455,34 @@ class TaskWatchService : CanvasWatchFaceService() {
                 WatchFaceService.TAP_TYPE_TAP ->{
                     // The user has completed the tap gesture.
 
-                    val radians = Math.atan2((x - mCenterX).toDouble(),-(y - mCenterY).toDouble())
-                    val angle:Double =
+                    //Check if we intercept center circle
+                    val dSquare = ((x - mCenterX)*(x - mCenterX)) + ((y - mCenterY)*(y - mCenterY))
+                    val rSquare = (mCenterX*mCenterX*0.25)
 
-                    when(radians){
-                        in 0.0..Math.PI -> {radians * 180 / Math.PI}
-                        else -> 180 * (1 + (1 - Math.abs(radians)/Math.PI))
+                    if (dSquare < rSquare) {
+                        //we're inside the circle so, cancel the alarm
+                        Log.d("onTapCommand","Cancel Alarms")
+                        applicationContext.getAlarmService().cancel(getRestPendingIntent())
+                        isRestAlarmEnabled = false
+                        applicationContext.saveAlarmRestStatus(false)
+
+                    }else {
+
+                        isRestAlarmEnabled = true
+                        applicationContext.saveAlarmRestStatus(true)
+                        val radians = Math.atan2((x - mCenterX).toDouble(), -(y - mCenterY).toDouble())
+                        val angle: Double =
+
+                                when (radians) {
+                                    in 0.0..Math.PI -> {
+                                        radians * 180 / Math.PI
+                                    }
+                                    else -> 180 * (1 + (1 - Math.abs(radians) / Math.PI))
+                                }
+
+                        selectedMinute = (angle / 6.0).roundToInt()
+                        initializeFeatures(selectedMinute)
                     }
-
-                    selectedMinute = (angle / 6.0).roundToInt()
-                    initializeFeatures(selectedMinute)
                 }
             }
             invalidate()
@@ -463,33 +511,37 @@ class TaskWatchService : CanvasWatchFaceService() {
 
         private fun drawFeatures(canvas: Canvas) {
 
-            canvas.save()
+            //TODO we don't need to draw all the features now because they don't update every second
+            //TODO Smooth transition of time selection
+            if (isRestAlarmEnabled) {
 
-            //TODO selected rotation
-            //selected minute = 15
-            canvas.rotate(mSelectedMinuteDegree , mCenterX,mCenterY)
-            canvas.drawLine(
-                    mCenterX,
-                    mCenterY - mBreakLineLength,
-                    mCenterX,
-                    0f,
-                    mBreakLinePaint)
+                canvas.save()
 
-
-            //now we rotate break interval amount
-            for (i in 1..(lines - 1)) {
-                canvas.rotate(breakIntervalDegree , mCenterX,mCenterY)
+                //selected minute = 15
+                canvas.rotate(mSelectedMinuteDegree , mCenterX,mCenterY)
                 canvas.drawLine(
                         mCenterX,
                         mCenterY - mBreakLineLength,
                         mCenterX,
                         0f,
                         mBreakLinePaint)
+
+
+                //now we rotate break interval amount
+                for (i in 1..(lines - 1)) {
+                    canvas.rotate(breakIntervalDegree , mCenterX,mCenterY)
+                    canvas.drawLine(
+                            mCenterX,
+                            mCenterY - mBreakLineLength,
+                            mCenterX,
+                            0f,
+                            mBreakLinePaint)
+                }
+
+                canvas.drawCircle(mCenterX,mCenterY,mCenterX*0.5f,mBreakLinePaint)
+
+                canvas.save()
             }
-
-
-
-            canvas.save()
 
         }
 
@@ -578,6 +630,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 /* Update time zone in case it changed while we weren't visible. */
                 mCalendar.timeZone = TimeZone.getDefault()
                 invalidate()
+
             } else {
                 unregisterReceiver()
             }

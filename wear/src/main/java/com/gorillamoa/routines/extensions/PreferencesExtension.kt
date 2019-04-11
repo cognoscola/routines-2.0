@@ -9,6 +9,7 @@ import java.util.*
 private const val LOCAL_SETTINGS ="local_app_settings"
 private const val isWakeAlarmActive= "isWakeAlarmActive"
 private const val isSleepAlarmActive= "isSleepAlarmActive"
+private const val isRestAlarmActive = "isRestAlarmActive"
 
 //TODO remove other copies of these values
 private const val WAKE_UP_HOUR = "wake_up_hour"
@@ -61,6 +62,9 @@ fun Context.saveSleepTime(hour:Int, minute:Int,phase:Int){
 }
 
 
+
+
+
 fun Context.isWakeAlarmSet():Boolean{
     return getLocalSettings().getBoolean(isWakeAlarmActive,false)
 }
@@ -68,6 +72,11 @@ fun Context.isWakeAlarmSet():Boolean{
 fun Context.isSleepAlarmSet():Boolean{
     return getLocalSettings().getBoolean(isSleepAlarmActive,false)
 }
+
+fun Context.isRestAlarmActive():Boolean{
+    return getLocalSettings().getBoolean(isRestAlarmActive,false)
+}
+
 
 fun Context.saveAlarmWakeStatus(isAlarmSet:Boolean){
     val prefs = getLocalSettings()
@@ -80,6 +89,13 @@ fun Context.saveAlarmSleepStatus(isAlarmSet:Boolean){
     val prefs = getLocalSettings()
     prefs.edit()
             .putBoolean(isSleepAlarmActive,isAlarmSet)
+            .apply()
+}
+
+fun Context.saveAlarmRestStatus(isAlarmSet:Boolean){
+    val prefs = getLocalSettings()
+    prefs.edit()
+            .putBoolean(isRestAlarmActive,isAlarmSet)
             .apply()
 }
 

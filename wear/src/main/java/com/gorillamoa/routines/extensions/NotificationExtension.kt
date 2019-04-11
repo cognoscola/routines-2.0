@@ -13,9 +13,11 @@ import com.gorillamoa.routines.receiver.TaskActionReceiver.Companion.ACTION_DONE
 import com.gorillamoa.routines.receiver.TaskActionReceiver.Companion.ACTION_INTO_FUTURE
 import com.gorillamoa.routines.receiver.TaskActionReceiver.Companion.ACTION_SKIP_SHORT
 import com.gorillamoa.routines.receiver.TaskActionReceiver.Companion.ACTION_SKIP_TODAY
+import java.util.*
 
 const val WAKE_UP_NOTIFICATION_ID =1
 const val SLEEP_NOTIFICATION_ID =65535
+const val REST_NOTIFICATION_ID =65534
 
 public const val NOTIFICATION_CHANNEL_ONE  = "channel"
 const val NOTIFICATION_TAG = "routines"
@@ -86,6 +88,33 @@ fun Notification.Builder.addTaskAction(context: Context,actionText:String, actio
             context.createNotificationActionPendingIntent(tid,action)
     ).build())
 }
+
+fun Context.notificationShowRest(){
+    val manager = getNotificationManager()
+
+    getBuilder().apply {
+
+        setContentTitle(Html.fromHtml("Rest!", Html.FROM_HTML_MODE_COMPACT))
+//                setContentTitle(Html.fromHtml("All done! &#127769", Html.FROM_HTML_MODE_COMPACT))
+
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = System.currentTimeMillis()
+
+        setContentText("Time: ${calendar.get(Calendar.HOUR)}:${calendar.get(Calendar.MINUTE)}")
+
+        setAutoCancel(true)
+        setCategory(Notification.CATEGORY_REMINDER)
+
+        manager.notify(
+                NOTIFICATION_TAG,
+                REST_NOTIFICATION_ID,
+                build()
+        )
+    }
+
+}
+
+
 
 fun Context.notificationShowSleep(){
 

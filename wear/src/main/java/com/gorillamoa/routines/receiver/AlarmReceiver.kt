@@ -6,6 +6,7 @@ import android.content.Intent
 import android.util.Log
 import com.gorillamoa.routines.extensions.*
 import com.gorillamoa.routines.scheduler.TaskScheduler
+import java.util.*
 
 /**
  * What to do when our app sounds the "wake up" alarm.
@@ -39,9 +40,13 @@ class AlarmReceiver:BroadcastReceiver(){
 
         const val ACTION_SLEEP = "S1"
 
+        /**
+         * Rest from whatever activity the user is curerntly undertaking
+         */
+        const val ACTION_REST = "R"
 
         const val KEY_ALARM = "A"
-        const val REST_ALARM = "R"
+
         const val WAKE_UP_INTENT_CODE = 1
         const val SLEEP_INTENT_CODE =2
 
@@ -89,11 +94,19 @@ class AlarmReceiver:BroadcastReceiver(){
                     TaskScheduler.endDay(context)
 
                 }
+                ACTION_REST -> {
+
+                    context.notificationShowRest()
+                    Log.d("onReceive","REST ALARM WENT OFF at ${Calendar.getInstance().get(Calendar.MINUTE)}")
+                }
+
                 else ->{
 
                     throw Exception("This wake up alarm did not receive instructions!")
                     //TODO create a notification that something went wrong
                 }
+
+
             }
         }
     }
