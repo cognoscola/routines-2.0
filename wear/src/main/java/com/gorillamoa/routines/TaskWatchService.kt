@@ -19,11 +19,13 @@ import androidx.palette.graphics.Palette
 import android.support.wearable.watchface.CanvasWatchFaceService
 import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
+import android.util.Log
 import android.view.SurfaceHolder
 
 import java.lang.ref.WeakReference
 import java.util.Calendar
 import java.util.TimeZone
+import kotlin.math.roundToInt
 
 /**
  * Updates rate in milliseconds for interactive mode. We update once a second to advance the
@@ -388,14 +390,27 @@ class TaskWatchService : CanvasWatchFaceService() {
                 WatchFaceService.TAP_TYPE_TAP ->{
                     // The user has completed the tap gesture.
 
-                    selectedMinute +=1
-                    if(selectedMinute > 60) selectedMinute = 0
+                    Log.d("onTapCommand","X:$x Y:$y")
+//                    val xCentered = x - (mCenterX)
+
+                    val radians = Math.atan2((x - mCenterX).toDouble(),-(y - mCenterY).toDouble())
+                    val angle:Double =
+
+                    when(radians){
+                        in 0.0..Math.PI -> {radians * 180 / Math.PI}
+                        else -> 180 * (1 + (1 - Math.abs(radians)/Math.PI))
+                    }
+
+                    Log.d("onTapCommand","angle:$angle")
+
+                    selectedMinute = (angle / 6.0).roundToInt()
                     initializeFeatures(selectedMinute)
                 }
-
             }
             invalidate()
         }
+
+        private fun isLessThanZero(value:Double):Boolean {return value<0}
 
 
         override fun onDraw(canvas: Canvas, bounds: Rect) {
@@ -421,7 +436,6 @@ class TaskWatchService : CanvasWatchFaceService() {
         private fun drawFeatures(canvas: Canvas) {
 
             canvas.save()
-
 
             //TODO selected rotation
             //selected minute = 15
