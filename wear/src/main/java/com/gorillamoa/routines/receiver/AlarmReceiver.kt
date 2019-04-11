@@ -105,8 +105,6 @@ class AlarmReceiver:BroadcastReceiver(){
                     Log.e("onReceive","Alarm Intent did not have ACTION")
                     //TODO create a notification that something went wrong
                 }
-
-
             }
         }
     }

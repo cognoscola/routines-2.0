@@ -486,6 +486,8 @@ class TaskWatchService : CanvasWatchFaceService() {
                 }
             }
             invalidate()
+
+
         }
 
 
