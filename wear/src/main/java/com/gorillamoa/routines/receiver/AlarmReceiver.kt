@@ -102,7 +102,7 @@ class AlarmReceiver:BroadcastReceiver(){
 
                 else ->{
 
-                    throw Exception("This wake up alarm did not receive instructions!")
+                    Log.e("onReceive","Alarm Intent did not have ACTION")
                     //TODO create a notification that something went wrong
                 }
 
