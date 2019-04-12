@@ -2,15 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.gorillamoa.routines">
 
-    <!-- Required to act as a custom watch face. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <!-- Required for complications to receive complication data and open the provider chooser. -->
+    <uses-feature android:name="android.hardware.type.watch" /> <!-- Required for complications to receive complication data and open the provider chooser. -->
     <uses-permission android:name="com.google.android.wearable.permission.RECEIVE_COMPLICATION_DATA" />
-
-    <uses-feature android:name="android.hardware.type.watch" />
-
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
+
 
     <application
         android:name=".app.App"
@@ -19,9 +17,27 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
+        <uses-library
+            android:name="com.google.android.wearable"
+            android:required="true" />
+
+        <!--
+               Set to true if your app is Standalone, that is, it does not require the handheld
+               app to run.
+        -->
         <meta-data
             android:name="com.google.android.wearable.standalone"
             android:value="true" />
+
+        <activity
+            android:name=".activity.RecognitionActivity"
+            android:label="@string/title_activity_recognition">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <service
             android:name=".TaskWatchService"
@@ -47,10 +63,6 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
-        <uses-library
-            android:name="com.google.android.wearable"
-            android:required="true" />
 
         <activity
             android:name=".activity.TaskAddActivity"
@@ -124,6 +136,9 @@
         <receiver
             android:name=".receiver.TaskActionReceiver"
             android:exported="false" />
+
+        <receiver android:name=".receiver.ActivityReceiver"
+            android:exported="false"/>
     </application>
 
 </manifest>

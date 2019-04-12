@@ -11,6 +11,8 @@ private const val isWakeAlarmActive= "isWakeAlarmActive"
 private const val isSleepAlarmActive= "isSleepAlarmActive"
 private const val isRestAlarmActive = "isRestAlarmActive"
 
+private const val isActivityRecognictionOn ="isRecognitionOn"
+
 //TODO remove other copies of these values
 private const val WAKE_UP_HOUR = "wake_up_hour"
 private const val WAKE_UP_MINUTE = "wake_up_minute"
@@ -75,6 +77,17 @@ fun Context.isSleepAlarmSet():Boolean{
 
 fun Context.isRestAlarmActive():Boolean{
     return getLocalSettings().getBoolean(isRestAlarmActive,false)
+}
+
+fun Context.isRecognitionOn():Boolean{
+    return getLocalSettings().getBoolean(isActivityRecognictionOn,false)
+}
+
+fun Context.saveRecognitionStatus(isRecogOn:Boolean){
+    val prefs = getLocalSettings()
+    prefs.edit()
+            .putBoolean(isActivityRecognictionOn,isRecogOn)
+            .apply()
 }
 
 
