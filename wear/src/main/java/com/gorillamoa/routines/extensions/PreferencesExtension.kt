@@ -9,8 +9,9 @@ import java.util.*
 private const val LOCAL_SETTINGS ="local_app_settings"
 private const val isWakeAlarmActive= "isWakeAlarmActive"
 private const val isSleepAlarmActive= "isSleepAlarmActive"
-private const val isRestAlarmActive = "isRestAlarmActive"
+const val isRestAlarmActive = "isRestAlarmActive"
 
+//TODO allow user to turn this feature on or off
 private const val isActivityRecognictionOn ="isRecognitionOn"
 
 //TODO remove other copies of these values
@@ -35,7 +36,6 @@ fun Context.getLocalSettings():SharedPreferences{
     //later investigate cost of retrieving shared preferences
     return getSharedPreferences(LOCAL_SETTINGS, Activity.MODE_PRIVATE)
 }
-
 
 
 /**

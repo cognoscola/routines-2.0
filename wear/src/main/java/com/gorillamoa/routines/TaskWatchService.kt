@@ -2,10 +2,7 @@ package com.gorillamoa.routines
 
 import android.app.AlarmManager
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -17,14 +14,15 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.os.SystemClock
 import androidx.palette.graphics.Palette
 import android.support.wearable.watchface.CanvasWatchFaceService
 import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
 import android.util.Log
 import android.view.SurfaceHolder
-import com.gorillamoa.routines.extensions.alarmEnableWakeUp
 import com.gorillamoa.routines.extensions.getAlarmService
+import com.gorillamoa.routines.extensions.getLocalSettings
 import com.gorillamoa.routines.extensions.isRestAlarmActive
 import com.gorillamoa.routines.extensions.saveAlarmRestStatus
 import com.gorillamoa.routines.receiver.AlarmReceiver
@@ -33,6 +31,7 @@ import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_REST
 import java.lang.ref.WeakReference
 import java.util.Calendar
 import java.util.TimeZone
+import kotlin.math.log
 import kotlin.math.roundToInt
 
 /**
@@ -87,7 +86,9 @@ class TaskWatchService : CanvasWatchFaceService() {
         }
     }
 
+
     inner class Engine : CanvasWatchFaceService.Engine() {
+        private val Tag:String = Engine::class.java.name
 
         private lateinit var mCalendar: Calendar
 
@@ -121,6 +122,10 @@ class TaskWatchService : CanvasWatchFaceService() {
         /* Handler to update the time once a second in interactive mode. */
         private val mUpdateTimeHandler = EngineHandler(this)
 
+        private var xLastTouch = 0
+        private var yLastTouch = 0
+        private var lastTimeTouch = 0L
+
 
         //Break hand color
         private var mWatchBreakColor: Int = 0
@@ -136,6 +141,16 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var mBreakLineLength = 0f
         private var isRestAlarmEnabled = false
 
+        //create a shared preference listener so that we can update the watchface UI when
+        //changes to preference variables occur
+         private val preferenceListener= SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+            if (key == isRestAlarmActive) {
+
+                if (!hasTouchedScreenRecently()) {
+                    if(sharedPreferences.getBoolean(key,false)) enableRestPeriods() else disableRestPeriods()
+                }
+            }
+        }
 
         private val mTimeZoneReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -143,7 +158,6 @@ class TaskWatchService : CanvasWatchFaceService() {
                 invalidate()
             }
         }
-
 
 
         override fun onCreate(holder: SurfaceHolder) {
@@ -160,7 +174,45 @@ class TaskWatchService : CanvasWatchFaceService() {
             initializeBackground()
             initializeWatchFace()
             initializeFeatures(selectedMinute)
+
+            applicationContext.getLocalSettings().registerOnSharedPreferenceChangeListener(preferenceListener)
         }
+
+        /**
+         * if the user touched the screen in the past 5 seconds
+         */
+        private fun hasTouchedScreenRecently():Boolean = (SystemClock.uptimeMillis() - lastTimeTouch) < 1500
+
+        private fun enableRestPeriods(){
+            isRestAlarmEnabled = true
+
+            selectedMinute = if (hasTouchedScreenRecently()) {
+                val radians = Math.atan2((xLastTouch - mCenterX).toDouble(), -(yLastTouch - mCenterY).toDouble())
+                val angle: Double =
+                        when (radians) {
+                            in 0.0..Math.PI -> {
+                                radians * 180 / Math.PI
+                            }
+                            else -> 180 * (1 + (1 - Math.abs(radians) / Math.PI))
+                        }
+                (angle / 6.0).roundToInt()
+            }
+
+            else{
+                //activate in 18 minutes from now (it takes about 2 minutes to recognize the activity)
+                (mCalendar.get(Calendar.MINUTE) + 18).rem(60)
+            }
+
+            initializeFeatures(selectedMinute)
+            applicationContext.saveAlarmRestStatus(true)
+        }
+
+        private fun disableRestPeriods() {
+            applicationContext.getAlarmService().cancel(getRestPendingIntent())
+            isRestAlarmEnabled = false
+            applicationContext.saveAlarmRestStatus(false)
+        }
+
 
         private fun initializeBackground() {
             mBackgroundPaint = Paint().apply {
@@ -257,11 +309,9 @@ class TaskWatchService : CanvasWatchFaceService() {
                 //if current minute is > latest inverval, alarm should go off in Min(intervals) + (60 - current) minutes
                 //else alarm should go off at the lowest of (intervali - current) that is possible
 
-
                 //current minutes
                 var minutesTilAlarm = 60
                 val cMinutes = mCalendar.get(Calendar.MINUTE)
-
                 if (cMinutes > intervals.max()?:0) { minutesTilAlarm = intervals.min()?:0 + (60 - cMinutes) }
                 else {
                     intervals.forEach {
@@ -295,6 +345,7 @@ class TaskWatchService : CanvasWatchFaceService() {
 
         override fun onDestroy() {
             mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME)
+            applicationContext.getLocalSettings().unregisterOnSharedPreferenceChangeListener(preferenceListener)
             super.onDestroy()
         }
 
@@ -455,41 +506,28 @@ class TaskWatchService : CanvasWatchFaceService() {
                 WatchFaceService.TAP_TYPE_TAP ->{
                     // The user has completed the tap gesture.
 
+                    xLastTouch = x
+                    yLastTouch = y
+                    lastTimeTouch = eventTime
+
                     //Check if we intercept center circle
                     val dSquare = ((x - mCenterX)*(x - mCenterX)) + ((y - mCenterY)*(y - mCenterY))
                     val rSquare = (mCenterX*mCenterX*0.25)
 
                     if (dSquare < rSquare) {
                         //we're inside the circle so, cancel the alarm
-                        Log.d("onTapCommand","Cancel Alarms")
-                        applicationContext.getAlarmService().cancel(getRestPendingIntent())
-                        isRestAlarmEnabled = false
-                        applicationContext.saveAlarmRestStatus(false)
+                        disableRestPeriods()
 
                     }else {
 
-                        isRestAlarmEnabled = true
-                        applicationContext.saveAlarmRestStatus(true)
-                        val radians = Math.atan2((x - mCenterX).toDouble(), -(y - mCenterY).toDouble())
-                        val angle: Double =
+                        //outside, so enable
+                        enableRestPeriods()
 
-                                when (radians) {
-                                    in 0.0..Math.PI -> {
-                                        radians * 180 / Math.PI
-                                    }
-                                    else -> 180 * (1 + (1 - Math.abs(radians) / Math.PI))
-                                }
-
-                        selectedMinute = (angle / 6.0).roundToInt()
-                        initializeFeatures(selectedMinute)
                     }
                 }
             }
             invalidate()
-
-
         }
-
 
         override fun onDraw(canvas: Canvas, bounds: Rect) {
             val now = System.currentTimeMillis()
@@ -541,7 +579,6 @@ class TaskWatchService : CanvasWatchFaceService() {
                 }
 
                 canvas.drawCircle(mCenterX,mCenterY,mCenterX*0.5f,mBreakLinePaint)
-
                 canvas.save()
             }
 
@@ -667,6 +704,8 @@ class TaskWatchService : CanvasWatchFaceService() {
                 mUpdateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME)
             }
         }
+
+
 
         /**
          * Returns whether the [.mUpdateTimeHandler] timer should be running. The timer
