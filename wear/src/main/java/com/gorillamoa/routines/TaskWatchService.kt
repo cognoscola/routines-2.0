@@ -298,7 +298,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 intervals.add(minute)
 
                 for (i in 1..(lines - 1)) {
-                    intervals.add((selectedMinute + i*breakInterval).rem(60))
+                    intervals.add((minute + i*breakInterval).rem(60))
                 }
 
                 Log.d("initializeFeatures","Intervals: ${intervals.joinToString(",")}")
@@ -311,18 +311,22 @@ class TaskWatchService : CanvasWatchFaceService() {
 
                 //current minutes
                 var minutesTilAlarm = 60
-                val cMinutes = mCalendar.get(Calendar.MINUTE)
-                if (cMinutes > intervals.max()?:0) { minutesTilAlarm = intervals.min()?:0 + (60 - cMinutes) }
+                val cMinutes = 50//mCalendar.get(Calendar.MINUTE)
+                if (cMinutes >= intervals.max()?:0) {
+                    minutesTilAlarm = (intervals.min()?:0) + (60 - cMinutes)
+                }
                 else {
                     intervals.forEach {
                         val tdiff = it - cMinutes
                         if (tdiff > 0) {
-                            if(tdiff < minutesTilAlarm) minutesTilAlarm = tdiff
+                            if(tdiff < minutesTilAlarm) {
+                                minutesTilAlarm = tdiff
+                            }
                         }
                     }
                 }
 
-                Log.d("initializeFeatures","Next Alarm in $minutesTilAlarm minutes")
+                Log.d("$Tag initializeFeatures","Next Alarm in $minutesTilAlarm minutes")
 
                 val manager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
                 manager.setRepeating(
@@ -611,7 +615,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                     mCalendar.get(Calendar.SECOND) + mCalendar.get(Calendar.MILLISECOND) / 1000f
             val secondsRotation = seconds * 6f
 
-            val minutesRotation = mCalendar.get(Calendar.MINUTE) * 6f
+            val minutesRotation = 50 * 6f//mCalendar.get(Calendar.MINUTE) * 6f
 
             val hourHandOffset = mCalendar.get(Calendar.MINUTE) / 2f
             val hoursRotation = mCalendar.get(Calendar.HOUR) * 30 + hourHandOffset
