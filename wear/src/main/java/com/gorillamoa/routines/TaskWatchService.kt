@@ -27,11 +27,10 @@ import com.gorillamoa.routines.extensions.isRestAlarmActive
 import com.gorillamoa.routines.extensions.saveAlarmRestStatus
 import com.gorillamoa.routines.receiver.AlarmReceiver
 import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_REST
+import com.gorillamoa.routines.views.SwitchingButton
 
 import java.lang.ref.WeakReference
-import java.util.Calendar
-import java.util.TimeZone
-import kotlin.math.log
+import java.util.*
 import kotlin.math.roundToInt
 
 /**
@@ -131,6 +130,8 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var mWatchBreakColor: Int = 0
         private lateinit var mBreakLinePaint:Paint
 
+        private var screenDimensions =Vector<Int>()
+
         //todo save selected Minute and break Interval
         private var selectedMinute = 0
         private var breakInterval:Int = 20
@@ -140,6 +141,8 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var mSelectedMinuteDegree = 0f
         private var mBreakLineLength = 0f
         private var isRestAlarmEnabled = false
+
+        private var switchingButton:SwitchingButton? = null
 
         //create a shared preference listener so that we can update the watchface UI when
         //changes to preference variables occur
@@ -173,9 +176,29 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             initializeBackground()
             initializeWatchFace()
+
             initializeFeatures(selectedMinute)
 
             applicationContext.getLocalSettings().registerOnSharedPreferenceChangeListener(preferenceListener)
+        }
+
+        /**
+         * Note, we need to ensure that our dimensions are initialized. So when we create these features
+         * they are given correct values
+         */
+        private fun measureTouchables(screenWidth:Int, screenHeight:Int) {
+
+            switchingButton = SwitchingButton(
+                    mCenterX.toInt(),
+                    mCenterY.toInt(),
+                    (screenWidth * 0.2).toInt(),
+                    (screenHeight* 0.2).toInt(),
+                    resources).apply {
+                onClickListener = {
+                    Log.d("$Tag SwitchingClick","Button is pressed! Hurrah!")
+                }
+            }
+
         }
 
         /**
@@ -311,7 +334,7 @@ class TaskWatchService : CanvasWatchFaceService() {
 
                 //current minutes
                 var minutesTilAlarm = 60
-                val cMinutes = 50//mCalendar.get(Calendar.MINUTE)
+                val cMinutes = mCalendar.get(Calendar.MINUTE)
                 if (cMinutes >= intervals.max()?:0) {
                     minutesTilAlarm = (intervals.min()?:0) + (60 - cMinutes)
                 }
@@ -458,7 +481,6 @@ class TaskWatchService : CanvasWatchFaceService() {
             sMinuteHandLength = (mCenterX * 0.75).toFloat()
             sHourHandLength = (mCenterX * 0.5).toFloat()
 
-
             /* Scale loaded background image (more efficient) if surface dimensions change. */
             val scale = width.toFloat() / mBackgroundBitmap.width.toFloat()
 
@@ -479,6 +501,9 @@ class TaskWatchService : CanvasWatchFaceService() {
             if (!mBurnInProtection && !mLowBitAmbient) {
                 initGrayBackgroundBitmap()
             }
+
+            measureTouchables(width,height)
+
         }
 
         private fun initGrayBackgroundBitmap() {
@@ -514,9 +539,12 @@ class TaskWatchService : CanvasWatchFaceService() {
                     yLastTouch = y
                     lastTimeTouch = eventTime
 
+                    //TODO process UI touches more eloquently
+                    switchingButton?.isTouched(x,y)
+
                     //Check if we intercept center circle
                     val dSquare = ((x - mCenterX)*(x - mCenterX)) + ((y - mCenterY)*(y - mCenterY))
-                    val rSquare = (mCenterX*mCenterX*0.25)
+                    val rSquare = (mCenterX*mCenterX*0.75*0.75)
 
                     if (dSquare < rSquare) {
                         //we're inside the circle so, cancel the alarm
@@ -540,23 +568,45 @@ class TaskWatchService : CanvasWatchFaceService() {
             drawBackground(canvas)
             drawWatchFace(canvas)
             drawFeatures(canvas)
+            drawButtons(canvas)
+        }
+
+        private fun drawButtons(canvas: Canvas) {
+            //TODO don't draw this everyframe
+
+            /*canvas.drawLine(
+                    mCenterX -10,
+                    mCenterY - mBreakLineLength - 10,
+                    mCenterX +10,
+                    0f +10,
+                    mBreakLinePaint)*/
+
+
+//            canvas.drawRect(mCenterX,mCenterY,mCenterX+10,mCenterY+10,mBreakLinePaint)
+//            canvas.drawRect(mCenterX,mCenterY,mCenterX+10,mCenterY+10,mBreakLinePaint)
+
+            switchingButton?.draw(canvas)
         }
 
         private fun drawBackground(canvas: Canvas) {
 
-            if (mAmbient && (mLowBitAmbient || mBurnInProtection)) {
+            /*if (mAmbient && (mLowBitAmbient || mBurnInProtection)) {
                 canvas.drawColor(Color.BLACK)
             } else if (mAmbient) {
                 canvas.drawBitmap(mGrayBackgroundBitmap, 0f, 0f, mBackgroundPaint)
             } else {
                 canvas.drawBitmap(mBackgroundBitmap, 0f, 0f, mBackgroundPaint)
-            }
+            }*/
+            canvas.drawColor(Color.BLACK)
         }
 
         private fun drawFeatures(canvas: Canvas) {
 
             //TODO we don't need to draw all the features now because they don't update every second
             //TODO Smooth transition of time selection
+
+
+
             if (isRestAlarmEnabled) {
 
                 canvas.save()
@@ -582,8 +632,8 @@ class TaskWatchService : CanvasWatchFaceService() {
                             mBreakLinePaint)
                 }
 
-                canvas.drawCircle(mCenterX,mCenterY,mCenterX*0.5f,mBreakLinePaint)
-                canvas.save()
+                canvas.drawCircle(mCenterX,mCenterY,mCenterX*0.75f,mBreakLinePaint)
+                canvas.restore()
             }
 
         }
@@ -614,8 +664,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             val seconds =
                     mCalendar.get(Calendar.SECOND) + mCalendar.get(Calendar.MILLISECOND) / 1000f
             val secondsRotation = seconds * 6f
-
-            val minutesRotation = 50 * 6f//mCalendar.get(Calendar.MINUTE) * 6f
+            val minutesRotation = mCalendar.get(Calendar.MINUTE) * 6f
 
             val hourHandOffset = mCalendar.get(Calendar.MINUTE) / 2f
             val hoursRotation = mCalendar.get(Calendar.HOUR) * 30 + hourHandOffset
