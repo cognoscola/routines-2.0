@@ -190,10 +190,10 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             switchingButton = SwitchingButton(
                     mCenterX.toInt(),
-                    mCenterY.toInt(),
+                    mCenterY.toInt() + (screenHeight * 0.2f).toInt(),
                     (screenWidth * 0.2).toInt(),
                     (screenHeight* 0.2).toInt(),
-                    resources).apply {
+                    this@TaskWatchService).apply {
                 onClickListener = {
                     Log.d("$Tag SwitchingClick","Button is pressed! Hurrah!")
                 }
