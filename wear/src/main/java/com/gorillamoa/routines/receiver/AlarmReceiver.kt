@@ -45,7 +45,10 @@ class AlarmReceiver:BroadcastReceiver(){
          */
         const val ACTION_REST = "R"
 
+        const val ACTION_TIMER = "T"
+
         const val KEY_ALARM = "A"
+
 
         const val WAKE_UP_INTENT_CODE = 1
         const val SLEEP_INTENT_CODE =2
@@ -94,11 +97,21 @@ class AlarmReceiver:BroadcastReceiver(){
                     TaskScheduler.endDay(context)
 
                 }
+
                 ACTION_REST -> {
 
                     context.notificationShowRest()
                     Log.d("onReceive","REST ALARM WENT OFF at ${Calendar.getInstance().get(Calendar.MINUTE)}")
                 }
+
+                ACTION_TIMER ->{
+
+                    //show a notification for the timer
+                    context.notificationShowTimer()
+                    //trigger any other listeners
+                    context.saveAlarmTimerTriggerStatus(true)
+                }
+
 
                 else ->{
 

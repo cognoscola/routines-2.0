@@ -19,6 +19,7 @@ const val WAKE_UP_NOTIFICATION_ID =1
 const val SLEEP_NOTIFICATION_ID =65535
 const val REST_NOTIFICATION_ID =65534
 const val ACTIVITY_NOTIFICATION_ID = 65533
+const val TIMER_NOTIFICATION_ID = 65532
 
 public const val NOTIFICATION_CHANNEL_ONE  = "channel"
 const val NOTIFICATION_TAG = "routines"
@@ -89,7 +90,30 @@ fun Notification.Builder.addTaskAction(context: Context,actionText:String, actio
             context.createNotificationActionPendingIntent(tid,action)
     ).build())
 }
+//TODO ADD common functionality to remove notifications!
+//TODO when switching between tasks, make notification priority low so it doesn't show up all the time
 
+//clean
+fun Context.notificationShowTimer(){
+    val manager = getNotificationManager()
+
+    getBuilder().apply {
+
+        setContentTitle(Html.fromHtml("Times up!", Html.FROM_HTML_MODE_COMPACT))
+        setAutoCancel(true)
+        setCategory(Notification.CATEGORY_REMINDER)
+
+        manager.notify(
+                NOTIFICATION_TAG,
+                TIMER_NOTIFICATION_ID,
+                build()
+        )
+    }
+
+}
+
+
+//clean
 fun Context.notificationShowRest(){
     val manager = getNotificationManager()
 

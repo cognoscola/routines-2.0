@@ -11,6 +11,10 @@ private const val isWakeAlarmActive= "isWakeAlarmActive"
 private const val isSleepAlarmActive= "isSleepAlarmActive"
 const val isRestAlarmActive = "isRestAlarmActive"
 
+const val isTimerAlarmActive = "isTimerAlarmActive"
+const val isTimerAlarmTriggered = "isTimerAlarmTriggered"
+const val selectedMinutesTimer = "timerMinute"
+
 //TODO allow user to turn this feature on or off
 private const val isActivityRecognictionOn ="isRecognitionOn"
 
@@ -63,10 +67,22 @@ fun Context.saveSleepTime(hour:Int, minute:Int,phase:Int){
             .apply()
 }
 
+fun Context.saveTimerTime(timeMillis:Long){
+
+    val prefs = getLocalSettings()
+    prefs
+            .edit()
+            .putLong(selectedMinutesTimer,timeMillis)
+            .apply()
+}
+
+fun Context.getTimerTime():Long{
+    return getLocalSettings().getLong(selectedMinutesTimer,0)
+}
 
 
 
-
+//clean truncate these and accept one parameter
 fun Context.isWakeAlarmSet():Boolean{
     return getLocalSettings().getBoolean(isWakeAlarmActive,false)
 }
@@ -83,6 +99,12 @@ fun Context.isRecognitionOn():Boolean{
     return getLocalSettings().getBoolean(isActivityRecognictionOn,false)
 }
 
+fun Context.isTimerAlarmActive():Boolean{
+    return getLocalSettings().getBoolean(isTimerAlarmActive,false)
+}
+
+
+//clean truncate these
 fun Context.saveRecognitionStatus(isRecogOn:Boolean){
     val prefs = getLocalSettings()
     prefs.edit()
@@ -111,6 +133,27 @@ fun Context.saveAlarmRestStatus(isAlarmSet:Boolean){
             .putBoolean(isRestAlarmActive,isAlarmSet)
             .apply()
 }
+
+fun Context.saveAlarmTimerStatus(isAlarmSet:Boolean){
+    val prefs = getLocalSettings()
+    prefs.edit()
+            .putBoolean(isTimerAlarmActive,isAlarmSet)
+            .apply()
+}
+
+
+
+/**
+ * Specify that the alarm is triggered. All preference listeners will
+ * be updated
+ */
+fun Context.saveAlarmTimerTriggerStatus(isAlarmSet:Boolean){
+    val prefs = getLocalSettings()
+    prefs.edit()
+            .putBoolean(isTimerAlarmTriggered,isAlarmSet)
+            .apply()
+}
+
 
 
 

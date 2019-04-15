@@ -21,13 +21,12 @@ import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
 import android.util.Log
 import android.view.SurfaceHolder
-import com.gorillamoa.routines.extensions.getAlarmService
-import com.gorillamoa.routines.extensions.getLocalSettings
-import com.gorillamoa.routines.extensions.isRestAlarmActive
-import com.gorillamoa.routines.extensions.saveAlarmRestStatus
+import com.gorillamoa.routines.extensions.*
 import com.gorillamoa.routines.receiver.AlarmReceiver
 import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_REST
+import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_TIMER
 import com.gorillamoa.routines.views.SwitchingButton
+import com.gorillamoa.routines.views.TimerView
 
 import java.lang.ref.WeakReference
 import java.util.*
@@ -89,7 +88,7 @@ class TaskWatchService : CanvasWatchFaceService() {
 
 
     inner class Engine : CanvasWatchFaceService.Engine() {
-        private val Tag:String = Engine::class.java.name
+        private val tag:String = Engine::class.java.name
 
         private lateinit var mCalendar: Calendar
 
@@ -135,6 +134,7 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var screenDimensions =Vector<Int>()
 
         //todo save selected Minute and break Interval
+        //clean breaks stuff into their own class
         private var selectedMinute = 0
         private var breakInterval:Int = 20
 
@@ -143,17 +143,40 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var mSelectedMinuteDegree = 0f
         private var mBreakLineLength = 0f
         private var isRestAlarmEnabled = false
+        private var isTimerEnabled = false
 
         private var switchingButton:SwitchingButton? = null
+
+        private val STATE_BREAKS = "break"
+        private val STATE_TIMER = "time"
+        private val STATE_ALARM = "alarm"
+
+        //clean the timer stuff into its own class
+        private lateinit var timerView:TimerView
+
+        //TODO we'll show 1 generic alarm, but modify that alarm slightly (e.g. color) to indicate which type of alarm went off
+        private var alarmTriggered = false
 
         //create a shared preference listener so that we can update the watchface UI when
         //changes to preference variables occur
          private val preferenceListener= SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+
             if (key == isRestAlarmActive) {
 
                 if (!hasTouchedScreenRecently()) {
                     if(sharedPreferences.getBoolean(key,false)) enableRestPeriods() else disableRestPeriods()
                 }
+            }
+
+            //TODO ADD A REST ALARM TRIGGER RESPONSE TO THE BREAKS
+
+            if (key == isTimerAlarmTriggered) {
+
+                //we're just going to fire off
+                if (sharedPreferences.getBoolean(key, false)) {
+                    alarmTriggered =true
+                }
+
             }
         }
 
@@ -174,13 +197,19 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             mCalendar = Calendar.getInstance()
 
-            isRestAlarmEnabled = applicationContext.isRestAlarmActive()
+            isRestAlarmEnabled = isRestAlarmActive()
+            isTimerEnabled = isTimerAlarmActive()
 
             initializeBackground()
             initializeWatchFace()
             initializeFeatures(selectedMinute)
 
             applicationContext.getLocalSettings().registerOnSharedPreferenceChangeListener(preferenceListener)
+        }
+
+        private fun measureFeatures(){
+            timerView = TimerView(mCenterX.toInt(),mCenterY.toInt(),mCenterX.toInt() - 30)
+
         }
 
         /**
@@ -197,12 +226,12 @@ class TaskWatchService : CanvasWatchFaceService() {
                     (screenWidth  *   0.18).toInt(),
                     this@TaskWatchService).apply {
                 onClickListener = {
-                    Log.d("$Tag SwitchingClick","Button is pressed! Hurrah! State: ${nextState()}")
+                    Log.d("$tag SwitchingClick","Button is pressed! Hurrah! State: ${nextState()}")
 
                 }
-                addState("breaks",R.drawable.ic_break_time)
-                addState("timer",R.drawable.ic_hourglass)
-                addState("alarm",R.drawable.ic_alarm)
+                addState(STATE_BREAKS,R.drawable.ic_break_time)
+                addState(STATE_TIMER,R.drawable.ic_hourglass)
+                addState(STATE_ALARM,R.drawable.ic_alarm)
             }
 
         }
@@ -241,6 +270,37 @@ class TaskWatchService : CanvasWatchFaceService() {
             isRestAlarmEnabled = false
             applicationContext.saveAlarmRestStatus(false)
         }
+
+        /**
+         * Enable a timer to go off in specified minutes
+         * @param minutes is the amount of minutes until the alarm goes off
+         */
+        private fun enableTimer(minutes:Int){
+            isTimerEnabled = true
+            timerView.minute = minutes
+
+            val timeToTrigger = System.currentTimeMillis() + (minutes * 60 * 1000) - (mCalendar.get(Calendar.SECOND) * 1000)
+
+            //TODO MOVE THIS TO alarm extensions
+            getAlarmService().set(
+                    AlarmManager.RTC_WAKEUP,
+                    timeToTrigger,
+                    getTimerPendingIntent()
+            )
+
+
+            saveTimerTime(timeToTrigger)
+        }
+
+        private fun disableTimer(){
+            timerView.reset()
+            //TODO move this to alarm extensions
+            applicationContext.getAlarmService().cancel(getTimerPendingIntent())
+            isTimerEnabled = false
+            applicationContext.saveAlarmTimerTriggerStatus(false)
+
+        }
+
 
 
         private fun initializeBackground() {
@@ -336,7 +396,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 //The first alarm should go off on the next available interval.
                 //which one is the correct interval?
                 //if current minute is > latest inverval, alarm should go off in Min(intervals) + (60 - current) minutes
-                //else alarm should go off at the lowest of (intervali - current) that is possible
+                //else alarm should go off at the lowest of (Intervali - current) that is possible
 
                 //current minutes
                 var minutesTilAlarm = 60
@@ -355,8 +415,9 @@ class TaskWatchService : CanvasWatchFaceService() {
                     }
                 }
 
-                Log.d("$Tag initializeFeatures","Next Alarm in $minutesTilAlarm minutes")
+                Log.d("$tag initializeFeatures","Next Alarm in $minutesTilAlarm minutes")
 
+                //TODO MOVE THIS TO alarm extensions
                 val manager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
                 manager.setRepeating(
                         AlarmManager.RTC_WAKEUP,
@@ -365,6 +426,13 @@ class TaskWatchService : CanvasWatchFaceService() {
                         breakInterval.toLong() * 60L * 1000L,
                         getRestPendingIntent()
                 )
+            }
+        }
+
+        private fun getTimerPendingIntent():PendingIntent{
+            return Intent(this@TaskWatchService, AlarmReceiver::class.java).let {
+                it.action = ACTION_TIMER
+                PendingIntent.getBroadcast(this@TaskWatchService, 0, it,PendingIntent.FLAG_UPDATE_CURRENT)
             }
         }
 
@@ -508,6 +576,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 initGrayBackgroundBitmap()
             }
 
+            measureFeatures()
             measureTouchables(width,height)
 
         }
@@ -541,31 +610,58 @@ class TaskWatchService : CanvasWatchFaceService() {
                 WatchFaceService.TAP_TYPE_TAP ->{
                     // The user has completed the tap gesture.
 
-                    xLastTouch = x
-                    yLastTouch = y
-                    lastTimeTouch = eventTime
+                    if (alarmTriggered) {
+                        alarmTriggered = false
 
-                    //TODO process UI touches more eloquently
-                    switchingButton?.isTouched(x,y)
+                        //TODO disable corresponding alarm
+                        disableTimer()
 
-                    //Check if we intercept center circle
-                    val dSquare = ((x - mCenterX)*(x - mCenterX)) + ((y - mCenterY)*(y - mCenterY))
-                    val rSquare = (mCenterX*mCenterX*PERCENT_OF_RADIUS*PERCENT_OF_RADIUS)
+                    }else{
+                        xLastTouch = x
+                        yLastTouch = y
+                        lastTimeTouch = eventTime
 
-                    if (dSquare < rSquare) {
-                        //we're inside the circle so, cancel the alarm
-                        disableRestPeriods()
+                        //TODO process UI touches more eloquently.
 
-                    }else {
+                        if (switchingButton?.isTouched(x, y) == false) {
 
-                        //outside, so enable
-                        enableRestPeriods()
-
+                            when (switchingButton?.getState()) {
+                                STATE_ALARM -> {}
+                                STATE_BREAKS -> { if(isTouchingCenter(x,y)) disableRestPeriods() else enableRestPeriods() }
+                                STATE_TIMER -> {if(isTouchingCenter(x,y)) disableTimer() else enableTimer(getSelectedMinute(x,y))}
+                                else ->{}
+                            }
+                        }
                     }
                 }
             }
             invalidate()
         }
+
+        /**
+         * Given coordinates, determine if we're touching the inner or outer part of the screen
+         */
+        private fun isTouchingCenter(x:Int, y:Int):Boolean{
+
+            val dSquare = ((x - mCenterX) * (x - mCenterX)) + ((y - mCenterY) * (y - mCenterY))
+            val rSquare = (mCenterX * mCenterX * PERCENT_OF_RADIUS * PERCENT_OF_RADIUS)
+            return dSquare < rSquare
+        }
+
+        private fun getSelectedMinute(x:Int,y:Int):Int{
+                val radians = Math.atan2((x - mCenterX).toDouble(), -(y - mCenterY).toDouble())
+                return ((when (radians) { //convert radians to degrees
+
+                    //if between 0 - PI angle is 0 - 180
+                    in 0.0..Math.PI -> {
+                        radians * 180 / Math.PI
+                    }
+                    //angle is >180 so add the angle to 180
+                    else -> 180 * (1 + (1 - Math.abs(radians) / Math.PI))
+                    //6 degrees per minute
+                }) / 6.0).roundToInt()
+        }
+
 
         override fun onDraw(canvas: Canvas, bounds: Rect) {
             val now = System.currentTimeMillis()
@@ -587,10 +683,6 @@ class TaskWatchService : CanvasWatchFaceService() {
                     0f +10,
                     mBreakLinePaint)*/
 
-
-//            canvas.drawRect(mCenterX,mCenterY,mCenterX+10,mCenterY+10,mBreakLinePaint)
-//            canvas.drawRect(mCenterX,mCenterY,mCenterX+10,mCenterY+10,mBreakLinePaint)
-
             switchingButton?.draw(canvas)
         }
 
@@ -611,7 +703,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             //TODO we don't need to draw all the features now because they don't update every second
             //TODO Smooth transition of time selection
 
-
+            //lets draw our rest alarms if enabled
 
             if (isRestAlarmEnabled) {
 
@@ -640,6 +732,10 @@ class TaskWatchService : CanvasWatchFaceService() {
 
                 canvas.drawCircle(mCenterX,mCenterY,mCenterX*PERCENT_OF_RADIUS.toFloat(),mBreakLinePaint)
                 canvas.restore()
+            }
+
+            if (isTimerEnabled) {
+                timerView.onDraw(canvas,mCalendar.timeInMillis)
             }
 
         }
