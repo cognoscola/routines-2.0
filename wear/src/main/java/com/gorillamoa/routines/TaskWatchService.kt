@@ -52,6 +52,8 @@ private const val CENTER_GAP_AND_CIRCLE_RADIUS = 4f
 
 private const val SHADOW_RADIUS = 6f
 
+private const val PERCENT_OF_RADIUS = 0.7
+
 
 /**
  * Analog watch face with a ticking second hand. In ambient mode, the second hand isn't
@@ -176,7 +178,6 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             initializeBackground()
             initializeWatchFace()
-
             initializeFeatures(selectedMinute)
 
             applicationContext.getLocalSettings().registerOnSharedPreferenceChangeListener(preferenceListener)
@@ -191,12 +192,17 @@ class TaskWatchService : CanvasWatchFaceService() {
             switchingButton = SwitchingButton(
                     mCenterX.toInt(),
                     mCenterY.toInt() + (screenHeight * 0.2f).toInt(),
-                    (screenWidth * 0.2).toInt(),
-                    (screenHeight* 0.2).toInt(),
+                    (screenWidth  * 0.18).toInt(),
+                    //use width to ensure we get a square object
+                    (screenWidth  *   0.18).toInt(),
                     this@TaskWatchService).apply {
                 onClickListener = {
-                    Log.d("$Tag SwitchingClick","Button is pressed! Hurrah!")
+                    Log.d("$Tag SwitchingClick","Button is pressed! Hurrah! State: ${nextState()}")
+
                 }
+                addState("breaks",R.drawable.ic_break_time)
+                addState("timer",R.drawable.ic_hourglass)
+                addState("alarm",R.drawable.ic_alarm)
             }
 
         }
@@ -544,7 +550,7 @@ class TaskWatchService : CanvasWatchFaceService() {
 
                     //Check if we intercept center circle
                     val dSquare = ((x - mCenterX)*(x - mCenterX)) + ((y - mCenterY)*(y - mCenterY))
-                    val rSquare = (mCenterX*mCenterX*0.75*0.75)
+                    val rSquare = (mCenterX*mCenterX*PERCENT_OF_RADIUS*PERCENT_OF_RADIUS)
 
                     if (dSquare < rSquare) {
                         //we're inside the circle so, cancel the alarm
@@ -632,7 +638,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                             mBreakLinePaint)
                 }
 
-                canvas.drawCircle(mCenterX,mCenterY,mCenterX*0.75f,mBreakLinePaint)
+                canvas.drawCircle(mCenterX,mCenterY,mCenterX*PERCENT_OF_RADIUS.toFloat(),mBreakLinePaint)
                 canvas.restore()
             }
 
