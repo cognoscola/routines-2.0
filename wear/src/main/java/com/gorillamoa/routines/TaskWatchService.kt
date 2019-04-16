@@ -288,7 +288,6 @@ class TaskWatchService : CanvasWatchFaceService() {
                     getTimerPendingIntent()
             )
 
-
             saveTimerTime(timeToTrigger)
         }
 

@@ -4,7 +4,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 
-
 private const val START_ANGLE = -90.0f
 private const val ANGLE_PER_MINUTE = 6.0f
 
