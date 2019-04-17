@@ -3,16 +3,15 @@ package com.gorillamoa.routines.activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.RecyclerView
 import androidx.wear.ambient.AmbientModeSupport
 import androidx.wear.widget.WearableLinearLayoutManager
-import androidx.wear.widget.drawer.WearableNavigationDrawerView
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.adapter.DrawerAdapter
+import com.gorillamoa.routines.adapter.MODE_ALL
+import com.gorillamoa.routines.adapter.MODE_DAILY
 import com.gorillamoa.routines.adapter.TaskListAdapter
 import com.gorillamoa.routines.extensions.getCompletedTaskList
 import com.gorillamoa.routines.extensions.getDayTaskList
@@ -58,31 +57,39 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
 
         taskListWearableRecyclerView?.apply {
             isEdgeItemsCenteringEnabled = true
-            adapter = TaskListAdapter({
+            adapter = TaskListAdapter(
 
-                Log.d("onCreate","Clicked task $it")
-                startActivity(Intent(this@TaskListActivity,TaskViewActivity::class.java))
-            },{tid, isDone ->
+                    itemClickedCallback = {
 
-                //TODO REMOVE THE NOTIFICATION IF IT EXISTS
-                if (isDone) {
-                    TaskScheduler.completeTask(context,tid)
-                }else{
-                    TaskScheduler.uncompleteTask(context,tid)
-                }
-            }){
+                        Log.d("onCreate", "Clicked task $it")
+                        startActivity(Intent(this@TaskListActivity, TaskViewActivity::class.java))
 
-                //add button call back
-                startActivity(Intent(this@TaskListActivity,TaskAddActivity::class.java))
+                    },
+                    completionCallback = { tid, isDone ->
+                        //TODO REMOVE THE NOTIFICATION IF IT EXISTS
+                        if (isDone) {
+                            TaskScheduler.completeTask(context, tid)
+                        } else {
+                            TaskScheduler.uncompleteTask(context, tid)
+                        }
+
+                    },
+                    scheduledCallback = { id, isScheduled ->
 
 
-            }
+
+
+                    },
+                    addButtonCallback = {
+
+                        //add button call back
+                        startActivity(Intent(this@TaskListActivity, TaskAddActivity::class.java))
+                    }
+            )
             layoutManager = WearableLinearLayoutManager(this@TaskListActivity)
 
 
-
-           //TODO make the navigation drawer open as the user finishes scrolling to the top
-
+            //TODO make the navigation drawer open as the user finishes scrolling to the top
         }
 
         top_navigation_drawer.apply {
@@ -90,6 +97,10 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
             setAdapter(DrawerAdapter(this@TaskListActivity))
             addOnItemSelectedListener { position ->
 
+                when(position){
+                    0 -> (taskListWearableRecyclerView?.adapter as TaskListAdapter).setDailyMode()
+                    1 -> (taskListWearableRecyclerView?.adapter as TaskListAdapter).setAllMode()
+                }
                 Log.d("NavigationDrawer","Clicked Position: $position")
             }
             controller.peekDrawer()

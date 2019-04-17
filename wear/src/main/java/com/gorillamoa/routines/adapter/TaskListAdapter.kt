@@ -8,41 +8,82 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.data.Task
 import java.util.*
 
 //TODO Comment this shit
+
+const val MODE_DAILY = 0 //Showing the day's tasks
+const val MODE_ALL = 1   //Showing all tasks
+
+/**
+ * Shows a list of tasks.
+ * Usually there will be 2 different types of lists to display:
+ * 1. a list of scheduled tasks
+ * 2. a list of all tasks
+ * @param itemClickedCallback is invoked when the user presses on the task
+ * @param completionCallback is invoked when the user presses the item's status icon (to the left)
+ * @param scheduledCallback is to notify the parent that the user requested to schedule or unschedule a task
+ * @param addButtonCallback is when the user presses the + button on the item header
+ */
 class TaskListAdapter(
-        private val callback:(Int)->Unit,
-        private val statusCallback:(Int,Boolean)->Any?,
+        private val itemClickedCallback:((Int)->Unit)? = null,
+        private val completionCallback:((Int, Boolean)->Any?)? =null,
+        private val scheduledCallback:((Int,Boolean)->Any?)? = null,
         private val addButtonCallback:(()->Any?)? = null): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var tasks:List<Task>? = null
-    private var done:ArrayDeque<Int>? = null
-    private var remaining:ArrayDeque<Int>? = null
+    private val tag:String = TaskListAdapter::class.java.name
 
+    private var tasks:List<Task>? = null          //All tasks to display
+    private var done:ArrayDeque<Int>? = null      //A list of tasks to mark as done
+    private var remaining:ArrayDeque<Int>? = null //A list of tasks to mark as not done
+
+
+    private var mode = MODE_DAILY
+
+    /**
+     * Recieve task data
+     * @param task is the list of tasks to display
+     * @param unfinished all tasks not done
+     * @param finished all tasks done
+     */
     fun setTaskData(task:List<Task>, unfinished:ArrayDeque<Int>, finished:ArrayDeque<Int>){
 
         tasks = task
         remaining = unfinished
         done = finished
+
         notifyDataSetChanged()
     }
 
 
     companion object {
-        const val VIEW_TYPE_TASK = 0
-        const val VIEW_TYPE_TITLE = 1
+        const val VIEW_TYPE_TASK = 0  //A Task type item
+        const val VIEW_TYPE_TITLE = 1 //A title type item
     }
 
+    /**
+     * Determine which Viewholder (Task or Title) to show
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return  if(viewType == VIEW_TYPE_TASK)
             TaskItemHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false))
         else {
             TitleViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_list_header, parent, false))
         }
+    }
+
+    fun setDailyMode(){
+        mode = MODE_DAILY
+        notifyDataSetChanged()
+    }
+
+    fun setAllMode(){
+        mode = MODE_ALL
+        notifyDataSetChanged()
     }
 
     /**
@@ -57,7 +98,21 @@ class TaskListAdapter(
         tasks?.let {
 
             if (holder is TitleViewHolder) {
-                holder.headerTextView.text = holder.headerTextView.context.getString(R.string.task_list_title)
+
+                val titleString = when (mode) {
+                    MODE_DAILY ->{
+                        holder.headerTextView.context.getString(
+                                if(tasks!!.isNotEmpty())
+                                    R.string.task_list_title else R.string.task_list_empty)
+                    }
+                    MODE_ALL->{
+                        holder.headerTextView.context.getString(R.string.task_all)
+                    }
+                    else -> {""}
+
+                }
+
+                holder.headerTextView.text = titleString
                 holder.headerTextView.setTypeface(holder.headerTextView.typeface, Typeface.BOLD)
                 holder.addButton.setOnClickListener { addButtonCallback?.invoke() }
             }
@@ -69,54 +124,92 @@ class TaskListAdapter(
                     val task =  tasks!![position - 1]
                     taskTextView.text = task.name
 
-                    if (done?.contains(task.id) == true) {
-                        changeToDone(iconImageView,taskTextView)
-                        iconImageView.setOnClickListener {
+                    when(mode){
+                        MODE_DAILY -> styleForDailyAppearance(holder,task,position)
+                        MODE_ALL -> styleForAllAppearance(holder,task,position)
 
-                            if (done?.removeFirstOccurrence(task.id) == true) {
-                                remaining!!.add(task.id)
-                            }
-                            Log.d("onBindViewHolder","Clicked Icon: ${task.id}, ${task.name}")
-                            statusCallback.invoke(task.id?:-1, false)
-                            notifyItemChanged(position)
-                        }
-
-                    }else if (remaining?.contains(task.id)== true){
-                        changeToUndone(iconImageView,taskTextView)
-                        iconImageView.setOnClickListener {
-
-                            if (remaining?.removeFirstOccurrence(task.id)==true) {
-                                done!!.add(task.id)
-                            }
-                            statusCallback.invoke(task.id?:-1, true)
-                            notifyItemChanged(position)
-                        }
-
-                    }else{
-                        //we don't know if this task is done or not!
-                        changeToUnknown(iconImageView,taskTextView)
                     }
 
                     taskTextView.setOnClickListener {
-                        callback.invoke(task.id?:-1)
+                        itemClickedCallback?.invoke(task.id?:-1)
                     }
                 }
             }
         }
     }
 
-    private fun changeToUnknown(iv:ImageView,tv:TextView){
-        iv.setImageResource(R.drawable.ic_priority_high_black_24dp)
+    private fun styleForAllAppearance(holder: TaskItemHolder, task: Task, position: Int) {
+
+
+        if (isScheduled(task)) {
+
+            holder.iconImageView.setImageResource(if(isScheduled(task))R.drawable.ic_schedule_black_24dp else R.drawable.ic_remove_black_24dp)
+            holder.iconImageView.setOnClickListener {
+                Toast.makeText(holder.iconImageView.context,"Unscheduling: ${task.name} [$position]",Toast.LENGTH_SHORT).show()
+            }
+
+        }else{
+            holder.iconImageView.setImageResource(if(isScheduled(task))R.drawable.ic_schedule_black_24dp else R.drawable.ic_remove_black_24dp)
+            holder.iconImageView.setOnClickListener {
+                Toast.makeText(holder.iconImageView.context,"Scheduling: ${task.name} [$position]",Toast.LENGTH_SHORT).show()
+//                completionCallback.invoke(task.id?:-1, false)
+//                notifyItemChanged(position)
+            }
+        }
+
+
     }
 
-    private fun changeToDone(iv:ImageView, tv:TextView){
-        iv.setImageResource(R.drawable.ic_done_black_24dp)
-        tv.paintFlags = tv.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+    private fun isScheduled(task:Task):Boolean{
+
+
+        return (done?.contains(task.id)?:false).or(remaining?.contains(task.id)?:false)
+
     }
 
-    private fun changeToUndone(iv:ImageView, tv:TextView){
-        iv.setImageResource(R.drawable.ic_radio_button_unchecked_black_24dp)
-        tv.paintFlags = tv.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+    private fun changeToUnknown(holder:TaskItemHolder){
+        holder.iconImageView.setImageResource(R.drawable.ic_priority_high_black_24dp)
+    }
+
+    private fun changeToDone(holder:TaskItemHolder){
+        holder.iconImageView.setImageResource(R.drawable.ic_done_black_24dp)
+        holder.taskTextView.paintFlags = holder.taskTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+    }
+
+    private fun changeToUndone(holder:TaskItemHolder){
+        holder.iconImageView.setImageResource(R.drawable.ic_radio_button_unchecked_black_24dp)
+        holder.taskTextView.paintFlags = holder.taskTextView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+    }
+
+    private fun styleForDailyAppearance(holder:TaskItemHolder,task:Task,position: Int){
+        if (done?.contains(task.id) == true) {
+            changeToDone(holder)
+            holder.iconImageView.setOnClickListener {
+
+                if (done?.removeFirstOccurrence(task.id) == true) {
+                    remaining!!.add(task.id)
+                }
+                Log.d("onBindViewHolder","Clicked Icon: ${task.id}, ${task.name}")
+                completionCallback?.invoke(task.id?:-1, false)
+                notifyItemChanged(position)
+            }
+
+        }else if (remaining?.contains(task.id)== true){
+            changeToUndone(holder)
+            holder.iconImageView.setOnClickListener {
+
+                if (remaining?.removeFirstOccurrence(task.id)==true) {
+                    done!!.add(task.id)
+                }
+                completionCallback?.invoke(task.id?:-1, true)
+                notifyItemChanged(position)
+            }
+
+        }else{
+            //we don't know if this task is done or not!
+            changeToUnknown(holder)
+        }
+
     }
 
 

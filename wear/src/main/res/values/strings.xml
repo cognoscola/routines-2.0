@@ -38,7 +38,12 @@
     <!--Task list -->
 
     <string name="task_list_title">"Today's Tasks"</string>
+    <string name="task_list_empty">"Schedule A Task"</string>
+    <string name="task_all">"All Tasks"</string>
     <string name="title_activity_task_add">TaskAddActivity</string>
+    <string name="message">Watch face tapped</string>
+    <string name="my_analog_name">My Analog</string>
+    <string name="title_activity_recognition">RecognitionActivity</string>
 
     <!-- Add task -->
     <string name="type_habit">Habit</string>

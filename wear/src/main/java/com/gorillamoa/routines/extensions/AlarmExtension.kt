@@ -83,7 +83,7 @@ fun Context.alarmDisableSleep(){
  * @param isWake determines wether this alarm will be a wake up or a sleep notification
  */
 fun Context.alarmSetRepeatWithCal(cal:Calendar, isWake:Boolean){
-    val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    val alarmManager = getAlarmService()
 
     alarmManager.setInexactRepeating(
             AlarmManager.RTC_WAKEUP,
@@ -94,5 +94,9 @@ fun Context.alarmSetRepeatWithCal(cal:Calendar, isWake:Boolean){
 
     //clean
     if(isWake)saveAlarmWakeStatus(true)else saveAlarmSleepStatus(true)
+}
+
+fun Context.getAlarmService():AlarmManager{
+    return getSystemService(Context.ALARM_SERVICE) as AlarmManager
 }
 

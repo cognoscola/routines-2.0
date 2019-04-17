@@ -43,6 +43,10 @@
                 android:textAlignment="center"
                 android:id="@+id/goalTextview"/>
 
+            <View
+                android:layout_width="8dp"
+                android:layout_height="0dp"/>
+
             <TextView
                 android:layout_width="@dimen/add_buttons_width"
                 android:layout_height="@dimen/add_buttons_height"
