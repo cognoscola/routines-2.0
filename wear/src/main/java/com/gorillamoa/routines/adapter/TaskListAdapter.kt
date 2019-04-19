@@ -2,16 +2,17 @@ package com.gorillamoa.routines.adapter
 
 import android.graphics.Paint
 import android.graphics.Typeface
-import android.util.Log
+import android.os.SystemClock
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
+
 import androidx.recyclerview.widget.RecyclerView
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.data.Task
+import java.lang.Exception
 import java.util.*
 
 //TODO Comment this shit
@@ -35,28 +36,70 @@ class TaskListAdapter(
         private val scheduledCallback:((Int,Boolean)->Any?)? = null,
         private val addButtonCallback:(()->Any?)? = null): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    @Suppress("unused")
     private val tag:String = TaskListAdapter::class.java.name
 
     private var tasks:List<Task>? = null          //All tasks to display
-    private var done:ArrayDeque<Int>? = null      //A list of tasks to mark as done
-    private var remaining:ArrayDeque<Int>? = null //A list of tasks to mark as not done
-
+    private var finished:ArrayDeque<Int>? = null      //A list of tasks to mark as finished
+    private var unfinished:ArrayDeque<Int>? = null //A list of tasks to mark as not finished
 
     private var mode = MODE_DAILY
+    private var lastTimeTouch = 0L
+    private var lastInteractedItemPosition = -1
+
+    /**
+     * Have we recently interacted with an item on this list?
+     */
+    private fun recentlyInteracted():Boolean = (SystemClock.uptimeMillis() - lastTimeTouch) < 1000
 
     /**
      * Recieve task data
      * @param task is the list of tasks to display
-     * @param unfinished all tasks not done
-     * @param finished all tasks done
+     * @param unfinished all tasks not finished
+     * @param finished all tasks finished
      */
     fun setTaskData(task:List<Task>, unfinished:ArrayDeque<Int>, finished:ArrayDeque<Int>){
 
         tasks = task
-        remaining = unfinished
-        done = finished
-
+        this.unfinished = unfinished
+        this.finished = finished
         notifyDataSetChanged()
+    }
+
+    /**
+     * Update a list of finished tasks
+     * @param finished is the new list of finished items
+     * It is likely that this list will change when the user interacts with the Listview (and
+     * not by other means) so that means only one item changed. But it its not the case then
+     * just update all items.
+     */
+    fun updateFinishedList(finished: ArrayDeque<Int>){
+
+        this.finished = finished
+
+        if (recentlyInteracted()) {
+            notifyItemChanged(lastInteractedItemPosition)
+        }else{
+            notifyDataSetChanged()
+        }
+    }
+
+
+    /**
+     * Update a list of finished tasks
+     * @param unfinished is the new list of finished items
+     * It is likely that this list will change when the user interacts with the ListView (and
+     * not by other means) so that means only one item changed. But it its not the case then
+     * just update all items.
+     */
+    fun updateRemainingList(unfinished: ArrayDeque<Int>) {
+
+        this.unfinished = unfinished
+        if (recentlyInteracted()) {
+            notifyItemChanged(lastInteractedItemPosition)
+        }else {
+            notifyDataSetChanged()
+        }
     }
 
 
@@ -86,12 +129,17 @@ class TaskListAdapter(
         notifyDataSetChanged()
     }
 
+
     /**
      * get the number of items to display.
      * note that we show an extra for the title, hence the +1
      */
     override fun getItemCount(): Int {
-        return (tasks?.size ?:0) + 1
+        val scheduledCount = ((finished?.size?:0) + (unfinished?.size?:0))
+        if (scheduledCount > (tasks?.size)?:0) {
+            throw Exception("Woops! Schedule Count cannot be greater than the total existing tasks")
+        }
+        return scheduledCount + 1
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -140,31 +188,30 @@ class TaskListAdapter(
 
     private fun styleForAllAppearance(holder: TaskItemHolder, task: Task, position: Int) {
 
-
         if (isScheduled(task)) {
 
             holder.iconImageView.setImageResource(if(isScheduled(task))R.drawable.ic_schedule_black_24dp else R.drawable.ic_remove_black_24dp)
             holder.iconImageView.setOnClickListener {
-                Toast.makeText(holder.iconImageView.context,"Unscheduling: ${task.name} [$position]",Toast.LENGTH_SHORT).show()
+                recordLastInteraction(position)
+                scheduledCallback?.invoke(task.id!!,false)
             }
 
         }else{
             holder.iconImageView.setImageResource(if(isScheduled(task))R.drawable.ic_schedule_black_24dp else R.drawable.ic_remove_black_24dp)
             holder.iconImageView.setOnClickListener {
-                Toast.makeText(holder.iconImageView.context,"Scheduling: ${task.name} [$position]",Toast.LENGTH_SHORT).show()
-//                completionCallback.invoke(task.id?:-1, false)
-//                notifyItemChanged(position)
+                recordLastInteraction(position)
+                scheduledCallback?.invoke(task.id!!,true)
             }
         }
+    }
 
-
+    private fun recordLastInteraction(position: Int) {
+        lastTimeTouch = SystemClock.uptimeMillis()
+        lastInteractedItemPosition = position
     }
 
     private fun isScheduled(task:Task):Boolean{
-
-
-        return (done?.contains(task.id)?:false).or(remaining?.contains(task.id)?:false)
-
+        return (finished?.contains(task.id)?:false).or(unfinished?.contains(task.id)?:false)
     }
 
     private fun changeToUnknown(holder:TaskItemHolder){
@@ -181,35 +228,32 @@ class TaskListAdapter(
         holder.taskTextView.paintFlags = holder.taskTextView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
     }
 
+    /**
+     * Style the item for display as scheduled task
+     */
     private fun styleForDailyAppearance(holder:TaskItemHolder,task:Task,position: Int){
-        if (done?.contains(task.id) == true) {
-            changeToDone(holder)
-            holder.iconImageView.setOnClickListener {
 
-                if (done?.removeFirstOccurrence(task.id) == true) {
-                    remaining!!.add(task.id)
+        if (isScheduled(task)) {
+
+            if (finished?.contains(task.id) == true) {
+                changeToDone(holder)
+
+                holder.iconImageView.setOnClickListener {
+                    recordLastInteraction(position)
+                    completionCallback?.invoke(task.id?:-1, false)
                 }
-                Log.d("onBindViewHolder","Clicked Icon: ${task.id}, ${task.name}")
-                completionCallback?.invoke(task.id?:-1, false)
-                notifyItemChanged(position)
-            }
 
-        }else if (remaining?.contains(task.id)== true){
-            changeToUndone(holder)
-            holder.iconImageView.setOnClickListener {
-
-                if (remaining?.removeFirstOccurrence(task.id)==true) {
-                    done!!.add(task.id)
+            }else if (unfinished?.contains(task.id)== true){
+                changeToUndone(holder)
+                holder.iconImageView.setOnClickListener {
+                    recordLastInteraction(position)
+                    completionCallback?.invoke(task.id?:-1, true)
                 }
-                completionCallback?.invoke(task.id?:-1, true)
-                notifyItemChanged(position)
+            }else{
+                //we don't know if this task is finished or not!
+                changeToUnknown(holder)
             }
-
-        }else{
-            //we don't know if this task is done or not!
-            changeToUnknown(holder)
         }
-
     }
 
 
@@ -219,13 +263,13 @@ class TaskListAdapter(
 
     inner class TaskItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
          var taskTextView: TextView = itemView.findViewById(R.id.taskNameTextView)
-        var iconImageView = itemView.findViewById<ImageView>(R.id.iconTextView)
+        var iconImageView:ImageView = itemView.findViewById(R.id.iconTextView)
     }
 
     inner class TitleViewHolder(item:View):RecyclerView.ViewHolder(item){
 
-        var headerTextView = item.findViewById<TextView>(R.id.headerTextView)
-        var addButton = item.findViewById<ImageView>(R.id.addButton)
+        var headerTextView:TextView = item.findViewById(R.id.headerTextView)
+        var addButton:ImageView = item.findViewById(R.id.addButton)
 
     }
 }

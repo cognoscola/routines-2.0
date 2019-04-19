@@ -1,6 +1,7 @@
 package com.gorillamoa.routines.activity
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
@@ -10,11 +11,8 @@ import androidx.wear.ambient.AmbientModeSupport
 import androidx.wear.widget.WearableLinearLayoutManager
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.adapter.DrawerAdapter
-import com.gorillamoa.routines.adapter.MODE_ALL
-import com.gorillamoa.routines.adapter.MODE_DAILY
 import com.gorillamoa.routines.adapter.TaskListAdapter
-import com.gorillamoa.routines.extensions.getCompletedTaskList
-import com.gorillamoa.routines.extensions.getDayTaskList
+import com.gorillamoa.routines.extensions.*
 import com.gorillamoa.routines.scheduler.TaskScheduler
 import com.gorillamoa.routines.viewmodel.TaskViewModel
 import kotlinx.android.synthetic.main.activity_task_list.*
@@ -22,13 +20,25 @@ import java.util.*
 
 //TODO the listview doesn't stretch out to the end and start edges of the activity. Make it so.
 //TODO handle use case where user interacts with notification, while on this app. One option is to remove the notification
-
 //TODO create a TASK EMPTY VIEW
 
 
 class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider {
 
     private lateinit var taskViewModel: TaskViewModel
+
+    private val preferenceListener= SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+
+        if (key == getTaskListKey()) {
+            (taskListWearableRecyclerView?.adapter as TaskListAdapter).updateRemainingList(getDayTaskList())
+        }
+
+        if (key == getTaskFinishedKey()) {
+            (taskListWearableRecyclerView?.adapter as TaskListAdapter).updateFinishedList(getCompletedTaskList())
+        }
+
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +73,6 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
 
                         Log.d("onCreate", "Clicked task $it")
                         startActivity(Intent(this@TaskListActivity, TaskViewActivity::class.java))
-
                     },
                     completionCallback = { tid, isDone ->
                         //TODO REMOVE THE NOTIFICATION IF IT EXISTS
@@ -72,12 +81,14 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
                         } else {
                             TaskScheduler.uncompleteTask(context, tid)
                         }
-
                     },
                     scheduledCallback = { id, isScheduled ->
 
-
-
+                        if (isScheduled) {
+                            TaskScheduler.scheduleTask(this@TaskListActivity,id)
+                        }else{
+                            TaskScheduler.unscheduleTask(this@TaskListActivity,id)
+                        }
 
                     },
                     addButtonCallback = {
@@ -87,6 +98,9 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
                     }
             )
             layoutManager = WearableLinearLayoutManager(this@TaskListActivity)
+
+
+
 
 
             //TODO make the navigation drawer open as the user finishes scrolling to the top
@@ -106,8 +120,15 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
             controller.peekDrawer()
         }
 
+
+        getLocalSettings().registerOnSharedPreferenceChangeListener(preferenceListener)
         // Enables Always-on
         //setAmbientEnabled()
+    }
+
+    override fun onDestroy() {
+        getLocalSettings().unregisterOnSharedPreferenceChangeListener(preferenceListener)
+        super.onDestroy()
     }
 
     private var mAmbientController: AmbientModeSupport.AmbientController? = null
@@ -133,7 +154,4 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
             Log.d("onUpdateAmbient","")
         }
     }
-
-
-
 }

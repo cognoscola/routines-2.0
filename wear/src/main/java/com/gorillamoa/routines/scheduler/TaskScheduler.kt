@@ -29,14 +29,6 @@ class TaskScheduler{
     //TODO account for day's progress. For now we'll just try to see # of tasks completed
     //TODO reset at the wake up alarm
 
-    /**
-     * Has the scheduler already scheduled tasks?
-     */
-    private enum class State {
-
-        Unschedule, //the scheduler has not scheduled anything
-        Scheduled, //the scheduler has scheduled for the dayy
-    }
 
     companion object {
 
@@ -76,6 +68,41 @@ class TaskScheduler{
                 scheduleCallback.invoke(StringBuilder().stringifyTasks(taskList))
             }
         }
+
+        /**
+         * Unschedule a specified Task.
+         * @param tid is the task id
+         */
+        fun unscheduleTask(context:Context, tid:Int){
+
+            val unfinished = context.getDayTaskList()
+            if (unfinished.contains(tid)) {
+                unfinished.remove(tid)
+                context.saveTaskList(unfinished)
+            }
+
+            val finished = context.getCompletedTaskList()
+            if (finished.contains(tid)) {
+                finished.remove(tid)
+                context.saveCompletedTaskList(finished)
+            }
+        }
+
+        /**
+         * Schedule a specific task indicated by the user
+         * @param tid is the task id
+         */
+        fun scheduleTask(context:Context, tid:Int){
+
+            //TODO determine where to put this (which order)
+            //for now just put it at the end
+            context.apply {
+                val unfinished = getDayTaskList()
+                unfinished.add(tid)
+                saveTaskList(unfinished)
+            }
+        }
+
 
         /**
          * The user has approved the schedule and so now we can begin assigning tasks

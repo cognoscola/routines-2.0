@@ -172,6 +172,23 @@ fun Context.saveTaskList(queue:ArrayDeque<Int>){
     }
 }
 
+
+/**
+ * save completed task list
+ * @param queue is the completed task list
+ */
+fun Context.saveCompletedTaskList(queue:ArrayDeque<Int>){
+    if (queue.size > 0) {
+
+        val prefs = getLocalSettings()
+        val taskString = queue.joinToString(",")
+        Log.d("saveTaskList","Scheduled Tasks: $taskString")
+        prefs.edit()
+                .putString(TASK_DONE,taskString).apply()
+    }
+}
+
+
 fun Context.saveTaskLists(queue:ArrayDeque<Int>,completed:ArrayDeque<Int>){
     val prefs = getLocalSettings()
     prefs.edit().apply{
@@ -187,6 +204,11 @@ fun Context.saveTaskLists(queue:ArrayDeque<Int>,completed:ArrayDeque<Int>){
         apply()
     }
 }
+
+fun Context.getTaskListKey() = TASK_ORDER
+fun Context.getTaskFinishedKey() = TASK_DONE
+
+
 
 
 fun Context.getCompletedTaskList():ArrayDeque<Int>{
