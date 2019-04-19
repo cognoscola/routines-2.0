@@ -3,6 +3,7 @@ package com.gorillamoa.routines.adapter
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.SystemClock
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +14,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.data.Task
 import java.lang.Exception
+import java.lang.StringBuilder
 import java.util.*
+import kotlin.collections.ArrayList
 
 //TODO Comment this shit
 
@@ -42,6 +45,7 @@ class TaskListAdapter(
     private var tasks:List<Task>? = null          //All tasks to display
     private var finished:ArrayDeque<Int>? = null      //A list of tasks to mark as finished
     private var unfinished:ArrayDeque<Int>? = null //A list of tasks to mark as not finished
+    private var order : ArrayList<Int> = ArrayList()
 
     private var mode = MODE_DAILY
     private var lastTimeTouch = 0L
@@ -63,6 +67,7 @@ class TaskListAdapter(
         tasks = task
         this.unfinished = unfinished
         this.finished = finished
+        calculateOrder()
         notifyDataSetChanged()
     }
 
@@ -76,11 +81,34 @@ class TaskListAdapter(
     fun updateFinishedList(finished: ArrayDeque<Int>){
 
         this.finished = finished
+       // calculateOrder()
 
         if (recentlyInteracted()) {
             notifyItemChanged(lastInteractedItemPosition)
         }else{
+            calculateOrder()
             notifyDataSetChanged()
+        }
+    }
+
+    private fun calculateOrder(){
+
+        order.clear()
+        when (mode) {
+            MODE_DAILY -> {
+                tasks?.forEachIndexed { index, task ->
+
+                    if (isScheduled(task)) {
+                        order.add(index)
+                    }
+                }
+            }
+            MODE_ALL ->{
+
+                tasks?.forEachIndexed { index, _ ->
+                    order.add(index)
+                }
+            }
         }
     }
 
@@ -98,6 +126,7 @@ class TaskListAdapter(
         if (recentlyInteracted()) {
             notifyItemChanged(lastInteractedItemPosition)
         }else {
+            calculateOrder()
             notifyDataSetChanged()
         }
     }
@@ -121,11 +150,13 @@ class TaskListAdapter(
 
     fun setDailyMode(){
         mode = MODE_DAILY
+        calculateOrder()
         notifyDataSetChanged()
     }
 
     fun setAllMode(){
         mode = MODE_ALL
+        calculateOrder()
         notifyDataSetChanged()
     }
 
@@ -135,11 +166,23 @@ class TaskListAdapter(
      * note that we show an extra for the title, hence the +1
      */
     override fun getItemCount(): Int {
-        val scheduledCount = ((finished?.size?:0) + (unfinished?.size?:0))
-        if (scheduledCount > (tasks?.size)?:0) {
-            throw Exception("Woops! Schedule Count cannot be greater than the total existing tasks")
+
+        return when (mode) {
+            MODE_ALL ->{
+                 ((tasks?.size)?:0) + 1
+            }
+            MODE_DAILY ->{
+                val scheduledCount = ((finished?.size?:0) + (unfinished?.size?:0))
+                if (scheduledCount > (tasks?.size)?:0) {
+                    throw Exception("Woops! Schedule Count cannot be greater than the total existing tasks")
+                }
+                 scheduledCount + 1
+            }
+            else ->{
+                 1
+            }
         }
-        return scheduledCount + 1
+
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -169,7 +212,7 @@ class TaskListAdapter(
 
                 holder.apply {
 
-                    val task =  tasks!![position - 1]
+                    val task =  tasks!![order[position - 1]]
                     taskTextView.text = task.name
 
                     when(mode){
@@ -187,6 +230,8 @@ class TaskListAdapter(
     }
 
     private fun styleForAllAppearance(holder: TaskItemHolder, task: Task, position: Int) {
+
+        uncrossLetters(holder.taskTextView)
 
         if (isScheduled(task)) {
 
@@ -225,7 +270,11 @@ class TaskListAdapter(
 
     private fun changeToUndone(holder:TaskItemHolder){
         holder.iconImageView.setImageResource(R.drawable.ic_radio_button_unchecked_black_24dp)
-        holder.taskTextView.paintFlags = holder.taskTextView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+        uncrossLetters(holder.taskTextView)
+    }
+
+    private fun uncrossLetters(textView: TextView) {
+        textView.paintFlags = textView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
     }
 
     /**

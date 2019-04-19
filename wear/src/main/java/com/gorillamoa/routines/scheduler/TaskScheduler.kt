@@ -28,8 +28,6 @@ class TaskScheduler{
 
     //TODO account for day's progress. For now we'll just try to see # of tasks completed
     //TODO reset at the wake up alarm
-
-
     companion object {
 
         /**

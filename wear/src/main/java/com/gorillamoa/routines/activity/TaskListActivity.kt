@@ -36,7 +36,6 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
         if (key == getTaskFinishedKey()) {
             (taskListWearableRecyclerView?.adapter as TaskListAdapter).updateFinishedList(getCompletedTaskList())
         }
-
     }
 
 
@@ -46,22 +45,14 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
 
         mAmbientController = AmbientModeSupport.attach(this@TaskListActivity)
         taskViewModel = ViewModelProviders.of(this@TaskListActivity).get(TaskViewModel::class.java)
-
-        val unfinished = getDayTaskList()
-        val finished = getCompletedTaskList()
-        val combined = ArrayDeque<Int>()
-
-        if(unfinished.isNotEmpty())unfinished.forEach { combined.add(it) }
-        if(finished.isNotEmpty())finished.forEach { combined.add(it) }
-
-        taskViewModel.loadTasks(combined)
+        taskViewModel.loadTasks()
         taskViewModel.tasks.observe(this, Observer {
 
             //TODO fetch only scheduled tasks!!
             (taskListWearableRecyclerView?.adapter as TaskListAdapter).setTaskData(
                     it,
-                    unfinished,
-                    finished
+                    getDayTaskList(),
+                    getCompletedTaskList()
             )
         })
 
