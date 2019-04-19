@@ -35,22 +35,22 @@ class TaskAddActivity : FragmentActivity() {
                             TaskType.TYPE_GOAL -> {
 
                                 //name
+                                showNamePickFragment()
                                 //Achieve by: a date
                                 //How often would you like to pick
-                                showNamePickFragment()
                             }
                             TaskType.TYPE_HABIT -> {
 
                                 //name
-                                //How often would you like to perform
                                 showNamePickFragment()
+                                //How often would you like to perform
 
                             }
                             TaskType.TYPE_UNKNOWN -> {
 
                                 //name
-                                //When should this happen?
                                 showNamePickFragment()
+                                //When should this happen?
                             }
                         }
                     }
@@ -64,6 +64,9 @@ class TaskAddActivity : FragmentActivity() {
                 .replace(R.id.fragmentContainerFrameLayout,NamePickerFragment.newInstance {
                     name = it
                     Log.d("showNamePickFragment","Name is: $it")
+
+                    //now we
+
 
                 } )
                 .commit()

@@ -45,7 +45,6 @@ fun Context.getLocalSettings():SharedPreferences{
 /**
  * Convenient method save into preferences the alarm time
  */
-
 //TODO Truncate these 2 methods below
 fun Context.saveWakeTime(hour:Int, minute:Int,phase:Int){
     val prefs= getLocalSettings()
@@ -103,7 +102,6 @@ fun Context.isTimerAlarmActive():Boolean{
     return getLocalSettings().getBoolean(isTimerAlarmActive,false)
 }
 
-
 //clean truncate these
 fun Context.saveRecognitionStatus(isRecogOn:Boolean){
     val prefs = getLocalSettings()
@@ -155,21 +153,23 @@ fun Context.saveAlarmTimerTriggerStatus(isAlarmSet:Boolean){
 }
 
 
-
-
 /**
  * save task list
  * @param queue is the task list
  */
-fun Context.saveTaskList(queue:ArrayDeque<Int>){
-    if (queue.size > 0) {
+fun Context.saveTaskList(queue:ArrayDeque<Int>) {
 
+    try {
         val prefs = getLocalSettings()
         val taskString = queue.joinToString(",")
-        Log.d("saveTaskList","Scheduled Tasks: $taskString")
+        Log.d("saveTaskList", "Scheduled Tasks: $taskString")
         prefs.edit()
-            .putString(TASK_ORDER,taskString).apply()
+                .putString(TASK_ORDER, taskString).apply()
+
+    } catch (e: Exception) {
+        Log.e("saveTaskList","Could not update task list",e)
     }
+
 }
 
 
@@ -177,15 +177,18 @@ fun Context.saveTaskList(queue:ArrayDeque<Int>){
  * save completed task list
  * @param queue is the completed task list
  */
-fun Context.saveCompletedTaskList(queue:ArrayDeque<Int>){
-    if (queue.size > 0) {
+fun Context.saveCompletedTaskList(queue:ArrayDeque<Int>) {
 
+    try {
         val prefs = getLocalSettings()
         val taskString = queue.joinToString(",")
-        Log.d("saveTaskList","Scheduled Tasks: $taskString")
+        Log.d("saveTaskList", "Scheduled Tasks: $taskString")
         prefs.edit()
-                .putString(TASK_DONE,taskString).apply()
+                .putString(TASK_DONE, taskString).apply()
+    } catch (e: Exception) {
+        Log.e("saveCompletedTaskList","Could not update task list",e)
     }
+
 }
 
 

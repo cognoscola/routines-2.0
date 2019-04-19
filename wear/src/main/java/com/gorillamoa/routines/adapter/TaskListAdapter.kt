@@ -181,10 +181,7 @@ class TaskListAdapter(
         return when (mode) {
             MODE_DAILY ->{
                 val scheduledCount = ((finished?.size?:0) + (unfinished?.size?:0))
-                if (scheduledCount > (tasks?.size)?:0) {
-                    throw Exception("Woops! Schedule Count cannot be greater than the total existing tasks")
-                }
-                 scheduledCount + 1
+                scheduledCount + 1
             }
             else ->{
                 ((tasks?.size)?:0) + 1
