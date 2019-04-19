@@ -16,7 +16,6 @@ import com.gorillamoa.routines.extensions.*
 import com.gorillamoa.routines.scheduler.TaskScheduler
 import com.gorillamoa.routines.viewmodel.TaskViewModel
 import kotlinx.android.synthetic.main.activity_task_list.*
-import java.util.*
 
 //TODO the listview doesn't stretch out to the end and start edges of the activity. Make it so.
 //TODO handle use case where user interacts with notification, while on this app. One option is to remove the notification
@@ -62,10 +61,10 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
 
                     itemClickedCallback = {
 
-                        Log.d("onCreate", "Clicked task $it")
                         startActivity(Intent(this@TaskListActivity, TaskViewActivity::class.java))
                     },
                     completionCallback = { tid, isDone ->
+
                         //TODO REMOVE THE NOTIFICATION IF IT EXISTS
                         if (isDone) {
                             TaskScheduler.completeTask(context, tid)
@@ -80,18 +79,19 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
                         }else{
                             TaskScheduler.unscheduleTask(this@TaskListActivity,id)
                         }
-
                     },
-                    addButtonCallback = {
+
+                    addButtonCallback = { isExisting -> //pick a task from existing tasks
 
                         //add button call back
-                        startActivity(Intent(this@TaskListActivity, TaskAddActivity::class.java))
+                        if (isExisting) {
+                            (adapter as TaskListAdapter).setPickerMode()
+                        }else{
+                            startActivity(Intent(this@TaskListActivity, TaskAddActivity::class.java))
+                        }
                     }
             )
             layoutManager = WearableLinearLayoutManager(this@TaskListActivity)
-
-
-
 
 
             //TODO make the navigation drawer open as the user finishes scrolling to the top

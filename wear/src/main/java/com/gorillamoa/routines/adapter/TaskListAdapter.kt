@@ -1,9 +1,9 @@
 package com.gorillamoa.routines.adapter
 
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.SystemClock
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.data.Task
 import java.lang.Exception
-import java.lang.StringBuilder
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -22,6 +21,7 @@ import kotlin.collections.ArrayList
 
 const val MODE_DAILY = 0 //Showing the day's tasks
 const val MODE_ALL = 1   //Showing all tasks
+const val MODE_PICKER = 2 //pick an existing unscheduled task
 
 /**
  * Shows a list of tasks.
@@ -37,7 +37,7 @@ class TaskListAdapter(
         private val itemClickedCallback:((Int)->Unit)? = null,
         private val completionCallback:((Int, Boolean)->Any?)? =null,
         private val scheduledCallback:((Int,Boolean)->Any?)? = null,
-        private val addButtonCallback:(()->Any?)? = null): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+        private val addButtonCallback:((Boolean)->Any?)? = null): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     @Suppress("unused")
     private val tag:String = TaskListAdapter::class.java.name
@@ -103,12 +103,10 @@ class TaskListAdapter(
                     }
                 }
             }
-            MODE_ALL ->{
+            else -> {tasks?.forEachIndexed { index, _ ->
+                order.add(index)
+            }}
 
-                tasks?.forEachIndexed { index, _ ->
-                    order.add(index)
-                }
-            }
         }
     }
 
@@ -148,14 +146,26 @@ class TaskListAdapter(
         }
     }
 
+    /**
+     * Display items on this list as if viewing DAILY tasks
+     */
     fun setDailyMode(){
         mode = MODE_DAILY
         calculateOrder()
         notifyDataSetChanged()
     }
 
+    /**
+     * Display items on this list as if viewing ALL tasks
+     */
     fun setAllMode(){
         mode = MODE_ALL
+        calculateOrder()
+        notifyDataSetChanged()
+    }
+
+    fun setPickerMode(){
+        mode = MODE_PICKER
         calculateOrder()
         notifyDataSetChanged()
     }
@@ -164,13 +174,11 @@ class TaskListAdapter(
     /**
      * get the number of items to display.
      * note that we show an extra for the title, hence the +1
+     * @return the number of items to display
      */
     override fun getItemCount(): Int {
 
         return when (mode) {
-            MODE_ALL ->{
-                 ((tasks?.size)?:0) + 1
-            }
             MODE_DAILY ->{
                 val scheduledCount = ((finished?.size?:0) + (unfinished?.size?:0))
                 if (scheduledCount > (tasks?.size)?:0) {
@@ -179,25 +187,44 @@ class TaskListAdapter(
                  scheduledCount + 1
             }
             else ->{
-                 1
+                ((tasks?.size)?:0) + 1
             }
         }
-
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+
         tasks?.let {
 
             if (holder is TitleViewHolder) {
 
+                holder.addButton.setColorFilter(Color.WHITE)
                 val titleString = when (mode) {
                     MODE_DAILY ->{
+
+
+                        holder.addButton.setOnClickListener {
+                            addButtonCallback?.invoke(true)
+                        }
+
                         holder.headerTextView.context.getString(
-                                if(tasks!!.isNotEmpty())
-                                    R.string.task_list_title else R.string.task_list_empty)
+                                if(order!!.isNotEmpty()) R.string.task_list_title else R.string.task_list_empty)
                     }
+
+
                     MODE_ALL->{
-                        holder.headerTextView.context.getString(R.string.task_all)
+                        holder.addButton.setOnClickListener {
+                            addButtonCallback?.invoke(false)
+                        }
+                        if(tasks!!.isNotEmpty())holder.headerTextView.context.getString(R.string.task_all) else holder.headerTextView.context.getString(R.string.task_all_empty)
+
+                    }
+
+                    MODE_PICKER->{
+                        holder.addButton.setOnClickListener {
+                            addButtonCallback?.invoke(false)
+                        }
+                        holder.headerTextView.context.getString(R.string.task_pick)
                     }
                     else -> {""}
 
@@ -205,7 +232,7 @@ class TaskListAdapter(
 
                 holder.headerTextView.text = titleString
                 holder.headerTextView.setTypeface(holder.headerTextView.typeface, Typeface.BOLD)
-                holder.addButton.setOnClickListener { addButtonCallback?.invoke() }
+
             }
 
             if (holder is TaskItemHolder) {
@@ -216,22 +243,61 @@ class TaskListAdapter(
                     taskTextView.text = task.name
 
                     when(mode){
-                        MODE_DAILY -> styleForDailyAppearance(holder,task,position)
-                        MODE_ALL -> styleForAllAppearance(holder,task,position)
+                        MODE_DAILY -> {
+                            styleForDailyAppearance(holder,task,position)
+                            taskTextView.setOnClickListener {
+                                itemClickedCallback?.invoke(task.id?:-1)
+                            }
+                        }
+                        MODE_ALL -> {
+                            styleForAllAppearance(holder,task,position)
+                            taskTextView.setOnClickListener {
+                                itemClickedCallback?.invoke(task.id?:-1)
+                            }
 
-                    }
-
-                    taskTextView.setOnClickListener {
-                        itemClickedCallback?.invoke(task.id?:-1)
+                        }
+                        MODE_PICKER -> styleForPicking(holder,task)
                     }
                 }
             }
         }
     }
 
+    private fun styleForPicking(holder: TaskItemHolder, task: Task) {
+        uncrossLetters(holder.taskTextView)
+        if (isScheduled(task)) {
+
+            holder.iconImageView.setImageResource(R.drawable.ic_schedule_black_24dp )
+            holder.iconImageView.setColorFilter(Color.DKGRAY)
+            holder.taskTextView.setTextColor(Color.DKGRAY)
+
+        }else{
+            useDefaultColorFilters(holder)
+            holder.iconImageView.setImageResource(R.drawable.ic_remove_black_24dp)
+            holder.iconImageView.setOnClickListener {
+                scheduleAndGoBack(task)
+            }
+            holder.taskTextView.setOnClickListener {
+                scheduleAndGoBack(task)
+            }
+        }
+    }
+
+    private fun scheduleAndGoBack(task:Task){
+        scheduledCallback?.invoke(task.id!!, true)
+        setDailyMode()
+
+    }
+
+    private fun useDefaultColorFilters(holder: TaskItemHolder) {
+        holder.iconImageView.setColorFilter(Color.WHITE)
+        holder.taskTextView.setTextColor(Color.WHITE)
+    }
+
     private fun styleForAllAppearance(holder: TaskItemHolder, task: Task, position: Int) {
 
         uncrossLetters(holder.taskTextView)
+        useDefaultColorFilters(holder)
 
         if (isScheduled(task)) {
 
@@ -281,6 +347,8 @@ class TaskListAdapter(
      * Style the item for display as scheduled task
      */
     private fun styleForDailyAppearance(holder:TaskItemHolder,task:Task,position: Int){
+
+        useDefaultColorFilters(holder)
 
         if (isScheduled(task)) {
 

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark_grey"
+    android:background="@drawable/ic_gradient_bg"
     android:padding="@dimen/box_inset_layout_padding"
     tools:context=".activity.TaskListActivity"
     tools:deviceIds="wear">
@@ -15,7 +15,6 @@
         android:paddingStart="30dp"
         android:paddingEnd="30dp"
         android:id="@+id/taskListWearableRecyclerView"
-        tools:background="#B95F5F"
         android:nestedScrollingEnabled="true">
     </androidx.wear.widget.WearableRecyclerView>
 
@@ -24,8 +23,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:navigationStyle="singlePage"
+
 />
-<!--        app:peekView="@layout/drawer_peek_content"
+<!--        ap  p:peekView="@layout/drawer_peek_content"
         app:peek_view="@layout/drawer_peek_content"-->
           <!--/>-->
 

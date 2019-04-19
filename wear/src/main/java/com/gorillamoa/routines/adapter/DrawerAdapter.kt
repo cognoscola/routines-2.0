@@ -2,8 +2,9 @@ package com.gorillamoa.routines.adapter
 
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
-import android.util.Log
 import androidx.wear.widget.drawer.WearableNavigationDrawerView
 import com.gorillamoa.routines.R
 
@@ -19,12 +20,18 @@ class DrawerAdapter internal constructor(private val mContext: Context) : Wearab
     }
 
     override fun getItemDrawable(index: Int): Drawable {
+
+
         return mContext.getDrawable(when(index) {
             0 -> R.drawable.ic_wb_sunny_black_24dp
             1 -> R.drawable.ic_format_list_bulleted_black_24dp
             else -> R.drawable.ic_extension_black_24dp
-        })!!
+        })!!.apply {
+            setColorFilter(Color.WHITE,PorterDuff.Mode.CLEAR)
+        }
     }
+
+
 
 /*
     override fun onItemSelected(index: Int) {
