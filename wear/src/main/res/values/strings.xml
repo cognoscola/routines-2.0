@@ -54,6 +54,8 @@
     <string name="select">"Select"</string>
     <string name="name">Name</string>
     <string name="Empty_error">This cannot be empty!</string>
+    <string name="frequency_title">I will perform:</string>
+    <string name="frequency_per">Per:</string>
 
     <!-- TODO: Remove or change this placeholder text -->
 
