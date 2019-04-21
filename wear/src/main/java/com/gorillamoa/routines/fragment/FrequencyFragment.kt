@@ -1,10 +1,12 @@
 package com.gorillamoa.routines.fragment
 
+import android.content.Context
 import android.os.Bundle
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
@@ -13,6 +15,7 @@ import androidx.recyclerview.widget.SnapHelper
 
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.adapter.FrequencyPickerAdapter
+import com.gorillamoa.routines.adapter.OffsetItemDecoration
 import kotlinx.android.synthetic.main.fragment_frequency_picker.*
 
 class FrequencyFragment : Fragment() {
@@ -37,6 +40,7 @@ class FrequencyFragment : Fragment() {
                 orientation = GridLayoutManager.HORIZONTAL
                 scrollToPosition(0)
             }
+            addItemDecoration(OffsetItemDecoration(getWindowManager()))
         }
         snapHelperAmount.attachToRecyclerView(recyclerAmount)
 
@@ -46,6 +50,7 @@ class FrequencyFragment : Fragment() {
                 orientation = GridLayoutManager.HORIZONTAL
                 scrollToPosition(0)
             }
+            addItemDecoration(OffsetItemDecoration(getWindowManager()))
         }
 
         snapHelperTime.attachToRecyclerView(recyclerTime)
@@ -56,6 +61,11 @@ class FrequencyFragment : Fragment() {
             submit?.invoke(1.0f)
         }
     }
+
+    private fun getWindowManager():WindowManager{
+        return context!!.getSystemService(Context.WINDOW_SERVICE)  as WindowManager
+    }
+
 
 
     companion object {
