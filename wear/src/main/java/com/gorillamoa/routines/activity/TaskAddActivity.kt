@@ -6,11 +6,10 @@ import androidx.fragment.app.FragmentActivity
 import androidx.wear.widget.BoxInsetLayout
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.data.TaskType
-import com.gorillamoa.routines.fragment.FrequencyFragment
+import com.gorillamoa.routines.fragment.FrequencyPickerFragment
 import com.gorillamoa.routines.fragment.NamePickerFragment
 import com.gorillamoa.routines.fragment.TypePickerFragment
 import kotlinx.android.synthetic.main.activity_task_add.*
-import kotlinx.android.synthetic.main.fragment_frequency_picker.*
 
 class TaskAddActivity : FragmentActivity() {
 
@@ -25,8 +24,9 @@ class TaskAddActivity : FragmentActivity() {
         Frequency
     }
 
-    lateinit var type: TaskType
+    lateinit var type:TaskType
     lateinit var name:String
+    var frequency:Float = 1.0f
 
     val editCallback:()->Any? = {
 
@@ -80,9 +80,34 @@ class TaskAddActivity : FragmentActivity() {
                     name = it
                     Log.d("showNamePickFragment","Name is: $it")
 
+                    when (type) {
+                        TaskType.TYPE_GOAL -> {
+
+                            //name
+                            //Achieve by: a date
+
+                            //How often would you like to pick
+                            showFrequencyFragment()
+                        }
+                        TaskType.TYPE_HABIT -> {
+
+
+                            //name
+                            showFrequencyFragment()
+                            //How often would you like to perform
+
+
+                        }
+                        TaskType.TYPE_UNKNOWN -> {
+
+                            //TODO schedule the task immediately
+                            //TODO close this window
+
+                        }
+                    }
+
 
                     //now we
-                    showFrequencyFragment()
 
                 } )
                 .commit()
@@ -91,12 +116,10 @@ class TaskAddActivity : FragmentActivity() {
     private fun showFrequencyFragment(){
 
         (fragmentContainerFrameLayout?.layoutParams as BoxInsetLayout.LayoutParams).boxedEdges = BoxInsetLayout.LayoutParams.BOX_TOP
-
-
         supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainerFrameLayout,FrequencyFragment.newInstance( {
+                .replace(R.id.fragmentContainerFrameLayout,FrequencyPickerFragment.newInstance( {
+                    frequency = it
                     Log.d("$tag showFrequencyFragment","Frequency: $it")
                 },editCallback)).commit()
-
     }
 }

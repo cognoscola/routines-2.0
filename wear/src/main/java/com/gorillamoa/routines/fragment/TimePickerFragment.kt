@@ -2,15 +2,14 @@ package com.gorillamoa.routines.fragment
 
 import android.os.Bundle
 import android.util.Log
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.adapter.TimePickerAdapter
-
 import kotlinx.android.synthetic.main.fragment_timepicker.*
 
 class TimePickerFragment: Fragment(){

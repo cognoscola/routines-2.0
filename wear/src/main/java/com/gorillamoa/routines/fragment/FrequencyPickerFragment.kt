@@ -14,12 +14,14 @@ import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 
 import com.gorillamoa.routines.R
-import com.gorillamoa.routines.adapter.FrequencyPickerAdapter
+import com.gorillamoa.routines.adapter.SimplePickerAdapter
 import com.gorillamoa.routines.adapter.OffsetItemDecoration
 import kotlinx.android.synthetic.main.fragment_frequency_picker.*
 
 
-class FrequencyFragment : Fragment() {
+
+
+class FrequencyPickerFragment : Fragment() {
 
     var submit:((Float)->Any?)? = null
 
@@ -39,12 +41,6 @@ class FrequencyFragment : Fragment() {
         val amountArray = arrayOf("Once", "Twice","3x","4x", "5x","10x")
 
         recyclerAmount?.apply {
-            adapter = FrequencyPickerAdapter(amountArray)
-            layoutManager =   GridLayoutManager(context, 1).apply {
-                orientation = GridLayoutManager.HORIZONTAL
-                scrollToPosition(0)
-            }
-            addItemDecoration(OffsetItemDecoration(getWindowManager()))
             val snapHelperAmount = DetectableLinearSnapHelper(this){ position ->
                 Log.d("$tag onViewCreated","Snapped To Pos:$position (${amountArray[position]})")
 
@@ -54,12 +50,27 @@ class FrequencyFragment : Fragment() {
                 frequency
             }
 
+
+            layoutManager =   GridLayoutManager(context, 1).apply {
+                orientation = GridLayoutManager.HORIZONTAL
+                scrollToPosition(0)
+            }
             snapHelperAmount.attachToRecyclerView(this)
+            adapter = SimplePickerAdapter(amountArray){view ->
+                val snapDistance = snapHelperAmount.calculateDistanceToFinalSnap(layoutManager!!, view)
+                if (snapDistance!![0] != 0 || snapDistance[1] != 0) {
+                    this.smoothScrollBy(snapDistance[0], snapDistance[1])
+                }
+            }
+
+            addItemDecoration(OffsetItemDecoration(getWindowManager()))
+
         }
 
+        //TODO Truncate these functions with above code
         val timeArray = arrayOf("Day", "2 Days","3 Days","Week","Month","2 Months","6 Months","Year" )
         recyclerTime?.apply {
-            adapter = FrequencyPickerAdapter(timeArray)
+            adapter = SimplePickerAdapter(timeArray)
             layoutManager =   GridLayoutManager(context, 1).apply {
                 orientation = GridLayoutManager.HORIZONTAL
                 scrollToPosition(0)
@@ -91,7 +102,7 @@ class FrequencyFragment : Fragment() {
     companion object {
 
         @JvmStatic
-        fun newInstance(callback:((Float)->Unit)?, editcallback:(()->Any?)? = null) = FrequencyFragment().apply {
+        fun newInstance(callback:((Float)->Unit)?, editcallback:(()->Any?)? = null) = FrequencyPickerFragment().apply {
             submit  = callback
         }
     }

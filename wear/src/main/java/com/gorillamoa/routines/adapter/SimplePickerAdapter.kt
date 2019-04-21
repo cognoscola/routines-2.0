@@ -12,7 +12,9 @@ import com.gorillamoa.routines.R
  * An adapter which will hold maxNumber of items
  * @param maxNumber the number of buttons to create
  */
-class FrequencyPickerAdapter(private val options:Array<String>): RecyclerView.Adapter<FrequencyPickerAdapter.TimeItem>(){
+class SimplePickerAdapter(
+        private val options:Array<String>,
+        private val itemClickedCallback:((View)->Any?)? = null): RecyclerView.Adapter<SimplePickerAdapter.TimeItem>(){
 
 
     override fun onBindViewHolder(holder: TimeItem, position: Int) {
@@ -20,10 +22,8 @@ class FrequencyPickerAdapter(private val options:Array<String>): RecyclerView.Ad
         holder.button.text = options[position]
         holder.button.setOnClickListener {
 
-            //TODO center
-
+            itemClickedCallback?.invoke(it)
         }
-
 
         /** for this button we'll animate alpha randomly **/
         holder.button.startAnimation(AlphaAnimation(0.0f,1.0f).apply {

@@ -11,7 +11,8 @@ data class Task(
 
         val type:TaskType = TaskType.TYPE_UNKNOWN,
         val name:String,
-        val description:String? = null
+        val description:String? = null,
+        val frequency:Float = 1.0f
 
 
         //TODO add addittional options
