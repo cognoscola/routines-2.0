@@ -6,9 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SnapHelper
 
 import com.gorillamoa.routines.R
-import kotlinx.android.synthetic.main.fragment_name_picker.*
+import com.gorillamoa.routines.adapter.FrequencyPickerAdapter
+import kotlinx.android.synthetic.main.fragment_frequency_picker.*
 
 class FrequencyFragment : Fragment() {
 
@@ -22,6 +27,28 @@ class FrequencyFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val snapHelperAmount = LinearSnapHelper()
+        val snapHelperTime = LinearSnapHelper()
+
+        recyclerAmount?.apply {
+            adapter = FrequencyPickerAdapter(arrayOf("Once", "Twice","3x","4x", "5x","10x" ,"Custom"))
+            layoutManager =   GridLayoutManager(context, 1).apply {
+                orientation = GridLayoutManager.HORIZONTAL
+                scrollToPosition(0)
+            }
+        }
+        snapHelperAmount.attachToRecyclerView(recyclerAmount)
+
+        recyclerTime?.apply {
+            adapter = FrequencyPickerAdapter(arrayOf("Day", "2 Days","3 Days","Week","Month","2 Months","6 Month","Year" ))
+            layoutManager =   GridLayoutManager(context, 1).apply {
+                orientation = GridLayoutManager.HORIZONTAL
+                scrollToPosition(0)
+            }
+        }
+
+        snapHelperTime.attachToRecyclerView(recyclerTime)
 
         submitButton.setOnClickListener {
 

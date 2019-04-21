@@ -12,14 +12,15 @@ import com.gorillamoa.routines.R
  * An adapter which will hold maxNumber of items
  * @param maxNumber the number of buttons to create
  */
-class FrequencyPickerAdapter(
-        private val options:List<String>): RecyclerView.Adapter<FrequencyPickerAdapter.TimeItem>(){
+class FrequencyPickerAdapter(private val options:Array<String>): RecyclerView.Adapter<FrequencyPickerAdapter.TimeItem>(){
 
 
     override fun onBindViewHolder(holder: TimeItem, position: Int) {
 
         holder.button.text = options[position]
         holder.button.setOnClickListener {
+
+            //TODO center
 
         }
 
@@ -39,7 +40,7 @@ class FrequencyPickerAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimeItem {
 
         val inflater = LayoutInflater.from(parent.context)
-        return TimeItem(inflater.inflate(R.layout.item_timepicker,parent,false))
+        return TimeItem(inflater.inflate(R.layout.item_frequencypicker,parent,false))
     }
 
 

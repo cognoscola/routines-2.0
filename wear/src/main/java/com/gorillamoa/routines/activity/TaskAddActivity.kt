@@ -3,11 +3,13 @@ package com.gorillamoa.routines.activity
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
+import androidx.wear.widget.BoxInsetLayout
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.data.TaskType
 import com.gorillamoa.routines.fragment.FrequencyFragment
 import com.gorillamoa.routines.fragment.NamePickerFragment
 import com.gorillamoa.routines.fragment.TypePickerFragment
+import kotlinx.android.synthetic.main.activity_task_add.*
 import kotlinx.android.synthetic.main.fragment_frequency_picker.*
 
 class TaskAddActivity : FragmentActivity() {
@@ -87,6 +89,9 @@ class TaskAddActivity : FragmentActivity() {
     }
 
     private fun showFrequencyFragment(){
+
+        (fragmentContainerFrameLayout?.layoutParams as BoxInsetLayout.LayoutParams).boxedEdges = BoxInsetLayout.LayoutParams.BOX_TOP.or(BoxInsetLayout.LayoutParams.BOX_BOTTOM)
+
 
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainerFrameLayout,FrequencyFragment.newInstance( {

@@ -55,7 +55,7 @@
     <string name="name">Name</string>
     <string name="Empty_error">This cannot be empty!</string>
     <string name="frequency_title">I will perform:</string>
-    <string name="frequency_per">Per:</string>
+    <string name="frequency_per">Every:</string>
 
     <!-- TODO: Remove or change this placeholder text -->
 
