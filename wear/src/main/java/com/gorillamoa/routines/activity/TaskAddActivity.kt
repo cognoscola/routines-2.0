@@ -90,7 +90,7 @@ class TaskAddActivity : FragmentActivity() {
 
     private fun showFrequencyFragment(){
 
-        (fragmentContainerFrameLayout?.layoutParams as BoxInsetLayout.LayoutParams).boxedEdges = BoxInsetLayout.LayoutParams.BOX_TOP.or(BoxInsetLayout.LayoutParams.BOX_BOTTOM)
+        (fragmentContainerFrameLayout?.layoutParams as BoxInsetLayout.LayoutParams).boxedEdges = BoxInsetLayout.LayoutParams.BOX_TOP
 
 
         supportFragmentManager.beginTransaction()
