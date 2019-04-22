@@ -12,9 +12,11 @@ data class Task(
         val type:TaskType = TaskType.TYPE_UNKNOWN,
         val name:String,
         val description:String? = null,
-        val frequency:Float = 1.0f
-
+        val frequency:Float = 1.0f,
+        val date:Long = 0L
 
         //TODO add addittional options
         //TODO add history
+
+
 )

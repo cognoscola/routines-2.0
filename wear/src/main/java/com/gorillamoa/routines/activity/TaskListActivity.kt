@@ -1,5 +1,6 @@
 package com.gorillamoa.routines.activity
 
+import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -12,10 +13,14 @@ import androidx.wear.widget.WearableLinearLayoutManager
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.adapter.DrawerAdapter
 import com.gorillamoa.routines.adapter.TaskListAdapter
+import com.gorillamoa.routines.data.Task
+import com.gorillamoa.routines.data.TaskType
+import com.gorillamoa.routines.data.TypeConverters
 import com.gorillamoa.routines.extensions.*
 import com.gorillamoa.routines.scheduler.TaskScheduler
 import com.gorillamoa.routines.viewmodel.TaskViewModel
 import kotlinx.android.synthetic.main.activity_task_list.*
+import java.lang.Exception
 
 //TODO the listview doesn't stretch out to the end and start edges of the activity. Make it so.
 //TODO handle use case where user interacts with notification, while on this app. One option is to remove the notification
@@ -23,8 +28,11 @@ import kotlinx.android.synthetic.main.activity_task_list.*
 
 
 class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider {
+    @Suppress("unused")
+    private val tag:String = TaskListActivity::class.java.name
 
     private lateinit var taskViewModel: TaskViewModel
+    private var isCreating = false
 
     private val preferenceListener= SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
 
@@ -47,12 +55,26 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
         taskViewModel.loadTasks()
         taskViewModel.tasks.observe(this, Observer {
 
+
             //TODO fetch only scheduled tasks!!
-            (taskListWearableRecyclerView?.adapter as TaskListAdapter).setTaskData(
-                    it,
-                    getDayTaskList(),
-                    getCompletedTaskList()
-            )
+            (taskListWearableRecyclerView?.adapter as TaskListAdapter).apply {
+                setTaskData(
+                        it,
+                        getDayTaskList(),
+                        getCompletedTaskList()
+                )
+            }
+            if (isCreating) {
+                isCreating = false
+                try {
+                    taskListWearableRecyclerView?.scrollToPosition(it.size -1 )
+
+                } catch (e: Exception) {
+                    Log.d("$tag onCreate","Can't scroll for some reason",e)
+                }
+            }
+
+
         })
 
         taskListWearableRecyclerView?.apply {
@@ -87,7 +109,9 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
                         if (isExisting) {
                             (adapter as TaskListAdapter).setPickerMode()
                         }else{
-                            startActivity(Intent(this@TaskListActivity, TaskAddActivity::class.java))
+                            startActivityForResult(
+                                    Intent(this@TaskListActivity, TaskAddActivity::class.java),
+                                    TaskAddActivity.REQUEST_CODE)
                         }
                     }
             )
@@ -121,6 +145,32 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
         getLocalSettings().unregisterOnSharedPreferenceChangeListener(preferenceListener)
         super.onDestroy()
     }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == TaskAddActivity.REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+
+                isCreating = true
+                data?.apply {
+                    val type:TaskType = TypeConverters().IntToType(getIntExtra("type", 0))!!
+                    taskViewModel.insertAndReturnList(
+                            Task(
+                                    name = getStringExtra("name"),
+                                    type = type,
+                                    description = "",
+                                    frequency = getFloatExtra("frequency",1.0f),
+                                    date = getLongExtra("date",0L)
+                            )
+                    )
+                }
+            }
+        }
+    }
+
+
+
 
     private var mAmbientController: AmbientModeSupport.AmbientController? = null
 

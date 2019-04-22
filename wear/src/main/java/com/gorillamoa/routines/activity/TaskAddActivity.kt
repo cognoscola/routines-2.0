@@ -1,20 +1,18 @@
 package com.gorillamoa.routines.activity
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.wear.widget.BoxInsetLayout
 import com.gorillamoa.routines.R
-import com.gorillamoa.routines.coroutines.Coroutines
-import com.gorillamoa.routines.data.Task
 import com.gorillamoa.routines.data.TaskType
-import com.gorillamoa.routines.extensions.getDataRepository
+import com.gorillamoa.routines.data.TypeConverters
 import com.gorillamoa.routines.fragment.DatePickerFragment
 import com.gorillamoa.routines.fragment.FrequencyPickerFragment
 import com.gorillamoa.routines.fragment.NamePickerFragment
 import com.gorillamoa.routines.fragment.TypePickerFragment
-import com.gorillamoa.routines.scheduler.TaskScheduler
 import kotlinx.android.synthetic.main.activity_task_add.*
 import java.util.*
 
@@ -25,11 +23,12 @@ class TaskAddActivity : FragmentActivity() {
 
     //TODO if its the first time opening this, explain show a fragment explaining what the symbols mean
 
-
     lateinit var type:TaskType
     lateinit var name:String
     var frequency:Float = 1.0f
-    lateinit var date : Calendar
+    private var isDateSet = false
+    lateinit var date:Calendar
+
 
     val editCallback:()->Any? = {
 
@@ -37,9 +36,15 @@ class TaskAddActivity : FragmentActivity() {
 
     }
 
+    companion object {
+        val REQUEST_CODE = 10
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task_add)
+
+        setResult(Activity.RESULT_CANCELED)
 
         supportFragmentManager.beginTransaction()
                 .add(R.id.fragmentContainerFrameLayout,TypePickerFragment().apply {
@@ -75,10 +80,7 @@ class TaskAddActivity : FragmentActivity() {
                         }
                         TaskType.TYPE_UNKNOWN -> {
 
-                            //TODO schedule the task immediately
-
-                           addTask()
-                            finish()
+                            addTaskAndClose()
                         }
                     }
 
@@ -95,19 +97,8 @@ class TaskAddActivity : FragmentActivity() {
                 .replace(R.id.fragmentContainerFrameLayout,FrequencyPickerFragment.newInstance( {
                     frequency = it
                     Log.d("$tag showFrequencyFragment","Frequency: $it")
+                    addTaskAndClose()
 
-                    //TODO schedule task if possible and close window!
-
-                    val repository = getDataRepository()
-                    Coroutines.io {
-                        val newId = repository.insert(Task(
-                                type = type,
-                                name = name,
-                                description = null,
-                                frequency = frequency))
-
-//                                TaskScheduler.scheduleTask(newId)
-                    }
 
 
                 },editCallback)).commit()
@@ -118,9 +109,9 @@ class TaskAddActivity : FragmentActivity() {
         (fragmentContainerFrameLayout?.layoutParams as BoxInsetLayout.LayoutParams).boxedEdges = BoxInsetLayout.LayoutParams.BOX_NONE
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainerFrameLayout,DatePickerFragment.newInstance(){
+                   isDateSet = true
                     date = it
                     Log.d("$tag showFrequencyFragment","Date: ${it.get(Calendar.MONTH)} ${it.get(Calendar.DAY_OF_MONTH)}")
-
 
                     when (type) {
                         TaskType.TYPE_GOAL -> {
@@ -132,16 +123,17 @@ class TaskAddActivity : FragmentActivity() {
                 }).commit()
     }
 
-    private fun addTask(){
-        val repository = getDataRepository()
-        Coroutines.io {
-            val newId = repository.insert(Task(
-                    type = type,
-                    name = name,
-                    description = null,
-                    frequency = 1.0f))
+    private fun addTaskAndClose(){
 
-//                                TaskScheduler.scheduleTask(newId)
-        }
+
+        setResult(Activity.RESULT_OK, Intent().apply {
+
+            putExtra("name",name)
+            putExtra("type",TypeConverters().TypeToInt(this@TaskAddActivity.type))
+            putExtra("frequency",frequency)
+            putExtra("date", if(isDateSet)this@TaskAddActivity.date.timeInMillis else 0L)
+
+        })
+        finish()
     }
 }
