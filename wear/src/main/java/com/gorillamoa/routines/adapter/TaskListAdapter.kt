@@ -133,17 +133,21 @@ class TaskListAdapter(
     companion object {
         const val VIEW_TYPE_TASK = 0  //A Task type item
         const val VIEW_TYPE_TITLE = 1 //A title type item
+        const val VIEW_TYPE_ADD = 2 // A a new task to this list
     }
 
     /**
      * Determine which Viewholder (Task or Title) to show
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return  if(viewType == VIEW_TYPE_TASK)
-            TaskItemHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false))
-        else {
-            TitleViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_list_header, parent, false))
+        return when (viewType) {
+            VIEW_TYPE_TASK -> TaskItemHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false))
+            VIEW_TYPE_TITLE -> TitleViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_list_header, parent, false))
+            VIEW_TYPE_ADD ->AddItemHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false))
+            else ->{TaskItemHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false))}
+
         }
+
     }
 
     /**
@@ -177,7 +181,7 @@ class TaskListAdapter(
      * @return the number of items to display
      */
     override fun getItemCount(): Int {
-        return order.size + 1
+        return order.size + 1 + 1
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -185,33 +189,17 @@ class TaskListAdapter(
         (tasks)?.let {
 
             if (holder is TitleViewHolder) {
-
-                holder.addButton.setColorFilter(Color.WHITE)
                 val titleString = when (mode) {
                     MODE_DAILY ->{
-
-
-                        holder.addButton.setOnClickListener {
-                            addButtonCallback?.invoke(true)
-                        }
-
                         holder.headerTextView.context.getString(
                                 if(order!!.isNotEmpty()) R.string.task_list_title else R.string.task_list_empty)
                     }
 
-
                     MODE_ALL->{
-                        holder.addButton.setOnClickListener {
-                            addButtonCallback?.invoke(false)
-                        }
                         if(tasks!!.isNotEmpty())holder.headerTextView.context.getString(R.string.task_all) else holder.headerTextView.context.getString(R.string.task_all_empty)
-
                     }
 
                     MODE_PICKER->{
-                        holder.addButton.setOnClickListener {
-                            addButtonCallback?.invoke(false)
-                        }
                         holder.headerTextView.context.getString(R.string.task_pick)
                     }
                     else -> {""}
@@ -251,6 +239,54 @@ class TaskListAdapter(
                     }
                 }
             }
+
+            if (holder is AddItemHolder) {
+
+                when (mode) {
+                    MODE_DAILY ->{
+                        holder.taskTextView.apply {
+                            text = context.getString(R.string.task_schedule)
+                            addSchedulingAction(this)
+                        }
+                        holder.iconImageView.apply {
+                          makeAddIcon(this)
+                            addSchedulingAction(this)
+                        }
+
+                    }
+                    else ->{
+                        holder.taskTextView.apply {
+                            text = context.getString(R.string.task_create)
+                            addCreationAction(this)
+                        }
+                        holder.iconImageView.apply {
+                            makeAddIcon(this)
+                            addCreationAction(this)
+                        }
+
+                    }
+                }
+
+            }
+
+
+        }
+    }
+
+    private fun makeAddIcon(iv: ImageView) {
+        iv.setImageResource(R.drawable.ic_add_black_24dp)
+        iv.setColorFilter(Color.WHITE)
+    }
+
+    private fun addSchedulingAction(view:View){
+        view.setOnClickListener {
+            addButtonCallback?.invoke(true)
+        }
+    }
+
+    private fun addCreationAction(view:View){
+        view.setOnClickListener {
+            addButtonCallback?.invoke(false)
         }
     }
 
@@ -366,7 +402,14 @@ class TaskListAdapter(
 
 
     override fun getItemViewType(position: Int): Int {
-        return if(position == 0 ) VIEW_TYPE_TITLE else VIEW_TYPE_TASK
+        return when (position) {
+            0 -> VIEW_TYPE_TITLE
+            (order.size + 1 ) -> VIEW_TYPE_ADD
+            else -> VIEW_TYPE_TASK
+
+        }
+
+
     }
 
     inner class TaskItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -374,10 +417,15 @@ class TaskListAdapter(
         var iconImageView:ImageView = itemView.findViewById(R.id.iconTextView)
     }
 
-    inner class TitleViewHolder(item:View):RecyclerView.ViewHolder(item){
+    inner class AddItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var taskTextView: TextView = itemView.findViewById(R.id.taskNameTextView)
+        var iconImageView:ImageView = itemView.findViewById(R.id.iconTextView)
+    }
 
+    inner class TitleViewHolder(item:View):RecyclerView.ViewHolder(item){
         var headerTextView:TextView = item.findViewById(R.id.headerTextView)
-        var addButton:ImageView = item.findViewById(R.id.addButton)
 
     }
+
+
 }

@@ -46,6 +46,8 @@
     <string name="message">Watch face tapped</string>
     <string name="my_analog_name">My Analog</string>
     <string name="title_activity_recognition">RecognitionActivity</string>
+    <string name="task_create">Create a Task</string>
+    <string name="task_schedule">Schedule more</string>
 
     <!-- Add task -->
     <string name="type_habit">Habit</string>
