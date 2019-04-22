@@ -28,8 +28,8 @@ class TaskRepository(private val taskdao:TaskDao){
     }
 
     @WorkerThread
-    fun insert(task: Task) {
-        taskdao.insertTask(task)
+    fun insert(task: Task):Long {
+        return taskdao.insertTask(task)
     }
 
     @WorkerThread

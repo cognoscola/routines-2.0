@@ -12,6 +12,7 @@ import com.gorillamoa.routines.R
  * An adapter which will hold maxNumber of items
  * @param maxNumber the number of buttons to create
  */
+//TODO Create a more generic type adapter
 class TimePickerAdapter(private val maxNumber:Int): RecyclerView.Adapter<TimePickerAdapter.TimeItem>(){
 
     enum class TimeState{

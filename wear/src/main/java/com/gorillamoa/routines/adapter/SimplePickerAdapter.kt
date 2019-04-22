@@ -10,7 +10,8 @@ import com.gorillamoa.routines.R
 
 /**
  * An adapter which will hold maxNumber of items
- * @param maxNumber the number of buttons to create
+ * @param options the string options to pick from
+ * @param itemClickedCallback is the call back when the item is selected
  */
 class SimplePickerAdapter(
         private val options:Array<String>,

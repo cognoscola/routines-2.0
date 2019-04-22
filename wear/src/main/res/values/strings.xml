@@ -26,7 +26,7 @@
 
     <string name="onboard_wake_up_text">I wake up at:</string>
     <string name="onboard_sleep_text">I sleep at:</string>
-    <string name="onboard_default_text">Pick a time:</string>
+    <string name="onboard_default_text">Pick:</string>
 
     <string name="onboard_seed">"Great! Your first daily task, the most important task, is to plan your day. Let's do a test run. "</string>
 
@@ -56,6 +56,24 @@
     <string name="Empty_error">This cannot be empty!</string>
     <string name="frequency_title">I will perform:</string>
     <string name="frequency_per">Every:</string>
+
+    <!-- Pickers-->
+    <string name="picker_date_title">Pick a date:</string>
+
+    <string-array name="month_names">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->
 

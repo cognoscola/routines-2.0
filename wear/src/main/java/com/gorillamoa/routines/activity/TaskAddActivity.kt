@@ -2,14 +2,21 @@ package com.gorillamoa.routines.activity
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.wear.widget.BoxInsetLayout
 import com.gorillamoa.routines.R
+import com.gorillamoa.routines.coroutines.Coroutines
+import com.gorillamoa.routines.data.Task
 import com.gorillamoa.routines.data.TaskType
+import com.gorillamoa.routines.extensions.getDataRepository
+import com.gorillamoa.routines.fragment.DatePickerFragment
 import com.gorillamoa.routines.fragment.FrequencyPickerFragment
 import com.gorillamoa.routines.fragment.NamePickerFragment
 import com.gorillamoa.routines.fragment.TypePickerFragment
+import com.gorillamoa.routines.scheduler.TaskScheduler
 import kotlinx.android.synthetic.main.activity_task_add.*
+import java.util.*
 
 class TaskAddActivity : FragmentActivity() {
 
@@ -18,15 +25,11 @@ class TaskAddActivity : FragmentActivity() {
 
     //TODO if its the first time opening this, explain show a fragment explaining what the symbols mean
 
-    private enum class State{
-        Type,
-        Name,
-        Frequency
-    }
 
     lateinit var type:TaskType
     lateinit var name:String
     var frequency:Float = 1.0f
+    lateinit var date : Calendar
 
     val editCallback:()->Any? = {
 
@@ -42,32 +45,8 @@ class TaskAddActivity : FragmentActivity() {
                 .add(R.id.fragmentContainerFrameLayout,TypePickerFragment().apply {
 
                     callback = { it ->
-
                         type = it
-                        when (it) {
-                            TaskType.TYPE_GOAL -> {
-
-                                //name
-                                showNamePickFragment()
-                                //Achieve by: a date
-
-                                //How often would you like to pick
-                            }
-                            TaskType.TYPE_HABIT -> {
-
-                                //name
-                                showNamePickFragment()
-                                //How often would you like to perform
-
-
-                            }
-                            TaskType.TYPE_UNKNOWN -> {
-
-                                //name
-                                showNamePickFragment()
-                                //When should this happen?
-                            }
-                        }
+                        showNamePickFragment()
                     }
                 })
                 .commit()
@@ -82,12 +61,8 @@ class TaskAddActivity : FragmentActivity() {
 
                     when (type) {
                         TaskType.TYPE_GOAL -> {
-
-                            //name
                             //Achieve by: a date
-
-                            //How often would you like to pick
-                            showFrequencyFragment()
+                            showDatePickerFragment()
                         }
                         TaskType.TYPE_HABIT -> {
 
@@ -101,11 +76,11 @@ class TaskAddActivity : FragmentActivity() {
                         TaskType.TYPE_UNKNOWN -> {
 
                             //TODO schedule the task immediately
-                            //TODO close this window
 
+                           addTask()
+                            finish()
                         }
                     }
-
 
                     //now we
 
@@ -115,11 +90,58 @@ class TaskAddActivity : FragmentActivity() {
 
     private fun showFrequencyFragment(){
 
-        (fragmentContainerFrameLayout?.layoutParams as BoxInsetLayout.LayoutParams).boxedEdges = BoxInsetLayout.LayoutParams.BOX_TOP
+        (fragmentContainerFrameLayout?.layoutParams as BoxInsetLayout.LayoutParams).boxedEdges = BoxInsetLayout.LayoutParams.BOX_NONE
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainerFrameLayout,FrequencyPickerFragment.newInstance( {
                     frequency = it
                     Log.d("$tag showFrequencyFragment","Frequency: $it")
+
+                    //TODO schedule task if possible and close window!
+
+                    val repository = getDataRepository()
+                    Coroutines.io {
+                        val newId = repository.insert(Task(
+                                type = type,
+                                name = name,
+                                description = null,
+                                frequency = frequency))
+
+//                                TaskScheduler.scheduleTask(newId)
+                    }
+
+
                 },editCallback)).commit()
+    }
+
+    private fun showDatePickerFragment(){
+
+        (fragmentContainerFrameLayout?.layoutParams as BoxInsetLayout.LayoutParams).boxedEdges = BoxInsetLayout.LayoutParams.BOX_NONE
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainerFrameLayout,DatePickerFragment.newInstance(){
+                    date = it
+                    Log.d("$tag showFrequencyFragment","Date: ${it.get(Calendar.MONTH)} ${it.get(Calendar.DAY_OF_MONTH)}")
+
+
+                    when (type) {
+                        TaskType.TYPE_GOAL -> {
+                            //How often would you like to pick
+                            showFrequencyFragment()
+                        }
+                        else->{}
+                    }
+                }).commit()
+    }
+
+    private fun addTask(){
+        val repository = getDataRepository()
+        Coroutines.io {
+            val newId = repository.insert(Task(
+                    type = type,
+                    name = name,
+                    description = null,
+                    frequency = 1.0f))
+
+//                                TaskScheduler.scheduleTask(newId)
+        }
     }
 }

@@ -18,7 +18,7 @@ interface TaskDao{
     fun getTaskByIds(ids: List<Int>): List<Task>
 
     @Insert
-    fun insertTask(task:Task)
+    fun insertTask(task:Task):Long
 
 /*    @Query("UPDATE users SET age = age + 1 WHERE userId = :userId")
     suspend fun incrementUserAge(userId: String)*/

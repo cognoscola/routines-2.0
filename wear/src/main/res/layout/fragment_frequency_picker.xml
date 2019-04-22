@@ -6,7 +6,7 @@
     tools:context=".fragment.NamePickerFragment"
     android:gravity="center"
     android:orientation="vertical"
-    android:layout_gravity="center_horizontal"
+    android:layout_gravity="center"
     >
 
     <TextView

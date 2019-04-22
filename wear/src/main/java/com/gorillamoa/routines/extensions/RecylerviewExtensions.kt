@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.WindowManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.gorillamoa.routines.adapter.DoubleRowSelectAdapter
 import com.gorillamoa.routines.adapter.OffsetItemDecoration
 import com.gorillamoa.routines.adapter.SimplePickerAdapter
 import com.gorillamoa.routines.other.DetectableLinearSnapHelper
@@ -28,6 +29,19 @@ fun RecyclerView.createSimplePicker(
     }
 
     addItemDecoration(OffsetItemDecoration(context.getSystemService(Context.WINDOW_SERVICE) as WindowManager))
+}
 
+fun RecyclerView.createDoubleRowPicker(
+        choices:Array<String>,
+        style:Int = 0,
+        choiceCallback: ((String) -> Any)? = null
+){
+
+    this.adapter = DoubleRowSelectAdapter(choices,choiceCallback,style)
+    val gridLayoutManager = GridLayoutManager(context, 2)
+    gridLayoutManager.orientation = GridLayoutManager.HORIZONTAL
+    gridLayoutManager.scrollToPosition(4)
+    this.layoutManager =  gridLayoutManager
+    addItemDecoration(OffsetItemDecoration(context.getSystemService(Context.WINDOW_SERVICE) as WindowManager))
 
 }

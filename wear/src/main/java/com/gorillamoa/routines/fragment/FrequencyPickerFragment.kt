@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.fragment_frequency_picker.*
 
 class FrequencyPickerFragment : Fragment() {
 
-    var submit:((Float)->Any?)? = null
+    private var submit:((Float)->Any?)? = null
 
     private var amountValue:Float = 1.0f
     private var timeValue:Float = 1.0f
@@ -26,7 +26,6 @@ class FrequencyPickerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
 
         val amountArray = arrayOf("Once", "Twice","3x","4x", "5x","10x")
         recyclerAmount?.createSimplePicker(amountArray){
