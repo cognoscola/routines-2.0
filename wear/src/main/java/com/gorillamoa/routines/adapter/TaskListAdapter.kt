@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.SystemClock
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -92,7 +93,6 @@ class TaskListAdapter(
     }
 
     private fun calculateOrder(){
-
         order.clear()
         when (mode) {
             MODE_DAILY -> {
@@ -177,21 +177,12 @@ class TaskListAdapter(
      * @return the number of items to display
      */
     override fun getItemCount(): Int {
-
-        return when (mode) {
-            MODE_DAILY ->{
-                val scheduledCount = ((finished?.size?:0) + (unfinished?.size?:0))
-                scheduledCount + 1
-            }
-            else ->{
-                ((tasks?.size)?:0) + 1
-            }
-        }
+        return order.size + 1
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
-        tasks?.let {
+        (tasks)?.let {
 
             if (holder is TitleViewHolder) {
 
@@ -235,6 +226,9 @@ class TaskListAdapter(
             if (holder is TaskItemHolder) {
 
                 holder.apply {
+
+                    Log.d("$tag onBindViewHolder","order size:${order.size}")
+                    Log.d("$tag onBindViewHolder","order size:${tasks!!.size}")
 
                     val task =  tasks!![order[position - 1]]
                     taskTextView.text = task.name
