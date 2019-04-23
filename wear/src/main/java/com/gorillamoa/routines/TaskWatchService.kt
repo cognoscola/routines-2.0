@@ -79,6 +79,8 @@ private const val INCOMPLETE = "incomplete"
  */
 class TaskWatchService : CanvasWatchFaceService() {
 
+    //TODO create pager like effect (or other animation) when switching tasks
+
     override fun onCreateEngine(): Engine {
         return Engine()
     }
@@ -107,7 +109,7 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var mCenterX: Float = 0F
         private var mCenterY: Float = 0F
 
-        private var  arbitraryNumber = 50f
+
 
         private var mSecondHandLength: Float = 0F
         private var sMinuteHandLength: Float = 0F
@@ -163,7 +165,7 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var lines = 0
         private var breakIntervalDegree = 0f
         private var mSelectedMinuteDegree = 0f
-        private var mBreakLineLength = 0f
+        private var middleSectionRadius = 0f
         private var isRestAlarmEnabled = false
         private var isTimerEnabled = false
 
@@ -254,7 +256,8 @@ class TaskWatchService : CanvasWatchFaceService() {
                     (screenWidth  *   0.18).toInt(),
                     this@TaskWatchService).apply {
                 onClickListener = {
-                    Log.d("$tag SwitchingClick","Button is pressed! Hurrah! State: ${nextState()}")
+                    nextState()
+                    invalidate()
 
                 }
                 addState(STATE_BREAKS,R.drawable.ic_break_time)
@@ -282,7 +285,6 @@ class TaskWatchService : CanvasWatchFaceService() {
                 touchables.add(this)
             }
             centerButton = SwitchingButton((mCenterX).toInt() ,(mCenterY).toInt(),(screenWidth*0.18f).toInt(),(screenWidth*0.18f).toInt(), this@TaskWatchService).apply {
-//                setImage(this@TaskWatchService,R.drawable.ic_radio_button_unchecked_black_24dp)
                 addState(INCOMPLETE,R.drawable.ic_radio_button_unchecked_black_24dp)
                 addState(COMPLETE,R.drawable.ic_cc_checkmark)
                 onClickListener = {
@@ -291,6 +293,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                         COMPLETE ->{TaskScheduler.completeTask(this@TaskWatchService,currentTask?.id?:-1)}
                         else ->{ } // do nothing
                     }
+                    invalidate()
                 }
                 touchables.add(this)
             }
@@ -645,7 +648,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             mCenterX = width / 2f
             mCenterY = height / 2f
 
-            mBreakLineLength = height*0.25f
+            middleSectionRadius = (mCenterY *PERCENT_OF_RADIUS).toFloat()
 
             /*
              * Calculate lengths of different hands based on watch screen size.
@@ -828,7 +831,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 canvas.rotate(mSelectedMinuteDegree , mCenterX,mCenterY)
                 canvas.drawLine(
                         mCenterX,
-                        mCenterY - mBreakLineLength,
+                        mCenterY - middleSectionRadius,
                         mCenterX,
                         0f,
                         mBreakLinePaint)
@@ -839,7 +842,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                     canvas.rotate(breakIntervalDegree , mCenterX,mCenterY)
                     canvas.drawLine(
                             mCenterX,
-                            mCenterY - mBreakLineLength,
+                            mCenterY - middleSectionRadius,
                             mCenterX,
                             0f,
                             mBreakLinePaint)
@@ -893,17 +896,17 @@ class TaskWatchService : CanvasWatchFaceService() {
             canvas.rotate(hoursRotation, mCenterX, mCenterY)
             canvas.drawLine(
                     mCenterX,
-                    mCenterY - CENTER_GAP_AND_CIRCLE_RADIUS - arbitraryNumber,
+                    mCenterY - middleSectionRadius,
                     mCenterX,
-                    mCenterY - sHourHandLength,
+                    0.0f,
                     mHourPaint)
 
             canvas.rotate(minutesRotation - hoursRotation, mCenterX, mCenterY)
             canvas.drawLine(
                     mCenterX,
-                    mCenterY - CENTER_GAP_AND_CIRCLE_RADIUS - arbitraryNumber,
+                    mCenterY - middleSectionRadius ,
                     mCenterX,
-                    mCenterY - sMinuteHandLength,
+                    0.0f,
                     mMinutePaint)
 
             /*
@@ -914,17 +917,18 @@ class TaskWatchService : CanvasWatchFaceService() {
                 canvas.rotate(secondsRotation - minutesRotation, mCenterX, mCenterY)
                 canvas.drawLine(
                         mCenterX,
-                        mCenterY - CENTER_GAP_AND_CIRCLE_RADIUS,
+                        mCenterY - middleSectionRadius,
                         mCenterX,
-                        mCenterY - mSecondHandLength,
+                        0.0f,
                         mSecondPaint)
-
             }
+/*
             canvas.drawCircle(
                     mCenterX,
                     mCenterY,
                     CENTER_GAP_AND_CIRCLE_RADIUS,
                     mTickAndCirclePaint)
+*/
 
             /* Restore the canvas' original orientation. */
             canvas.restore()
@@ -973,8 +977,6 @@ class TaskWatchService : CanvasWatchFaceService() {
                 mUpdateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME)
             }
         }
-
-
 
         /**
          * Returns whether the [.mUpdateTimeHandler] timer should be running. The timer
