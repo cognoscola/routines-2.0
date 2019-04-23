@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import java.util.*
+import kotlin.collections.ArrayList
 
 private const val LOCAL_SETTINGS ="local_app_settings"
 private const val isWakeAlarmActive= "isWakeAlarmActive"
@@ -29,8 +30,9 @@ private const val SLEEP_PHASE = "sleep_phase"
 //TODO END
 
 //Task related information
-private const val TASK_ORDER = "order" //also serves as tasks not yet completed
-private const val TASK_DONE = "done" //which tasks completed
+private const val TASK_INCOMPLETE = "INCOMPLETE" // tasks not yet completed
+private const val TASK_COMPLETE = "COMPLETE" //which tasks completed
+private const val TASK_ORDER = "order" //task order
 
 
 private const val IS_ACTIVE = "ready" //wether the app is currently working on not
@@ -78,7 +80,6 @@ fun Context.saveTimerTime(timeMillis:Long){
 fun Context.getTimerTime():Long{
     return getLocalSettings().getLong(selectedMinutesTimer,0)
 }
-
 
 
 //clean truncate these and accept one parameter
@@ -164,7 +165,7 @@ fun Context.saveTaskList(queue:ArrayDeque<Int>) {
         val taskString = queue.joinToString(",")
         Log.d("saveTaskList", "Scheduled Tasks: $taskString")
         prefs.edit()
-                .putString(TASK_ORDER, taskString).apply()
+                .putString(TASK_INCOMPLETE, taskString).apply()
 
     } catch (e: Exception) {
         Log.e("saveTaskList","Could not update task list",e)
@@ -184,7 +185,7 @@ fun Context.saveCompletedTaskList(queue:ArrayDeque<Int>) {
         val taskString = queue.joinToString(",")
         Log.d("saveTaskList", "Scheduled Tasks: $taskString")
         prefs.edit()
-                .putString(TASK_DONE, taskString).apply()
+                .putString(TASK_COMPLETE, taskString).apply()
     } catch (e: Exception) {
         Log.e("saveCompletedTaskList","Could not update task list",e)
     }
@@ -198,32 +199,72 @@ fun Context.saveTaskLists(queue:ArrayDeque<Int>,completed:ArrayDeque<Int>){
 
         var taskString = queue.joinToString(",")
         Log.d("saveTaskList","Scheduled Tasks: $taskString")
-        putString(TASK_ORDER,taskString)
+        putString(TASK_INCOMPLETE,taskString)
 
         taskString = completed.joinToString(",")
         Log.d("saveTaskList","Completed Tasks: $taskString")
-        putString(TASK_DONE,taskString)
+        putString(TASK_COMPLETE,taskString)
 
         apply()
     }
 }
 
-fun Context.getTaskListKey() = TASK_ORDER
-fun Context.getTaskFinishedKey() = TASK_DONE
+fun Context.saveOrder(list:ArrayList<Int>){
+     getLocalSettings().edit().apply{
+         putString(TASK_ORDER,list.joinToString(","))
+    }.apply()
+}
 
-
+fun Context.getTaskListKey() = TASK_INCOMPLETE
+fun Context.getTaskFinishedKey() = TASK_COMPLETE
+fun Context.getOrderKey() = TASK_ORDER
 
 
 fun Context.getCompletedTaskList():ArrayDeque<Int>{
-    return fetchArrayFromPreference(TASK_DONE)
+    return fetchArrayFromPreference(TASK_COMPLETE)
 }
+
 
 /**
  * We get the task list, if there is any.
  */
 fun Context.getDayTaskList():ArrayDeque<Int>{
-    return fetchArrayFromPreference(TASK_ORDER)
+    return fetchArrayFromPreference(TASK_INCOMPLETE)
 }
+
+fun Context.getSavedOrder():ArrayList<Int>{
+    val prefs = getLocalSettings()
+    val taskString = prefs.getString(TASK_ORDER,"-1")
+    if (taskString != "-1") {
+        val deque = ArrayList<Int>()
+        if (taskString!!.contains(",")) {
+
+            try {
+                val sequence = taskString.split(",")
+                sequence.forEach {
+                    try {
+                        deque.add(it.toInt())
+                    } catch (e: IllegalArgumentException) {
+                        Log.d("getDayTaskList", "Tried to convert numbers", e)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.d("getDayTaskList","",e)
+                return ArrayList()
+            }
+        }else{
+            //only one task today?
+
+            if (taskString.isNotEmpty()) {
+                deque.add(taskString.toInt())
+            }
+        }
+        return deque
+    }else{
+        return ArrayList()
+    }
+}
+
 
 fun Context.fetchArrayFromPreference(listName:String):ArrayDeque<Int>{
     val prefs = getLocalSettings()
@@ -257,6 +298,7 @@ fun Context.fetchArrayFromPreference(listName:String):ArrayDeque<Int>{
         return ArrayDeque()
     }
 }
+
 
 fun Context.isEnabled(){
     getLocalSettings().getBoolean(IS_ACTIVE,false)

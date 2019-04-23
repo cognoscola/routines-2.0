@@ -24,7 +24,6 @@ import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.Log
 import android.view.SurfaceHolder
-import android.widget.Toast
 import com.gorillamoa.routines.data.Task
 import com.gorillamoa.routines.extensions.*
 import com.gorillamoa.routines.receiver.AlarmReceiver
@@ -60,6 +59,9 @@ private const val CENTER_GAP_AND_CIRCLE_RADIUS = 4f
 private const val SHADOW_RADIUS = 6f
 
 private const val PERCENT_OF_RADIUS = 0.7
+
+private const val COMPLETE = "complete"
+private const val INCOMPLETE = "incomplete"
 
 
 /**
@@ -147,7 +149,7 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var textHalfWidth = 0f
         private var leftButton:CanvasButton? = null
         private var rightButton:CanvasButton? = null
-        private var centerButton:CanvasButton? = null
+        private var centerButton:SwitchingButton? = null
 
         private val touchables= ArrayList<ClickableRectangle>()
 
@@ -221,9 +223,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             isRestAlarmEnabled = isRestAlarmActive()
             isTimerEnabled = isTimerAlarmActive()
 
-            TaskScheduler.getNextTask(this@TaskWatchService){ task -> configureTaskUI(task) }
-
-
+            TaskScheduler.getNextUncompletedTask(this@TaskWatchService){ task -> configureTaskUI(task) }
 
             initializeBackground()
             initializeWatchFace()
@@ -247,7 +247,8 @@ class TaskWatchService : CanvasWatchFaceService() {
 //            ClickableRectangle.enableDebug()
 
             switchingButton = SwitchingButton(
-                    mCenterX.toInt(), mCenterY.toInt() + (screenHeight * 0.2f).toInt(),
+                    mCenterX.toInt(),
+                    mCenterY.toInt() + (screenHeight * 0.2f).toInt(),
                     (screenWidth  * 0.18).toInt(),
                     //use width to ensure we get a square object
                     (screenWidth  *   0.18).toInt(),
@@ -266,6 +267,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 setImage(this@TaskWatchService,R.drawable.ic_left_skin_direction)
                 onClickListener = {
 
+                    TaskScheduler.getPreviousOrderedTask(this@TaskWatchService,currentTask?.id?:0){configureTaskUI(it)}
                 }
                 touchables.add(this)
             }
@@ -273,16 +275,22 @@ class TaskWatchService : CanvasWatchFaceService() {
                 setImage(this@TaskWatchService,R.drawable.ic_right_skin_arrow)
                 onClickListener = {
 
-                    TaskScheduler.getNextTask(this@TaskWatchService){ configureTaskUI(it) }
+                    TaskScheduler.getNextOrderedTask(this@TaskWatchService,currentTask?.id?:0){ configureTaskUI(it) }
+
 
                 }
                 touchables.add(this)
             }
-            centerButton = CanvasButton((mCenterX).toInt() ,(mCenterY).toInt(),(screenWidth*0.18f).toInt(),(screenWidth*0.18f).toInt()).apply {
-                setImage(this@TaskWatchService,R.drawable.ic_radio_button_unchecked_black_24dp)
+            centerButton = SwitchingButton((mCenterX).toInt() ,(mCenterY).toInt(),(screenWidth*0.18f).toInt(),(screenWidth*0.18f).toInt(), this@TaskWatchService).apply {
+//                setImage(this@TaskWatchService,R.drawable.ic_radio_button_unchecked_black_24dp)
+                addState(INCOMPLETE,R.drawable.ic_radio_button_unchecked_black_24dp)
+                addState(COMPLETE,R.drawable.ic_cc_checkmark)
                 onClickListener = {
-
-
+                    when (nextState()) {
+                        INCOMPLETE ->{ TaskScheduler.uncompleteTask(this@TaskWatchService, currentTask?.id?:-1)}
+                        COMPLETE ->{TaskScheduler.completeTask(this@TaskWatchService,currentTask?.id?:-1)}
+                        else ->{ } // do nothing
+                    }
                 }
                 touchables.add(this)
             }
@@ -359,19 +367,30 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             //create new text for the task name
 
-            task?.apply {
+          task?.apply {
+
+              //Set the correct title
                 val width = mTextPaint.measureText(name)
                 textHalfWidth = (width * 0.5).toFloat()
 
-                val sb = StaticLayout.Builder.obtain(name,0,name.length, mTextPaint, width.toInt())
+                val sb = StaticLayout.Builder.obtain(name, 0, name.length, mTextPaint, width.toInt())
                         .setAlignment(Layout.Alignment.ALIGN_CENTER)
                         .setLineSpacing(0.0f, 1.0f)
                         .setIncludePad(false)
                 staticLayout = sb.build()
-            }
 
+              //make sure our complete button shows the correct status
+              if (TaskScheduler.isComplete(this@TaskWatchService, task.id ?: -1)) {
+                  centerButton?.setState(COMPLETE)
+              }else centerButton?.setState(INCOMPLETE)
+
+            }
+            currentTask = task
+            invalidate()
 
         }
+
+        var currentTask:Task? = null
 
 
         private fun initializeBackground() {

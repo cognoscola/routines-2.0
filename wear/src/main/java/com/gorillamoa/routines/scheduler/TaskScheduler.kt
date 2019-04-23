@@ -53,13 +53,16 @@ class TaskScheduler{
                 //TODO FETCH some habits
                 //TODO FETCH Some goals
                 val queue = ArrayDeque<Int>()
+                val orderList = ArrayList<Int>()
                 //save the empty list to the Completed list
 
                 taskList?.forEach {
                     queue.push(it.id)
+                    orderList.add(it.id!!)
                 }
 
                 context.saveTaskLists(queue,ArrayDeque())
+                context.saveOrder(orderList)
 
                 //TODO wait for approval of user
                 context.EnableScheduler()
@@ -67,11 +70,18 @@ class TaskScheduler{
             }
         }
 
+        fun isComplete(context: Context, tid: Int):Boolean {
+
+            val completedList = context.getCompletedTaskList()
+            return completedList.contains(tid)
+        }
+
         /**
          * Unschedule a specified Task.
          * @param tid is the task id
          */
         fun unscheduleTask(context:Context, tid:Int){
+
 
             val unfinished = context.getDayTaskList()
             if (unfinished.contains(tid)) {
@@ -84,6 +94,14 @@ class TaskScheduler{
                 finished.remove(tid)
                 context.saveCompletedTaskList(finished)
             }
+
+            val order = context.getSavedOrder()
+            if (order.contains(tid)) {
+                order.remove(tid)
+                context.saveOrder(order)
+            }
+
+
         }
 
         /**
@@ -98,9 +116,12 @@ class TaskScheduler{
                 val unfinished = getDayTaskList()
                 unfinished.add(tid)
                 saveTaskList(unfinished)
+
+                val order = getSavedOrder()
+                order.add(tid)
+                saveOrder(order)
             }
         }
-
 
         /**
          * The user has approved the schedule and so now we can begin assigning tasks
@@ -198,8 +219,15 @@ class TaskScheduler{
 
         /**
          * User may wish to mark a task as uncompleted for whatever reasons
+         * @param context is the application context
+         * @param tid is the task id
+         * @return wether the operation was succesfful or not
          */
         fun uncompleteTask(context:Context, tid:Int):Boolean{
+
+            if (tid == -1) {
+                return false// nothing to do here
+            }
 
             val taskList = context.getDayTaskList()
             val doneList = context.getCompletedTaskList()
@@ -245,6 +273,70 @@ class TaskScheduler{
             return false
         }
 
+        /**
+         * Returns the previous task in the scheduled day. If the current Task is the first of the day
+         * the call will return the last scheduled task
+         */
+        fun getPreviousOrderedTask(context: Context, currentTid: Int,schedulerCallback: (task: Task?) -> Any?){
+
+            if (currentTid == 0) {
+                getNextUncompletedTask(context,schedulerCallback)
+                return
+            }
+            val order = context.getSavedOrder()
+
+            if (order.size > 0) {
+
+                val position = order.indexOf(currentTid)
+
+                val nextPosition:Int = if (position == 0) {
+                    order.size - 1
+                }else{
+                    position -1
+                }
+
+                Coroutines.ioThenMain({context.getDataRepository().getTaskById(order[nextPosition])}){
+                    schedulerCallback.invoke(it)
+                }
+
+            }else{
+                //we don't have a schedule yet so just pass back nothing
+                //TODO prevent user from calling this function when there isn't anny task scheduled
+                schedulerCallback.invoke(null)
+            }
+        }
+
+        /**
+         * Return the next task in our scheduled set. If the task is last it will return the first
+         * task of the day
+         */
+        fun getNextOrderedTask(context: Context,currentTid:Int, schedulerCallback:(task:Task?) ->Any?){
+
+            if (currentTid == 0) {
+                getNextUncompletedTask(context,schedulerCallback)
+                return
+            }
+            val order = context.getSavedOrder()
+
+            if (order.size > 0) {
+                val position = order.indexOf(currentTid)
+                val nextPosition:Int = if (position == order.size - 1) {
+                    0
+                }else{
+                    position + 1
+                }
+
+                Coroutines.ioThenMain({context.getDataRepository().getTaskById(order[nextPosition])}){
+                    schedulerCallback.invoke(it)
+                }
+
+            }else{
+                //we don't have a schedule yet so just pass back nothing
+                //TODO prevent user from calling this function when there isn't anny task scheduled
+                schedulerCallback.invoke(null)
+            }
+
+        }
 
 
         /**
@@ -253,7 +345,7 @@ class TaskScheduler{
          * @param currentTid is the current task id (which the user is currently doing
          * @param scheduleCallback is the call back function to fetch the next task
          */
-        fun getNextTask(context:Context, scheduleCallback: (task:Task?) -> Any?){
+        fun getNextUncompletedTask(context:Context, scheduleCallback: (task:Task?) -> Any?){
 
             var nextTid:Int =-1
             val taskList = context.getDayTaskList()
@@ -266,13 +358,13 @@ class TaskScheduler{
             if (nextTid != -1) {
 
                 val repository = context.getDataRepository()
-                Log.d("getNextTask","Will show Task:$nextTid")
+                Log.d("getNextUncompletedTask","Will show Task:$nextTid")
                 Coroutines.ioThenMain({repository.getTaskById(nextTid)}){
                     scheduleCallback.invoke(it)
                 }
             }else{
 
-                Log.d("getNextTask","Out of tasks!")
+                Log.d("getNextUncompletedTask","Out of tasks!")
                 //TODO check if any tasks were completed, if not don't show sleep notification
                     scheduleCallback.invoke(null)
                 //TODO schedule alarm at some point S
@@ -303,7 +395,7 @@ class TaskScheduler{
         }
 
         fun showNext(context:Context){
-            TaskScheduler.getNextTask(context) { task ->
+            TaskScheduler.getNextUncompletedTask(context) { task ->
 
                 task?.let {
                     context.notificationShowTask(

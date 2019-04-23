@@ -2,8 +2,6 @@ package com.gorillamoa.routines.views
 
 import android.content.Context
 import android.graphics.*
-import android.graphics.drawable.Drawable
-import android.util.Log
 import androidx.core.content.ContextCompat
 import com.gorillamoa.routines.R
 import android.graphics.Bitmap
@@ -52,17 +50,34 @@ class SwitchingButton(
             currentState = states.first.first
 
             if (bitmap == null) {
-                bitmap = getBitmap(context, icon)
-                val scale = width.toFloat() / bitmap!!.width.toFloat()
-                bitmap = Bitmap.createScaledBitmap(bitmap!!,
-                        (bitmap!!.width * scale).toInt(),
-                        (bitmap!!.height * scale).toInt(), true)
-                srcRect.set(0, 0, bitmap!!.width, bitmap!!.height)
+              setBitmap(icon)
             }
         }
 
         return currentState
     }
+
+    fun setState(key:String){
+
+        states.find {
+            it.first == key
+        }?.let {
+            currentState = it.first
+            setBitmap(it.second)
+        }
+    }
+
+    private fun setBitmap(icon: Int) {
+        bitmap = getBitmap(context, icon)
+        val scale = width.toFloat() / bitmap!!.width.toFloat()
+        bitmap = Bitmap.createScaledBitmap(bitmap!!,
+                (bitmap!!.width * scale).toInt(),
+                (bitmap!!.height * scale).toInt(), true)
+        srcRect.set(0, 0, bitmap!!.width, bitmap!!.height)
+    }
+
+
+
 
     fun getState():String{
         return currentState
@@ -86,26 +101,11 @@ class SwitchingButton(
             if (nextPair.first != currentState) {
                 currentState = nextPair.first
 
+                bitmap?.recycle()
                 try {
-
-                    bitmap?.recycle()
-                    bitmap = getBitmap(context, nextPair.second)
-                    val scale = width.toFloat() / bitmap!!.width.toFloat()
-                    bitmap = Bitmap.createScaledBitmap(bitmap!!,
-                            (bitmap!!.width * scale).toInt(),
-                            (bitmap!!.height * scale).toInt(), true)
-
+                    setBitmap(nextPair.second)
                 } catch (e: Exception) {
-
-                    bitmap?.recycle()
-                    bitmap = getBitmap(context, R.drawable.ic_warning_black_24dp)
-                    val scale = width.toFloat() / bitmap!!.width.toFloat()
-                    bitmap = Bitmap.createScaledBitmap(bitmap!!,
-                            (bitmap!!.width * scale).toInt(),
-                            (bitmap!!.height * scale).toInt(), true)
-
-                } finally {
-                    srcRect.set(0,0,bitmap!!.width,bitmap!!.height)
+                    setBitmap(R.drawable.ic_warning_black_24dp)
                 }
             }
         }else{

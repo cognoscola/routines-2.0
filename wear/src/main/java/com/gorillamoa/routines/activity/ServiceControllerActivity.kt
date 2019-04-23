@@ -119,7 +119,7 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
         //clean truncate notificationShowTask function
         taskNotificationButton?.setOnClickListener {
-            TaskScheduler.getNextTask(this) { task ->
+            TaskScheduler.getNextUncompletedTask(this) { task ->
                 task?.let {
                     notificationShowTask(it)
                 }

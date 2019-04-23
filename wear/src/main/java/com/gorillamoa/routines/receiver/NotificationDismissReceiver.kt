@@ -65,7 +65,7 @@ class NotificationDismissReceiver:BroadcastReceiver() {
                         TaskScheduler.approve(context)
 //                    }
 
-                    TaskScheduler.getNextTask(context){ task ->
+                    TaskScheduler.getNextUncompletedTask(context){ task ->
                         task?.let {
                             context.notificationShowTask(
                                     it,

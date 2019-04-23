@@ -14,7 +14,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.data.Task
-import java.lang.Exception
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -192,7 +191,7 @@ class TaskListAdapter(
                 val titleString = when (mode) {
                     MODE_DAILY ->{
                         holder.headerTextView.context.getString(
-                                if(order!!.isNotEmpty()) R.string.task_list_title else R.string.task_list_empty)
+                                if(order.isNotEmpty()) R.string.task_list_title else R.string.task_list_empty)
                     }
 
                     MODE_ALL->{
