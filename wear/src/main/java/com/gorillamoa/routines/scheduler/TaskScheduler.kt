@@ -246,6 +246,7 @@ class TaskScheduler{
         }
 
 
+
         /**
          * Will fetch the next task which the scheduler thinks should be fetched
          * @param context is the application context
@@ -303,7 +304,6 @@ class TaskScheduler{
 
         fun showNext(context:Context){
             TaskScheduler.getNextTask(context) { task ->
-
 
                 task?.let {
                     context.notificationShowTask(

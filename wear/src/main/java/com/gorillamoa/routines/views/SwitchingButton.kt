@@ -12,13 +12,12 @@ import java.util.*
 //CLEAN this code
 
 class SwitchingButton(
-        val center_x:Int,
-        val center_y:Int,
-        val width:Int,
-        val height:Int,
-        val context: Context):ClickableRectangle(){
+        centerX:Int,
+        centerY:Int,
+        width:Int,
+        height:Int,
+        val context: Context):ClickableRectangle(centerX,centerY,width,height){
 
-    private val tag:String = SwitchingButton::class.java.name
 
     private var paint = Paint().apply {
         color = Color.BLUE
@@ -27,32 +26,12 @@ class SwitchingButton(
         isAntiAlias = true
     }
     private var srcRect =Rect()
-    private var dstRect =Rect()
     private var bitmap:Bitmap? = null
-
     private var states=ArrayDeque<Pair<String,Int>>()
     private var currentState:String =""
 
-    init{
-        dstRect.set(
-                (center_x - (width*0.5).toInt()),
-                (center_y - (height*0.5).toInt()),
-                (center_x + (width*0.5).toInt()),
-                (center_y + (height*0.5).toInt())
-
-//          30,10,60,40
-
-        )
-        Log.d("$tag ","center_x: $center_x, center_y:$center_y, width:$width, height:$height")
-
-
-        //TODO supppor the author
-//<div>Icons made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" 			    title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" 			    title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
-    }
-
-
-    fun draw(canvas: Canvas){
-
+    override fun draw(canvas: Canvas){
+        super.draw(canvas)
         bitmap?.let {
 
             canvas.drawBitmap(bitmap!!,srcRect,dstRect,paint)
@@ -149,14 +128,5 @@ class SwitchingButton(
         return bitmap
     }
 
-    fun isTouched(x:Int,y:Int):Boolean{
-
-        if (dstRect.contains(x, y)) {
-            onClickListener?.invoke()
-            return true
-        }else{
-            return false
-        }
-    }
 
 }
