@@ -3,14 +3,7 @@ package com.gorillamoa.routines
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.*
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -30,6 +23,7 @@ import com.gorillamoa.routines.receiver.AlarmReceiver
 import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_REST
 import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_TIMER
 import com.gorillamoa.routines.scheduler.TaskScheduler
+import com.gorillamoa.routines.utils.lerp
 import com.gorillamoa.routines.views.CanvasButton
 import com.gorillamoa.routines.views.ClickableRectangle
 import com.gorillamoa.routines.views.SwitchingButton
@@ -400,7 +394,10 @@ class TaskWatchService : CanvasWatchFaceService() {
             mBackgroundPaint = Paint().apply {
                 color = Color.BLACK
             }
-            mBackgroundBitmap = BitmapFactory.decodeResource(resources, R.drawable.bg)
+
+            mBackgroundBitmap = generateBackgroundImage()
+
+
 
             /* Extracts colors from background image to improve watchface style. */
             Palette.from(mBackgroundBitmap).generate {
@@ -411,6 +408,60 @@ class TaskWatchService : CanvasWatchFaceService() {
                     updateWatchHandStyle()
                 }
             }
+        }
+
+        private fun generateBackgroundImage():Bitmap {
+
+            val height = 200.0f
+            val width = 200.0f
+            val max_radius = 40.0f
+            val intermidiateBitmap = Bitmap.createBitmap(width.toInt(),height.toInt(),Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(intermidiateBitmap)
+            val lab = ColorSpace.get(ColorSpace.Named.CIE_LAB)
+            val alpha = 10.0f
+
+
+            //draw .. lets say.. 200 circles on this white canvas
+            canvas.drawColor(Color.WHITE)
+
+            val painter =Paint().apply {
+                style = Paint.Style.FILL
+                isAntiAlias = true
+            }
+
+            //TODO look up how to spread colors better
+            //we'll make a gradient of 4 colors for now,
+            val topLeft = Color.valueOf(255.0f,245.0f,235.0f,alpha,lab)
+
+            val bottomRight = Color.valueOf(200.0f,190.0f,180.0f, alpha,lab)
+            //greyish
+
+//            val bottomRight = Color.valueOf(127.0f,120.0f,127.0f, alpha,lab)
+            //light red
+//            val bottomRight = Color.valueOf(127.0f,39.0f,4.0f, alpha,lab)
+            val bottomLeft = Color.valueOf(175.0f,111.0f,84.0f, alpha,lab)
+            val topRight = Color.valueOf(175.0f,111.0f,84.0f,alpha,lab)
+
+            val random = Random()
+            for (i in 0..250) {
+
+                val x = random.nextFloat() * width
+                val y = random.nextFloat() * height
+                var radius = random.nextFloat() * max_radius + 10.0f
+
+                if(radius < 0.0) radius = 0.0f
+
+                val colorLeft = topLeft.lerp(bottomLeft,y/height,lab)
+                val colorRight = topRight.lerp(bottomRight,y/height,lab)
+                val final =  colorLeft.lerp(colorRight,x/width,lab)
+                painter.color = Color.argb(final.alpha().roundToInt(),final.red().roundToInt(), final.green().roundToInt(), final.blue().roundToInt())
+
+                canvas.drawCircle(x,y,radius,painter)
+            }
+
+            val finalBitmap = intermidiateBitmap.copy(Bitmap.Config.ARGB_8888,false)
+//            intermidiateBitmap.recycle()
+            return finalBitmap
         }
 
         private fun initializeWatchFace() {
@@ -774,6 +825,9 @@ class TaskWatchService : CanvasWatchFaceService() {
             val now = System.currentTimeMillis()
             mCalendar.timeInMillis = now
 
+            //Reset everything to black
+            canvas.drawColor(Color.BLACK)
+            //draw our bg
             drawBackground(canvas)
             drawWatchFace(canvas)
             drawFeatures(canvas)
@@ -790,14 +844,13 @@ class TaskWatchService : CanvasWatchFaceService() {
 
         private fun drawBackground(canvas: Canvas) {
 
-            /*if (mAmbient && (mLowBitAmbient || mBurnInProtection)) {
+            if (mAmbient && (mLowBitAmbient || mBurnInProtection)) {
                 canvas.drawColor(Color.BLACK)
             } else if (mAmbient) {
                 canvas.drawBitmap(mGrayBackgroundBitmap, 0f, 0f, mBackgroundPaint)
             } else {
                 canvas.drawBitmap(mBackgroundBitmap, 0f, 0f, mBackgroundPaint)
-            }*/
-            canvas.drawColor(Color.BLACK)
+            }
         }
 
         private fun drawFeatures(canvas: Canvas) {
