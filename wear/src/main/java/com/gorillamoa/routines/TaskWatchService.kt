@@ -33,6 +33,9 @@ import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.math.roundToInt
 
+
+
+
 /**
  * Updates rate in milliseconds for interactive mode. We update once a second to advance the
  * second hand.
@@ -261,7 +264,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             }
 
             leftButton = CanvasButton((mCenterX - screenWidth * 0.2f).toInt() ,mCenterY.toInt(),(screenWidth*0.18f).toInt(),(screenWidth*0.18f).toInt()).apply {
-                setImage(this@TaskWatchService,R.drawable.ic_left_skin_direction)
+                setImage(this@TaskWatchService,R.drawable.ic_chevron_left_white_24dp)
                 onClickListener = {
 
                     TaskScheduler.getPreviousOrderedTask(this@TaskWatchService,currentTask?.id?:0){configureTaskUI(it)}
@@ -269,7 +272,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 touchables.add(this)
             }
             rightButton = CanvasButton((mCenterX + screenWidth * 0.2f).toInt() ,mCenterY.toInt(),(screenWidth*0.18f).toInt(),(screenWidth*0.18f).toInt()).apply {
-                setImage(this@TaskWatchService,R.drawable.ic_right_skin_arrow)
+                setImage(this@TaskWatchService,R.drawable.ic_chevron_right_black_24dp)
                 onClickListener = {
 
                     TaskScheduler.getNextOrderedTask(this@TaskWatchService,currentTask?.id?:0){ configureTaskUI(it) }
@@ -410,15 +413,15 @@ class TaskWatchService : CanvasWatchFaceService() {
             }
         }
 
-        private fun generateBackgroundImage():Bitmap {
-
+        private fun generateWaterColorBackground():Bitmap{
             val height = 200.0f
             val width = 200.0f
             val max_radius = 40.0f
             val intermidiateBitmap = Bitmap.createBitmap(width.toInt(),height.toInt(),Bitmap.Config.ARGB_8888)
             val canvas = Canvas(intermidiateBitmap)
             val lab = ColorSpace.get(ColorSpace.Named.CIE_LAB)
-            val alpha = 10.0f
+            val alpha = 40.0f
+//            val alpha = 10.0f
 
 
             //draw .. lets say.. 200 circles on this white canvas
@@ -458,6 +461,103 @@ class TaskWatchService : CanvasWatchFaceService() {
 
                 canvas.drawCircle(x,y,radius,painter)
             }
+
+            val finalBitmap = intermidiateBitmap.copy(Bitmap.Config.ARGB_8888,false)
+//            intermidiateBitmap.recycle()
+            return finalBitmap
+
+        }
+
+        private fun generateBackgroundImage():Bitmap {
+
+            val height = 200.0f
+            val width = 200.0f
+            val intermidiateBitmap = Bitmap.createBitmap(width.toInt(),height.toInt(),Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(intermidiateBitmap)
+            val lab = ColorSpace.get(ColorSpace.Named.CIE_LAB)
+            val alpha = 40.0f
+//            val alpha = 10.0f
+
+
+            //draw .. lets say.. 200 circles on this white canvas
+            canvas.drawColor(Color.WHITE)
+
+            val painter =Paint().apply {
+                style = Paint.Style.FILL
+                isAntiAlias = true
+            }
+
+            //TODO look up how to spread colors better
+            //we'll make a gradient of 4 colors for now,
+            val topLeft = Color.valueOf(255.0f,245.0f,235.0f,alpha,lab)
+            val bottomRight = Color.valueOf(200.0f,190.0f,180.0f, alpha,lab)
+            val bottomLeft = Color.valueOf(175.0f,111.0f,84.0f, alpha,lab)
+            val topRight = Color.valueOf(175.0f,111.0f,84.0f,alpha,lab)
+
+            //we'll create delayney triangles
+            val POINTS =61
+            val MAXTRIANGLES = 110
+
+            val random = Random()
+
+            //initialize an empty array of floating points to mark the vertices of our triangles
+            val point2ds = Array(POINTS){PointF(0.0f,0.0f)}
+
+            //place points on the corners of our quad
+            point2ds[0].x = 0.0f
+            point2ds[0].y = 0.0f
+            point2ds[1].x = 1.0f
+            point2ds[1].y = -1.0f
+            point2ds[2].x = -1.0f
+            point2ds[2].y = 1.0f
+            point2ds[3].x = 1.0f
+            point2ds[3].y = 1.0f
+
+            for (i in 4 until POINTS) {
+
+                //place points on the edges of the quad
+                if (i < 8) {
+                    point2ds[i].x = 2.0f * random.nextFloat()  - 1.0f
+                    point2ds[i].y = -1.0f
+                } else if (i < 12) {
+                    point2ds[i].x = (2.0f * random.nextFloat()) - 1.0f
+                    point2ds[i].y = 1.0f
+                } else if (i < 16) {
+                    point2ds[i].x = 1.0f
+                    point2ds[i].y = 2.0f * random.nextFloat() - 1.0f
+                } else if (i < 20) {
+                    point2ds[i].x = -1.0f
+                    point2ds[i].y = (2.0f * random.nextFloat())  - 1.0f
+
+
+                    //in order to disperse points more evenly across the entire quad, the quad is split into 4 quadrants
+                    // and random points are generated within each quadrant
+                } else if (i < 30) {
+                    point2ds[i].x = random.nextFloat()
+                    point2ds[i].y = random.nextFloat()
+                } else if (i < 40) {
+                    point2ds[i].x = random.nextFloat() - 1.0f
+                    point2ds[i].y = random.nextFloat()
+                } else if (i < 50) {
+                    point2ds[i].x = random.nextFloat()  - 1.0f
+                    point2ds[i].y = random.nextFloat()  - 1.0f
+                } else if (i < 60) {
+                    point2ds[i].x = random.nextFloat()
+                    point2ds[i].y = random.nextFloat()  - 1.0f
+                }
+                
+            }
+
+
+
+
+
+
+
+
+
+//                canvas.drawCircle(x,y,radius,painter)
+
 
             val finalBitmap = intermidiateBitmap.copy(Bitmap.Config.ARGB_8888,false)
 //            intermidiateBitmap.recycle()

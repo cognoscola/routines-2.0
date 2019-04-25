@@ -1,0 +1,12 @@
+-classpath '/Users/alvarezgd/AndroidStudioProjects/delaunay-triangulator/library/build/classes/java/main:/Users/alvarezgd/AndroidStudioProjects/delaunay-triangulator/library/build/resources/main'
+-d '/Users/alvarezgd/AndroidStudioProjects/delaunay-triangulator/library/build/docs/javadoc'
+-doctitle 'library 1.0.3 API'
+-quiet 
+-windowtitle 'library 1.0.3 API'
+'/Users/alvarezgd/AndroidStudioProjects/delaunay-triangulator/library/src/main/java/io/github/jdiemke/triangulation/DelaunayTriangulator.java'
+'/Users/alvarezgd/AndroidStudioProjects/delaunay-triangulator/library/src/main/java/io/github/jdiemke/triangulation/Edge2D.java'
+'/Users/alvarezgd/AndroidStudioProjects/delaunay-triangulator/library/src/main/java/io/github/jdiemke/triangulation/EdgeDistancePack.java'
+'/Users/alvarezgd/AndroidStudioProjects/delaunay-triangulator/library/src/main/java/io/github/jdiemke/triangulation/NotEnoughPointsException.java'
+'/Users/alvarezgd/AndroidStudioProjects/delaunay-triangulator/library/src/main/java/io/github/jdiemke/triangulation/Triangle2D.java'
+'/Users/alvarezgd/AndroidStudioProjects/delaunay-triangulator/library/src/main/java/io/github/jdiemke/triangulation/TriangleSoup.java'
+'/Users/alvarezgd/AndroidStudioProjects/delaunay-triangulator/library/src/main/java/io/github/jdiemke/triangulation/Vector2D.java'
