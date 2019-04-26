@@ -14,6 +14,7 @@ const val isRestAlarmActive = "isRestAlarmActive"
 
 const val isTimerAlarmActive = "isTimerAlarmActive"
 const val isTimerAlarmTriggered = "isTimerAlarmTriggered"
+const val isBreakAlarmTriggered = "isBreakAlarmTriggered"
 const val selectedMinutesTimer = "timerMinute"
 
 //TODO allow user to turn this feature on or off
@@ -150,6 +151,13 @@ fun Context.saveAlarmTimerTriggerStatus(isAlarmSet:Boolean){
     val prefs = getLocalSettings()
     prefs.edit()
             .putBoolean(isTimerAlarmTriggered,isAlarmSet)
+            .apply()
+}
+
+fun Context.saveAlarmRestTriggerStatus(isAlarmSet: Boolean) {
+    val prefs = getLocalSettings()
+    prefs.edit()
+            .putBoolean(isBreakAlarmTriggered,isAlarmSet)
             .apply()
 }
 

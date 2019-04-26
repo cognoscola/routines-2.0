@@ -6,7 +6,6 @@ import android.content.Intent
 import android.util.Log
 import com.gorillamoa.routines.extensions.*
 import com.gorillamoa.routines.scheduler.TaskScheduler
-import java.util.*
 
 /**
  * What to do when our app sounds the "wake up" alarm.
@@ -101,7 +100,7 @@ class AlarmReceiver:BroadcastReceiver(){
                 ACTION_REST -> {
 
                     context.notificationShowRest()
-                    Log.d("onReceive","REST ALARM WENT OFF at ${Calendar.getInstance().get(Calendar.MINUTE)}")
+                    context.saveAlarmRestTriggerStatus(true)
                 }
 
                 ACTION_TIMER ->{

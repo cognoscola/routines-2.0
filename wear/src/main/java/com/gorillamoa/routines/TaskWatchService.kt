@@ -4,10 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.*
 import android.graphics.*
-import android.os.Bundle
-import android.os.Handler
-import android.os.Message
-import android.os.SystemClock
+import android.os.*
 import android.support.wearable.watchface.CanvasWatchFaceService
 import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
@@ -30,7 +27,11 @@ import kotlin.math.roundToInt
  * Updates rate in milliseconds for interactive mode. We update once a second to advance the
  * second hand.
  */
-private const val INTERACTIVE_UPDATE_RATE_MS = 1000
+private const val INTERACTIVE_UPDATE_RATE_MS = 67L
+//private const val INTERACTIVE_UPDATE_RATE_MS = 1000
+
+
+//
 
 /**
  * Handler message id for updating the time periodically in interactive mode.
@@ -140,13 +141,9 @@ class TaskWatchService : CanvasWatchFaceService() {
 
 
 
-
-
         //clean the timer stuff into its own class
         private lateinit var timerView:TimerView
 
-        //TODO we'll show 1 generic alarm, but modify that alarm slightly (e.g. color) to indicate which type of alarm went off
-        private var alarmTriggered = false
 
         //create a shared preference listener so that we can update the watchface UI when
         //changes to preference variables occur
@@ -165,10 +162,18 @@ class TaskWatchService : CanvasWatchFaceService() {
 
                 //we're just going to fire off
                 if (sharedPreferences.getBoolean(key, false)) {
-                    alarmTriggered =true
+                    livingBackground.enableAlarm()
                 }
-
             }
+
+            if (key == isBreakAlarmTriggered) {
+
+                //we're just going to fire off
+                if (sharedPreferences.getBoolean(key, false)) {
+                    livingBackground.enableAlarm()
+                }
+            }
+
 
         }
 
@@ -198,7 +203,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 invalidate()
             }
 
-            livingBackground.initializeBackground{
+            livingBackground.initializeBackground(getSystemService(VIBRATOR_SERVICE) as Vibrator){
                 updateWatchHandStyle()
             }
 
@@ -274,6 +279,10 @@ class TaskWatchService : CanvasWatchFaceService() {
             applicationContext.getAlarmService().cancel(getTimerPendingIntent())
             isTimerEnabled = false
             applicationContext.saveAlarmTimerTriggerStatus(false)
+        }
+
+        private fun disableRestAlarm(){
+            applicationContext.saveAlarmRestTriggerStatus(false)
         }
 
         var currentTask:Task? = null
@@ -584,12 +593,11 @@ class TaskWatchService : CanvasWatchFaceService() {
                 WatchFaceService.TAP_TYPE_TAP ->{
                     // The user has completed the tap gesture.
 
-                    if (alarmTriggered) {
-                        alarmTriggered = false
-
+                    if (livingBackground.isAlarmEnabled()) {
+                        livingBackground.disableAlarm()
                         //TODO disable corresponding alarm
                         disableTimer()
-
+                        disableRestAlarm()
                     }else{
 
 
@@ -645,7 +653,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             //Reset everything to black
             canvas.drawColor(Color.BLACK)
             //draw our bg
-            livingBackground.drawBackground(canvas, mAmbient,mLowBitAmbient,mBurnInProtection)
+            livingBackground.drawBackground(canvas, mAmbient,mLowBitAmbient,mBurnInProtection, bounds)
             drawWatchFace(canvas)
             drawFeatures(canvas)
             foreground.drawButtons(canvas)

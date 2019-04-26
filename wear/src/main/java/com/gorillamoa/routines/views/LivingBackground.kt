@@ -1,6 +1,7 @@
 package com.gorillamoa.routines.views
 
 import android.graphics.*
+import android.os.SystemClock
 import android.util.Log
 import androidx.palette.graphics.Palette
 import com.gorillamoa.routines.utils.lerp
@@ -10,25 +11,62 @@ import io.github.jdiemke.triangulation.Triangle2D
 import io.github.jdiemke.triangulation.Vector2D
 import java.util.*
 import kotlin.math.roundToInt
+import android.os.VibrationEffect
+import android.os.Vibrator
 
-class LivingBackground():Drawable{
+
+
+class LivingBackground{
 
     @Suppress("unused")
     private val tag:String = LivingBackground::class.java.name
 
     private lateinit var mBackgroundPaint: Paint
+    private lateinit var mAlarmPaint:Paint
     private lateinit var mBackgroundBitmap: Bitmap
     private lateinit var mGrayBackgroundBitmap: Bitmap
 
+    val lab = ColorSpace.get(ColorSpace.Named.CIE_LAB)
+
     private lateinit var palette: Palette
 
+    var scale = 0.0f
+    var triangleSoup:List<Triangle2D>? = null
+    private var isAlarmOn = false
+    private var isAlarmAlphaIncreasing = true
+    private var currentTimeCounter = 0L
+    private var currentAlarmAlpha = 0.0f
+    private val TIME2MAX = 1000 // 1 second to light up, and 1 to show up.
+    private val MAXALPHA = 255.0f
+    private var lastMeasuredTime = 0L
+    private var dt = 0L
 
+    val vibrationEffect = VibrationEffect.createOneShot(1000,VibrationEffect.DEFAULT_AMPLITUDE)
+    lateinit var vibrator:Vibrator
 
+    fun enableAlarm(){ isAlarmOn = true}
+    fun disableAlarm() {isAlarmOn = false}
+    fun isAlarmEnabled() = isAlarmOn
+//TODO we'll show 1 generic alarm, but modify that alarm slightly (e.g. color) to indicate which type of alarm went off
 
-    fun initializeBackground(paletteCallback:((Palette)->Any?)? = null ) {
+    fun initializeBackground(vibratorService: Vibrator,paletteCallback:((Palette)->Any?)? = null ) {
+      vibrator = vibratorService
+
         mBackgroundPaint = Paint().apply {
             color = Color.BLACK
         }
+
+        mAlarmPaint = Paint().apply {
+            color = Color.RED
+            isAntiAlias = true
+            strokeWidth = 1.0f
+            style = Paint.Style.STROKE
+            //too performant
+           /* setShadowLayer(
+                    6f, 0f, 0f, Color.RED)*/
+        }
+
+
 
         mBackgroundBitmap = generateDelauneyBackgroundImage()
 
@@ -44,10 +82,7 @@ class LivingBackground():Drawable{
     fun getPalette() = palette
 
 
-
-
-
-    fun drawBackground(canvas: Canvas, mAmbient:Boolean, mLowBitAmbient:Boolean, mBurnInProtection:Boolean) {
+    fun drawBackground(canvas: Canvas, mAmbient:Boolean, mLowBitAmbient:Boolean, mBurnInProtection:Boolean, bounds:Rect) {
 
         if (mAmbient && (mLowBitAmbient || mBurnInProtection)) {
             canvas.drawColor(Color.BLACK)
@@ -55,17 +90,60 @@ class LivingBackground():Drawable{
             canvas.drawBitmap(mGrayBackgroundBitmap, 0f, 0f, mBackgroundPaint)
         } else {
             canvas.drawBitmap(mBackgroundBitmap, 0f, 0f, mBackgroundPaint)
+
+            if (isAlarmOn) {
+
+                if(lastMeasuredTime == 0L) {
+                    lastMeasuredTime = SystemClock.uptimeMillis()
+                    return
+                }
+
+                dt = (SystemClock.uptimeMillis() - lastMeasuredTime) //first dt will be 0
+
+                if (isAlarmAlphaIncreasing) {
+
+                    currentTimeCounter += dt
+                    if(currentTimeCounter > 1000.0) {
+                        currentTimeCounter = 1000
+                        isAlarmAlphaIncreasing = false
+                    }
+                }else{
+                    currentTimeCounter -= dt
+                    if(currentTimeCounter < 0.0) {
+                        currentTimeCounter = 0
+                        isAlarmAlphaIncreasing = true
+
+                        //sound a vibration
+                        vibrator.vibrate(vibrationEffect)
+                    }
+                }
+                currentAlarmAlpha = (currentTimeCounter.toFloat().div(TIME2MAX.toFloat())* MAXALPHA)
+                if(currentAlarmAlpha > 255.0)currentAlarmAlpha = 255f else if(currentAlarmAlpha < 0){currentAlarmAlpha = 0f}
+                lastMeasuredTime = SystemClock.uptimeMillis()
+
+                mAlarmPaint.alpha = currentAlarmAlpha.roundToInt()
+
+                canvas.save()
+                canvas.scale(scale,scale)
+                //now draw the lines
+
+                //TODO find performance between drawing another image on top and drawing these lines
+                triangleSoup?.forEach {
+
+                    //TODO don't draw duplicate triangles
+                    canvas.drawLine(it.a.x.toFloat(),it.a.y.toFloat(),it.b.x.toFloat(),it.b.y.toFloat(),mAlarmPaint)
+                    canvas.drawLine(it.b.x.toFloat(),it.b.y.toFloat(),it.c.x.toFloat(),it.c.y.toFloat(),mAlarmPaint)
+                    canvas.drawLine(it.c.x.toFloat(),it.c.y.toFloat(),it.a.x.toFloat(),it.a.y.toFloat(),mAlarmPaint)
+                }
+                canvas.restore()
+            }
         }
     }
 
 
-    override fun draw(canvas: Canvas) {
-
-    }
-
     fun scaleBackground(width:Int,height:Int){
 
-        val scale = width.toFloat() / mBackgroundBitmap.width.toFloat()
+        scale = width.toFloat() / mBackgroundBitmap.width.toFloat()
 
         mBackgroundBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap,
                 (mBackgroundBitmap.width * scale).toInt(),
@@ -92,7 +170,7 @@ class LivingBackground():Drawable{
         val max_radius = 40.0f
         val intermidiateBitmap = Bitmap.createBitmap(width.toInt(),height.toInt(),Bitmap.Config.ARGB_8888)
         val canvas = Canvas(intermidiateBitmap)
-        val lab = ColorSpace.get(ColorSpace.Named.CIE_LAB)
+
         val alpha = 40.0f
 
         canvas.drawColor(Color.WHITE)
@@ -142,14 +220,13 @@ class LivingBackground():Drawable{
         val alpha = 255.0f
 //            val alpha = 10.0f
 
-
         //draw .. lets say.. 200 circles on this white canvas
         canvas.drawColor(Color.WHITE)
 
         val painter =Paint().apply {
             style = Paint.Style.FILL_AND_STROKE
             isAntiAlias = true
-            strokeWidth = 2.0f
+            strokeWidth = 1.0f
         }
 
         //TODO look up how to spread colors better
@@ -209,7 +286,7 @@ class LivingBackground():Drawable{
             }
         }
 
-        val triangleSoup:List<Triangle2D>? = try {
+        triangleSoup = try {
             val delaunayTriangulator = DelaunayTriangulator(point2ds)
             delaunayTriangulator.triangulate()
             delaunayTriangulator.triangles as List<Triangle2D>
@@ -217,7 +294,6 @@ class LivingBackground():Drawable{
         } catch (e: NotEnoughPointsException) {
             Log.d("$tag generateDelauneyBackgroundImage","Woops Triangulation")
             null
-
         }
 
         var centerX:Double
@@ -225,46 +301,38 @@ class LivingBackground():Drawable{
         val path=Path()
         path.fillType = Path.FillType.EVEN_ODD
 
-        triangleSoup?.let {
+        triangleSoup?.forEach {
 
-            //TODO work with floats because we don't need double precision
-            triangleSoup.forEach {
+            //                    Log.d("$tag generateDelauneyBackgroundImage","Triangle: A(${it.a.x},${it.a.y}) B(${it.b.x},${it.b.y}) C(${it.c.x},${it.c.y})")
 
-                //                    Log.d("$tag generateDelauneyBackgroundImage","Triangle: A(${it.a.x},${it.a.y}) B(${it.b.x},${it.b.y}) C(${it.c.x},${it.c.y})")
-
-                //first find the Center Coordinates
-                centerX = (it.a.x + it.b.x + it.c.x).div(3.0)
-                centerY = (it.a.y + it.b.y + it.c.y).div(3.0)
+            //first find the Center Coordinates
+            centerX = (it.a.x + it.b.x + it.c.x).div(3.0)
+            centerY = (it.a.y + it.b.y + it.c.y).div(3.0)
 
 //                    Log.d("$tag generateDelauneyBackgroundImage","Centroid: $centerX, $centerY")
 
-                //now use the coordinates to locate the correct color
-                val colorLeft = topLeft.lerp(bottomLeft,centerY.toFloat()/height,lab)
-                val colorRight = topRight.lerp(bottomRight,centerY.toFloat()/height,lab)
-                val final =  colorLeft.lerp(colorRight,centerX.toFloat()/width,lab)
-                painter.color = Color.argb(final.alpha().roundToInt(),final.red().roundToInt(), final.green().roundToInt(), final.blue().roundToInt())
+            //now use the coordinates to locate the correct color
+            val colorLeft = topLeft.lerp(bottomLeft, centerY.toFloat() / height, lab)
+            val colorRight = topRight.lerp(bottomRight, centerY.toFloat() / height, lab)
+            val final = colorLeft.lerp(colorRight, centerX.toFloat() / width, lab)
+            painter.color = Color.argb(final.alpha().roundToInt(), final.red().roundToInt(), final.green().roundToInt(), final.blue().roundToInt())
 
 
-                //draw the centroids
-                //  canvas.drawPoint(centerX.toFloat(),centerY.toFloat(),painter)
+            //draw the centroids
+            //  canvas.drawPoint(centerX.toFloat(),centerY.toFloat(),painter)
 
-                //now we draw the triangle
-                path.moveTo(it.a.x.toFloat(),it.a.y.toFloat())
-                path.lineTo(it.b.x.toFloat(),it.b.y.toFloat())
-                path.lineTo(it.c.x.toFloat(),it.c.y.toFloat())
-                path.lineTo(it.a.x.toFloat(),it.a.y.toFloat())
+            //now we draw the triangle
+            path.moveTo(it.a.x.toFloat(), it.a.y.toFloat())
+            path.lineTo(it.b.x.toFloat(), it.b.y.toFloat())
+            path.lineTo(it.c.x.toFloat(), it.c.y.toFloat())
+            path.lineTo(it.a.x.toFloat(), it.a.y.toFloat())
 
-                canvas.drawPath(path,painter)
-                path.reset()
-            }
+            canvas.drawPath(path, painter)
+            path.reset()
         }
-        //Determine the center position of each triangle
-
-//                canvas.drawCircle(x,y,radius,painter)
 
 
         val finalBitmap = intermidiateBitmap.copy(Bitmap.Config.ARGB_8888,false)
-//            intermidiateBitmap.recycle()
         return finalBitmap
     }
 
