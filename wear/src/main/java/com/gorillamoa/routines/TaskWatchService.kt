@@ -11,9 +11,6 @@ import android.os.SystemClock
 import android.support.wearable.watchface.CanvasWatchFaceService
 import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
-import android.text.Layout
-import android.text.StaticLayout
-import android.text.TextPaint
 import android.util.Log
 import android.view.SurfaceHolder
 import com.gorillamoa.routines.data.Task
@@ -44,14 +41,12 @@ private const val HOUR_STROKE_WIDTH = 5f
 private const val MINUTE_STROKE_WIDTH = 3f
 private const val SECOND_TICK_STROKE_WIDTH = 2f
 
-private const val CENTER_GAP_AND_CIRCLE_RADIUS = 4f
 
 private const val SHADOW_RADIUS = 6f
 
 private const val PERCENT_OF_RADIUS = 0.7
 
-private const val COMPLETE = "complete"
-private const val INCOMPLETE = "incomplete"
+
 
 
 /**
@@ -88,7 +83,6 @@ class TaskWatchService : CanvasWatchFaceService() {
         }
     }
 
-
     inner class Engine : CanvasWatchFaceService.Engine() {
         private val tag:String = Engine::class.java.name
 
@@ -98,8 +92,6 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var mMuteMode: Boolean = false
         private var mCenterX: Float = 0F
         private var mCenterY: Float = 0F
-
-
 
         private var mSecondHandLength: Float = 0F
         private var sMinuteHandLength: Float = 0F
@@ -116,7 +108,7 @@ class TaskWatchService : CanvasWatchFaceService() {
         private lateinit var mTickAndCirclePaint: Paint
 
         private val livingBackground = LivingBackground()
-
+        private val foreground=Foreground()
 
 
         private var mAmbient: Boolean = false
@@ -130,21 +122,8 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var yLastTouch = 0
         private var lastTimeTouch = 0L
 
-
         //Break hand color
         private lateinit var mBreakLinePaint:Paint
-
-        //clean code TASK STUFF
-        private lateinit var mTextPaint:TextPaint
-        private var textHeight = 0f
-        private var staticLayout: StaticLayout? = null
-        private var textHalfWidth = 0f
-        private var leftButton:CanvasButton? = null
-        private var rightButton:CanvasButton? = null
-        private var centerButton:SwitchingButton? = null
-
-        private val touchables= ArrayList<ClickableRectangle>()
-
 
 
         //todo save selected Minute and break Interval
@@ -159,11 +138,9 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var isRestAlarmEnabled = false
         private var isTimerEnabled = false
 
-        private var switchingButton:SwitchingButton? = null
 
-        private val STATE_BREAKS = "break"
-        private val STATE_TIMER = "time"
-        private val STATE_ALARM = "alarm"
+
+
 
         //clean the timer stuff into its own class
         private lateinit var timerView:TimerView
@@ -215,7 +192,11 @@ class TaskWatchService : CanvasWatchFaceService() {
             isRestAlarmEnabled = isRestAlarmActive()
             isTimerEnabled = isTimerAlarmActive()
 
-            TaskScheduler.getNextUncompletedTask(this@TaskWatchService){ task -> configureTaskUI(task) }
+
+            TaskScheduler.getNextUncompletedTask(this@TaskWatchService) { task ->
+                foreground.configureTaskUI(task, this@TaskWatchService)
+                invalidate()
+            }
 
             livingBackground.initializeBackground{
                 updateWatchHandStyle()
@@ -229,71 +210,8 @@ class TaskWatchService : CanvasWatchFaceService() {
 
         private fun measureFeatures(){
             timerView = TimerView(mCenterX.toInt(),mCenterY.toInt(),mCenterX.toInt() - 30)
-
-
-
         }
 
-        /**
-         * Note, we need to ensure that our dimensions are initialized. So when we create these features
-         * they are given correct values
-         */
-        private fun measureTouchables(screenWidth:Int, screenHeight:Int) {
-//            ClickableRectangle.enableDebug()
-
-            switchingButton = SwitchingButton(
-                    mCenterX.toInt(),
-                    mCenterY.toInt() + (screenHeight * 0.2f).toInt(),
-                    (screenWidth  * 0.18).toInt(),
-                    //use width to ensure we get a square object
-                    (screenWidth  *   0.18).toInt(),
-                    this@TaskWatchService).apply {
-                onClickListener = {
-                    nextState()
-                    invalidate()
-
-                }
-                addState(STATE_BREAKS,R.drawable.ic_break_time)
-                addState(STATE_TIMER,R.drawable.ic_hourglass)
-                addState(STATE_ALARM,R.drawable.ic_alarm)
-                touchables.add(this)
-            }
-
-            leftButton = CanvasButton((mCenterX - screenWidth * 0.2f).toInt() ,mCenterY.toInt(),(screenWidth*0.18f).toInt(),(screenWidth*0.18f).toInt()).apply {
-                setImage(this@TaskWatchService,R.drawable.ic_chevron_left_white_24dp)
-                onClickListener = {
-
-                    TaskScheduler.getPreviousOrderedTask(this@TaskWatchService,currentTask?.id?:0){configureTaskUI(it)}
-                }
-                touchables.add(this)
-            }
-            rightButton = CanvasButton((mCenterX + screenWidth * 0.2f).toInt() ,mCenterY.toInt(),(screenWidth*0.18f).toInt(),(screenWidth*0.18f).toInt()).apply {
-                setImage(this@TaskWatchService,R.drawable.ic_chevron_right_black_24dp)
-                onClickListener = {
-
-                    TaskScheduler.getNextOrderedTask(this@TaskWatchService,currentTask?.id?:0){ configureTaskUI(it) }
-
-
-                }
-                touchables.add(this)
-            }
-            centerButton = SwitchingButton((mCenterX).toInt() ,(mCenterY).toInt(),(screenWidth*0.18f).toInt(),(screenWidth*0.18f).toInt(), this@TaskWatchService).apply {
-                addState(INCOMPLETE,R.drawable.ic_radio_button_unchecked_black_24dp)
-                addState(COMPLETE,R.drawable.ic_cc_checkmark)
-                onClickListener = {
-                    when (nextState()) {
-                        INCOMPLETE ->{ TaskScheduler.uncompleteTask(this@TaskWatchService, currentTask?.id?:-1)}
-                        COMPLETE ->{TaskScheduler.completeTask(this@TaskWatchService,currentTask?.id?:-1)}
-                        else ->{ } // do nothing
-                    }
-                    invalidate()
-                }
-                touchables.add(this)
-            }
-
-            //measure text height
-            textHeight = mCenterY - screenHeight*0.09f - 30f //some text height
-        }
 
         /**
          * if the user touched the screen in the past 5 seconds
@@ -356,39 +274,9 @@ class TaskWatchService : CanvasWatchFaceService() {
             applicationContext.getAlarmService().cancel(getTimerPendingIntent())
             isTimerEnabled = false
             applicationContext.saveAlarmTimerTriggerStatus(false)
-
-        }
-
-        private fun configureTaskUI(task:Task?){
-
-            //create new text for the task name
-
-          task?.apply {
-
-              //Set the correct title
-                val width = mTextPaint.measureText(name)
-                textHalfWidth = (width * 0.5).toFloat()
-
-                val sb = StaticLayout.Builder.obtain(name, 0, name.length, mTextPaint, width.toInt())
-                        .setAlignment(Layout.Alignment.ALIGN_CENTER)
-                        .setLineSpacing(0.0f, 1.0f)
-                        .setIncludePad(false)
-                staticLayout = sb.build()
-
-              //make sure our complete button shows the correct status
-              if (TaskScheduler.isComplete(this@TaskWatchService, task.id ?: -1)) {
-                  centerButton?.setState(COMPLETE)
-              }else centerButton?.setState(INCOMPLETE)
-
-            }
-            currentTask = task
-            invalidate()
-
         }
 
         var currentTask:Task? = null
-
-
 
         private fun initializeWatchFace() {
             /* Set defaults for colors */
@@ -441,10 +329,6 @@ class TaskWatchService : CanvasWatchFaceService() {
 
 
             //clean up
-            mTextPaint = TextPaint().apply {
-                color = Color.WHITE
-                textSize = 24.0f
-            }
 
 
         }
@@ -628,7 +512,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             mCenterX = width / 2f
             mCenterY = height / 2f
 
-            middleSectionRadius = (mCenterY *PERCENT_OF_RADIUS).toFloat()
+            middleSectionRadius = (mCenterY * PERCENT_OF_RADIUS).toFloat()
 
             /*
              * Calculate lengths of different hands based on watch screen size.
@@ -638,7 +522,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             sHourHandLength = (mCenterX * 0.5).toFloat()
 
             /* Scale loaded background image (more efficient) if surface dimensions change. */
-            livingBackground.scaleBackground(width,height)
+            livingBackground.scaleBackground(width, height)
 
             /*
              * Create a gray version of the image only if it will look nice on the device in
@@ -655,8 +539,32 @@ class TaskWatchService : CanvasWatchFaceService() {
             }
 
             measureFeatures()
-            measureTouchables(width,height)
 
+
+            foreground.measureTouchables(this@TaskWatchService, width, height,
+                    stateButtonCallback = { invalidate() },
+                    leftButtonCallback = {
+                        TaskScheduler.getPreviousOrderedTask(this@TaskWatchService, currentTask?.id
+                                ?: 0) {
+                            foreground.configureTaskUI(it,this@TaskWatchService)
+                            invalidate()
+                        }
+                    },
+                    rightButtonCallback = {
+                        TaskScheduler.getNextOrderedTask(this@TaskWatchService, currentTask?.id
+                                ?: 0) {
+                            foreground.configureTaskUI(it, this@TaskWatchService)
+                            invalidate()
+                        }
+                    },
+                    centerButtonCallback = { isComplete ->
+                        if (isComplete) {
+                            TaskScheduler.completeTask(this@TaskWatchService,currentTask?.id?:-1)}
+                        else{
+                            TaskScheduler.uncompleteTask(this@TaskWatchService, currentTask?.id?:-1)
+                        }
+                        invalidate()}
+            )
         }
 
 
@@ -683,23 +591,19 @@ class TaskWatchService : CanvasWatchFaceService() {
                         disableTimer()
 
                     }else{
+
+
                         xLastTouch = x
                         yLastTouch = y
                         lastTimeTouch = eventTime
 
-                        //TODO process UI touches more eloquently.
-                        var buttonTouched = false
-                        touchables.forEach {
-                            buttonTouched = it.isTouched(x,y)
-                            if (buttonTouched) {
-                                return
-                            }
-                        }
-                        if (!buttonTouched) {
-                            when (switchingButton?.getState()) {
-                                STATE_ALARM -> {}
-                                STATE_BREAKS -> { if(isTouchingCenter(x,y)) disableRestPeriods() else enableRestPeriods() }
-                                STATE_TIMER -> {if(isTouchingCenter(x,y)) disableTimer() else enableTimer(getSelectedMinute(x,y))}
+                        if (!foreground.processTouch(x, y)) {
+
+                            //clean needs more depedency. See if you can store state somewhere else
+                            when (foreground.getState()) {
+                                Foreground.STATE_ALARM -> {}
+                                Foreground.STATE_BREAKS -> { if(isTouchingCenter(x,y)) disableRestPeriods() else enableRestPeriods() }
+                                Foreground.STATE_TIMER -> {if(isTouchingCenter(x,y)) disableTimer() else enableTimer(getSelectedMinute(x,y))}
                                 else ->{}
                             }
                         }
@@ -744,15 +648,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             livingBackground.drawBackground(canvas, mAmbient,mLowBitAmbient,mBurnInProtection)
             drawWatchFace(canvas)
             drawFeatures(canvas)
-            drawButtons(canvas)
-        }
-
-        private fun drawButtons(canvas: Canvas) {
-            //TODO don't draw this everyframe
-            leftButton?.draw(canvas)
-            centerButton?.draw(canvas)
-            rightButton?.draw(canvas)
-            switchingButton?.draw(canvas)
+            foreground.drawButtons(canvas)
         }
 
 
@@ -764,20 +660,10 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             //lets draw our rest alarms if enabled
             drawRestLines(canvas)
-            drawTexts(canvas)
-
+            foreground.drawTexts(mCenterX.toInt(),canvas)
         }
 
-        private fun drawTexts(canvas: Canvas) {
 
-            staticLayout?.let {
-
-                canvas.save()
-                canvas.translate(mCenterX - textHalfWidth, textHeight)
-                staticLayout!!.draw(canvas)
-                canvas.restore()
-            }
-        }
 
         private fun drawRestLines(canvas: Canvas) {
             if (isRestAlarmEnabled) {
