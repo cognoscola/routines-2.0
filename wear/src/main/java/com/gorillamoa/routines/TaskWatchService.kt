@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.os.SystemClock
-import androidx.palette.graphics.Palette
 import android.support.wearable.watchface.CanvasWatchFaceService
 import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
@@ -23,23 +22,11 @@ import com.gorillamoa.routines.receiver.AlarmReceiver
 import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_REST
 import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_TIMER
 import com.gorillamoa.routines.scheduler.TaskScheduler
-import com.gorillamoa.routines.utils.lerp
-import com.gorillamoa.routines.views.CanvasButton
-import com.gorillamoa.routines.views.ClickableRectangle
-import com.gorillamoa.routines.views.SwitchingButton
-import com.gorillamoa.routines.views.TimerView
-import io.github.jdiemke.triangulation.Vector2D
+import com.gorillamoa.routines.views.*
 
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.math.roundToInt
-import io.github.jdiemke.triangulation.NotEnoughPointsException
-import io.github.jdiemke.triangulation.Triangle2D
-import io.github.jdiemke.triangulation.DelaunayTriangulator
-
-
-
-
 
 
 /**
@@ -128,9 +115,9 @@ class TaskWatchService : CanvasWatchFaceService() {
         private lateinit var mSecondPaint: Paint
         private lateinit var mTickAndCirclePaint: Paint
 
-        private lateinit var mBackgroundPaint: Paint
-        private lateinit var mBackgroundBitmap: Bitmap
-        private lateinit var mGrayBackgroundBitmap: Bitmap
+        private val livingBackground = LivingBackground()
+
+
 
         private var mAmbient: Boolean = false
         private var mLowBitAmbient: Boolean = false
@@ -230,7 +217,10 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             TaskScheduler.getNextUncompletedTask(this@TaskWatchService){ task -> configureTaskUI(task) }
 
-            initializeBackground()
+            livingBackground.initializeBackground{
+                updateWatchHandStyle()
+            }
+
             initializeWatchFace()
             initializeFeatures(selectedMinute)
 
@@ -399,216 +389,6 @@ class TaskWatchService : CanvasWatchFaceService() {
         var currentTask:Task? = null
 
 
-        private fun initializeBackground() {
-            mBackgroundPaint = Paint().apply {
-                color = Color.BLACK
-            }
-
-            mBackgroundBitmap = generateBackgroundImage()
-
-
-
-            /* Extracts colors from background image to improve watchface style. */
-            Palette.from(mBackgroundBitmap).generate {
-                it?.let {
-                    mWatchHandHighlightColor = it.getVibrantColor(Color.RED)
-                    mWatchHandColor = it.getLightVibrantColor(Color.WHITE)
-                    mWatchHandShadowColor = it.getDarkMutedColor(Color.BLACK)
-                    updateWatchHandStyle()
-                }
-            }
-        }
-
-        private fun generateWaterColorBackground():Bitmap{
-            val height = 200.0f
-            val width = 200.0f
-            val max_radius = 40.0f
-            val intermidiateBitmap = Bitmap.createBitmap(width.toInt(),height.toInt(),Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(intermidiateBitmap)
-            val lab = ColorSpace.get(ColorSpace.Named.CIE_LAB)
-            val alpha = 40.0f
-//            val alpha = 10.0f
-
-
-            //draw .. lets say.. 200 circles on this white canvas
-            canvas.drawColor(Color.WHITE)
-
-            val painter =Paint().apply {
-                style = Paint.Style.FILL
-                isAntiAlias = true
-            }
-
-            //TODO look up how to spread colors better
-            //we'll make a gradient of 4 colors for now,
-            val topLeft = Color.valueOf(255.0f,245.0f,235.0f,alpha,lab)
-
-            val bottomRight = Color.valueOf(200.0f,190.0f,180.0f, alpha,lab)
-            //greyish
-
-//            val bottomRight = Color.valueOf(127.0f,120.0f,127.0f, alpha,lab)
-            //light red
-//            val bottomRight = Color.valueOf(127.0f,39.0f,4.0f, alpha,lab)
-            val bottomLeft = Color.valueOf(175.0f,111.0f,84.0f, alpha,lab)
-            val topRight = Color.valueOf(175.0f,111.0f,84.0f,alpha,lab)
-
-            val random = Random()
-            for (i in 0..250) {
-
-                val x = random.nextFloat() * width
-                val y = random.nextFloat() * height
-                var radius = random.nextFloat() * max_radius + 10.0f
-
-                if(radius < 0.0) radius = 0.0f
-
-                val colorLeft = topLeft.lerp(bottomLeft,y/height,lab)
-                val colorRight = topRight.lerp(bottomRight,y/height,lab)
-                val final =  colorLeft.lerp(colorRight,x/width,lab)
-                painter.color = Color.argb(final.alpha().roundToInt(),final.red().roundToInt(), final.green().roundToInt(), final.blue().roundToInt())
-
-                canvas.drawCircle(x,y,radius,painter)
-            }
-
-            val finalBitmap = intermidiateBitmap.copy(Bitmap.Config.ARGB_8888,false)
-//            intermidiateBitmap.recycle()
-            return finalBitmap
-
-        }
-
-        private fun generateBackgroundImage():Bitmap {
-
-            val height = 200.0f
-            val width = 200.0f
-            val intermidiateBitmap = Bitmap.createBitmap(width.toInt(),height.toInt(),Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(intermidiateBitmap)
-            val lab = ColorSpace.get(ColorSpace.Named.CIE_LAB)
-            val alpha = 255.0f
-//            val alpha = 10.0f
-
-
-            //draw .. lets say.. 200 circles on this white canvas
-            canvas.drawColor(Color.WHITE)
-
-            val painter =Paint().apply {
-                style = Paint.Style.FILL_AND_STROKE
-                isAntiAlias = true
-                strokeWidth = 2.0f
-            }
-
-            //TODO look up how to spread colors better
-            //we'll make a gradient of 4 colors for now,
-            val topLeft = Color.valueOf(255.0f,245.0f,235.0f,alpha,lab)
-            val bottomRight = Color.valueOf(127.0f,39.0f,4.0f, alpha,lab)
-            val bottomLeft = Color.valueOf(175.0f,111.0f,84.0f, alpha,lab)
-            val topRight = Color.valueOf(175.0f,111.0f,84.0f,alpha,lab)
-
-            //we'll create delayney triangles
-            val POINTS =61
-
-            val random = Random()
-
-            //initialize an empty array of floating points to mark the vertices of our triangles
-            val point2ds = Vector<Vector2D>(POINTS)
-
-            //place points on the corners of our quad
-            point2ds.addElement(Vector2D(0.0,0.0))
-            point2ds.addElement(Vector2D(width.toDouble(),height.toDouble()))
-            point2ds.addElement(Vector2D(0.0,height.toDouble()))
-            point2ds.addElement(Vector2D(width.toDouble(),0.0))
-
-            val halfWidth = width.toDouble().times(0.5)
-            val halfHeight = height.toDouble().times(0.5)
-
-            for (i in 4 until POINTS) {
-
-                //place points on the edges of the quad
-                if (i < 8) {
-                    //left edge
-                    point2ds.addElement(Vector2D(  0.0, random.nextDouble() * height))
-                } else if (i < 12) {
-                    //top edge
-                    point2ds.addElement(Vector2D((width.toDouble() * random.nextDouble()), height.toDouble()))
-                } else if (i < 16) {
-                    //right edge
-                    point2ds.addElement(Vector2D(width.toDouble(), random.nextDouble() * height.toDouble()))
-                } else if (i < 20) {
-                    //bottom edge
-                    point2ds.addElement(Vector2D(width.toDouble() * random.nextDouble(), 0.0))
-
-                    //in order to disperse points more evenly across the entire quad, the quad is split into 4 quadrants
-                    // and random points are generated within each quadrant
-                } else if (i < 30) {
-                    //bottom left quadrant
-                    point2ds.addElement(Vector2D(random.nextDouble() * halfWidth, random.nextDouble() * halfHeight))
-                } else if (i < 40) {
-                    //top left quadrant
-                    point2ds.addElement(Vector2D(random.nextDouble() *halfWidth, (random.nextDouble() * halfHeight) + halfHeight))
-                } else if (i < 50) {
-                    //top right quadrant
-                    point2ds.addElement(Vector2D((random.nextDouble() * halfWidth) + halfWidth, (random.nextDouble()*halfHeight + halfHeight) ))
-                } else if (i < 60) {
-                    //bottom right quadrant
-                    point2ds.addElement(Vector2D((random.nextDouble() * halfWidth) + halfWidth , random.nextDouble() * halfHeight))
-                }
-            }
-
-            val triangleSoup:List<Triangle2D>? = try {
-                val delaunayTriangulator = DelaunayTriangulator(point2ds)
-                delaunayTriangulator.triangulate()
-                delaunayTriangulator.triangles as List<Triangle2D>
-
-            } catch (e: NotEnoughPointsException) {
-                Log.d("$tag generateBackgroundImage","Woops Triangulation")
-                null
-
-            }
-
-            var centerX:Double
-            var centerY:Double
-            val path=Path()
-            path.fillType = Path.FillType.EVEN_ODD
-
-            triangleSoup?.let {
-
-                //TODO work with floats because we don't need double precision
-                triangleSoup.forEach {
-
-//                    Log.d("$tag generateBackgroundImage","Triangle: A(${it.a.x},${it.a.y}) B(${it.b.x},${it.b.y}) C(${it.c.x},${it.c.y})")
-
-                    //first find the Center Coordinates
-                    centerX = (it.a.x + it.b.x + it.c.x).div(3.0)
-                    centerY = (it.a.y + it.b.y + it.c.y).div(3.0)
-
-//                    Log.d("$tag generateBackgroundImage","Centroid: $centerX, $centerY")
-
-                    //now use the coordinates to locate the correct color
-                    val colorLeft = topLeft.lerp(bottomLeft,centerY.toFloat()/height,lab)
-                    val colorRight = topRight.lerp(bottomRight,centerY.toFloat()/height,lab)
-                    val final =  colorLeft.lerp(colorRight,centerX.toFloat()/width,lab)
-                    painter.color = Color.argb(final.alpha().roundToInt(),final.red().roundToInt(), final.green().roundToInt(), final.blue().roundToInt())
-
-
-                    //draw the centroids
-                  //  canvas.drawPoint(centerX.toFloat(),centerY.toFloat(),painter)
-
-                    //now we draw the triangle
-                    path.moveTo(it.a.x.toFloat(),it.a.y.toFloat())
-                    path.lineTo(it.b.x.toFloat(),it.b.y.toFloat())
-                    path.lineTo(it.c.x.toFloat(),it.c.y.toFloat())
-                    path.lineTo(it.a.x.toFloat(),it.a.y.toFloat())
-
-                    canvas.drawPath(path,painter)
-                    path.reset()
-                }
-            }
-            //Determine the center position of each triangle
-
-//                canvas.drawCircle(x,y,radius,painter)
-
-
-            val finalBitmap = intermidiateBitmap.copy(Bitmap.Config.ARGB_8888,false)
-//            intermidiateBitmap.recycle()
-            return finalBitmap
-        }
 
         private fun initializeWatchFace() {
             /* Set defaults for colors */
@@ -794,10 +574,11 @@ class TaskWatchService : CanvasWatchFaceService() {
                 mBreakLinePaint.clearShadowLayer()
 
             } else {
-                mHourPaint.color = mWatchHandColor
-                mMinutePaint.color = mWatchHandColor
-                mSecondPaint.color = mWatchHandHighlightColor
-                mTickAndCirclePaint.color = mWatchHandColor
+
+                mHourPaint.color = livingBackground.getPalette().getLightVibrantColor(Color.WHITE)
+                mMinutePaint.color = livingBackground.getPalette().getLightVibrantColor(Color.WHITE)
+                mSecondPaint.color = livingBackground.getPalette().getVibrantColor(Color.RED)
+                mTickAndCirclePaint.color = livingBackground.getPalette().getLightVibrantColor(Color.WHITE)
                 mBreakLinePaint.color = Color.MAGENTA
 
 
@@ -806,6 +587,8 @@ class TaskWatchService : CanvasWatchFaceService() {
                 mSecondPaint.isAntiAlias = true
                 mTickAndCirclePaint.isAntiAlias = true
                 mBreakLinePaint.isAntiAlias = true
+
+                val mWatchHandShadowColor = livingBackground.getPalette().getDarkMutedColor(Color.BLACK)
 
                 mHourPaint.setShadowLayer(
                         SHADOW_RADIUS, 0f, 0f, mWatchHandShadowColor)
@@ -855,11 +638,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             sHourHandLength = (mCenterX * 0.5).toFloat()
 
             /* Scale loaded background image (more efficient) if surface dimensions change. */
-            val scale = width.toFloat() / mBackgroundBitmap.width.toFloat()
-
-            mBackgroundBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap,
-                    (mBackgroundBitmap.width * scale).toInt(),
-                    (mBackgroundBitmap.height * scale).toInt(), true)
+            livingBackground.scaleBackground(width,height)
 
             /*
              * Create a gray version of the image only if it will look nice on the device in
@@ -872,7 +651,7 @@ class TaskWatchService : CanvasWatchFaceService() {
              * efficient to create a black/white version (png, etc.) and load that when you need it.
              */
             if (!mBurnInProtection && !mLowBitAmbient) {
-                initGrayBackgroundBitmap()
+                livingBackground.initGrayBackgroundBitmap()
             }
 
             measureFeatures()
@@ -880,19 +659,7 @@ class TaskWatchService : CanvasWatchFaceService() {
 
         }
 
-        private fun initGrayBackgroundBitmap() {
-            mGrayBackgroundBitmap = Bitmap.createBitmap(
-                    mBackgroundBitmap.width,
-                    mBackgroundBitmap.height,
-                    Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(mGrayBackgroundBitmap)
-            val grayPaint = Paint()
-            val colorMatrix = ColorMatrix()
-            colorMatrix.setSaturation(0f)
-            val filter = ColorMatrixColorFilter(colorMatrix)
-            grayPaint.colorFilter = filter
-            canvas.drawBitmap(mBackgroundBitmap, 0f, 0f, grayPaint)
-        }
+
 
         /**
          * Captures tap event (and tap type). The [WatchFaceService.TAP_TYPE_TAP] case can be
@@ -974,7 +741,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             //Reset everything to black
             canvas.drawColor(Color.BLACK)
             //draw our bg
-            drawBackground(canvas)
+            livingBackground.drawBackground(canvas, mAmbient,mLowBitAmbient,mBurnInProtection)
             drawWatchFace(canvas)
             drawFeatures(canvas)
             drawButtons(canvas)
@@ -988,16 +755,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             switchingButton?.draw(canvas)
         }
 
-        private fun drawBackground(canvas: Canvas) {
 
-            if (mAmbient && (mLowBitAmbient || mBurnInProtection)) {
-                canvas.drawColor(Color.BLACK)
-            } else if (mAmbient) {
-                canvas.drawBitmap(mGrayBackgroundBitmap, 0f, 0f, mBackgroundPaint)
-            } else {
-                canvas.drawBitmap(mBackgroundBitmap, 0f, 0f, mBackgroundPaint)
-            }
-        }
 
         private fun drawFeatures(canvas: Canvas) {
 
