@@ -5,16 +5,22 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.palette.graphics.Palette
 import com.gorillamoa.routines.utils.lerp
-import io.github.jdiemke.triangulation.DelaunayTriangulator
-import io.github.jdiemke.triangulation.NotEnoughPointsException
-import io.github.jdiemke.triangulation.Triangle2D
-import io.github.jdiemke.triangulation.Vector2D
 import java.util.*
 import kotlin.math.roundToInt
 import android.os.VibrationEffect
 import android.os.Vibrator
+import io.github.jdiemke.triangulation.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.tan
 
 
+private const val WORKING_BITMAP_WIDTH = 200
+private const val WORKING_BITMAP_HEIGHT = 200
+
+private const val EPSILON = 0.0000001
 
 class LivingBackground{
 
@@ -25,6 +31,7 @@ class LivingBackground{
     private lateinit var mAlarmPaint:Paint
     private lateinit var mBackgroundBitmap: Bitmap
     private lateinit var mGrayBackgroundBitmap: Bitmap
+    private lateinit var debugPaint:Paint
 
     val lab = ColorSpace.get(ColorSpace.Named.CIE_LAB)
 
@@ -32,6 +39,9 @@ class LivingBackground{
 
     var scale = 0.0f
     var triangleSoup:List<Triangle2D>? = null
+    var circleTangents:List<Edge2D>? = null
+    var affectedTriangles:HashMap<Edge2D,List<Triangle2D>> = HashMap()
+
     private var isAlarmOn = false
     private var isAlarmAlphaIncreasing = true
     private var currentTimeCounter = 0L
@@ -66,6 +76,13 @@ class LivingBackground{
                     6f, 0f, 0f, Color.RED)*/
         }
 
+        debugPaint = Paint().apply {
+            color = Color.BLUE
+            isAntiAlias = true
+            strokeWidth = 1.0f
+            style = Paint.Style.STROKE
+        }
+
 
 
         mBackgroundBitmap = generateDelauneyBackgroundImage()
@@ -90,6 +107,27 @@ class LivingBackground{
             canvas.drawBitmap(mGrayBackgroundBitmap, 0f, 0f, mBackgroundPaint)
         } else {
             canvas.drawBitmap(mBackgroundBitmap, 0f, 0f, mBackgroundPaint)
+
+            //draw our tangent temporarily
+            canvas.save()
+            canvas.scale(scale, scale)
+            mAlarmPaint.alpha = 255
+            circleTangents?.forEach {
+
+                canvas.drawLine(it.a.x.toFloat(),it.a.y.toFloat(),it.b.x.toFloat(),it.b.y.toFloat(), debugPaint)
+
+                val triangleSet = affectedTriangles[it]
+                triangleSet?.let { list ->
+                    list.forEach { triangle ->
+                        canvas.drawLine(triangle.a.x.toFloat(),triangle.a.y.toFloat(),triangle.b.x.toFloat(),triangle.b.y.toFloat(),mAlarmPaint)
+                        canvas.drawLine(triangle.b.x.toFloat(),triangle.b.y.toFloat(),triangle.c.x.toFloat(),triangle.c.y.toFloat(),mAlarmPaint)
+                        canvas.drawLine(triangle.c.x.toFloat(),triangle.c.y.toFloat(),triangle.a.x.toFloat(),triangle.a.y.toFloat(),mAlarmPaint)
+                    }
+                }
+            }
+
+            canvas.restore()
+
 
             if (isAlarmOn) {
 
@@ -148,6 +186,101 @@ class LivingBackground{
         mBackgroundBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap,
                 (mBackgroundBitmap.width * scale).toInt(),
                 (mBackgroundBitmap.height * scale).toInt(), true)
+
+
+        //Use this opportunity to create a morphed background
+
+        //first determine radius of morphing circle
+        //lets just make the radius somewhere close to the outer rim of the circular watch
+        val radius = (WORKING_BITMAP_WIDTH.div(2.0) - 15.0).toFloat()
+
+        //now find all the triangles that intersect with this circle, we do this by dividing the circle into tangents
+        //60 of them since 360/6 = 60 sections
+        var xCenter = WORKING_BITMAP_WIDTH.div(2.0)
+        var yCenter = WORKING_BITMAP_HEIGHT.div(2.0)
+
+        circleTangents = List(60) {pos ->
+
+            //the first tangent is the line between 0 and 6 degrees:
+            val start:Vector2D
+            val end:Vector2D
+            if (pos < 59 ) {
+                start = Vector2D((radius * sin(Math.toRadians(pos *6.0))) + xCenter,(radius * -cos(Math.toRadians(pos*6.0))) + xCenter)
+                end = Vector2D((radius * sin(Math.toRadians((pos + 1)*6.0))) + xCenter,(radius * -cos(Math.toRadians((pos + 1)*6.0))) + xCenter)
+
+            }else{
+                start = Vector2D((radius * sin(Math.toRadians(pos*6.0))) + xCenter,radius * -cos(Math.toRadians(pos * 6.0)) + xCenter)
+                end = Vector2D((radius * sin(Math.toRadians(0.0))) + xCenter,(radius * -cos(Math.toRadians(0.0))) + xCenter)
+            }
+
+            val tangent = Edge2D(start,end)
+
+            //Now find all that touch this tangent
+            val touching = ArrayList<Triangle2D>()
+
+            triangleSoup?.forEach {
+
+                when(isIntersecting(tangent.a,tangent.b,it.a,it.b,it.c)){
+                    TOUCHING,INTERSECTING,OVERLAPPING ->{
+                        touching.add(it)
+                    }
+                }
+            }
+            if (touching.size > 0) {
+                affectedTriangles[tangent] = touching
+            }
+            tangent
+        }
+    }
+
+    /** Check whether P and Q lie on the same side of line AB */
+    private fun Side(p: Vector2D, q: Vector2D, a: Vector2D, b: Vector2D): Float {
+        val z1 = (b.x - a.x) * (p.y - a.y) - (p.x - a.x) * (b.y - a.y)
+        val z2 = (b.x - a.x) * (q.y - a.y) - (q.x - a.x) * (b.y - a.y)
+        return (z1 * z2).toFloat()
+    }
+
+    val INTERSECTING = 0
+    val NOT_INTERSECTING = 1
+    val OVERLAPPING = 2
+    val TOUCHING = 3
+
+    /* Check whether segment P0P1 intersects with triangle t0t1t2 */
+    fun isIntersecting(p0: Vector2D, p1: Vector2D, t0: Vector2D, t1: Vector2D, t2: Vector2D): Int {
+        /* Check whether segment is outside one of the three half-planes
+     * delimited by the triangle. */
+        val f1 = Side(p0, t2, t0, t1)
+        val f2 = Side(p1, t2, t0, t1)
+        val f3 = Side(p0, t0, t1, t2)
+        val f4 = Side(p1, t0, t1, t2)
+        val f5 = Side(p0, t1, t2, t0)
+        val f6 = Side(p1, t1, t2, t0)
+        /* Check whether triangle is totally inside one of the two half-planes
+     * delimited by the segment. */
+        val f7 = Side(t0, t1, p0, p1)
+        val f8 = Side(t1, t2, p0, p1)
+
+        /* If segment is strictly outside triangle, or triangle is strictly
+     * apart from the line, we're not intersecting */
+        if (f1 < 0 && f2 < 0 || f3 < 0 && f4 < 0 || f5 < 0 && f6 < 0
+                || f7 > 0 && f8 > 0)
+            return NOT_INTERSECTING
+
+        /* If segment is aligned with one of the edges, we're overlapping */
+        if (f1 == 0f && f2 == 0f || f3 == 0f && f4 == 0f || f5 == 0f && f6 == 0f)
+            return OVERLAPPING
+
+        /* If segment is outside but not strictly, or triangle is apart but
+     * not strictly, we're touching */
+        if (f1 <= 0 && f2 <= 0 || f3 <= 0 && f4 <= 0 || f5 <= 0 && f6 <= 0
+                || f7 >= 0 && f8 >= 0)
+            return TOUCHING
+
+        /* If both segment points are strictly inside the triangle, we
+     * are not intersecting either */
+        return if (f1 > 0 && f2 > 0 && f3 > 0 && f4 > 0 && f5 > 0 && f6 > 0) NOT_INTERSECTING else INTERSECTING
+
+        /* Otherwise we're intersecting with at least one edge */
     }
 
     fun initGrayBackgroundBitmap() {
@@ -212,9 +345,10 @@ class LivingBackground{
 
     private fun generateDelauneyBackgroundImage():Bitmap {
 
-        val height = 200.0f
-        val width = 200.0f
-        val intermidiateBitmap = Bitmap.createBitmap(width.toInt(),height.toInt(),Bitmap.Config.ARGB_8888)
+
+        val widthD = WORKING_BITMAP_WIDTH.toDouble()
+        val heightD = WORKING_BITMAP_HEIGHT.toDouble()
+        val intermidiateBitmap = Bitmap.createBitmap(WORKING_BITMAP_WIDTH, WORKING_BITMAP_HEIGHT,Bitmap.Config.ARGB_8888)
         val canvas = Canvas(intermidiateBitmap)
         val lab = ColorSpace.get(ColorSpace.Named.CIE_LAB)
         val alpha = 255.0f
@@ -246,28 +380,29 @@ class LivingBackground{
 
         //place points on the corners of our quad
         point2ds.addElement(Vector2D(0.0,0.0))
-        point2ds.addElement(Vector2D(width.toDouble(),height.toDouble()))
-        point2ds.addElement(Vector2D(0.0,height.toDouble()))
-        point2ds.addElement(Vector2D(width.toDouble(),0.0))
+        point2ds.addElement(Vector2D(widthD,heightD))
+        point2ds.addElement(Vector2D(0.0,heightD))
+        point2ds.addElement(Vector2D(widthD,0.0))
 
-        val halfWidth = width.toDouble().times(0.5)
-        val halfHeight = height.toDouble().times(0.5)
+
+        val halfWidth = widthD.times(0.5)
+        val halfHeight = heightD.times(0.5)
 
         for (i in 4 until POINTS) {
 
             //place points on the edges of the quad
             if (i < 8) {
                 //left edge
-                point2ds.addElement(Vector2D(  0.0, random.nextDouble() * height))
+                point2ds.addElement(Vector2D(  0.0, random.nextDouble() * heightD))
             } else if (i < 12) {
                 //top edge
-                point2ds.addElement(Vector2D((width.toDouble() * random.nextDouble()), height.toDouble()))
+                point2ds.addElement(Vector2D((widthD * random.nextDouble()), heightD.toDouble()))
             } else if (i < 16) {
                 //right edge
-                point2ds.addElement(Vector2D(width.toDouble(), random.nextDouble() * height.toDouble()))
+                point2ds.addElement(Vector2D(widthD, random.nextDouble() * heightD.toDouble()))
             } else if (i < 20) {
-                //bottom edge
-                point2ds.addElement(Vector2D(width.toDouble() * random.nextDouble(), 0.0))
+                //bottom edgeD
+                point2ds.addElement(Vector2D(widthD * random.nextDouble(), 0.0))
 
                 //in order to disperse points more evenly across the entire quad, the quad is split into 4 quadrants
                 // and random points are generated within each quadrant
@@ -312,9 +447,9 @@ class LivingBackground{
 //                    Log.d("$tag generateDelauneyBackgroundImage","Centroid: $centerX, $centerY")
 
             //now use the coordinates to locate the correct color
-            val colorLeft = topLeft.lerp(bottomLeft, centerY.toFloat() / height, lab)
-            val colorRight = topRight.lerp(bottomRight, centerY.toFloat() / height, lab)
-            val final = colorLeft.lerp(colorRight, centerX.toFloat() / width, lab)
+            val colorLeft = topLeft.lerp(bottomLeft, centerY.toFloat() / heightD.toFloat(), lab)
+            val colorRight = topRight.lerp(bottomRight, centerY.toFloat() / heightD.toFloat(), lab)
+            val final = colorLeft.lerp(colorRight, centerX.toFloat() / widthD.toFloat(), lab)
             painter.color = Color.argb(final.alpha().roundToInt(), final.red().roundToInt(), final.green().roundToInt(), final.blue().roundToInt())
 
 
@@ -331,8 +466,10 @@ class LivingBackground{
             path.reset()
         }
 
-
         val finalBitmap = intermidiateBitmap.copy(Bitmap.Config.ARGB_8888,false)
+
+        intermidiateBitmap.recycle()
+
         return finalBitmap
     }
 
