@@ -26,9 +26,12 @@ import java.util.*
  */
 class TaskScheduler{
 
+
     //TODO account for day's progress. For now we'll just try to see # of tasks completed
     //TODO reset at the wake up alarm
     companion object {
+        @Suppress("unused")
+        private val tag:String = TaskScheduler::class.java.name
 
         /**
          * Using the context, we'll fetch task data
@@ -317,16 +320,16 @@ class TaskScheduler{
                 return
             }
             val order = context.getSavedOrder()
-
             if (order.size > 0) {
                 val position = order.indexOf(currentTid)
-                val nextPosition:Int = if (position == order.size - 1) {
+                val nextPosition:Int = if (position == (order.size - 1)) {
                     0
                 }else{
                     position + 1
                 }
 
                 Coroutines.ioThenMain({context.getDataRepository().getTaskById(order[nextPosition])}){
+
                     schedulerCallback.invoke(it)
                 }
 

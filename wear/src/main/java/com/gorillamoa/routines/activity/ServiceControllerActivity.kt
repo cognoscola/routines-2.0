@@ -156,6 +156,7 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
         clearTask?.setOnClickListener {
             //TODO show better notification on empty tasks
             taskViewModel.clearReturnList()
+            clearSavedArrays()
         }
 
         dummy?.setOnClickListener {

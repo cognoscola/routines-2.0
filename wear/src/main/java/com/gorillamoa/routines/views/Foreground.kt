@@ -15,6 +15,8 @@ import java.util.ArrayList
 private const val COMPLETE = "complete"
 private const val INCOMPLETE = "incomplete"
 
+//TODO update task if it is deleted somewhere else
+
 class Foreground{
 
     //includes buttons, texts and others
@@ -114,10 +116,10 @@ class Foreground{
         task?.apply {
 
             //Set the correct title
-            val width = mTextPaint.measureText(name)
+            val width = mTextPaint.measureText(this.name)
             textHalfWidth = (width * 0.5).toFloat()
 
-            val sb = StaticLayout.Builder.obtain(name, 0, name.length, mTextPaint, width.toInt())
+            val sb = StaticLayout.Builder.obtain(this.name, 0, this.name.length, mTextPaint, width.toInt())
                     .setAlignment(Layout.Alignment.ALIGN_CENTER)
                     .setLineSpacing(0.0f, 1.0f)
                     .setIncludePad(false)

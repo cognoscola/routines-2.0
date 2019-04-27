@@ -47,8 +47,8 @@ private const val SHADOW_RADIUS = 6f
 
 private const val PERCENT_OF_RADIUS = 0.7
 
-
-
+//TODO give user option to approve today's task if there isn't any scheduled!
+//TODO create Approve/No task/Done day UI
 
 /**
  * Analog watch face with a ticking second hand. In ambient mode, the second hand isn't
@@ -556,6 +556,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                         TaskScheduler.getPreviousOrderedTask(this@TaskWatchService, currentTask?.id
                                 ?: 0) {
                             foreground.configureTaskUI(it,this@TaskWatchService)
+                            currentTask = it
                             invalidate()
                         }
                     },
@@ -563,6 +564,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                         TaskScheduler.getNextOrderedTask(this@TaskWatchService, currentTask?.id
                                 ?: 0) {
                             foreground.configureTaskUI(it, this@TaskWatchService)
+                            currentTask = it
                             invalidate()
                         }
                     },

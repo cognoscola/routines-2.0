@@ -308,6 +308,15 @@ fun Context.fetchArrayFromPreference(listName:String):ArrayDeque<Int>{
 }
 
 
+fun Context.clearSavedArrays(){
+    getLocalSettings().edit()
+            .putString(TASK_COMPLETE,"")
+            .putString(TASK_ORDER,"")
+            .putString(TASK_INCOMPLETE,"")
+            .apply()
+}
+
+
 fun Context.isEnabled(){
     getLocalSettings().getBoolean(IS_ACTIVE,false)
 }
