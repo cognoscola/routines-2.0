@@ -11,6 +11,7 @@ public class EdgeDistancePack implements Comparable<EdgeDistancePack> {
     public Edge2D edge;
     public double distance;
 
+
     /**
      * Constructor of the edge distance pack class used to create a new edge
      * distance pack instance from a 2D edge and a scalar value describing a

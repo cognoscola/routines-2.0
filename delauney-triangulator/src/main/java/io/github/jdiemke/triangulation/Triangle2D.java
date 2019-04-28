@@ -13,6 +13,10 @@ public class Triangle2D {
     public Vector2D b;
     public Vector2D c;
 
+    public Vector2D qA;
+    public Vector2D qB;
+    public Vector2D qC;
+
     /**
      * Constructor of the 2D triangle class used to create a new triangle
      * instance from three 2D vectors describing the triangle's vertices.
@@ -184,6 +188,58 @@ public class Triangle2D {
         return edges[0];
     }
 
+    public void computeClosestPointsToAEdge(Edge2D edge) {
+        qA = computeClosestPoint(edge,a);
+        qB = computeClosestPoint(edge,b);
+        qC = computeClosestPoint(edge,c);
+
+    }
+
+    public boolean moveClosestUntouchingVertexToQ() {
+
+        boolean hasFoundOne = false;
+        double potentialDistance = 10000.0;
+        double magnitue;
+        Vector2D potentialVertex = null;
+        Vector2D potentialQ = null;
+        if (a != qA) {
+            magnitue = qA.sub(a).mag();
+            if(magnitue < potentialDistance){
+                potentialVertex = a;
+                potentialDistance = magnitue;
+                potentialQ = qA;
+                hasFoundOne = true;
+            }
+        }
+        if (b != qB) {
+            magnitue = qB.sub(b).mag();
+            if (magnitue < potentialDistance) {
+                potentialVertex = b;
+                potentialDistance = magnitue;
+                potentialQ = qB;
+                hasFoundOne = true;
+            }
+        }
+
+        if (c != qC) {
+            magnitue = qC.sub(c).mag();
+            if (magnitue < potentialDistance) {
+                potentialVertex = c;
+                potentialQ = qC;
+                hasFoundOne = true;
+            }
+        }
+
+        if (hasFoundOne) {
+            if(a == potentialVertex) { a.x = potentialQ.x; a.y = potentialQ.y ;}
+            if(b == potentialVertex) { b.x = potentialQ.x; b.y = potentialQ.y ;}
+            if(c == potentialVertex) { c.x = potentialQ.x; c.y = potentialQ.y ;}
+            return true;
+        }else {
+            return false;
+        }
+    }
+
     /**
      * Computes the closest point on the given edge to the specified point.
      * 
@@ -194,7 +250,7 @@ public class Triangle2D {
      *            The point to which we search the closest point on the edge
      * @return The closest point on the given edge to the specified point
      */
-    private Vector2D computeClosestPoint(Edge2D edge, Vector2D point) {
+    public Vector2D computeClosestPoint(Edge2D edge, Vector2D point) {
         Vector2D ab = edge.b.sub(edge.a);
         double t = point.sub(edge.a).dot(ab) / ab.dot(ab);
 
@@ -206,6 +262,8 @@ public class Triangle2D {
 
         return edge.a.add(ab.mult(t));
     }
+
+
 
     /**
      * Tests if the two arguments have the same sign.

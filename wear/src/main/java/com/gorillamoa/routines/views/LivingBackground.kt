@@ -9,18 +9,16 @@ import java.util.*
 import kotlin.math.roundToInt
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.text.method.Touch
 import io.github.jdiemke.triangulation.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.math.cos
 import kotlin.math.sin
-import kotlin.math.tan
 
 
 private const val WORKING_BITMAP_WIDTH = 200
 private const val WORKING_BITMAP_HEIGHT = 200
-
-private const val EPSILON = 0.0000001
 
 class LivingBackground{
 
@@ -40,7 +38,10 @@ class LivingBackground{
     var scale = 0.0f
     var triangleSoup:List<Triangle2D>? = null
     var circleTangents:List<Edge2D>? = null
-    var affectedTriangles:HashMap<Edge2D,List<Triangle2D>> = HashMap()
+    var intersectingMap:HashMap<Edge2D,ArrayList<Triangle2D>> = HashMap()
+    var overlappingMap:HashMap<Edge2D,ArrayList<Triangle2D>> = HashMap()
+    var touchingMap:HashMap<Edge2D,ArrayList<Triangle2D>> = HashMap()
+//    var morphedMap:HashMap<Edge2D,ArrayList<Triangle2D>> = HashMap()
 
     private var isAlarmOn = false
     private var isAlarmAlphaIncreasing = true
@@ -116,7 +117,8 @@ class LivingBackground{
 
                 canvas.drawLine(it.a.x.toFloat(),it.a.y.toFloat(),it.b.x.toFloat(),it.b.y.toFloat(), debugPaint)
 
-                val triangleSet = affectedTriangles[it]
+                mAlarmPaint.color = Color.RED
+                var triangleSet = intersectingMap[it]
                 triangleSet?.let { list ->
                     list.forEach { triangle ->
                         canvas.drawLine(triangle.a.x.toFloat(),triangle.a.y.toFloat(),triangle.b.x.toFloat(),triangle.b.y.toFloat(),mAlarmPaint)
@@ -124,6 +126,29 @@ class LivingBackground{
                         canvas.drawLine(triangle.c.x.toFloat(),triangle.c.y.toFloat(),triangle.a.x.toFloat(),triangle.a.y.toFloat(),mAlarmPaint)
                     }
                 }
+
+                mAlarmPaint.color = Color.YELLOW
+                triangleSet = overlappingMap[it]
+                triangleSet?.let { list ->
+                    list.forEach { triangle ->
+                        canvas.drawLine(triangle.a.x.toFloat(),triangle.a.y.toFloat(),triangle.b.x.toFloat(),triangle.b.y.toFloat(),mAlarmPaint)
+                        canvas.drawLine(triangle.b.x.toFloat(),triangle.b.y.toFloat(),triangle.c.x.toFloat(),triangle.c.y.toFloat(),mAlarmPaint)
+                        canvas.drawLine(triangle.c.x.toFloat(),triangle.c.y.toFloat(),triangle.a.x.toFloat(),triangle.a.y.toFloat(),mAlarmPaint)
+                    }
+                }
+
+/*
+                mAlarmPaint.color = Color.GREEN
+                triangleSet = touchingMap[it]
+                triangleSet?.let { list ->
+                    list.forEach { triangle ->
+                        canvas.drawLine(triangle.a.x.toFloat(),triangle.a.y.toFloat(),triangle.b.x.toFloat(),triangle.b.y.toFloat(),mAlarmPaint)
+                        canvas.drawLine(triangle.b.x.toFloat(),triangle.b.y.toFloat(),triangle.c.x.toFloat(),triangle.c.y.toFloat(),mAlarmPaint)
+                        canvas.drawLine(triangle.c.x.toFloat(),triangle.c.y.toFloat(),triangle.a.x.toFloat(),triangle.a.y.toFloat(),mAlarmPaint)
+                    }
+                }
+*/
+
             }
 
             canvas.restore()
@@ -195,21 +220,23 @@ class LivingBackground{
         val radius = (WORKING_BITMAP_WIDTH.div(2.0) - 15.0).toFloat()
 
         //now find all the triangles that intersect with this circle, we do this by dividing the circle into tangents
-        //60 of them since 360/6 = 60 sections
+        //60 of them since 360/12 = 30 sections
         var xCenter = WORKING_BITMAP_WIDTH.div(2.0)
         var yCenter = WORKING_BITMAP_HEIGHT.div(2.0)
 
-        circleTangents = List(60) {pos ->
+        val degreesPerSection = 12.0
+        val numSections = (360.0 / degreesPerSection).roundToInt()
+        circleTangents = List(numSections) {pos ->
 
             //the first tangent is the line between 0 and 6 degrees:
             val start:Vector2D
             val end:Vector2D
-            if (pos < 59 ) {
-                start = Vector2D((radius * sin(Math.toRadians(pos *6.0))) + xCenter,(radius * -cos(Math.toRadians(pos*6.0))) + xCenter)
-                end = Vector2D((radius * sin(Math.toRadians((pos + 1)*6.0))) + xCenter,(radius * -cos(Math.toRadians((pos + 1)*6.0))) + xCenter)
+            if (pos < numSections - 1 ) {
+                start = Vector2D((radius * sin(Math.toRadians(pos *degreesPerSection))) + xCenter,(radius * -cos(Math.toRadians(pos*degreesPerSection))) + xCenter)
+                end = Vector2D((radius * sin(Math.toRadians((pos + 1)*degreesPerSection))) + xCenter,(radius * -cos(Math.toRadians((pos + 1)*degreesPerSection))) + xCenter)
 
             }else{
-                start = Vector2D((radius * sin(Math.toRadians(pos*6.0))) + xCenter,radius * -cos(Math.toRadians(pos * 6.0)) + xCenter)
+                start = Vector2D((radius * sin(Math.toRadians(pos*degreesPerSection))) + xCenter,radius * -cos(Math.toRadians(pos * degreesPerSection)) + xCenter)
                 end = Vector2D((radius * sin(Math.toRadians(0.0))) + xCenter,(radius * -cos(Math.toRadians(0.0))) + xCenter)
             }
 
@@ -217,20 +244,142 @@ class LivingBackground{
 
             //Now find all that touch this tangent
             val touching = ArrayList<Triangle2D>()
+            val overlapping = ArrayList<Triangle2D>()
+            val intersecting = ArrayList<Triangle2D>()
 
             triangleSoup?.forEach {
 
                 when(isIntersecting(tangent.a,tangent.b,it.a,it.b,it.c)){
-                    TOUCHING,INTERSECTING,OVERLAPPING ->{
-                        touching.add(it)
+                    TOUCHING ->{ touching.add(it) }
+                    OVERLAPPING -> { overlapping.add(it)}
+                    INTERSECTING -> {
+
+                        morphOnce(tangent,it)
+                        if (isIntersecting(tangent.a, tangent.b, it.a, it.b, it.c) == INTERSECTING) {
+
+                            morphOnce(tangent,it)
+                            if (isIntersecting(tangent.a, tangent.b, it.a, it.b, it.c) == INTERSECTING){
+                                intersecting.add(it)
+                            }else{
+                                touching.add(it)
+                            }
+                        }else{
+                            touching.add(it)
+                        }
                     }
                 }
             }
             if (touching.size > 0) {
-                affectedTriangles[tangent] = touching
+                touchingMap[tangent] = touching
             }
+            if (overlapping.size > 0) {
+                overlappingMap[tangent] = overlapping
+            }
+            if (intersecting.size > 0) {
+                intersectingMap[tangent] = intersecting
+            }
+
+//            morph(tangent)
             tangent
         }
+
+
+        // Now we must morph the triangles slightly, we'll try iterating through the points of each triangle until
+        //A -> the triangle touches the tangent (no longer intersects it)
+        //B -> the triangle edge becomes tangent to our tangent
+
+
+/*
+        circleTangents?.forEach {tangent ->
+
+        }
+*/
+    }
+
+    private fun morphOnce(tangent: Edge2D, triangle: Triangle2D){
+
+        var moprhedSuccess = false
+        triangle.computeClosestPointsToAEdge(tangent)
+        moprhedSuccess = triangle.moveClosestUntouchingVertexToQ()
+
+
+
+    }
+
+/*
+    private fun morph(tangent: Edge2D){
+        //
+        var moprhedSuccess = false
+        var status = -1
+
+        val morphedList = ArrayList<Triangle2D>()
+        val triangleSet = intersectingMap[tangent]
+        triangleSet?.let { list ->
+
+
+            list.forEach { triangle ->
+
+                triangle.computeClosestPointsToAEdge(tangent)
+                moprhedSuccess = triangle.moveClosestUntouchingVertexToQ()
+
+                if (moprhedSuccess) {
+
+                    //check once more if we're actually intersecting or not
+                    if (isIntersecting(tangent.a, tangent.b, triangle.a, triangle.b, triangle.c) != INTERSECTING) {
+
+                        morphedList.add(triangle)
+                        list.remove(triangle)
+                    }
+
+                }
+
+
+                */
+/*status = isIntersecting(tangent.a, tangent.b, triangle.a, triangle.b, triangle.c)
+                while ((status == INTERSECTING) and moprhedSuccess) {
+                    moprhedSuccess =triangle.moveClosestUntouchingVertexToQ()
+                }
+
+                if (status != INTERSECTING) {
+                    //remove from this list
+
+                }*//*
+
+            }
+
+            if (morphedList.size > 0) {
+                morphedMap[tangent] = morphedList
+            }
+        }
+
+    }
+*/
+
+
+
+    private fun FindEdgeBetweenPointAndLine(tangent:Edge2D, point: Vector2D, outEdge2D: Edge2D){
+        findQ(tangent,point,outEdge2D.b)
+    }
+
+    private fun findQ(edge: Edge2D, point:Vector2D, outPoint:Vector2D) {
+        val px = edge.b.x - edge.a.x //x portion of our line
+        val py = edge.b.y - edge.a.y //y portion of our line
+        val temp = px * px + py * py  // denominator of our d = sqrt(A cross B)/sqrt( temp )
+        var u = ((point.x - edge.a.x) * px + (point.y - edge.a.y) * py) / temp
+        if (u > 1) {
+            u = 1.0
+        } else if (u < 0) {
+            u = 0.0
+        }
+
+        outPoint.x =  edge.a.x + u * px //Qx
+        outPoint.y = edge.a.y + u * py //Qy
+
+//        val dx = x - point.x
+//        val dy = y - point.y
+
+//        return Math.sqrt((dx * dx + dy * dy))
+
     }
 
     /** Check whether P and Q lie on the same side of line AB */
@@ -240,10 +389,10 @@ class LivingBackground{
         return (z1 * z2).toFloat()
     }
 
-    val INTERSECTING = 0
+    val INTERSECTING = 0 // RED
     val NOT_INTERSECTING = 1
-    val OVERLAPPING = 2
-    val TOUCHING = 3
+    val OVERLAPPING = 2 //Yellow
+    val TOUCHING = 3 //Green
 
     /* Check whether segment P0P1 intersects with triangle t0t1t2 */
     fun isIntersecting(p0: Vector2D, p1: Vector2D, t0: Vector2D, t1: Vector2D, t2: Vector2D): Int {
