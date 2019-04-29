@@ -98,6 +98,9 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var sMinuteHandLength: Float = 0F
         private var sHourHandLength: Float = 0F
 
+        private var seconds = 0.0f
+        private var secondsRotation = 0.0f
+
         /* Colors for all hands (hour, minute, seconds, ticks) based on photo loaded. */
         private var mWatchHandColor: Int = 0
         private var mWatchHandHighlightColor: Int = 0
@@ -125,7 +128,6 @@ class TaskWatchService : CanvasWatchFaceService() {
 
         //Break hand color
         private lateinit var mBreakLinePaint:Paint
-
 
         //todo save selected Minute and break Interval
         //clean breaks stuff into their own class
@@ -654,8 +656,15 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             //Reset everything to black
             canvas.drawColor(Color.BLACK)
+
+            //measure some things , aka second
+            //TODO remove this and switch to minutes
+            seconds = mCalendar.get(Calendar.SECOND) + mCalendar.get(Calendar.MILLISECOND) / 1000f
+            secondsRotation = seconds * 6f
+
+
             //draw our bg
-            livingBackground.drawBackground(canvas, mAmbient,mLowBitAmbient,mBurnInProtection, bounds)
+            livingBackground.drawBackground(canvas, mAmbient,mLowBitAmbient,mBurnInProtection, bounds, secondsRotation)
             drawWatchFace(canvas)
             drawFeatures(canvas)
             foreground.drawButtons(canvas)
@@ -733,9 +742,8 @@ class TaskWatchService : CanvasWatchFaceService() {
              * These calculations reflect the rotation in degrees per unit of time, e.g.,
              * 360 / 60 = 6 and 360 / 12 = 30.
              */
-            val seconds =
-                    mCalendar.get(Calendar.SECOND) + mCalendar.get(Calendar.MILLISECOND) / 1000f
-            val secondsRotation = seconds * 6f
+
+
             val minutesRotation = mCalendar.get(Calendar.MINUTE) * 6f
 
             val hourHandOffset = mCalendar.get(Calendar.MINUTE) / 2f
@@ -767,6 +775,9 @@ class TaskWatchService : CanvasWatchFaceService() {
              * Otherwise, we only update the watch face once a minute.
              */
             if (!mAmbient) {
+
+
+
                 canvas.rotate(secondsRotation - minutesRotation, mCenterX, mCenterY)
                 canvas.drawLine(
                         mCenterX,
