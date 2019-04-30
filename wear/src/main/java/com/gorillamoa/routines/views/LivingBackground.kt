@@ -38,6 +38,9 @@ class LivingBackground{
     private lateinit var mBackgroundPaint: Paint
     private lateinit var mMorphPaint:Paint
     private lateinit var debugPaint:Paint
+
+    private lateinit var triangulator: DelaunayTriangulator
+
     private val baseDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC)
     private val morphDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
     private val bgDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_ATOP)
@@ -310,9 +313,8 @@ class LivingBackground{
 
     private fun morphOnce(tangent: Edge2D, triangle: Triangle2D){
 
-        var moprhedSuccess = false
         triangle.computeClosestPointsToAEdge(tangent)
-        moprhedSuccess = triangle.moveClosestUntouchingVertexToQ()
+        triangle.moveClosestUntouchingVertexToQ()
 
     }
 
@@ -612,9 +614,9 @@ class LivingBackground{
         }
 
         triangleSoup = try {
-            val delaunayTriangulator = DelaunayTriangulator(point2ds)
-            delaunayTriangulator.triangulate()
-            delaunayTriangulator.triangles as ArrayList<Triangle2D>
+            triangulator = DelaunayTriangulator(point2ds)
+            triangulator.triangulate()
+            triangulator.triangles as ArrayList<Triangle2D>
 
         } catch (e: NotEnoughPointsException) {
             Log.d("$tag generateBackgroundBitmaps","Woops Triangulation")
@@ -668,15 +670,18 @@ class LivingBackground{
                     OVERLAPPING -> { overlapping.add(triangle)}
                     INTERSECTING -> {
 
+                        //TODO find the right edge points for when we add a triangle
+
+
                         borderTrianglePack.examinePotential(triangle)
                         morphOnce(tangent,triangle)
-                        borderTrianglePack.checkMovement(point2ds)?.let { trianglesToAdd.add(it) }
+                        borderTrianglePack.checkMovement(triangulator.triangleSoup, triangle)?.let { trianglesToAdd.add(it) }
                         if (isIntersecting(tangent.a, tangent.b, triangle.a, triangle.b, triangle.c) == INTERSECTING) {
 
                             //in the space that was made.
                             borderTrianglePack.examinePotential(triangle)
                             morphOnce(tangent,triangle)
-                            borderTrianglePack.checkMovement(point2ds)?.let { trianglesToAdd.add(it) }
+                            borderTrianglePack.checkMovement(triangulator.triangleSoup, triangle)?.let { trianglesToAdd.add(it) }
 
                             if (isIntersecting(tangent.a, tangent.b, triangle.a, triangle.b, triangle.c) == INTERSECTING){
                                 intersecting.add(triangle)
@@ -711,5 +716,4 @@ class LivingBackground{
         morphedBitmap = generateBitmapFromTriangles(widthD,heightD, triangleSoup!!)
 
     }
-
 }

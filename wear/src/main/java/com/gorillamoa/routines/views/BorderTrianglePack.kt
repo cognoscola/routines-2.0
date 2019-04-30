@@ -1,9 +1,12 @@
 package com.gorillamoa.routines.views
 
 import android.util.Log
+import io.github.jdiemke.triangulation.Edge2D
 import io.github.jdiemke.triangulation.Triangle2D
+import io.github.jdiemke.triangulation.TriangleSoup
 import io.github.jdiemke.triangulation.Vector2D
 import java.util.*
+import kotlin.collections.ArrayList
 
 private const val zeroD = 0.0
 
@@ -80,7 +83,7 @@ class BorderTrianglePack(val width:Double,val height:Double){
         return  border
     }
 
-    fun checkMovement(pointList: Vector<Vector2D>): Triangle2D? {
+    fun checkMovement(triangleSoup: TriangleSoup,triangle:Triangle2D): Triangle2D? {
         potentialPoint?.let {
 
             xRepositioned = (potentialPoint!!.x != oldPointLocation!!.x)
@@ -89,7 +92,7 @@ class BorderTrianglePack(val width:Double,val height:Double){
                 //they don't match, so it has relocated. Create new triangle
                 //we already know A, since it is the morphed point
                 val newA = Vector2D(potentialPoint!!.x, potentialPoint!!.y)
-                createNewTriangle(border, oldPointLocation!!,newA, pointList)
+                createNewTriangle(border, triangle,newA, triangleSoup)
             } else{
                 Log.d("$tag checkMovement","Vertex did not move")
                 null
@@ -98,11 +101,122 @@ class BorderTrianglePack(val width:Double,val height:Double){
         Log.d("$tag checkMovement","Not touching edge ")
         return null
     }
-    private fun createNewTriangle(border:Border, old:Vector2D, pointA: Vector2D, pointList: Vector<Vector2D>):Triangle2D?{
+    private fun createNewTriangle(border:Border, triangle: Triangle2D, pointA: Vector2D, soup:TriangleSoup):Triangle2D?{
         //now create the other 2
-        Log.d("$tag createNewTriangle","old (${old.x} ${old.y})")
+//        Log.d("$tag createNewTriangle","old (${old.x} ${old.y})")
+
+        //we have the old point and the new point. Old point is kind of useless unless
+        //we'd like to create 2 triangles with the old point acting as a kind of middle point
+        //but more on that later... for now just make 1 triangle
+
+        //Get a neighbouring triangle (there should only be one) of our current triangle. We do so
+        //by taking an edge and seeing if it is shared.
+
+        //Which point is A again?
+        var neighbour:Triangle2D? = null
+        var edge:Edge2D? = null
+        var pointC :Vector2D? = null //pointC must be the last unused point of our triangle
+        if ((triangle.a == pointA) and (neighbour == null)) {
+            //edge will be A - B or A -C
+            //lets try A - B
+            edge = Edge2D(triangle.a, triangle.b)
+            neighbour = soup.findNeighbour(triangle,edge).let {
+
+                pointC = Vector2D(triangle.c.x, triangle.c.y)
+                it
+            } ?: kotlin.run {
+                edge = Edge2D(triangle.a,triangle.c)
+                soup.findNeighbour(triangle,edge)?.let {
+
+                    pointC = Vector2D(triangle.b.x, triangle.b.y)
+                    it
+                }?: kotlin.run {
+                    Log.d("$tag createNewTriangle","Something went wrong, lets try other cases")
+                    neighbour = null
+                    edge = null
+                    null
+                }
+            }
+        }
+
+        if ((triangle.b == pointA) and (neighbour == null)) {
+            //edge will be B - A or B -C
+            edge = Edge2D(triangle.b, triangle.a)
+            neighbour = soup.findNeighbour(triangle,edge)?.let {
+
+                pointC = Vector2D(triangle.c.x, triangle.c.y)
+                it
+            } ?: kotlin.run {
+                edge = Edge2D(triangle.b,triangle.c)
+                soup.findNeighbour(triangle,edge)?.let {
+
+                    pointC = Vector2D(triangle.a.x, triangle.a.y)
+                    it
+                }?: kotlin.run {
+                    Log.d("$tag createNewTriangle","Something went wrong, lets try last cases")
+                    neighbour = null
+                    edge = null
+                    null
+                }
+            }
+        }
+
+        if ((triangle.c == pointA) and (neighbour == null)) {
+            //edge will be C - A or C -B
+            edge = Edge2D(triangle.c, triangle.a)
+            neighbour = soup.findNeighbour(triangle,edge)?.let {
+                pointC = Vector2D(triangle.b.x,triangle.b.y)
+                it
+            } ?: kotlin.run {
+                edge = Edge2D(triangle.c,triangle.b)
+                soup.findNeighbour(triangle,edge)?.let {
+                    pointC =Vector2D(triangle.a.x,triangle.a.y)
+                    it
+                }?: kotlin.run {
+                    Log.d("$tag createNewTriangle","Something's up! WTF")
+                    neighbour = null
+                    edge = null
+                    null
+                }
+            }
+        }
+
+        if(neighbour == null){
+            Log.d("$tag createNewTriangle","Couldn't find any neighbours! Possibly because of morph")
+            return null
+        }
+
+        //at this point we should have a neighbouring triangle
+        //find the point that is not a part of the edge
+        var pointB:Vector2D? = null
+        if ((neighbour!!.a != edge!!.a) and (neighbour!!.a != edge!!.b)) {
+            //we'll use point neighbour point A as the 2nd point
+            pointB = Vector2D(neighbour!!.a.x,neighbour!!.a.y)
+        }
+
+        if ((neighbour!!.b != edge!!.a) and (neighbour!!.b != edge!!.b) and (pointB != null)) {
+            //we'll use point neighbour point A as the 2nd point
+            pointB = Vector2D(neighbour!!.b.x,neighbour!!.b.y)
+        }
+
+        if ((neighbour!!.c != edge!!.a) and (neighbour!!.c != edge!!.b) and (pointB != null)) {
+            //we'll use point neighbour point c as the 2nd point
+            pointB = Vector2D(neighbour!!.c.x,neighbour!!.c.y)
+        }
+
+        //as a final precaution we'll make sure this point is on the EDGE
+        if (!((pointB!!.x == 0.0) or (pointB.x == width) or (pointB.y == 0.0) or (pointB.y == height))) {
+
+            Log.d("$tag createNewTriangle","This point won't work! it doesn't lie on the edge")
+            return null
+        }
+
+        //Now we have all points, make the triangle!
+        Log.d("$tag createNewTriangle","Success")
+        return Triangle2D(pointA,pointB,pointC)
 
 
+/*
         return when (border) {
             Border.Left -> {
                 Log.d("$tag createNewTriangle","Left")
@@ -184,8 +298,8 @@ class BorderTrianglePack(val width:Double,val height:Double){
                 null
             }
         }
+*/
     }
-
 
 
 }

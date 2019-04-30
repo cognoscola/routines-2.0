@@ -192,7 +192,6 @@ public class Triangle2D {
         qA = computeClosestPoint(edge,a);
         qB = computeClosestPoint(edge,b);
         qC = computeClosestPoint(edge,c);
-
     }
 
     public boolean moveClosestUntouchingVertexToQ() {
