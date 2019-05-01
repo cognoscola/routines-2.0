@@ -13,9 +13,11 @@ public class Triangle2D {
     public Vector2D b;
     public Vector2D c;
 
-    public Vector2D qA;
-    public Vector2D qB;
-    public Vector2D qC;
+    //we'll know which triangle has been morphed because q values will be different than normal values.
+    //this allows us to always return q values for extended functions
+    private Vector2D qA;
+    private Vector2D qB;
+    private Vector2D qC;
 
     /**
      * Constructor of the 2D triangle class used to create a new triangle
@@ -189,55 +191,77 @@ public class Triangle2D {
     }
 
     public void computeClosestPointsToAEdge(Edge2D edge) {
-        qA = computeClosestPoint(edge,a);
-        qB = computeClosestPoint(edge,b);
-        qC = computeClosestPoint(edge,c);
-    }
+        Vector2D tempqA = computeClosestPoint(edge,a);
+        Vector2D tempqB = computeClosestPoint(edge,b);
+        Vector2D tempqC = computeClosestPoint(edge,c);
 
-    public boolean moveClosestUntouchingVertexToQ() {
-
-        boolean hasFoundOne = false;
+        //TODO perform the moving operation while still retaining original values of a,b,c
         double potentialDistance = 10000.0;
         double magnitue;
-        Vector2D potentialVertex = null;
-        Vector2D potentialQ = null;
-        if (a != qA) {
-            magnitue = qA.sub(a).mag();
+
+        Vector2D potentialPoint = null;
+
+        //Has A been used?
+        if (qA == null || qA == a) {
+            //not used yet, so find its mag and see if it will work
+            magnitue = tempqA.sub(a).mag();
             if(magnitue < potentialDistance){
-                potentialVertex = a;
                 potentialDistance = magnitue;
-                potentialQ = qA;
-                hasFoundOne = true;
-            }
-        }
-        if (b != qB) {
-            magnitue = qB.sub(b).mag();
-            if (magnitue < potentialDistance) {
-                potentialVertex = b;
-                potentialDistance = magnitue;
-                potentialQ = qB;
-                hasFoundOne = true;
+                potentialPoint = a;
             }
         }
 
-        if (c != qC) {
-            magnitue = qC.sub(c).mag();
+        if (qB == null || qB == b) {
+            magnitue = tempqB.sub(b).mag();
             if (magnitue < potentialDistance) {
-                potentialVertex = c;
-                potentialQ = qC;
-                hasFoundOne = true;
+                potentialDistance = magnitue;
+                potentialPoint = b;
+
             }
         }
 
-        if (hasFoundOne) {
-            if(a == potentialVertex) { a.x = potentialQ.x; a.y = potentialQ.y ;}
-            if(b == potentialVertex) { b.x = potentialQ.x; b.y = potentialQ.y ;}
-            if(c == potentialVertex) { c.x = potentialQ.x; c.y = potentialQ.y ;}
-            return true;
+        if (qC == null || qB == c) {
+            magnitue = tempqC.sub(c).mag();
+            if (magnitue < potentialDistance) {
+                potentialPoint = c;
+            }
+        }
+
+        //By now we should know which point to morph
+        if(a == potentialPoint) {qA = tempqA;}
+        else if(b == potentialPoint) {qB = tempqB;}
+        else if(c == potentialPoint) {qC = tempqC;}
+
+    }
+
+    public boolean hasMorphed(){
+        return (qA != null && qA != a) || (qB != null && qB != b ) || (qC != null && qC != c);
+    }
+
+    public Vector2D qA() {
+        if (qA != null ) {
+            return qA;
         }else {
-            return false;
+            return a;
         }
     }
+
+    public Vector2D qB() {
+        if (qB != null) {
+            return qB;
+        }else {
+            return b;
+        }
+    }
+
+    public Vector2D qC() {
+        if (qC != null) {
+            return qC;
+        } else {
+            return c;
+        }
+    }
+
 
     /**
      * Computes the closest point on the given edge to the specified point.

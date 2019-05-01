@@ -58,8 +58,9 @@ class LivingBackground{
     var triangleSoup:ArrayList<Triangle2D>? = null
     var circleTangents:List<Edge2D>? = null
     var intersectingMap:HashMap<Edge2D,ArrayList<Triangle2D>> = HashMap()
-    var overlappingMap:HashMap<Edge2D,ArrayList<Triangle2D>> = HashMap()
-    var touchingMap:HashMap<Edge2D,ArrayList<Triangle2D>> = HashMap()
+
+    val trianglesToAdd = ArrayList<Triangle2D>()
+    val trianglesTouchingEdge = ArrayList<Triangle2D>()
 
     //COLORS
     private val backgroundAlpha = 255.0f
@@ -170,116 +171,117 @@ class LivingBackground{
             workingCanvas.drawBitmap(mBackgroundBitmap,0.0f,0.0f,mMorphPaint)
 */
 
+            //TODO delete these
             canvas.save()
-            canvas.scale(1/scale, 1/scale)
-            canvas.translate(bounds.right/2.0f,bounds.bottom/2.0f)
-            canvas.drawBitmap(morphedBitmap,0.0f,0.0f,mAlarmPaint)
+            canvas.scale(1 / scale, 1 / scale)
+            canvas.translate(bounds.right / 2.0f, bounds.bottom / 2.0f)
+            canvas.drawBitmap(mBackgroundBitmap, 0.0f, 0.0f, mAlarmPaint)
             canvas.restore()
 
-//            canvas.drawBitmap(workingBitmap,bounds.left.toFloat(),bounds.top.toFloat(),mAlarmPaint)
+            canvas.save()
+            canvas.translate(bounds.right / 4.0f, bounds.bottom / 4.0f)
 
-
-
-            //draw our tangent temporarily
-//            canvas.save()
-//            canvas.scale(scale, scale)
             mAlarmPaint.alpha = 255
+            mAlarmPaint.color = Color.RED
             circleTangents?.forEach {
 
                 //draw the tangent
 //                canvas.drawLine(it.a.x.toFloat(),it.a.y.toFloat(),it.b.x.toFloat(),it.b.y.toFloat(), debugPaint)
 
-/*
                 mAlarmPaint.color = Color.RED
                 var triangleSet = intersectingMap[it]
                 triangleSet?.let { list ->
                     list.forEach { triangle ->
-                        canvas.drawLine(triangle.a.x.toFloat(),triangle.a.y.toFloat(),triangle.b.x.toFloat(),triangle.b.y.toFloat(),mAlarmPaint)
-                        canvas.drawLine(triangle.b.x.toFloat(),triangle.b.y.toFloat(),triangle.c.x.toFloat(),triangle.c.y.toFloat(),mAlarmPaint)
-                        canvas.drawLine(triangle.c.x.toFloat(),triangle.c.y.toFloat(),triangle.a.x.toFloat(),triangle.a.y.toFloat(),mAlarmPaint)
+
+
+                        canvas.drawLine(triangle.a.x.toFloat(), triangle.a.y.toFloat(), triangle.b.x.toFloat(), triangle.b.y.toFloat(), mAlarmPaint)
+                        canvas.drawLine(triangle.b.x.toFloat(), triangle.b.y.toFloat(), triangle.c.x.toFloat(), triangle.c.y.toFloat(), mAlarmPaint)
+                        canvas.drawLine(triangle.c.x.toFloat(), triangle.c.y.toFloat(), triangle.a.x.toFloat(), triangle.a.y.toFloat(), mAlarmPaint)
+
+
                     }
+                }
+                mAlarmPaint.color = Color.BLUE
+                triangleSet?.let {  list ->
+                    list.forEach { triangle ->
+                        canvas.drawLine(triangle.qA().x.toFloat(), triangle.qA().y.toFloat(), triangle.qB().x.toFloat(), triangle.qB().y.toFloat(), mAlarmPaint)
+                        canvas.drawLine(triangle.qB().x.toFloat(), triangle.qB().y.toFloat(), triangle.qC().x.toFloat(), triangle.qC().y.toFloat(), mAlarmPaint)
+                        canvas.drawLine(triangle.qC().x.toFloat(), triangle.qC().y.toFloat(), triangle.qA().x.toFloat(), triangle.qA().y.toFloat(), mAlarmPaint)
+                    }
+                }
+
+              /*  mAlarmPaint.color = Color.WHITE
+                trianglesTouchingEdge.forEach {triangle ->
+                    canvas.drawLine(triangle.a.x.toFloat(), triangle.a.y.toFloat(), triangle.b.x.toFloat(), triangle.b.y.toFloat(), mAlarmPaint)
+                    canvas.drawLine(triangle.b.x.toFloat(), triangle.b.y.toFloat(), triangle.c.x.toFloat(), triangle.c.y.toFloat(), mAlarmPaint)
+                    canvas.drawLine(triangle.c.x.toFloat(), triangle.c.y.toFloat(), triangle.a.x.toFloat(), triangle.a.y.toFloat(), mAlarmPaint)
                 }
 */
 
-                canvas.save()
-                canvas.scale(scale,scale)
                 mAlarmPaint.color = Color.YELLOW
-                var triangleSet = overlappingMap[it]
-                triangleSet?.let { list ->
-                    list.forEach { triangle ->
-                        canvas.drawLine(triangle.a.x.toFloat(),triangle.a.y.toFloat(),triangle.b.x.toFloat(),triangle.b.y.toFloat(),mAlarmPaint)
-                        canvas.drawLine(triangle.b.x.toFloat(),triangle.b.y.toFloat(),triangle.c.x.toFloat(),triangle.c.y.toFloat(),mAlarmPaint)
-                        canvas.drawLine(triangle.c.x.toFloat(),triangle.c.y.toFloat(),triangle.a.x.toFloat(),triangle.a.y.toFloat(),mAlarmPaint)
-                    }
+
+                trianglesToAdd.forEach { triangle ->
+                    canvas.drawLine(triangle.a.x.toFloat(), triangle.a.y.toFloat(), triangle.b.x.toFloat(), triangle.b.y.toFloat(), mAlarmPaint)
+                    canvas.drawLine(triangle.b.x.toFloat(), triangle.b.y.toFloat(), triangle.c.x.toFloat(), triangle.c.y.toFloat(), mAlarmPaint)
+                    canvas.drawLine(triangle.c.x.toFloat(), triangle.c.y.toFloat(), triangle.a.x.toFloat(), triangle.a.y.toFloat(), mAlarmPaint)
                 }
-                canvas.restore()
 
-/*
-                mAlarmPaint.color = Color.GREEN
-                triangleSet = touchingMap[it]
-                triangleSet?.let { list ->
-                    list.forEach { triangle ->
-                        canvas.drawLine(triangle.a.x.toFloat(),triangle.a.y.toFloat(),triangle.b.x.toFloat(),triangle.b.y.toFloat(),mAlarmPaint)
-                        canvas.drawLine(triangle.b.x.toFloat(),triangle.b.y.toFloat(),triangle.c.x.toFloat(),triangle.c.y.toFloat(),mAlarmPaint)
-                        canvas.drawLine(triangle.c.x.toFloat(),triangle.c.y.toFloat(),triangle.a.x.toFloat(),triangle.a.y.toFloat(),mAlarmPaint)
+
+                // mAlarmPaintcanvas.restore()
+
+                if (isAlarmOn) {
+
+                    if (lastMeasuredTime == 0L) {
+                        lastMeasuredTime = SystemClock.uptimeMillis()
+                        return
                     }
-                }
-*/
 
-            }
+                    dt = (SystemClock.uptimeMillis() - lastMeasuredTime) //first dt will be 0
 
-           // mAlarmPaintcanvas.restore()
+                    if (isAlarmAlphaIncreasing) {
 
-            canvas.save()
-            canvas.scale(scale,scale)
+                        currentTimeCounter += dt
+                        if (currentTimeCounter > 1000.0) {
+                            currentTimeCounter = 1000
+                            isAlarmAlphaIncreasing = false
+                        }
+                    } else {
+                        currentTimeCounter -= dt
+                        if (currentTimeCounter < 0.0) {
+                            currentTimeCounter = 0
+                            isAlarmAlphaIncreasing = true
 
-            if (isAlarmOn) {
-
-                if(lastMeasuredTime == 0L) {
+                            //sound a vibration
+                            vibrator.vibrate(vibrationEffect)
+                        }
+                    }
+                    currentAlarmAlpha = (currentTimeCounter.toFloat().div(TIME2MAX.toFloat()) * MAXALPHA)
+                    if (currentAlarmAlpha > 255.0) currentAlarmAlpha = 255f else if (currentAlarmAlpha < 0) {
+                        currentAlarmAlpha = 0f
+                    }
                     lastMeasuredTime = SystemClock.uptimeMillis()
-                    return
-                }
 
-                dt = (SystemClock.uptimeMillis() - lastMeasuredTime) //first dt will be 0
-
-                if (isAlarmAlphaIncreasing) {
-
-                    currentTimeCounter += dt
-                    if(currentTimeCounter > 1000.0) {
-                        currentTimeCounter = 1000
-                        isAlarmAlphaIncreasing = false
-                    }
-                }else{
-                    currentTimeCounter -= dt
-                    if(currentTimeCounter < 0.0) {
-                        currentTimeCounter = 0
-                        isAlarmAlphaIncreasing = true
-
-                        //sound a vibration
-                        vibrator.vibrate(vibrationEffect)
-                    }
-                }
-                currentAlarmAlpha = (currentTimeCounter.toFloat().div(TIME2MAX.toFloat())* MAXALPHA)
-                if(currentAlarmAlpha > 255.0)currentAlarmAlpha = 255f else if(currentAlarmAlpha < 0){currentAlarmAlpha = 0f}
-                lastMeasuredTime = SystemClock.uptimeMillis()
-
-                mAlarmPaint.alpha = currentAlarmAlpha.roundToInt()
+                    mAlarmPaint.alpha = currentAlarmAlpha.roundToInt()
 
 //                canvas.save()
 //                canvas.scale(scale,scale)
-                //now draw the lines
+                    //now draw the lines
 
-                //TODO find performance between drawing another image on top and drawing these lines
-                triangleSoup?.forEach {
+                    //TODO find performance between drawing another image on top and drawing these lines
+                    mAlarmPaint.color = Color.RED
+                    triangleSoup?.forEach {
 
-                    //TODO don't draw duplicate triangles
-                    canvas.drawLine(it.a.x.toFloat(),it.a.y.toFloat(),it.b.x.toFloat(),it.b.y.toFloat(),mAlarmPaint)
-                    canvas.drawLine(it.b.x.toFloat(),it.b.y.toFloat(),it.c.x.toFloat(),it.c.y.toFloat(),mAlarmPaint)
-                    canvas.drawLine(it.c.x.toFloat(),it.c.y.toFloat(),it.a.x.toFloat(),it.a.y.toFloat(),mAlarmPaint)
+                        //TODO don't draw duplicate triangles
+                        canvas.drawLine(it.a.x.toFloat(), it.a.y.toFloat(), it.b.x.toFloat(), it.b.y.toFloat(), mAlarmPaint)
+                        canvas.drawLine(it.b.x.toFloat(), it.b.y.toFloat(), it.c.x.toFloat(), it.c.y.toFloat(), mAlarmPaint)
+                        canvas.drawLine(it.c.x.toFloat(), it.c.y.toFloat(), it.a.x.toFloat(), it.a.y.toFloat(), mAlarmPaint)
+                    }
+
                 }
 
             }
             canvas.restore()
+
         }
     }
 
@@ -308,13 +310,6 @@ class LivingBackground{
 
         //first determine radius of morphing circle
         //lets just make the radius somewhere close to the outer rim of the circular watch
-
-    }
-
-    private fun morphOnce(tangent: Edge2D, triangle: Triangle2D){
-
-        triangle.computeClosestPointsToAEdge(tangent)
-        triangle.moveClosestUntouchingVertexToQ()
 
     }
 
@@ -528,8 +523,8 @@ class LivingBackground{
             //                    Log.d("$tag generateBackgroundBitmaps","Triangle: A(${it.a.x},${it.a.y}) B(${it.b.x},${it.b.y}) C(${it.c.x},${it.c.y})")
 
             //first find the Center Coordinates
-            centerX = (it.a.x + it.b.x + it.c.x).div(3.0)
-            centerY = (it.a.y + it.b.y + it.c.y).div(3.0)
+            centerX = (it.qA().x + it.qB().x + it.qC().x).div(3.0)
+            centerY = (it.qA().y + it.qB().y + it.qC().y).div(3.0)
 
 //                    Log.d("$tag generateBackgroundBitmaps","Centroid: $centerX, $centerY")
 
@@ -544,10 +539,10 @@ class LivingBackground{
             //  canvas.drawPoint(centerX.toFloat(),centerY.toFloat(),painter)
 
             //now we draw the triangle
-            path.moveTo(it.a.x.toFloat(), it.a.y.toFloat())
-            path.lineTo(it.b.x.toFloat(), it.b.y.toFloat())
-            path.lineTo(it.c.x.toFloat(), it.c.y.toFloat())
-            path.lineTo(it.a.x.toFloat(), it.a.y.toFloat())
+            path.moveTo(it.qA().x.toFloat(), it.qA().y.toFloat())
+            path.lineTo(it.qB().x.toFloat(), it.qB().y.toFloat())
+            path.lineTo(it.qC().x.toFloat(), it.qC().y.toFloat())
+            path.lineTo(it.qA().x.toFloat(), it.qA().y.toFloat())
 
             canvas.drawPath(path, painter)
             path.reset()
@@ -629,6 +624,8 @@ class LivingBackground{
 
         mBackgroundBitmap = generateBitmapFromTriangles(widthD, heightD,triangleSoup!!)
 
+
+
         //generate Morphed background
         val radius = (WORKING_BITMAP_WIDTH.div(2.0) - 15.0).toFloat()
         //now find all the triangles that intersect with this circle, we do this by dividing the circle into tangents
@@ -639,6 +636,7 @@ class LivingBackground{
         val degreesPerSection = 12.0
         val numSections = (360.0 / degreesPerSection).roundToInt()
         circleTangents = List(numSections) {pos ->
+
 
             //the first tangent is the line between 0 and 6 degrees:
             val start:Vector2D
@@ -655,32 +653,37 @@ class LivingBackground{
             val tangent = Edge2D(start,end)
 
             //Now find all that touch this tangent
-            val touching = ArrayList<Triangle2D>()
-            val overlapping = ArrayList<Triangle2D>()
             val intersecting = ArrayList<Triangle2D>()
 
             val borderTrianglePack = BorderTrianglePack(widthD, heightD)
 
-            val trianglesToAdd = ArrayList<Triangle2D>()
-
             triangleSoup?.forEach { triangle ->
 
+
                 when(isIntersecting(tangent.a,tangent.b,triangle.a,triangle.b,triangle.c)){
-                    TOUCHING ->{ touching.add(triangle) }
-                    OVERLAPPING -> { overlapping.add(triangle)}
-                    INTERSECTING -> {
+                    OVERLAPPING , INTERSECTING-> {
 
-                        //TODO find the right edge points for when we add a triangle
+                        intersecting.add(triangle)
+                        if (borderTrianglePack.isTouchingBorder(triangle)) {
+                            trianglesTouchingEdge.add(triangle)
+                        }
+
+                        triangle.computeClosestPointsToAEdge(tangent)
+                    }
 
 
-                        borderTrianglePack.examinePotential(triangle)
-                        morphOnce(tangent,triangle)
-                        borderTrianglePack.checkMovement(triangulator.triangleSoup, triangle)?.let { trianglesToAdd.add(it) }
+
+
+                       /* borderTrianglePack.examinePotential(triangle)
+
+                        borderTrianglePack.checkMovement(triangulator.triangleSoup, triangle)?.let {
+                            trianglesToAdd.add(it)
+                        }
                         if (isIntersecting(tangent.a, tangent.b, triangle.a, triangle.b, triangle.c) == INTERSECTING) {
 
                             //in the space that was made.
                             borderTrianglePack.examinePotential(triangle)
-                            morphOnce(tangent,triangle)
+                            triangle.computeClosestPointsToAEdge(tangent)
                             borderTrianglePack.checkMovement(triangulator.triangleSoup, triangle)?.let { trianglesToAdd.add(it) }
 
                             if (isIntersecting(tangent.a, tangent.b, triangle.a, triangle.b, triangle.c) == INTERSECTING){
@@ -690,16 +693,11 @@ class LivingBackground{
                             }
                         }else{
                             touching.add(triangle)
-                        }
-                    }
+                        }*/
+
                 }
             }
-            if (touching.size > 0) {
-                touchingMap[tangent] = touching
-            }
-            if (overlapping.size > 0) {
-                overlappingMap[tangent] = overlapping
-            }
+
             if (intersecting.size > 0) {
                 intersectingMap[tangent] = intersecting
             }
@@ -707,7 +705,7 @@ class LivingBackground{
             trianglesToAdd.forEach {
                 triangleSoup!!.add(it)
             }
-            trianglesToAdd.clear()
+           // trianglesToAdd.clear()
 
             tangent
         }

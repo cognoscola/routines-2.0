@@ -665,9 +665,9 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             //draw our bg
             livingBackground.drawBackground(canvas, mAmbient,mLowBitAmbient,mBurnInProtection, bounds, secondsRotation)
-            drawWatchFace(canvas)
-            drawFeatures(canvas)
-            foreground.drawButtons(canvas)
+//            drawWatchFace(canvas)
+//            drawFeatures(canvas)
+//            foreground.drawButtons(canvas)
         }
 
 

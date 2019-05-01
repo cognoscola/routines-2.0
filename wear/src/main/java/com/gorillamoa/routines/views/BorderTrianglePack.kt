@@ -5,8 +5,6 @@ import io.github.jdiemke.triangulation.Edge2D
 import io.github.jdiemke.triangulation.Triangle2D
 import io.github.jdiemke.triangulation.TriangleSoup
 import io.github.jdiemke.triangulation.Vector2D
-import java.util.*
-import kotlin.collections.ArrayList
 
 private const val zeroD = 0.0
 
@@ -26,23 +24,18 @@ class BorderTrianglePack(val width:Double,val height:Double){
 
     private var triangle: Triangle2D? = null
 
-    private var potentialPoint: Vector2D? = null
+    private var pointOnEdge: Vector2D? = null
     private var oldPointLocation: Vector2D? = null
     private var border:Border = Border.None
 
-    private var xRepositioned = false
-    private var yRepositioned = false
-
-    fun examinePotential(questionableTriangle: Triangle2D) {
+    fun isTouchingBorder(questionableTriangle: Triangle2D):Boolean {
 
         Log.d("$tag examinePotential","Examining" +
                 " A(${questionableTriangle.a.x}, ${questionableTriangle.a.y}) " +
                 "B(${questionableTriangle.b.x}, ${questionableTriangle.b.y}) " +
                 "C(${questionableTriangle.c.x}, ${questionableTriangle.c.y}) ")
 
-        xRepositioned = false
-        yRepositioned = false
-        potentialPoint = null
+        pointOnEdge = null
         oldPointLocation = null
         border = Border.None
         triangle = questionableTriangle
@@ -56,20 +49,20 @@ class BorderTrianglePack(val width:Double,val height:Double){
             if(border == Border.None){
                 border = isTouchingEdges(questionableTriangle.c)
                 if(border != Border.None){
-                    potentialPoint = questionableTriangle.c
+                    pointOnEdge = questionableTriangle.c
                 }
             } else {
-                potentialPoint = questionableTriangle.b }
+                pointOnEdge = questionableTriangle.b }
         }else {
-            potentialPoint = questionableTriangle.a }
+            pointOnEdge = questionableTriangle.a }
 
-
-        //One of the vertices touches the edge lets save the coordinates before we move it
-        potentialPoint?.let {
-            oldPointLocation = Vector2D(potentialPoint!!.x, potentialPoint!!.y)
+        //potential Point contains the coordinates of the original a, b, ,c
+        pointOnEdge?.let {
+            oldPointLocation = Vector2D(pointOnEdge!!.x, pointOnEdge!!.y)
             Log.d("$tag examinePotential","Point on Border: $border")
+            return true
         }
-
+        return false
     }
 
 
@@ -84,17 +77,30 @@ class BorderTrianglePack(val width:Double,val height:Double){
     }
 
     fun checkMovement(triangleSoup: TriangleSoup,triangle:Triangle2D): Triangle2D? {
-        potentialPoint?.let {
 
-            xRepositioned = (potentialPoint!!.x != oldPointLocation!!.x)
-            yRepositioned = (potentialPoint!!.y != oldPointLocation!!.y)
-            return if (xRepositioned or yRepositioned ) {
+        pointOnEdge?.let {
+
+            return if (triangle.hasMorphed()) {
                 //they don't match, so it has relocated. Create new triangle
                 //we already know A, since it is the morphed point
-                val newA = Vector2D(potentialPoint!!.x, potentialPoint!!.y)
-                createNewTriangle(border, triangle,newA, triangleSoup)
+                val newA:Vector2D?
+                if (pointOnEdge == triangle.a) {
+                    newA = Vector2D(triangle.qA().x, triangle.qA().y)
+                }else if (pointOnEdge == triangle.b) {
+                    newA = Vector2D(triangle.qB().x, triangle.qB().y)
+                }else if (pointOnEdge == triangle.c) {
+                    newA = Vector2D(triangle.qC().x, triangle.qC().y)
+                }else { newA = null}
+
+                newA?.let {
+                    createNewTriangle(border, triangle,newA, triangleSoup)
+                }?: kotlin.run {
+                    Log.d("$tag checkMovement","Vertex did not move")
+                null
+                }
+
             } else{
-                Log.d("$tag checkMovement","Vertex did not move")
+                kotlin.run { Log.d("$tag checkMovement","Vertex did not move") }
                 null
             }
         }
@@ -116,19 +122,20 @@ class BorderTrianglePack(val width:Double,val height:Double){
         var neighbour:Triangle2D? = null
         var edge:Edge2D? = null
         var pointC :Vector2D? = null //pointC must be the last unused point of our triangle
+
         if ((triangle.a == pointA) and (neighbour == null)) {
             //edge will be A - B or A -C
             //lets try A - B
             edge = Edge2D(triangle.a, triangle.b)
             neighbour = soup.findNeighbour(triangle,edge).let {
 
-                pointC = Vector2D(triangle.c.x, triangle.c.y)
+                pointC = Vector2D(triangle.qC().x, triangle.qC().y)
                 it
             } ?: kotlin.run {
                 edge = Edge2D(triangle.a,triangle.c)
                 soup.findNeighbour(triangle,edge)?.let {
 
-                    pointC = Vector2D(triangle.b.x, triangle.b.y)
+                    pointC = Vector2D(triangle.qB().x, triangle.qB().y)
                     it
                 }?: kotlin.run {
                     Log.d("$tag createNewTriangle","Something went wrong, lets try other cases")
@@ -144,13 +151,13 @@ class BorderTrianglePack(val width:Double,val height:Double){
             edge = Edge2D(triangle.b, triangle.a)
             neighbour = soup.findNeighbour(triangle,edge)?.let {
 
-                pointC = Vector2D(triangle.c.x, triangle.c.y)
+                pointC = Vector2D(triangle.qC().x, triangle.qC().y)
                 it
             } ?: kotlin.run {
                 edge = Edge2D(triangle.b,triangle.c)
                 soup.findNeighbour(triangle,edge)?.let {
 
-                    pointC = Vector2D(triangle.a.x, triangle.a.y)
+                    pointC = Vector2D(triangle.qA().x, triangle.qA().y)
                     it
                 }?: kotlin.run {
                     Log.d("$tag createNewTriangle","Something went wrong, lets try last cases")
@@ -165,12 +172,12 @@ class BorderTrianglePack(val width:Double,val height:Double){
             //edge will be C - A or C -B
             edge = Edge2D(triangle.c, triangle.a)
             neighbour = soup.findNeighbour(triangle,edge)?.let {
-                pointC = Vector2D(triangle.b.x,triangle.b.y)
+                pointC = Vector2D(triangle.qB().x,triangle.qB().y)
                 it
             } ?: kotlin.run {
                 edge = Edge2D(triangle.c,triangle.b)
                 soup.findNeighbour(triangle,edge)?.let {
-                    pointC =Vector2D(triangle.a.x,triangle.a.y)
+                    pointC =Vector2D(triangle.qA().x,triangle.qA().y)
                     it
                 }?: kotlin.run {
                     Log.d("$tag createNewTriangle","Something's up! WTF")
