@@ -285,6 +285,12 @@ public class Triangle2D {
 
         return edge.a.add(ab.mult(t));
     }
+    /** Check whether P and Q lie on the same side of line AB */
+    /*private fun Side(p: Vector2D, q: Vector2D, a: Vector2D, b: Vector2D): Float {
+        val z1 = (b.x - a.x) * (p.y - a.y) - (p.x - a.x) * (b.y - a.y)
+        val z2 = (b.x - a.x) * (q.y - a.y) - (q.x - a.x) * (b.y - a.y)
+        return (z1 * z2).toFloat()
+    }*/
 
 
 /*
