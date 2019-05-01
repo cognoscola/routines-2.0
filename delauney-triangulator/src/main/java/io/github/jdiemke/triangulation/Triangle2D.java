@@ -287,6 +287,61 @@ public class Triangle2D {
     }
 
 
+/*
+    public int isIntersecting(p0: Vector2D, p1: Vector2D, t0: Vector2D, t1: Vector2D,  Vector2D) {
+        */
+/* Check whether segment is outside one of the three half-planes
+         * delimited by the triangle. *//*
+
+        val f1 = Side(p0, t2, t0, t1)
+        val f2 = Side(p1, t2, t0, t1)
+        val f3 = Side(p0, t0, t1, t2)
+        val f4 = Side(p1, t0, t1, t2)
+        val f5 = Side(p0, t1, t2, t0)
+        val f6 = Side(p1, t1, t2, t0)
+        */
+/* Check whether triangle is totally inside one of the two half-planes
+         * delimited by the segment. *//*
+
+        val f7 = Side(t0, t1, p0, p1)
+        val f8 = Side(t1, t2, p0, p1)
+
+        */
+/* If segment is strictly outside triangle, or triangle is strictly
+         * apart from the line, we're not intersecting *//*
+
+        if (f1 < 0 && f2 < 0 || f3 < 0 && f4 < 0 || f5 < 0 && f6 < 0
+                || f7 > 0 && f8 > 0)
+            return NOT_INTERSECTING
+
+        */
+/* If segment is aligned with one of the edges, we're overlapping *//*
+
+        if (f1 == 0f && f2 == 0f || f3 == 0f && f4 == 0f || f5 == 0f && f6 == 0f)
+            return OVERLAPPING
+
+        */
+/* If segment is outside but not strictly, or triangle is apart but
+         * not strictly, we're touching *//*
+
+        if (f1 <= 0 && f2 <= 0 || f3 <= 0 && f4 <= 0 || f5 <= 0 && f6 <= 0
+                || f7 >= 0 && f8 >= 0)
+            return TOUCHING
+
+        */
+/* If both segment points are strictly inside the triangle, we
+         * are not intersecting either *//*
+
+        return if (f1 > 0 && f2 > 0 && f3 > 0 && f4 > 0 && f5 > 0 && f6 > 0) NOT_INTERSECTING else INTERSECTING
+
+        */
+/* Otherwise we're intersecting with at least one edge *//*
+
+    }
+*/
+
+
+
 
     /**
      * Tests if the two arguments have the same sign.

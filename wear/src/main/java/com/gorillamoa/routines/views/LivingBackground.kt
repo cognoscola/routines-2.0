@@ -151,14 +151,13 @@ class LivingBackground{
 
             //recreate new path
             //TODO uncomment
-/*            morphPath.reset()
+            morphPath.reset()
             morphPath.moveTo(bounds.width().div(2.0f), bounds.height().div(2.0f))
             morphPath.lineTo(bounds.width().div(2.0f), 0.0f)
             morphPath.arcTo(0.0f,0.0f, bounds.width().toFloat(), bounds.height().toFloat(),-90.0f,rotation,true)
-            morphPath.lineTo(bounds.width().div(2.0f), bounds.height().div(2.0f))*/
+            morphPath.lineTo(bounds.width().div(2.0f), bounds.height().div(2.0f))
 
 
-/*
             //draw morph background
             //TODO uncomment
             workingCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
@@ -169,26 +168,21 @@ class LivingBackground{
             workingCanvas.drawBitmap(morphedBitmap,0.0f,0.0f,mMorphPaint)
             mMorphPaint.xfermode = bgDrawingMode
             workingCanvas.drawBitmap(mBackgroundBitmap,0.0f,0.0f,mMorphPaint)
-*/
 
-            //TODO delete these
-            canvas.save()
-            canvas.scale(1 / scale, 1 / scale)
-            canvas.translate(bounds.right / 2.0f, bounds.bottom / 2.0f)
-            canvas.drawBitmap(mBackgroundBitmap, 0.0f, 0.0f, mAlarmPaint)
-            canvas.restore()
+            canvas.drawBitmap(workingBitmap,0.0f,0.0f,mAlarmPaint)
 
-            canvas.save()
-            canvas.translate(bounds.right / 4.0f, bounds.bottom / 4.0f)
 
-            mAlarmPaint.alpha = 255
-            mAlarmPaint.color = Color.RED
-            circleTangents?.forEach {
+//            canvas.save()
+//            canvas.translate(bounds.right / 4.0f, bounds.bottom / 4.0f)
+
+//            mAlarmPaint.alpha = 255
+//            mAlarmPaint.color = Color.RED
+//            REcircleTangents?.forEach {
 
                 //draw the tangent
 //                canvas.drawLine(it.a.x.toFloat(),it.a.y.toFloat(),it.b.x.toFloat(),it.b.y.toFloat(), debugPaint)
 
-                mAlarmPaint.color = Color.RED
+               /* mAlarmPaint.color = Color.RED
                 var triangleSet = intersectingMap[it]
                 triangleSet?.let { list ->
                     list.forEach { triangle ->
@@ -200,8 +194,8 @@ class LivingBackground{
 
 
                     }
-                }
-                mAlarmPaint.color = Color.BLUE
+                }*/
+          /*      mAlarmPaint.color = Color.BLUE
                 triangleSet?.let {  list ->
                     list.forEach { triangle ->
                         canvas.drawLine(triangle.qA().x.toFloat(), triangle.qA().y.toFloat(), triangle.qB().x.toFloat(), triangle.qB().y.toFloat(), mAlarmPaint)
@@ -209,7 +203,7 @@ class LivingBackground{
                         canvas.drawLine(triangle.qC().x.toFloat(), triangle.qC().y.toFloat(), triangle.qA().x.toFloat(), triangle.qA().y.toFloat(), mAlarmPaint)
                     }
                 }
-
+*/
               /*  mAlarmPaint.color = Color.WHITE
                 trianglesTouchingEdge.forEach {triangle ->
                     canvas.drawLine(triangle.a.x.toFloat(), triangle.a.y.toFloat(), triangle.b.x.toFloat(), triangle.b.y.toFloat(), mAlarmPaint)
@@ -218,16 +212,20 @@ class LivingBackground{
                 }
 */
 
-                mAlarmPaint.color = Color.YELLOW
+//                mAlarmPaint.color = Color.YELLOW
 
+/*
                 trianglesToAdd.forEach { triangle ->
                     canvas.drawLine(triangle.a.x.toFloat(), triangle.a.y.toFloat(), triangle.b.x.toFloat(), triangle.b.y.toFloat(), mAlarmPaint)
                     canvas.drawLine(triangle.b.x.toFloat(), triangle.b.y.toFloat(), triangle.c.x.toFloat(), triangle.c.y.toFloat(), mAlarmPaint)
                     canvas.drawLine(triangle.c.x.toFloat(), triangle.c.y.toFloat(), triangle.a.x.toFloat(), triangle.a.y.toFloat(), mAlarmPaint)
                 }
+*/
 
 
                 // mAlarmPaintcanvas.restore()
+            canvas.save()
+            canvas.scale(scale,scale)
 
                 if (isAlarmOn) {
 
@@ -278,10 +276,9 @@ class LivingBackground{
                     }
 
                 }
-
-            }
             canvas.restore()
 
+//            }
         }
     }
 
@@ -402,42 +399,6 @@ class LivingBackground{
     val TOUCHING = 3 //Green
 
     /* Check whether segment P0P1 intersects with triangle t0t1t2 */
-    fun isIntersecting(p0: Vector2D, p1: Vector2D, t0: Vector2D, t1: Vector2D, t2: Vector2D): Int {
-        /* Check whether segment is outside one of the three half-planes
-     * delimited by the triangle. */
-        val f1 = Side(p0, t2, t0, t1)
-        val f2 = Side(p1, t2, t0, t1)
-        val f3 = Side(p0, t0, t1, t2)
-        val f4 = Side(p1, t0, t1, t2)
-        val f5 = Side(p0, t1, t2, t0)
-        val f6 = Side(p1, t1, t2, t0)
-        /* Check whether triangle is totally inside one of the two half-planes
-     * delimited by the segment. */
-        val f7 = Side(t0, t1, p0, p1)
-        val f8 = Side(t1, t2, p0, p1)
-
-        /* If segment is strictly outside triangle, or triangle is strictly
-     * apart from the line, we're not intersecting */
-        if (f1 < 0 && f2 < 0 || f3 < 0 && f4 < 0 || f5 < 0 && f6 < 0
-                || f7 > 0 && f8 > 0)
-            return NOT_INTERSECTING
-
-        /* If segment is aligned with one of the edges, we're overlapping */
-        if (f1 == 0f && f2 == 0f || f3 == 0f && f4 == 0f || f5 == 0f && f6 == 0f)
-            return OVERLAPPING
-
-        /* If segment is outside but not strictly, or triangle is apart but
-     * not strictly, we're touching */
-        if (f1 <= 0 && f2 <= 0 || f3 <= 0 && f4 <= 0 || f5 <= 0 && f6 <= 0
-                || f7 >= 0 && f8 >= 0)
-            return TOUCHING
-
-        /* If both segment points are strictly inside the triangle, we
-     * are not intersecting either */
-        return if (f1 > 0 && f2 > 0 && f3 > 0 && f4 > 0 && f5 > 0 && f6 > 0) NOT_INTERSECTING else INTERSECTING
-
-        /* Otherwise we're intersecting with at least one edge */
-    }
 
     fun initGrayBackgroundBitmap() {
         mGrayBackgroundBitmap = Bitmap.createBitmap(
@@ -497,7 +458,6 @@ class LivingBackground{
     }
 
     private fun generateBitmapFromTriangles(width:Double, height:Double, triangles:List<Triangle2D>):Bitmap{
-
 
         //we'll make a gradient of 4 colors for now,
         val intermidiateBitmap = Bitmap.createBitmap(width.toInt(), height.toInt(),Bitmap.Config.ARGB_8888)
@@ -651,12 +611,14 @@ class LivingBackground{
             }
 
             val tangent = Edge2D(start,end)
+            point2ds.add(end)
 
             //Now find all that touch this tangent
             val intersecting = ArrayList<Triangle2D>()
 
-            val borderTrianglePack = BorderTrianglePack(widthD, heightD)
+//            val borderTrianglePack = BorderTrianglePack(widthD, heightD)
 
+/*
             triangleSoup?.forEach { triangle ->
 
 
@@ -674,7 +636,8 @@ class LivingBackground{
 
 
 
-                       /* borderTrianglePack.examinePotential(triangle)
+                       */
+/* borderTrianglePack.examinePotential(triangle)
 
                         borderTrianglePack.checkMovement(triangulator.triangleSoup, triangle)?.let {
                             trianglesToAdd.add(it)
@@ -693,25 +656,30 @@ class LivingBackground{
                             }
                         }else{
                             touching.add(triangle)
-                        }*/
+                        }*//*
+
 
                 }
             }
+*/
 
-            if (intersecting.size > 0) {
+        /*    if (intersecting.size > 0) {
                 intersectingMap[tangent] = intersecting
             }
 
             trianglesToAdd.forEach {
                 triangleSoup!!.add(it)
-            }
+            }*/
            // trianglesToAdd.clear()
 
             tangent
         }
 
-        //We morphed the background slightly, now lets create the bitmap for it.
-        morphedBitmap = generateBitmapFromTriangles(widthD,heightD, triangleSoup!!)
 
+            triangulator = DelaunayTriangulator(point2ds)
+            triangulator.triangulate()
+
+        //We morphed the background slightly, now lets create the bitmap for it.
+        morphedBitmap = generateBitmapFromTriangles(widthD,heightD, triangulator.triangles as ArrayList<Triangle2D>)
     }
 }

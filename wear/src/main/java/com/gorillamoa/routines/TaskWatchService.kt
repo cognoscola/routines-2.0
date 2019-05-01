@@ -27,8 +27,8 @@ import kotlin.math.roundToInt
  * Updates rate in milliseconds for interactive mode. We update once a second to advance the
  * second hand.
  */
-private const val INTERACTIVE_UPDATE_RATE_MS = 67L
-//private const val INTERACTIVE_UPDATE_RATE_MS = 1000
+//private const val INTERACTIVE_UPDATE_RATE_MS = 67L //15fps
+private const val INTERACTIVE_UPDATE_RATE_MS = 1000 // 1 fps
 
 
 //
@@ -664,10 +664,12 @@ class TaskWatchService : CanvasWatchFaceService() {
 
 
             //draw our bg
+
+            //TODO CALCULATE THINGS WHILE NOT UPDATING!
             livingBackground.drawBackground(canvas, mAmbient,mLowBitAmbient,mBurnInProtection, bounds, secondsRotation)
-//            drawWatchFace(canvas)
-//            drawFeatures(canvas)
-//            foreground.drawButtons(canvas)
+            drawWatchFace(canvas)
+            drawFeatures(canvas)
+            foreground.drawButtons(canvas)
         }
 
 
