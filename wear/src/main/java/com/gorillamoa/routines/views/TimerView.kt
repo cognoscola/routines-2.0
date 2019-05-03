@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import java.util.*
 
+private const val ZERO_ANGLE = 90.0f
 private const val ANGLE_PER_MINUTE = 6.0f
 private const val ANGLE_PER_SECOND = 1/60.0f
 private const val ANGLE_PER_MILLISECOND = 1/60000.0f
@@ -33,7 +34,7 @@ class TimerView(
         startTime = System.currentTimeMillis()
 
         val currentMinute = calendar.get(Calendar.MINUTE)
-        minutes =  if (selectedMinute > currentMinute) {
+        minutes =  if (selectedMinute >= currentMinute) {
             selectedMinute - currentMinute
         }else{
             (60 - currentMinute) + selectedMinute
@@ -72,9 +73,8 @@ class TimerView(
                         (cy - radius).toFloat(),
                         (cx + radius).toFloat(),
                         (cy + radius).toFloat(),
-                        mCalendar.get(Calendar.MINUTE)
-                                + ((ANGLE_PER_SECOND) * mCalendar.get(Calendar.SECOND))
-                                + ((ANGLE_PER_MILLISECOND) * mCalendar.get(Calendar.MILLISECOND)),
+                        (mCalendar.get(Calendar.MINUTE) * ANGLE_PER_MINUTE)
+                                + ((ANGLE_PER_SECOND) * mCalendar.get(Calendar.SECOND)) - ZERO_ANGLE,
                         recalculateAngle(upTime,endTime,minutes),
                         false,
                         paint)
