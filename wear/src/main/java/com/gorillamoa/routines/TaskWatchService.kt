@@ -101,7 +101,7 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var seconds = 0.0f
         private var secondsRotation = 0.0f
 
-        /* Colors for all hands (hour, minute, seconds, ticks) based on photo loaded. */
+        /* Colors for all hands (hour, minutes, seconds, ticks) based on photo loaded. */
         private var mWatchHandColor: Int = 0
         private var mWatchHandHighlightColor: Int = 0
         private var mWatchHandShadowColor: Int = 0
@@ -140,8 +140,6 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var middleSectionRadius = 0f
         private var isRestAlarmEnabled = false
         private var isTimerEnabled = false
-
-
 
         //clean the timer stuff into its own class
         private lateinit var timerView:TimerView
@@ -261,7 +259,7 @@ class TaskWatchService : CanvasWatchFaceService() {
          */
         private fun enableTimer(minutes:Int){
             isTimerEnabled = true
-            timerView.minute = minutes
+            timerView.setSelectedMinute(minutes, mCalendar)
 
             val timeToTrigger = System.currentTimeMillis() + (minutes * 60 * 1000) - (mCalendar.get(Calendar.SECOND) * 1000)
 
@@ -369,7 +367,7 @@ class TaskWatchService : CanvasWatchFaceService() {
 
                 //The first alarm should go off on the next available interval.
                 //which one is the correct interval?
-                //if current minute is > latest inverval, alarm should go off in Min(intervals) + (60 - current) minutes
+                //if current minutes is > latest inverval, alarm should go off in Min(intervals) + (60 - current) minutes
                 //else alarm should go off at the lowest of (Intervali - current) that is possible
 
                 //current minutes
@@ -395,7 +393,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 val manager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
                 manager.setRepeating(
                         AlarmManager.RTC_WAKEUP,
-                        //set the alarm to go off on the minute
+                        //set the alarm to go off on the minutes
                         System.currentTimeMillis() + (minutesTilAlarm * 60 * 1000) - (mCalendar.get(Calendar.SECOND) * 1000),
                         breakInterval.toLong() * 60L * 1000L,
                         getRestPendingIntent()
@@ -635,9 +633,10 @@ class TaskWatchService : CanvasWatchFaceService() {
             return dSquare < rSquare
         }
 
+
         private fun getSelectedMinute(x:Int,y:Int):Int{
                 val radians = Math.atan2((x - mCenterX).toDouble(), -(y - mCenterY).toDouble())
-                return ((when (radians) { //convert radians to degrees
+                return  ((when (radians) { //convert radians to degrees
 
                     //if between 0 - PI angle is 0 - 180
                     in 0.0..Math.PI -> {
@@ -645,7 +644,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                     }
                     //angle is >180 so add the angle to 180
                     else -> 180 * (1 + (1 - Math.abs(radians) / Math.PI))
-                    //6 degrees per minute
+                    //6 degrees per minutes
                 }) / 6.0).roundToInt()
         }
 
@@ -685,13 +684,12 @@ class TaskWatchService : CanvasWatchFaceService() {
         }
 
 
-
         private fun drawRestLines(canvas: Canvas) {
             if (isRestAlarmEnabled) {
 
                 canvas.save()
 
-                //selected minute = 15
+                //selected minutes = 15
                 canvas.rotate(mSelectedMinuteDegree , mCenterX,mCenterY)
                 canvas.drawLine(
                         mCenterX,
@@ -717,7 +715,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             }
 
             if (isTimerEnabled) {
-                timerView.onDraw(canvas,mCalendar.timeInMillis)
+                timerView.onDraw(canvas,mCalendar)
             }
         }
 
@@ -736,8 +734,8 @@ class TaskWatchService : CanvasWatchFaceService() {
                 val innerY = (-Math.cos(tickRot.toDouble())).toFloat() * innerTickRadius
                 val outerX = Math.sin(tickRot.toDouble()).toFloat() * outerTickRadius
                 val outerY = (-Math.cos(tickRot.toDouble())).toFloat() * outerTickRadius
-                canvas.drawLine(mCenterX + innerX, mCenterY + innerY,
-                        mCenterX + outerX, mCenterY + outerY, mTickAndCirclePaint)
+//                canvas.drawLine(mCenterX + innerX, mCenterY + innerY,
+//                        mCenterX + outerX, mCenterY + outerY, mTickAndCirclePaint)
             }
 
             /*
@@ -774,7 +772,7 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             /*
              * Ensure the "seconds" hand is drawn only when we are in interactive mode.
-             * Otherwise, we only update the watch face once a minute.
+             * Otherwise, we only update the watch face once a minutes.
              */
             if (!mAmbient) {
 

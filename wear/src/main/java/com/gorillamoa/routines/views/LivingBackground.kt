@@ -9,6 +9,7 @@ import java.util.*
 import kotlin.math.roundToInt
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.view.WindowManager
 import io.github.jdiemke.triangulation.*
 import kotlin.collections.ArrayList
 import kotlin.math.cos
@@ -77,8 +78,8 @@ class LivingBackground {
     lateinit var vibrator: Vibrator
 
     fun enableAlarm() {
-        isAlarmOn = true
-    }
+        isAlarmOn = true}
+
 
     fun disableAlarm() {
         isAlarmOn = false
