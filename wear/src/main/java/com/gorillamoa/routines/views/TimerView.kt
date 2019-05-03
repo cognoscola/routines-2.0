@@ -3,12 +3,13 @@ package com.gorillamoa.routines.views
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.util.Log
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 private const val ZERO_ANGLE = 90.0f
 private const val ANGLE_PER_MINUTE = 6.0f
 private const val ANGLE_PER_SECOND = 1/60.0f
-private const val ANGLE_PER_MILLISECOND = 1/60000.0f
 
 class TimerView(
         private val cx:Int,
@@ -26,22 +27,25 @@ class TimerView(
     /**
      * The minute at which the alarm must go off
      */
-    private var minutes:Int = 0
+    private var minutes:Long = 0
 
 
-    fun setSelectedMinute(selectedMinute:Int,calendar: Calendar){
+    fun setSelectedMinute(start:Long,timetoTrigger:Long){
 
-        startTime = System.currentTimeMillis()
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = start
 
-        val currentMinute = calendar.get(Calendar.MINUTE)
-        minutes =  if (selectedMinute >= currentMinute) {
-            selectedMinute - currentMinute
-        }else{
-            (60 - currentMinute) + selectedMinute
-        }
-        //calculate the end time. We subtract any seconds so that our line is perfectly on minute
-        endTime = startTime + (minutes)*60L * 1000L - (calendar.get(Calendar.SECOND) * 1000L)
+        Log.d("$tag setSelectedMinute","Initiated Alarm at${cal.get(Calendar.HOUR)}:${cal.get(Calendar.MINUTE)}:${cal.get(Calendar.SECOND)}")
 
+        cal.timeInMillis = timetoTrigger
+
+        Log.d("$tag setSelectedMinute","time to trigger $timetoTrigger")
+        Log.d("$tag setSelectedMinute","AKA at ${cal.get(Calendar.HOUR)}:${cal.get(Calendar.MINUTE)}:${cal.get(Calendar.SECOND)}")
+
+        startTime = start
+        endTime = timetoTrigger
+
+        minutes = TimeUnit.MILLISECONDS.toMinutes(endTime - startTime)
     }
 
 
@@ -95,13 +99,13 @@ class TimerView(
      * @param endTime is the time at which the alarm should go off
      * @param minute is the user chosen time to elapse
      */
-    private fun recalculateAngle(upTime:Long, endTime:Long,minute:Int):Float {
+    private fun recalculateAngle(upTime:Long, endTime:Long,minute:Long):Float {
 
         //lets pretend 1second is one minutes for the sake of debugging
 
         val dtPercent = ((upTime - startTime).toFloat() / (endTime - startTime).toFloat())
-        val remainingPerfect = 1.0 - dtPercent
-        return (minute * ANGLE_PER_MINUTE * remainingPerfect).toFloat()
+        val remainingTimePercent = 1.0 - dtPercent
+        return (minute * ANGLE_PER_MINUTE * remainingTimePercent).toFloat()
 
     }
 }

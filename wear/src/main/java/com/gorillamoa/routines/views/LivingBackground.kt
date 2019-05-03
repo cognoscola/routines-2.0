@@ -78,7 +78,9 @@ class LivingBackground {
     lateinit var vibrator: Vibrator
 
     fun enableAlarm() {
-        isAlarmOn = true}
+        isAlarmOn = true
+
+    }
 
 
     fun disableAlarm() {
@@ -166,7 +168,7 @@ class LivingBackground {
             workingCanvas.drawBitmap(morphedBitmap, 0.0f, 0.0f, mMorphPaint)
             mMorphPaint.xfermode = bgDrawingMode
             workingCanvas.drawBitmap(mBackgroundBitmap, 0.0f, 0.0f, mMorphPaint)
-            canvas.drawBitmap(workingBitmap, 0.0f, 0.0f, mAlarmPaint)
+            canvas.drawBitmap(workingBitmap, 0.0f, 0.0f, mBackgroundPaint)
 
             canvas.save()
             canvas.scale(scale, scale)
@@ -206,7 +208,6 @@ class LivingBackground {
                 mAlarmPaint.alpha = currentAlarmAlpha.roundToInt()
 
                 //TODO find performance between drawing another image on top and drawing these lines
-                mAlarmPaint.color = Color.RED
                 triangleSoup?.forEach {
 
                     //TODO don't draw duplicate triangles

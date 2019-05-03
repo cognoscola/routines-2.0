@@ -21,6 +21,9 @@ import com.gorillamoa.routines.views.*
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.math.roundToInt
+import android.view.WindowManager
+
+
 
 
 /**
@@ -84,6 +87,7 @@ class TaskWatchService : CanvasWatchFaceService() {
         }
     }
 
+
     inner class Engine : CanvasWatchFaceService.Engine() {
         private val tag:String = Engine::class.java.name
 
@@ -144,6 +148,8 @@ class TaskWatchService : CanvasWatchFaceService() {
         //clean the timer stuff into its own class
         private lateinit var timerView:TimerView
 
+        var wakeLock:PowerManager.WakeLock? = null
+
 
         //create a shared preference listener so that we can update the watchface UI when
         //changes to preference variables occur
@@ -162,6 +168,7 @@ class TaskWatchService : CanvasWatchFaceService() {
 
                 //we're just going to fire off
                 if (sharedPreferences.getBoolean(key, false)) {
+                    turnOnScreen()
                     livingBackground.enableAlarm()
                 }
             }
@@ -170,9 +177,22 @@ class TaskWatchService : CanvasWatchFaceService() {
 
                 //we're just going to fire off
                 if (sharedPreferences.getBoolean(key, false)) {
+
+                    turnOnScreen()
                     livingBackground.enableAlarm()
                 }
             }
+
+
+        }
+
+        private fun turnOnScreen(){
+            wakeLock =
+                    (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
+                        newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MyApp::MyWakelockTag").apply {
+                            acquire(30000)
+                        }
+                    }
 
 
         }
@@ -254,14 +274,23 @@ class TaskWatchService : CanvasWatchFaceService() {
         }
 
         /**
-         * Enable a timer to go off in specified minutes
-         * @param minutes is the amount of minutes until the alarm goes off
+         * Enable a timer to go off in specified selectedMinute
+         * @param selectedMinute is the selected user value according to his view
          */
-        private fun enableTimer(minutes:Int){
+        private fun enableTimer(selectedMinute:Int){
             isTimerEnabled = true
-            timerView.setSelectedMinute(minutes, mCalendar)
 
-            val timeToTrigger = System.currentTimeMillis() + (minutes * 60 * 1000) - (mCalendar.get(Calendar.SECOND) * 1000)
+            val currentMinute = mCalendar.get(Calendar.MINUTE)
+            val minutes =
+                    if (selectedMinute > currentMinute) {
+                selectedMinute - currentMinute
+            }else{
+                (60 - currentMinute) + selectedMinute
+            }
+
+            val timeToTrigger = System.currentTimeMillis() + (minutes * 60 * 1000)
+            timerView.setSelectedMinute(System.currentTimeMillis(), timeToTrigger)
+
 
             //TODO MOVE THIS TO alarm extensions
             getAlarmService().set(
@@ -598,6 +627,8 @@ class TaskWatchService : CanvasWatchFaceService() {
                     if (livingBackground.isAlarmEnabled()) {
                         livingBackground.disableAlarm()
                         //TODO disable corresponding alarm
+                        wakeLock?.release()
+                        wakeLock = null
                         disableTimer()
                         disableRestAlarm()
                     }else{
