@@ -21,6 +21,8 @@ class CircularTimer{
         minutes = 0
         startTime = 0
         endTime = 0
+        startAngle = 0.0f
+        sweepAngle = 0.0f
     }
 
     fun setSelectedMinute(start:Long,timetoTrigger:Long){

@@ -9,7 +9,6 @@ import java.util.*
 import kotlin.math.roundToInt
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.view.WindowManager
 import com.gorillamoa.routines.utils.CircularTimer
 import io.github.jdiemke.triangulation.*
 import kotlin.collections.ArrayList
@@ -46,6 +45,7 @@ class LivingBackground {
     private val baseDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC)
     private val morphDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
     private val bgDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_ATOP)
+
     private var morphPath = Path().apply {
         fillType = Path.FillType.EVEN_ODD
 
@@ -155,7 +155,6 @@ class LivingBackground {
             canvas.drawBitmap(mGrayBackgroundBitmap, 0f, 0f, mBackgroundPaint)
         } else {
 
-
             //add a smooth transition
             timers.forEach {
 
@@ -167,18 +166,22 @@ class LivingBackground {
                     morphPath.lineTo(bounds.width().div(CircularTimer.TWO), 0.0f)
                     morphPath.arcTo(0.0f, 0.0f, bounds.width().toFloat(), bounds.height().toFloat(), it.startAngle, it.sweepAngle, true)
                     morphPath.lineTo(bounds.width().div(CircularTimer.TWO), bounds.height().div(CircularTimer.TWO))
+
+                    //TODO configure to work with multiple timers
+                    workingCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+                    mMorphPaint.color = Color.RED
+                    mMorphPaint.xfermode = baseDrawingMode
+                    workingCanvas.drawPath(morphPath, mMorphPaint)
+                    mMorphPaint.xfermode = morphDrawingMode
+                    //draw morph background
+                    workingCanvas.drawBitmap(morphedBitmap, 0.0f, 0.0f, mMorphPaint)
+                    mMorphPaint.xfermode = bgDrawingMode
+
+                }else{
+                    mMorphPaint.xfermode = baseDrawingMode
                 }
             }
 
-
-            //draw morph background
-            workingCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-            mMorphPaint.color = Color.RED
-            mMorphPaint.xfermode = baseDrawingMode
-            workingCanvas.drawPath(morphPath, mMorphPaint)
-            mMorphPaint.xfermode = morphDrawingMode
-            workingCanvas.drawBitmap(morphedBitmap, 0.0f, 0.0f, mMorphPaint)
-            mMorphPaint.xfermode = bgDrawingMode
             workingCanvas.drawBitmap(mBackgroundBitmap, 0.0f, 0.0f, mMorphPaint)
             canvas.drawBitmap(workingBitmap, 0.0f, 0.0f, mBackgroundPaint)
 
