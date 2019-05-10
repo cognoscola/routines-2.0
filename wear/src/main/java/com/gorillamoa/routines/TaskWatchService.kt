@@ -16,14 +16,12 @@ import com.gorillamoa.routines.receiver.AlarmReceiver
 import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_REST
 import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_TIMER
 import com.gorillamoa.routines.scheduler.TaskScheduler
+import com.gorillamoa.routines.utils.CircularTimer
 import com.gorillamoa.routines.views.*
 
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.math.roundToInt
-import android.view.WindowManager
-
-
 
 
 /**
@@ -66,6 +64,9 @@ private const val PERCENT_OF_RADIUS = 0.7
  * in the Google Watch Face Code Lab:
  * https://codelabs.developers.google.com/codelabs/watchface/index.html#0
  */
+
+//TODO ADD a seconds timer
+//TODO add a hour timer
 class TaskWatchService : CanvasWatchFaceService() {
 
     //TODO create pager like effect (or other animation) when switching tasks
@@ -118,7 +119,6 @@ class TaskWatchService : CanvasWatchFaceService() {
         private val livingBackground = LivingBackground()
         private val foreground=Foreground()
 
-
         private var mAmbient: Boolean = false
         private var mLowBitAmbient: Boolean = false
         private var mBurnInProtection: Boolean = false
@@ -147,6 +147,7 @@ class TaskWatchService : CanvasWatchFaceService() {
 
         //clean the timer stuff into its own class
         private lateinit var timerView:TimerView
+        private var timingObject=CircularTimer()
 
         var wakeLock:PowerManager.WakeLock? = null
 
@@ -187,14 +188,12 @@ class TaskWatchService : CanvasWatchFaceService() {
         }
 
         private fun turnOnScreen(){
-            wakeLock =
+      /*      wakeLock =
                     (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
                         newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MyApp::MyWakelockTag").apply {
                             acquire(30000)
                         }
-                    }
-
-
+                    }*/
         }
 
         private val mTimeZoneReceiver = object : BroadcastReceiver() {
@@ -216,7 +215,6 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             isRestAlarmEnabled = isRestAlarmActive()
             isTimerEnabled = isTimerAlarmActive()
-
 
             TaskScheduler.getNextUncompletedTask(this@TaskWatchService) { task ->
                 foreground.configureTaskUI(task, this@TaskWatchService)
@@ -288,8 +286,9 @@ class TaskWatchService : CanvasWatchFaceService() {
                 (60 - currentMinute) + selectedMinute
             }
 
+
             val timeToTrigger = System.currentTimeMillis() + (minutes * 60 * 1000)
-            timerView.setSelectedMinute(System.currentTimeMillis(), timeToTrigger)
+            timingObject.setSelectedMinute(System.currentTimeMillis(), timeToTrigger)
 
 
             //TODO MOVE THIS TO alarm extensions
@@ -303,11 +302,12 @@ class TaskWatchService : CanvasWatchFaceService() {
         }
 
         private fun disableTimer(){
-            timerView.reset()
+            timingObject.reset()
             //TODO move this to alarm extensions
             applicationContext.getAlarmService().cancel(getTimerPendingIntent())
             isTimerEnabled = false
             applicationContext.saveAlarmTimerTriggerStatus(false)
+
         }
 
         private fun disableRestAlarm(){
@@ -693,10 +693,17 @@ class TaskWatchService : CanvasWatchFaceService() {
             secondsRotation = seconds * 6f
 
 
-            //draw our bg
+            timingObject.calculateAngles(mCalendar)
 
+
+            //draw our bg
             //TODO CALCULATE THINGS WHILE NOT UPDATING!
-            livingBackground.drawBackground(canvas, mAmbient,mLowBitAmbient,mBurnInProtection, bounds, secondsRotation)
+            livingBackground.drawBackground(canvas, mAmbient,mLowBitAmbient,mBurnInProtection, bounds, timingObject)
+
+            if (isTimerEnabled) {
+                timerView.onDraw(canvas,timingObject)
+            }
+
             drawWatchFace(canvas)
             drawFeatures(canvas)
             foreground.drawButtons(canvas)
@@ -745,9 +752,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 canvas.restore()
             }
 
-            if (isTimerEnabled) {
-                timerView.onDraw(canvas,mCalendar)
-            }
+
         }
 
         private fun drawWatchFace(canvas: Canvas) {

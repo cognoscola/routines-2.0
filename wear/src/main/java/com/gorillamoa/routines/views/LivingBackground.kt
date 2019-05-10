@@ -10,6 +10,7 @@ import kotlin.math.roundToInt
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.view.WindowManager
+import com.gorillamoa.routines.utils.CircularTimer
 import io.github.jdiemke.triangulation.*
 import kotlin.collections.ArrayList
 import kotlin.math.cos
@@ -136,14 +137,17 @@ class LivingBackground {
 
     fun getPalette() = palette
 
-
     /**
      * Draw the background. There are 3 main steps:
      * 1. Draw the morphed background
      * 2. Draw the unmorphed background
      * 3. Draw Features
      */
-    fun drawBackground(canvas: Canvas, mAmbient: Boolean, mLowBitAmbient: Boolean, mBurnInProtection: Boolean, bounds: Rect, rotation: Float) {
+    fun drawBackground(canvas: Canvas,
+                       mAmbient: Boolean,
+                       mLowBitAmbient: Boolean,
+                       mBurnInProtection: Boolean,
+                       bounds: Rect, vararg timers:CircularTimer) {
 
         if (mAmbient && (mLowBitAmbient || mBurnInProtection)) {
             canvas.drawColor(Color.BLACK)
@@ -151,12 +155,20 @@ class LivingBackground {
             canvas.drawBitmap(mGrayBackgroundBitmap, 0f, 0f, mBackgroundPaint)
         } else {
 
-            //recreate new path
-            morphPath.reset()
-            morphPath.moveTo(bounds.width().div(2.0f), bounds.height().div(2.0f))
-            morphPath.lineTo(bounds.width().div(2.0f), 0.0f)
-            morphPath.arcTo(0.0f, 0.0f, bounds.width().toFloat(), bounds.height().toFloat(), -90.0f, rotation, true)
-            morphPath.lineTo(bounds.width().div(2.0f), bounds.height().div(2.0f))
+
+            //add a smooth transition
+            timers.forEach {
+
+                if (it.isRunning()) {
+
+                    morphPath.reset()
+                    //move to the center
+                    morphPath.moveTo(bounds.width().div(CircularTimer.TWO), bounds.height().div(CircularTimer.TWO))
+                    morphPath.lineTo(bounds.width().div(CircularTimer.TWO), 0.0f)
+                    morphPath.arcTo(0.0f, 0.0f, bounds.width().toFloat(), bounds.height().toFloat(), it.startAngle, it.sweepAngle, true)
+                    morphPath.lineTo(bounds.width().div(CircularTimer.TWO), bounds.height().div(CircularTimer.TWO))
+                }
+            }
 
 
             //draw morph background
