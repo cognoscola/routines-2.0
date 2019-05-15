@@ -70,7 +70,7 @@ class LivingBackground {
     private var isAlarmAlphaIncreasing = true
     private var currentTimeCounter = 0L
     private var currentAlarmAlpha = 0.0f
-    private val TIME2MAX = 1000 // 1 second to light up, and 1 to show up.
+    private val TIME2MAX = 1000.0f // 1 second to light up, and 1 to show up.
     private val MAXALPHA = 255.0f
     private var lastMeasuredTime = 0L
     private var dt = 0L
@@ -82,7 +82,6 @@ class LivingBackground {
         isAlarmOn = true
 
     }
-
 
     fun disableAlarm() {
         isAlarmOn = false
@@ -214,9 +213,11 @@ class LivingBackground {
                         vibrator.vibrate(vibrationEffect)
                     }
                 }
-                currentAlarmAlpha = (currentTimeCounter.toFloat().div(TIME2MAX.toFloat()) * MAXALPHA)
+                //Log.d("$tag drawBackground","Alpha $currentAlarmAlpha")
+                currentAlarmAlpha = (currentTimeCounter.toFloat().div(TIME2MAX) * MAXALPHA)
                 if (currentAlarmAlpha > 255.0) currentAlarmAlpha = 255f else if (currentAlarmAlpha < 0) {
                     currentAlarmAlpha = 0f
+
                 }
                 lastMeasuredTime = SystemClock.uptimeMillis()
 

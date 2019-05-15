@@ -10,12 +10,19 @@ import android.text.TextPaint
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.data.Task
 import com.gorillamoa.routines.scheduler.TaskScheduler
-import java.util.ArrayList
+import java.util.*
 
 private const val COMPLETE = "complete"
 private const val INCOMPLETE = "incomplete"
 
 //TODO update task if it is deleted somewhere else
+
+private const val taskTextSize =24.0f
+private const val timeTextSize =28.0f
+
+private const val SHADOW_RADIUS = 6f
+private var mWatchHandShadowColor: Int = Color.BLACK
+private const val sampleTime = "13:30"
 
 class Foreground{
 
@@ -29,17 +36,29 @@ class Foreground{
     private var centerButton:SwitchingButton? = null
     private var switchingButton:SwitchingButton? = null
 
+
+
     companion object {
         val STATE_BREAKS = "break"
         val STATE_TIMER = "time"
         val STATE_ALARM = "alarm"
     }
 
+
     //Text Stuff
-    private val mTextPaint=TextPaint().apply {
+
+    private val timeTextPaint = TextPaint().apply {
+        color = Color.WHITE
+    }
+    private val taskTextPaint =TextPaint().apply {
         color = Color.WHITE
         textSize = 24.0f
+      /*  setShadowLayer(
+                SHADOW_RADIUS, 0f, 0f, mWatchHandShadowColor)*/
     }
+
+
+    private var timeTextHeight = 0f
     private var textHeight = 0f
     private var staticLayout: StaticLayout? = null
     private var textHalfWidth = 0f
@@ -69,6 +88,7 @@ class Foreground{
                 (screenWidth  * 0.18).toInt(),
                 //use width to ensure we get a square object
                 (screenWidth  *   0.18).toInt(),
+                10,
                 context).apply {
             onClickListener = {
                 nextState()
@@ -76,7 +96,6 @@ class Foreground{
             }
             addState(STATE_BREAKS, R.drawable.ic_break_time)
             addState(STATE_TIMER, R.drawable.ic_hourglass)
-            addState(STATE_ALARM, R.drawable.ic_alarm)
             touchables.add(this)
         }
 
@@ -96,7 +115,7 @@ class Foreground{
             touchables.add(this)
         }
 
-        centerButton = SwitchingButton((mCenterX).toInt() ,(mCenterY).toInt(),(screenWidth*0.18f).toInt(),(screenWidth*0.18f).toInt(), context).apply {
+        centerButton = SwitchingButton((mCenterX).toInt() ,(mCenterY).toInt(),(screenWidth*0.18f).toInt(),(screenWidth*0.18f).toInt(),0, context).apply {
             addState(INCOMPLETE, R.drawable.ic_radio_button_unchecked_black_24dp)
             addState(COMPLETE, R.drawable.ic_cc_checkmark)
             onClickListener = {
@@ -108,6 +127,12 @@ class Foreground{
 
         //measure text height
         textHeight = mCenterY - screenHeight*0.09f - 30f //some text height
+
+
+        timeTextPaint.isAntiAlias = true
+        timeTextPaint.textSize = (timeTextSize * context.resources.displayMetrics.density)
+        timeTextHeight =textHeight - timeTextPaint.ascent() + timeTextPaint.descent() - screenHeight*0.16f
+
     }
 
     fun configureTaskUI(task: Task?,context:Context){
@@ -116,10 +141,10 @@ class Foreground{
         task?.apply {
 
             //Set the correct title
-            val width = mTextPaint.measureText(this.name)
+            val width = taskTextPaint.measureText(this.name)
             textHalfWidth = (width * 0.5).toFloat()
 
-            val sb = StaticLayout.Builder.obtain(this.name, 0, this.name.length, mTextPaint, width.toInt())
+            val sb = StaticLayout.Builder.obtain(this.name, 0, this.name.length, taskTextPaint, width.toInt())
                     .setAlignment(Layout.Alignment.ALIGN_CENTER)
                     .setLineSpacing(0.0f, 1.0f)
                     .setIncludePad(false)
@@ -141,7 +166,7 @@ class Foreground{
         switchingButton?.draw(canvas)
     }
 
-    fun drawTexts(xPos:Int,canvas: Canvas) {
+    fun drawTexts(xPos:Int,canvas: Canvas,mCalendar:Calendar) {
 
         staticLayout?.let {
 
@@ -149,7 +174,12 @@ class Foreground{
             canvas.translate(xPos - textHalfWidth, textHeight)
             staticLayout!!.draw(canvas)
             canvas.restore()
+
         }
+
+
+        val textWidth = timeTextPaint.measureText(sampleTime)
+        canvas.drawText(sampleTime,xPos - textWidth.div(2.0f), timeTextHeight, timeTextPaint)
     }
 
     /**

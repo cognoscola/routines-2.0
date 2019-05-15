@@ -28,7 +28,7 @@ import kotlin.math.roundToInt
  * Updates rate in milliseconds for interactive mode. We update once a second to advance the
  * second hand.
  */
-//private const val INTERACTIVE_UPDATE_RATE_MS = 67L //15fps
+private const val INTERACTIVE_UPDATE_RATE_MS_15FPS = 67L //15fps
 private const val INTERACTIVE_UPDATE_RATE_MS = 1000 // 1 fps
 
 
@@ -229,6 +229,8 @@ class TaskWatchService : CanvasWatchFaceService() {
             initializeFeatures(selectedMinute)
 
             applicationContext.getLocalSettings().registerOnSharedPreferenceChangeListener(preferenceListener)
+
+//            ClickableRectangle.enableDebug()
         }
 
         private fun measureFeatures(){
@@ -709,8 +711,6 @@ class TaskWatchService : CanvasWatchFaceService() {
             foreground.drawButtons(canvas)
         }
 
-
-
         private fun drawFeatures(canvas: Canvas) {
 
             //TODO we don't need to draw all the features now because they don't update every second
@@ -718,7 +718,7 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             //lets draw our rest alarms if enabled
             drawRestLines(canvas)
-            foreground.drawTexts(mCenterX.toInt(),canvas)
+            foreground.drawTexts(mCenterX.toInt(),canvas,mCalendar)
         }
 
 
@@ -893,7 +893,9 @@ class TaskWatchService : CanvasWatchFaceService() {
             invalidate()
             if (shouldTimerBeRunning()) {
                 val timeMs = System.currentTimeMillis()
-                val delayMs = INTERACTIVE_UPDATE_RATE_MS - timeMs % INTERACTIVE_UPDATE_RATE_MS
+                val delayMs =if(livingBackground.isAlarmEnabled()){
+                    INTERACTIVE_UPDATE_RATE_MS_15FPS - timeMs % INTERACTIVE_UPDATE_RATE_MS_15FPS
+                } else{ INTERACTIVE_UPDATE_RATE_MS - timeMs % INTERACTIVE_UPDATE_RATE_MS}
                 mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs)
             }
         }

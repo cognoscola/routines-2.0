@@ -14,6 +14,7 @@ class SwitchingButton(
         centerY:Int,
         width:Int,
         height:Int,
+        val padding:Int = 0,
         val context: Context):ClickableRectangle(centerX,centerY,width,height){
 
 
@@ -22,8 +23,10 @@ class SwitchingButton(
         style = Paint.Style.STROKE
         strokeWidth = 3.0f
         isAntiAlias = true
+
     }
     private var srcRect =Rect()
+    private var drawingRect = Rect()
     private var bitmap:Bitmap? = null
     private var states=ArrayDeque<Pair<String,Int>>()
     private var currentState:String =""
@@ -77,8 +80,6 @@ class SwitchingButton(
     }
 
 
-
-
     fun getState():String{
         return currentState
     }
@@ -120,9 +121,16 @@ class SwitchingButton(
     private fun getBitmap(context:Context,drawableRes: Int): Bitmap {
         val drawable = ContextCompat.getDrawable(context,drawableRes)
         val canvas = Canvas()
-        val bitmap = Bitmap.createBitmap(drawable!!.getIntrinsicWidth(), drawable!!.getIntrinsicHeight(), Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap(drawable!!.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
         canvas.setBitmap(bitmap)
-        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable!!.getIntrinsicHeight())
+
+        val edge = padding.div(2)
+
+        drawable.setBounds(
+                0 + edge,
+                0 + edge,
+                drawable.intrinsicWidth - edge,
+                drawable.intrinsicHeight - edge)
         drawable.draw(canvas)
 
         return bitmap
