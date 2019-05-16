@@ -82,6 +82,8 @@ class App:Application(){
 
     //TODO add progress bar around the circumference of the app
 
+    //TODO DATA TRACKING AND LOGGING for insight (habit building)
+
 
     //later CREATE A BUG CHART
 }

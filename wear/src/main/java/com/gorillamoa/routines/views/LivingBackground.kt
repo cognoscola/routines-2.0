@@ -349,11 +349,7 @@ class LivingBackground {
 //                    Log.d("$tag generateBackgroundBitmaps","Centroid: $centerX, $centerY")
 
             //now use the coordinates to locate the correct color
-            val colorLeft = topLeft.lerp(bottomLeft, centerY.toFloat() / height.toFloat(), lab)
-            val colorRight = topRight.lerp(bottomRight, centerY.toFloat() / height.toFloat(), lab)
-            val final = colorLeft.lerp(colorRight, centerX.toFloat() / width.toFloat(), lab)
-            painter.color = Color.argb(final.alpha().roundToInt(), final.red().roundToInt(), final.green().roundToInt(), final.blue().roundToInt())
-
+            painter.color = getColor(centerX.toFloat(),centerY.toFloat(),width.toFloat(),height.toFloat())
 
             //draw the centroids
             //  canvas.drawPoint(centerX.toFloat(),centerY.toFloat(),painter)
@@ -478,5 +474,12 @@ class LivingBackground {
 
         //We morphed the background slightly, now lets create the bitmap for it.
         morphedBitmap = generateBitmapFromTriangles(widthD, heightD, triangulator.triangles as ArrayList<Triangle2D>)
+    }
+
+    fun getColor(x:Float,y:Float,width:Float,height:Float):Int{
+        val colorLeft = topLeft.lerp(bottomLeft, y / height, lab)
+        val colorRight = topRight.lerp(bottomRight, y / height, lab)
+        val final = colorLeft.lerp(colorRight, x / width, lab)
+        return Color.argb(final.alpha().roundToInt(), final.red().roundToInt(), final.green().roundToInt(), final.blue().roundToInt())
     }
 }
