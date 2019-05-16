@@ -174,12 +174,11 @@ class Foreground{
             canvas.translate(xPos - textHalfWidth, textHeight)
             staticLayout!!.draw(canvas)
             canvas.restore()
-
         }
 
-
-        val textWidth = timeTextPaint.measureText(sampleTime)
-        canvas.drawText(sampleTime,xPos - textWidth.div(2.0f), timeTextHeight, timeTextPaint)
+        val text = "${mCalendar.get(Calendar.HOUR_OF_DAY)}:${String.format("%02d", mCalendar.get(Calendar.MINUTE))}"
+        val textWidth = timeTextPaint.measureText(text)
+        canvas.drawText(text,xPos - textWidth.div(2.0f), timeTextHeight, timeTextPaint)
     }
 
     /**
