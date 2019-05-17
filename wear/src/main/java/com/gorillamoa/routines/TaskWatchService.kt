@@ -17,6 +17,8 @@ import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_REST
 import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_TIMER
 import com.gorillamoa.routines.scheduler.TaskScheduler
 import com.gorillamoa.routines.utils.CircularTimer
+import com.gorillamoa.routines.utils.CircularTimer.Companion.getXFromDegree
+import com.gorillamoa.routines.utils.CircularTimer.Companion.getYFromDegree
 import com.gorillamoa.routines.views.*
 
 import java.lang.ref.WeakReference
@@ -46,7 +48,8 @@ private const val SECOND_TICK_STROKE_WIDTH = 2f
 
 private const val SHADOW_RADIUS = 6f
 
-private const val PERCENT_OF_RADIUS = 0.7
+private const val CENTER_AREA_RADIUS = 0.7
+private const val HAND_TRAVEL_CIRCLE_RADIUS = 0.85
 
 //TODO give user option to approve today's task if there isn't any scheduled!
 //TODO create Approve/No task/Done day UI
@@ -104,12 +107,15 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var sHourHandLength: Float = 0F
 
         private var seconds = 0.0f
-        private var secondsRotation = 0.0f
+        private var secondsRotationDegrees = 0.0f
 
         /* Colors for all hands (hour, minutes, seconds, ticks) based on photo loaded. */
         private var mWatchHandColor: Int = 0
         private var mWatchHandHighlightColor: Int = 0
         private var mWatchHandShadowColor: Int = 0
+
+        private val secondHand = TimeHand(TimeHand.TYPE_SECOND)
+        private val minuteHand = TimeHand(TimeHand.TYPE_MINUTE)
 
         private lateinit var mHourPaint: Paint
         private lateinit var mMinutePaint: Paint
@@ -145,8 +151,17 @@ class TaskWatchService : CanvasWatchFaceService() {
         //Break hand color
         private var breakLinePath = Path().apply {
             fillType = Path.FillType.EVEN_ODD
-
         }
+
+        private var timeLinePath = Path().apply {
+            fillType = Path.FillType.EVEN_ODD
+        }
+
+
+        private var secondLinePath1 = Path().apply {
+            fillType = Path.FillType.EVEN_ODD
+        }
+
 
         //todo save selected Minute and break Interval
         //clean breaks stuff into their own class
@@ -156,7 +171,8 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var lines = 0
         private var breakIntervalDegree = 0f
         private var mSelectedMinuteDegree = 0f
-        private var middleSectionRadius = 0f
+        private var middleSectionRadius = 0f //the radius of the circle on which a line is draw
+        private var secondTravelPathRadius = 0f //the radius of the circle on which the seconds Hands travels on
         private var isRestAlarmEnabled = false
         private var isTimerEnabled = false
 
@@ -353,9 +369,13 @@ class TaskWatchService : CanvasWatchFaceService() {
                 color = mWatchHandHighlightColor
                 strokeWidth = SECOND_TICK_STROKE_WIDTH
                 isAntiAlias = true
-                strokeCap = Paint.Cap.ROUND
+                style = Paint.Style.FILL_AND_STROKE
+
+
+/*
                 setShadowLayer(
                         SHADOW_RADIUS, 0f, 0f, mWatchHandShadowColor)
+*/
             }
 
             mTickAndCirclePaint = Paint().apply {
@@ -504,7 +524,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 mTickAndCirclePaint.color = livingBackground.getPalette().getLightVibrantColor(Color.WHITE)
 
 
-                breakLinePaint.setShadowLayer(6.0f,0.0f,0.0f,livingBackground.getPalette().getMutedColor(Color.WHITE))
+                breakLinePaint.setShadowLayer(6.0f,0.0f,0.0f,livingBackground.getPalette().getMutedColor(Color.BLACK))
 
                 mHourPaint.isAntiAlias = true
                 mMinutePaint.isAntiAlias = true
@@ -518,7 +538,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 mMinutePaint.setShadowLayer(
                         SHADOW_RADIUS, 0f, 0f, mWatchHandShadowColor)
                 mSecondPaint.setShadowLayer(
-                        SHADOW_RADIUS, 0f, 0f, mWatchHandShadowColor)
+                        SHADOW_RADIUS, 0f, 0f, Color.WHITE)
                 mTickAndCirclePaint.setShadowLayer(
                         SHADOW_RADIUS, 0f, 0f, mWatchHandShadowColor) }
         }
@@ -548,8 +568,8 @@ class TaskWatchService : CanvasWatchFaceService() {
             mCenterX = width / 2f
             mCenterY = height / 2f
 
-            middleSectionRadius = (mCenterY * PERCENT_OF_RADIUS).toFloat()
-
+            middleSectionRadius = (mCenterY * HAND_TRAVEL_CIRCLE_RADIUS).toFloat()
+            secondTravelPathRadius = (mCenterY * HAND_TRAVEL_CIRCLE_RADIUS - 5.0f).toFloat()
             /*
              * Calculate lengths of different hands based on watch screen size.
              */
@@ -583,6 +603,38 @@ class TaskWatchService : CanvasWatchFaceService() {
                 lineTo(mCenterX - 15f, 0f)
                 lineTo(mCenterX + 15f,0f)
                 lineTo(mCenterX, mCenterY - middleSectionRadius - 10f)
+            }
+
+
+            secondHand.measure(width,height,secondTravelPathRadius)
+            minuteHand.measure(width,height, middleSectionRadius)
+
+            timeLinePath.apply {
+                reset()
+
+                moveTo(mCenterX, mCenterY - middleSectionRadius + 10.0f )
+                lineTo(mCenterX - 15f, mCenterY -middleSectionRadius )
+                lineTo(mCenterX + 15f, mCenterY - middleSectionRadius)
+                lineTo(mCenterX, mCenterY - middleSectionRadius + 10f)
+
+                moveTo(mCenterX -15f, mCenterY - middleSectionRadius )
+                lineTo(mCenterX , mCenterY- middleSectionRadius - 10.0f )
+                lineTo(mCenterX +15f, mCenterY- middleSectionRadius )
+                lineTo(mCenterX -15f, mCenterY- middleSectionRadius )
+            }
+
+            secondLinePath1.apply {
+                reset()
+
+                moveTo(mCenterX, mCenterY - secondTravelPathRadius + 5.0f )
+                lineTo(mCenterX - 10f, mCenterY -secondTravelPathRadius )
+                lineTo(mCenterX + 10f, mCenterY - secondTravelPathRadius)
+                lineTo(mCenterX, mCenterY - secondTravelPathRadius + 5f)
+
+                moveTo(mCenterX -10f, mCenterY - secondTravelPathRadius )
+                lineTo(mCenterX , mCenterY- secondTravelPathRadius - 5.0f )
+                lineTo(mCenterX +10f, mCenterY- secondTravelPathRadius )
+                lineTo(mCenterX -10f, mCenterY- secondTravelPathRadius )
             }
 
 
@@ -669,27 +721,8 @@ class TaskWatchService : CanvasWatchFaceService() {
         private fun isTouchingCenter(x:Int, y:Int):Boolean{
 
             val dSquare = ((x - mCenterX) * (x - mCenterX)) + ((y - mCenterY) * (y - mCenterY))
-            val rSquare = (mCenterX * mCenterX * PERCENT_OF_RADIUS * PERCENT_OF_RADIUS)
+            val rSquare = (mCenterX * mCenterX * CENTER_AREA_RADIUS * CENTER_AREA_RADIUS)
             return dSquare < rSquare
-        }
-
-        /**
-         * Returns a specific X coordinate given a minute and radius of circle
-         */
-        private fun getXFromDegree(selectedDegree:Float, radius:Float, circleCenterX:Float):Float{
-
-            //6 degrees per minute
-            (selectedDegree * Math.PI / 180).let { rads ->
-                return (circleCenterX + radius * Math.sin(rads)).toFloat()
-            }
-        }
-
-        private fun getYFromDegree(selectedDegree:Float, radius:Float, circleCenterY:Float):Float{
-
-            //6 degrees per minute
-            (selectedDegree * Math.PI / 180).let { rads ->
-                return (circleCenterY - radius * Math.cos(rads)).toFloat()
-            }
         }
 
 
@@ -719,7 +752,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             //measure some things , aka second
             //TODO remove this and switch to minutes
             seconds = mCalendar.get(Calendar.SECOND) + mCalendar.get(Calendar.MILLISECOND) / 1000f
-            secondsRotation = seconds * 6f
+            secondsRotationDegrees = seconds * 6f
 
 
             timingObject.calculateAngles(mCalendar)
@@ -733,7 +766,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 timerView.onDraw(canvas,timingObject)
             }
 
-            drawWatchFace(canvas)
+            drawWatchFace(canvas,bounds)
             drawFeatures(canvas,bounds)
             foreground.drawButtons(canvas)
         }
@@ -769,7 +802,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                         bounds.height().toFloat()
                 )
 
-                drawBreakTriangle(canvas)
+                canvas.drawPath(breakLinePath,breakLinePaint)
 
                 //now we rotate break interval amount
                 for (i in 1..(lines - 1)) {
@@ -782,31 +815,16 @@ class TaskWatchService : CanvasWatchFaceService() {
                             bounds.width().toFloat(),
                             bounds.height().toFloat()
                     )
-                    drawBreakTriangle(canvas)
+                    canvas.drawPath(breakLinePath,breakLinePaint)
+
                 }
 
-//                canvas.drawCircle(mCenterX,mCenterY,mCenterX*PERCENT_OF_RADIUS.toFloat(),mBreakLinePaint)
+//                canvas.drawCircle(mCenterX,mCenterY,mCenterX*CENTER_AREA_RADIUS.toFloat(),mBreakLinePaint)
                 canvas.restore()
             }
-
         }
 
-        private fun drawBreakTriangle(canvas: Canvas){
-
-            canvas.drawPath(breakLinePath,breakLinePaint)
-/*
-            canvas.drawLine(
-                    mCenterX,
-                    mCenterY - middleSectionRadius,
-                    mCenterX,
-                    0f,
-                    mBreakLinePaint)
-*/
-
-
-        }
-
-        private fun drawWatchFace(canvas: Canvas) {
+        private fun drawWatchFace(canvas: Canvas, bounds:Rect) {
 
             /*
              * Draw ticks. Usually you will want to bake this directly into the photo, but in
@@ -840,46 +858,19 @@ class TaskWatchService : CanvasWatchFaceService() {
              * Save the canvas state before we can begin to rotate it.
              */
             canvas.save()
-
             canvas.rotate(hoursRotation, mCenterX, mCenterY)
-            canvas.drawLine(
-                    mCenterX,
-                    mCenterY - middleSectionRadius,
-                    mCenterX,
-                    0.0f,
-                    mHourPaint)
-
+            canvas.drawPath(timeLinePath,mHourPaint)
             canvas.rotate(minutesRotation - hoursRotation, mCenterX, mCenterY)
-            canvas.drawLine(
-                    mCenterX,
-                    mCenterY - middleSectionRadius ,
-                    mCenterX,
-                    0.0f,
-                    mMinutePaint)
+            minuteHand.draw(canvas, mCenterX,mCenterY, bounds,livingBackground, minutesRotation)
 
             /*
              * Ensure the "seconds" hand is drawn only when we are in interactive mode.
              * Otherwise, we only update the watch face once a minutes.
              */
             if (!mAmbient) {
-
-
-
-                canvas.rotate(secondsRotation - minutesRotation, mCenterX, mCenterY)
-                canvas.drawLine(
-                        mCenterX,
-                        mCenterY - middleSectionRadius,
-                        mCenterX,
-                        0.0f,
-                        mSecondPaint)
+                canvas.rotate(secondsRotationDegrees - minutesRotation, mCenterX, mCenterY)
+                secondHand.draw(canvas,mCenterX,mCenterY,bounds,livingBackground,secondsRotationDegrees)
             }
-/*
-            canvas.drawCircle(
-                    mCenterX,
-                    mCenterY,
-                    CENTER_GAP_AND_CIRCLE_RADIUS,
-                    mTickAndCirclePaint)
-*/
 
             /* Restore the canvas' original orientation. */
             canvas.restore()

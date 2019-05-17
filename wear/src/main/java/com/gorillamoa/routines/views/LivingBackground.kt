@@ -440,6 +440,14 @@ class LivingBackground {
 
 
         //generate Morphed background
+        //if image is square, height = with, so
+        //radius = % * width /2
+
+        //100 - 15 / 100 =
+
+
+
+
         val radius = (WORKING_BITMAP_WIDTH.div(2.0) - 15.0).toFloat()
         //now find all the triangles that intersect with this circle, we do this by dividing the circle into tangents
         //60 of them since 360/12 = 30 sections
@@ -468,7 +476,6 @@ class LivingBackground {
 
         }
 
-
         triangulator = DelaunayTriangulator(point2ds)
         triangulator.triangulate()
 
@@ -476,6 +483,9 @@ class LivingBackground {
         morphedBitmap = generateBitmapFromTriangles(widthD, heightD, triangulator.triangles as ArrayList<Triangle2D>)
     }
 
+
+    //clean the method getColor should be declared static as well as its colors
+    //clean its colors should also be chosen based on the percent (instead of real values) of the canvas since canvas bounds can change
     fun getColor(x:Float,y:Float,width:Float,height:Float):Int{
         val colorLeft = topLeft.lerp(bottomLeft, y / height, lab)
         val colorRight = topRight.lerp(bottomRight, y / height, lab)

@@ -19,7 +19,7 @@ class TimerView(
 
     init {
         paint.apply {
-            strokeWidth = 5f
+            strokeWidth = 1f
             isAntiAlias = true
             style = Paint.Style.STROKE
             color = Color.argb(100,207,201,213) //207 201 213

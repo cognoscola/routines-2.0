@@ -67,6 +67,8 @@ class CircularTimer{
 
     }
 
+
+
     companion object {
 
         const val TWO = 2.0f
@@ -74,6 +76,25 @@ class CircularTimer{
         const val ZERO_ANGLE = 90.0f
         const val ANGLE_PER_MINUTE = 6.0f
         const val ANGLE_PER_SECOND = 1/60.0f
+
+        /**
+         * Returns a specific X coordinate given a minute and radius of circle
+         */
+        fun getXFromDegree(selectedDegree:Float, radius:Float, circleCenterX:Float):Float{
+
+            //6 degrees per minute
+            (selectedDegree * Math.PI / 180).let { rads ->
+                return (circleCenterX + radius * Math.sin(rads)).toFloat()
+            }
+        }
+
+        fun getYFromDegree(selectedDegree:Float, radius:Float, circleCenterY:Float):Float{
+
+            //6 degrees per minute
+            (selectedDegree * Math.PI / 180).let { rads ->
+                return (circleCenterY - radius * Math.cos(rads)).toFloat()
+            }
+        }
 
 
 
