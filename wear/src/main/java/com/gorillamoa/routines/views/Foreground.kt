@@ -10,6 +10,7 @@ import android.text.TextPaint
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.data.Task
 import com.gorillamoa.routines.scheduler.TaskScheduler
+import java.lang.StringBuilder
 import java.util.*
 
 private const val COMPLETE = "complete"
@@ -20,9 +21,9 @@ private const val INCOMPLETE = "incomplete"
 private const val taskTextSize =24.0f
 private const val timeTextSize =28.0f
 
-private const val SHADOW_RADIUS = 6f
-private var mWatchHandShadowColor: Int = Color.BLACK
-private const val sampleTime = "13:30"
+private const val TIME_MINUTE_FORMAT = "%02d"
+private const val TIME_COLON = ":"
+private const val TEXT_HALF_WIDTH = 2.0f
 
 class Foreground{
 
@@ -35,7 +36,6 @@ class Foreground{
     private var rightButton:CanvasButton? = null
     private var centerButton:SwitchingButton? = null
     private var switchingButton:SwitchingButton? = null
-
 
 
     companion object {
@@ -63,8 +63,11 @@ class Foreground{
     private var staticLayout: StaticLayout? = null
     private var textHalfWidth = 0f
 
-    fun getState() = switchingButton!!.getState()
+    private var textBuilder = StringBuilder(5)
+    private var timeString:String = ""
+    private var textWidth:Float = 0.0f
 
+    fun getState() = switchingButton!!.getState()
 
 
     /**
@@ -166,19 +169,27 @@ class Foreground{
         switchingButton?.draw(canvas)
     }
 
+    fun updateTimeText(calendar: Calendar){
+        textBuilder.clear()
+        textBuilder.append(String.format(TIME_MINUTE_FORMAT, calendar.get(Calendar.HOUR_OF_DAY)))
+        textBuilder.append(TIME_COLON)
+        textBuilder.append(String.format(TIME_MINUTE_FORMAT, calendar.get(Calendar.MINUTE)))
+        timeString = textBuilder.toString()
+        textWidth = timeTextPaint.measureText(timeString)
+    }
+
     fun drawTexts(xPos:Int,canvas: Canvas,mCalendar:Calendar) {
 
+        //draw the task name
         staticLayout?.let {
-
             canvas.save()
             canvas.translate(xPos - textHalfWidth, textHeight)
             staticLayout!!.draw(canvas)
             canvas.restore()
         }
 
-        val text = "${mCalendar.get(Calendar.HOUR_OF_DAY)}:${String.format("%02d", mCalendar.get(Calendar.MINUTE))}"
-        val textWidth = timeTextPaint.measureText(text)
-        canvas.drawText(text,xPos - textWidth.div(2.0f), timeTextHeight, timeTextPaint)
+        //draw the time
+        canvas.drawText(timeString,xPos - textWidth.div(TEXT_HALF_WIDTH), timeTextHeight, timeTextPaint)
     }
 
     /**

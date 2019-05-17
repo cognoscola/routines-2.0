@@ -118,8 +118,6 @@ class TaskWatchService : CanvasWatchFaceService() {
         private val minuteHand = TimeHand(TimeHand.TYPE_MINUTE)
 
         private lateinit var mHourPaint: Paint
-        private lateinit var mMinutePaint: Paint
-        private lateinit var mSecondPaint: Paint
         private lateinit var mTickAndCirclePaint: Paint
         private val debugPaint = Paint().apply {
             style = Paint.Style.STROKE
@@ -356,28 +354,6 @@ class TaskWatchService : CanvasWatchFaceService() {
                         SHADOW_RADIUS, 0f, 0f, mWatchHandShadowColor)
             }
 
-            mMinutePaint = Paint().apply {
-                color = mWatchHandColor
-                strokeWidth = MINUTE_STROKE_WIDTH
-                isAntiAlias = true
-                strokeCap = Paint.Cap.ROUND
-                setShadowLayer(
-                        SHADOW_RADIUS, 0f, 0f, mWatchHandShadowColor)
-            }
-
-            mSecondPaint = Paint().apply {
-                color = mWatchHandHighlightColor
-                strokeWidth = SECOND_TICK_STROKE_WIDTH
-                isAntiAlias = true
-                style = Paint.Style.FILL_AND_STROKE
-
-
-/*
-                setShadowLayer(
-                        SHADOW_RADIUS, 0f, 0f, mWatchHandShadowColor)
-*/
-            }
-
             mTickAndCirclePaint = Paint().apply {
                 color = mWatchHandColor
                 strokeWidth = SECOND_TICK_STROKE_WIDTH
@@ -501,44 +477,30 @@ class TaskWatchService : CanvasWatchFaceService() {
         private fun updateWatchHandStyle() {
             if (mAmbient) {
                 mHourPaint.color = Color.WHITE
-                mMinutePaint.color = Color.WHITE
-                mSecondPaint.color = Color.WHITE
                 mTickAndCirclePaint.color = Color.WHITE
 
                 mHourPaint.isAntiAlias = false
-                mMinutePaint.isAntiAlias = false
-                mSecondPaint.isAntiAlias = false
                 mTickAndCirclePaint.isAntiAlias = false
 
                 mHourPaint.clearShadowLayer()
-                mMinutePaint.clearShadowLayer()
-                mSecondPaint.clearShadowLayer()
                 mTickAndCirclePaint.clearShadowLayer()
 
 
             } else {
 
                 mHourPaint.color = livingBackground.getPalette().getLightVibrantColor(Color.WHITE)
-                mMinutePaint.color = livingBackground.getPalette().getLightVibrantColor(Color.WHITE)
-                mSecondPaint.color = livingBackground.getPalette().getVibrantColor(Color.RED)
                 mTickAndCirclePaint.color = livingBackground.getPalette().getLightVibrantColor(Color.WHITE)
 
 
                 breakLinePaint.setShadowLayer(6.0f,0.0f,0.0f,livingBackground.getPalette().getMutedColor(Color.BLACK))
 
                 mHourPaint.isAntiAlias = true
-                mMinutePaint.isAntiAlias = true
-                mSecondPaint.isAntiAlias = true
                 mTickAndCirclePaint.isAntiAlias = true
 
                 val mWatchHandShadowColor = livingBackground.getPalette().getDarkMutedColor(Color.BLACK)
 
                 mHourPaint.setShadowLayer(
                         SHADOW_RADIUS, 0f, 0f, mWatchHandShadowColor)
-                mMinutePaint.setShadowLayer(
-                        SHADOW_RADIUS, 0f, 0f, mWatchHandShadowColor)
-                mSecondPaint.setShadowLayer(
-                        SHADOW_RADIUS, 0f, 0f, Color.WHITE)
                 mTickAndCirclePaint.setShadowLayer(
                         SHADOW_RADIUS, 0f, 0f, mWatchHandShadowColor) }
         }
@@ -551,8 +513,6 @@ class TaskWatchService : CanvasWatchFaceService() {
             if (mMuteMode != inMuteMode) {
                 mMuteMode = inMuteMode
                 mHourPaint.alpha = if (inMuteMode) 100 else 255
-                mMinutePaint.alpha = if (inMuteMode) 100 else 255
-                mSecondPaint.alpha = if (inMuteMode) 80 else 255
                 invalidate()
             }
         }
@@ -675,6 +635,8 @@ class TaskWatchService : CanvasWatchFaceService() {
          * used for implementing specific logic to handle the gesture.
          */
         override fun onTapCommand(tapType: Int, x: Int, y: Int, eventTime: Long) {
+            Log.d("$tag onTapCommand","TAP DETECTED")
+
             when (tapType) {
                 WatchFaceService.TAP_TYPE_TOUCH -> {
                     // The user has started touching the screen.
@@ -778,8 +740,21 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             //lets draw our rest alarms if enabled
             drawRestLines(canvas,bounds)
+
+
+            /**
+             * Make sure we only update the time once per minute!
+             */
+            mCalendar.get(Calendar.MINUTE).let {
+                if (it != lastMinute) {
+                    lastMinute = it
+                    foreground.updateTimeText(mCalendar)
+                }
+            }
             foreground.drawTexts(mCenterX.toInt(),canvas,mCalendar)
         }
+
+        var lastMinute = 0
 
 
         private fun drawRestLines(canvas: Canvas,bounds: Rect) {
@@ -935,9 +910,10 @@ class TaskWatchService : CanvasWatchFaceService() {
             invalidate()
             if (shouldTimerBeRunning()) {
                 val timeMs = System.currentTimeMillis()
-                val delayMs =if(livingBackground.isAlarmEnabled()){
+                val delayMs =/*if(livingBackground.isAlarmEnabled()){
                     INTERACTIVE_UPDATE_RATE_MS_15FPS - timeMs % INTERACTIVE_UPDATE_RATE_MS_15FPS
-                } else{ INTERACTIVE_UPDATE_RATE_MS - timeMs % INTERACTIVE_UPDATE_RATE_MS}
+                } else{ INTERACTIVE_UPDATE_RATE_MS - timeMs % INTERACTIVE_UPDATE_RATE_MS}*/
+                        INTERACTIVE_UPDATE_RATE_MS_15FPS - timeMs % INTERACTIVE_UPDATE_RATE_MS_15FPS
                 mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs)
             }
         }
