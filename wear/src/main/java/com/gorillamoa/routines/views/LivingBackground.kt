@@ -9,6 +9,7 @@ import java.util.*
 import kotlin.math.roundToInt
 import android.os.VibrationEffect
 import android.os.Vibrator
+import com.gorillamoa.routines.utils.CIEColor
 import com.gorillamoa.routines.utils.CircularTimer
 import io.github.jdiemke.triangulation.*
 import kotlin.collections.ArrayList
@@ -51,7 +52,7 @@ class LivingBackground {
 
     }
 
-    val lab = ColorSpace.get(ColorSpace.Named.CIE_LAB)
+//    val lab = ColorSpace.get(ColorSpace.Named.CIE_LAB)
 
     private lateinit var palette: Palette
 
@@ -60,11 +61,6 @@ class LivingBackground {
 
     //COLORS
     private val backgroundAlpha = 255.0f
-    private val topLeft = Color.valueOf(255.0f, 245.0f, 235.0f, backgroundAlpha, lab)
-    private val bottomRight = Color.valueOf(127.0f, 39.0f, 4.0f, backgroundAlpha, lab)
-    private val bottomLeft = Color.valueOf(175.0f, 111.0f, 84.0f, backgroundAlpha, lab)
-    private val topRight = Color.valueOf(175.0f, 111.0f, 84.0f, backgroundAlpha, lab)
-
 
     private var isAlarmOn = false
     private var isAlarmAlphaIncreasing = true
@@ -77,6 +73,37 @@ class LivingBackground {
 
     val vibrationEffect = VibrationEffect.createOneShot(1000, VibrationEffect.DEFAULT_AMPLITUDE)
     lateinit var vibrator: Vibrator
+
+    init {
+        LivingBackground.topLeft.apply {
+            r = 255.0f
+            g = 245.0f
+            b = 230.0f
+            a = backgroundAlpha
+        }
+
+        LivingBackground.bottomRight.apply {
+            r = 127f
+            g = 39f
+            b = 4f
+            a = backgroundAlpha
+        }
+
+        LivingBackground.bottomLeft.apply {
+            r = 175f
+            g = 111f
+            b = 84f
+            a = backgroundAlpha
+        }
+
+        LivingBackground.topRight.apply {
+            r = 175f
+            g = 111f
+            b = 84f
+            a = backgroundAlpha
+        }
+
+    }
 
     fun enableAlarm() {
         isAlarmOn = true
@@ -484,12 +511,25 @@ class LivingBackground {
     }
 
 
+    companion object {
+        /**
+         * This is preallocated memory to calculate colors
+         */
+        private val colorLeft = CIEColor(0.0f,0.0f,0.0f,0f)
+        private val colorRight = CIEColor(0f,0f,0f,0f)
+        private val topLeft = CIEColor(0f,0f,0f,0f)
+        private val topRight = CIEColor(0f,0f,0f,0f)
+        private val bottomLeft = CIEColor(0f,0f,0f,0f)
+        private val bottomRight = CIEColor(0f,0f,0f,0f)
+        private val final = CIEColor(0f,0f,0f,0f)
+    }
+
     //clean the method getColor should be declared static as well as its colors
     //clean its colors should also be chosen based on the percent (instead of real values) of the canvas since canvas bounds can change
     fun getColor(x:Float,y:Float,width:Float,height:Float):Int{
-        val colorLeft = topLeft.lerp(bottomLeft, y / height, lab)
-        val colorRight = topRight.lerp(bottomRight, y / height, lab)
-        val final = colorLeft.lerp(colorRight, x / width, lab)
-        return Color.argb(final.alpha().roundToInt(), final.red().roundToInt(), final.green().roundToInt(), final.blue().roundToInt())
+        topLeft.lerp(bottomLeft, y / height, colorLeft)
+        topRight.lerp(bottomRight, y / height, colorRight)
+        colorLeft.lerp(colorRight, x / width, final)
+        return Color.argb(final.a, final.r, final.g, final.b)
     }
 }

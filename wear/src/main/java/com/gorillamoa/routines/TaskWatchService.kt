@@ -315,6 +315,7 @@ class TaskWatchService : CanvasWatchFaceService() {
 
 
             //TODO MOVE THIS TO alarm extensions
+            //clean clear up Allocation issues!
             getAlarmService().set(
                     AlarmManager.RTC_WAKEUP,
                     timeToTrigger,
@@ -418,6 +419,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 Log.d("$tag initializeFeatures","Next Alarm in $minutesTilAlarm minutes")
 
                 //TODO MOVE THIS TO alarm extensions
+                //clean CLEAR The allocation of memory
                 val manager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
                 manager.setRepeating(
                         AlarmManager.RTC_WAKEUP,

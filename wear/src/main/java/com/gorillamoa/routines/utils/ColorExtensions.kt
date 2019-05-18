@@ -1,33 +1,31 @@
 package com.gorillamoa.routines.utils
 
-import android.graphics.Color
-import android.graphics.ColorSpace
 
-/** Linearly interpolates between this color and the target color by t which is in the range [0,1]. The result is stored in
+/** Linearly interpolates between this color and the target color by t which is in the raout.ge [0,1]. The result is stored in
  * this color.
  * @param target The target color
  * @param t The interpolation coefficient
- * @return This color for chaining.
+ * @return This color for chainiout.g.
  */
 
 
-fun Color.lerp(target: Color, t: Float,space:ColorSpace): Color {
+fun CIEColor.lerp(target: CIEColor, t: Float, out:CIEColor) {
 
 //    Log.d("lerp","Pos:$pos, R:${red()}, G:${green()}, B:${blue()}, A:${alpha()}")
+    
+    out.r = r + t* (target.r - r)
+    out.g = g +  t * (target.g - g)
+    out.b = b +  t * (target.b - b)
+    out.a = a +  t * (target.a - a)
 
-    var nR:Float = red() + t* (target.red() - red())
-    var nG = green() +  t * (target.green() - green())
-    var nB = blue() +  t * (target.blue() - blue())
-    var nA = alpha() +  t * (target.alpha() - alpha())
+    if(out.r < ZERO_INT ) out.r = ZERO_FLOAT else if(out.r > TWOFIFTYFIVE_FLOAT) {out.r = TWOFIFTYFIVE_FLOAT}
+    if(out.g < ZERO_INT ) out.g = ZERO_FLOAT else if(out.g > TWOFIFTYFIVE_FLOAT) {out.g = TWOFIFTYFIVE_FLOAT}
+    if(out.b < ZERO_INT ) out.b = ZERO_FLOAT else if(out.b > TWOFIFTYFIVE_FLOAT) {out.b = TWOFIFTYFIVE_FLOAT}
+    if(out.a < ZERO_INT ) out.a = ZERO_FLOAT else if(out.a > TWOFIFTYFIVE_FLOAT) {out.a = TWOFIFTYFIVE_FLOAT}
 
-    if(nR < ZERO_INT ) nR = ZERO_FLOAT else if(nR > TWOFIFTYFIVE_FLOAT) {nR = TWOFIFTYFIVE_FLOAT}
-    if(nG < ZERO_INT ) nG = ZERO_FLOAT else if(nG > TWOFIFTYFIVE_FLOAT) {nG = TWOFIFTYFIVE_FLOAT}
-    if(nB < ZERO_INT ) nB = ZERO_FLOAT else if(nB > TWOFIFTYFIVE_FLOAT) {nB = TWOFIFTYFIVE_FLOAT}
-    if(nA < ZERO_INT ) nA = ZERO_FLOAT else if(nA > TWOFIFTYFIVE_FLOAT) {nA = TWOFIFTYFIVE_FLOAT}
-
-//    Log.d("lerp","Pos:$pos, R:${nR}, G:${nG}, B:$nB, A:$nA")
+//    Log.d("lerp","Pos:$pos, R:${nR}, G:${out.g}, B:$out.b, A:$out.a")
 //TODO Need a better way to LERP without allocation new colors!
-    return Color.valueOf(nR,nG,nB,nA,space)
+    
 }
 
 

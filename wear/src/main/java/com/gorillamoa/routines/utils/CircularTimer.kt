@@ -27,6 +27,7 @@ class CircularTimer{
 
     fun setSelectedMinute(start:Long,timetoTrigger:Long){
 
+        //clean we're allocation more memory! stop this!
         val cal = Calendar.getInstance()
         cal.timeInMillis = start
         cal.timeInMillis = timetoTrigger
