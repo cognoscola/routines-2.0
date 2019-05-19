@@ -94,7 +94,7 @@ class FloatingCrystal {
                 height.toFloat()
         )
 
-        canvas.drawPath(path1!!, painter1)
-        canvas.drawPath(path2!!, painter2)
+        canvas.drawPath(path1!!, painter2)
+        canvas.drawPath(path2!!, painter1)
     }
 }
