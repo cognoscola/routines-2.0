@@ -522,14 +522,14 @@ class LivingBackground {
         private val bottomLeft = CIEColor(0f,0f,0f,0f)
         private val bottomRight = CIEColor(0f,0f,0f,0f)
         private val final = CIEColor(0f,0f,0f,0f)
+
     }
 
-    //clean the method getColor should be declared static as well as its colors
-    //clean its colors should also be chosen based on the percent (instead of real values) of the canvas since canvas bounds can change
     fun getColor(x:Float,y:Float,width:Float,height:Float):Int{
         topLeft.lerp(bottomLeft, y / height, colorLeft)
         topRight.lerp(bottomRight, y / height, colorRight)
         colorLeft.lerp(colorRight, x / width, final)
-        return Color.argb(final.a, final.r, final.g, final.b)
+
+        return Color.argb(final.a.roundToInt(), final.r.roundToInt(), final.g.roundToInt(), final.b.roundToInt())
     }
 }

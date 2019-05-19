@@ -13,7 +13,7 @@ fun CIEColor.lerp(target: CIEColor, t: Float, out:CIEColor) {
 
 //    Log.d("lerp","Pos:$pos, R:${red()}, G:${green()}, B:${blue()}, A:${alpha()}")
     
-    out.r = r + t* (target.r - r)
+    out.r = r +  t * (target.r - r)
     out.g = g +  t * (target.g - g)
     out.b = b +  t * (target.b - b)
     out.a = a +  t * (target.a - a)
