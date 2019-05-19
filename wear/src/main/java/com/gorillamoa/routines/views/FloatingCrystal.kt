@@ -3,80 +3,72 @@ package com.gorillamoa.routines.views
 import android.graphics.*
 import com.gorillamoa.routines.utils.CircularTimer
 
-class FloatingCrystal(val type:Int){
-    private var radius:Float = 0.0f
-    private var path1: Path? = null
-    private var path2: Path? = null
-    private var shadowPath: Path? = null
+const val HORIZONTAL_DISPLACEMENT = 30.0f
+const val VERTICAL_DISPLACEMENT = 30f
+const val COLOR_DISPLACEMENT = 5.0f
+private const val DEGREE_COLOR_SEPERATION =10
 
-    private val shadowPainter = Paint().apply {
-        strokeWidth = 0f
-        isAntiAlias = true
-        setShadowLayer(3.0f, 0f, 0f, Color.WHITE)
+class FloatingCrystal {
+
+    companion object {
+        private var path1: Path? = null
+        private var path2: Path? = null
+        private var path3: Path? = null
+        private var path4: Path? = null
+        private var radius:Float = 0f
+        private var width: Int = 0
+        private var height:Int = 0
+
+        fun measureDiamond(width: Int, height: Int, radius: Float){
+            val mCenterX = width / 2.0f
+            val mCenterY = height / 2.0f
+            this.width = width
+            this.height = height
+            this.radius = radius
+
+            path1 = Path().apply {
+                fillType = Path.FillType.EVEN_ODD
+                reset()
+                moveTo(mCenterX, mCenterY - radius + VERTICAL_DISPLACEMENT)
+                lineTo(mCenterX, mCenterY - radius - VERTICAL_DISPLACEMENT)
+                lineTo(mCenterX + HORIZONTAL_DISPLACEMENT, mCenterY - radius)
+                lineTo(mCenterX, mCenterY - radius + VERTICAL_DISPLACEMENT)
+            }
+            path2 = Path().apply {
+                fillType = Path.FillType.EVEN_ODD
+                reset()
+                moveTo(mCenterX , mCenterY - radius + VERTICAL_DISPLACEMENT)
+                lineTo(mCenterX - HORIZONTAL_DISPLACEMENT, mCenterY - radius)
+                lineTo(mCenterX, mCenterY - radius - VERTICAL_DISPLACEMENT)
+                lineTo(mCenterX, mCenterY - radius + VERTICAL_DISPLACEMENT)
+
+            }
+        }
     }
-    private  val painter = Paint().apply {
+
+
+    private val painter1 = Paint().apply {
         strokeWidth = 0.0f
         isAntiAlias = true
         strokeCap = Paint.Cap.SQUARE
     }
 
-    fun measure(width:Int, height:Int, radius:Float){
-
-        //we'll assume that
-        val mCenterX = width/2.0f
-        val mCenterY = height/2.0f
-        this.radius = radius
-
-        when (type) {
-            TimeHand.TYPE_SECOND -> {
-
-                painter.setShadowLayer(3.0f,0f,0f, Color.WHITE)
-
-                path1 = Path().apply {
-                    reset()
-
-                    moveTo(mCenterX, mCenterY - radius + SECOND_VERTICAL_DISPLACEMENT )
-                    lineTo(mCenterX - SECOND_HORIZONTAL_DISPLACEMENT, mCenterY -radius )
-                    lineTo(mCenterX + SECOND_HORIZONTAL_DISPLACEMENT, mCenterY - radius)
-                    lineTo(mCenterX, mCenterY - radius + SECOND_VERTICAL_DISPLACEMENT)
-
-                    moveTo(mCenterX -SECOND_HORIZONTAL_DISPLACEMENT, mCenterY - radius )
-                    lineTo(mCenterX , mCenterY- radius - SECOND_VERTICAL_DISPLACEMENT )
-                    lineTo(mCenterX +SECOND_HORIZONTAL_DISPLACEMENT, mCenterY- radius )
-                    lineTo(mCenterX -SECOND_HORIZONTAL_DISPLACEMENT, mCenterY- radius )
-                }
-
-            }
-            TimeHand.TYPE_MINUTE ->{
-                shadowPath = Path().apply {
-                    fillType = Path.FillType.EVEN_ODD
-                    moveTo(mCenterX, mCenterY - radius + MINUTE_VERTICAL_DISPLACEMENT )
-                    lineTo(mCenterX - MINUTE_HORIZONTAL_DISPLACEMENT, mCenterY -radius )
-                    lineTo(mCenterX , mCenterY- radius - MINUTE_VERTICAL_DISPLACEMENT )
-                    lineTo(mCenterX + MINUTE_HORIZONTAL_DISPLACEMENT, mCenterY - radius)
-                    lineTo(mCenterX, mCenterY - radius + MINUTE_VERTICAL_DISPLACEMENT)
-                }
-
-                path1 = Path().apply {
-                    fillType = Path.FillType.EVEN_ODD
-                    reset()
-                    moveTo(mCenterX, mCenterY - radius + MINUTE_VERTICAL_DISPLACEMENT )
-                    lineTo(mCenterX , mCenterY- radius - MINUTE_VERTICAL_DISPLACEMENT )
-                    lineTo(mCenterX + MINUTE_HORIZONTAL_DISPLACEMENT, mCenterY - radius)
-                    lineTo(mCenterX, mCenterY - radius + MINUTE_VERTICAL_DISPLACEMENT)
-                }
-                path2 = Path().apply {
-                    fillType = Path.FillType.EVEN_ODD
-                    reset()
-                    moveTo(mCenterX+ OVERLAP_AMOUNT, mCenterY - radius + MINUTE_VERTICAL_DISPLACEMENT)
-                    lineTo(mCenterX -MINUTE_HORIZONTAL_DISPLACEMENT, mCenterY- radius )
-                    lineTo(mCenterX+OVERLAP_AMOUNT , mCenterY- radius - MINUTE_VERTICAL_DISPLACEMENT)
-                    lineTo(mCenterX+OVERLAP_AMOUNT , mCenterY- radius + MINUTE_VERTICAL_DISPLACEMENT )
-
-                }
-            }
-        }
+    private val painter2 = Paint().apply {
+        strokeWidth = 0.0f
+        isAntiAlias = true
+        strokeCap = Paint.Cap.SQUARE
     }
+    private val painter3 = Paint().apply {
+        strokeWidth = 0.0f
+        isAntiAlias = true
+        strokeCap = Paint.Cap.SQUARE
+    }
+    private val painter4 = Paint().apply {
+        strokeWidth = 0.0f
+        isAntiAlias = true
+        strokeCap = Paint.Cap.SQUARE
+    }
+
 
     /**
      * Draw the timer at the specified tick (minute or second)
@@ -86,45 +78,23 @@ class FloatingCrystal(val type:Int){
      * @param bg is the background to draw on top of
      * @param angleDegrees specifies the angle at which to draw the hand
      */
-    fun draw(canvas: Canvas, circleCenterX:Float, circleCenterY:Float, bounds: Rect, bg:LivingBackground, angleDegrees:Float){
+    fun draw(canvas: Canvas,angleDegrees: Float,bg:LivingBackground) {
 
-        if ((angleDegrees < LOWER_DEGREE_LIMIT) or (angleDegrees > UPPER_DEGREE_LIMIT)) {
-            throw Exception("tick must be 0 <= tick <= 60")
-        }
-        //use the background to extract color
+        painter1.color = bg.getColor(
+                CircularTimer.getXFromDegree(angleDegrees + DEGREE_COLOR_SEPERATION, radius + COLOR_DISPLACEMENT, width/2.0f),
+                CircularTimer.getYFromDegree(angleDegrees + DEGREE_COLOR_SEPERATION, radius+ COLOR_DISPLACEMENT, height/2.0f),
+                width.toFloat(),
+                height.toFloat()
+        )
 
-        when (type) {
-            TimeHand.TYPE_SECOND -> {
-                painter.color =bg.getColor(
-                        CircularTimer.getXFromDegree(angleDegrees, radius, circleCenterX),
-                        CircularTimer.getYFromDegree(angleDegrees, radius, circleCenterY),
-                        bounds.width().toFloat(),
-                        bounds.height().toFloat())
-                canvas.drawPath(path1!!,painter)
-            }
-            TimeHand.TYPE_MINUTE -> {
-                shadowPainter.color =bg.getColor(
-                        CircularTimer.getXFromDegree(angleDegrees, radius, circleCenterX),
-                        CircularTimer.getYFromDegree(angleDegrees, radius, circleCenterY),
-                        bounds.width().toFloat(),
-                        bounds.height().toFloat())
-                canvas.drawPath(shadowPath!!,shadowPainter)
+        painter2.color = bg.getColor(
+                CircularTimer.getXFromDegree(angleDegrees - DEGREE_COLOR_SEPERATION, radius + COLOR_DISPLACEMENT, width/2.0f),
+                CircularTimer.getYFromDegree(angleDegrees - DEGREE_COLOR_SEPERATION, radius + COLOR_DISPLACEMENT, height/2.0f),
+                width.toFloat(),
+                height.toFloat()
+        )
 
-                painter.color = bg.getColor(
-                        CircularTimer.getXFromDegree(angleDegrees - DEGREE_COLOR_SEPERATION, radius, circleCenterX),
-                        CircularTimer.getYFromDegree(angleDegrees - DEGREE_COLOR_SEPERATION, radius, circleCenterY),
-                        bounds.width().toFloat(),
-                        bounds.height().toFloat()
-                )
-                canvas.drawPath(path1!!,painter)
-                painter.color = bg.getColor(
-                        CircularTimer.getXFromDegree(angleDegrees + DEGREE_COLOR_SEPERATION, radius, circleCenterX),
-                        CircularTimer.getYFromDegree(angleDegrees + DEGREE_COLOR_SEPERATION, radius, circleCenterY),
-                        bounds.width().toFloat(),
-                        bounds.height().toFloat()
-                )
-                canvas.drawPath(path2!!,painter)
-            }
-        }
+        canvas.drawPath(path1!!, painter1)
+        canvas.drawPath(path2!!, painter2)
     }
 }

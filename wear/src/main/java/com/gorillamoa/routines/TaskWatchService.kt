@@ -108,6 +108,8 @@ class TaskWatchService : CanvasWatchFaceService() {
         private val minuteHand = TimeHand(TimeHand.TYPE_MINUTE)
         private val hourHand  = TimeHand(TimeHand.TYPE_HOUR)
 
+        private val breakIndicator = FloatingCrystal()
+
         private lateinit var mHourPaint: Paint
         private lateinit var mTickAndCirclePaint: Paint
         private val debugPaint = Paint().apply {
@@ -156,7 +158,6 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var timingObject=CircularTimer()
 
         var wakeLock:PowerManager.WakeLock? = null
-
 
         //create a shared preference listener so that we can update the watchface UI when
         //changes to preference variables occur
@@ -361,6 +362,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 intervals.add(minute)
 
                 for (i in 1..(lines - 1)) {
+                    //TODO add more indicators
                     intervals.add((minute + i*breakInterval).rem(60))
                 }
 
@@ -390,6 +392,8 @@ class TaskWatchService : CanvasWatchFaceService() {
                 }
 
                 Log.d("$tag initializeFeatures","Next Alarm in $minutesTilAlarm minutes")
+
+
 
                 //TODO MOVE THIS TO alarm extensions
                 //clean CLEAR The allocation of memory
@@ -521,6 +525,9 @@ class TaskWatchService : CanvasWatchFaceService() {
             }
 
             measureFeatures()
+
+            FloatingCrystal.measureDiamond(width,height,middleSectionRadius - 30f)
+
 
             secondHand.measure(width,height,secondTravelPathRadius)
             minuteHand.measure(width,height, middleSectionRadius)
@@ -665,9 +672,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             //TODO Smooth transition of time selection
 
             //lets draw our rest alarms if enabled
-            drawRestLines(canvas,bounds)
-
-
+            drawRestLines(canvas)
             /**
              * Make sure we only update the time once per minute!
              */
@@ -683,47 +688,22 @@ class TaskWatchService : CanvasWatchFaceService() {
         var lastMinute = 0
 
 
-        private fun drawRestLines(canvas: Canvas,bounds: Rect) {
+        private fun drawRestLines(canvas: Canvas) {
             if (isRestAlarmEnabled) {
 
                 canvas.save()
-
-                var currentDegree:Float
                 //selected minutes = 15
                 canvas.rotate(mSelectedMinuteDegree , mCenterX,mCenterY)
-
-                currentDegree = mSelectedMinuteDegree
+                var currentDegree:Float = mSelectedMinuteDegree
 
                 //calculate the X, Y position of the indicated triangle so we can find out the correct colod
-
-                //TODO draw the breakline
-            /*    breakLinePaint.color = livingBackground.getColor(
-                        getXFromDegree(currentDegree, radius = mCenterX,circleCenterX =  mCenterX),
-                        getYFromDegree(currentDegree,radius = mCenterX, circleCenterY = mCenterY),
-                        bounds.width().toFloat(),
-                        bounds.height().toFloat()
-                )
-
-
-                canvas.drawPath(breakLinePath,breakLinePaint)
-*/
+                breakIndicator.draw(canvas,currentDegree,livingBackground)
                 //now we rotate break interval amount
                 for (i in 1..(lines - 1)) {
                     canvas.rotate(breakIntervalDegree , mCenterX,mCenterY)
                     currentDegree +=breakIntervalDegree
-
-                    ///TODO draw the breakline
-                    /*breakLinePaint.color = livingBackground.getColor(
-                            getXFromDegree(currentDegree, radius = mCenterX,circleCenterX =  mCenterX),
-                            getYFromDegree(currentDegree,radius = mCenterX, circleCenterY = mCenterY),
-                            bounds.width().toFloat(),
-                            bounds.height().toFloat()
-                    )
-                    canvas.drawPath(breakLinePath,breakLinePaint)*/
-
+                    breakIndicator.draw(canvas,currentDegree,livingBackground)
                 }
-
-//                canvas.drawCircle(mCenterX,mCenterY,mCenterX*CENTER_AREA_RADIUS.toFloat(),mBreakLinePaint)
                 canvas.restore()
             }
         }

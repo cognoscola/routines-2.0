@@ -515,13 +515,13 @@ class LivingBackground {
         /**
          * This is preallocated memory to calculate colors
          */
-        private val colorLeft = CIEColor(0.0f,0.0f,0.0f,0f)
-        private val colorRight = CIEColor(0f,0f,0f,0f)
-        private val topLeft = CIEColor(0f,0f,0f,0f)
-        private val topRight = CIEColor(0f,0f,0f,0f)
-        private val bottomLeft = CIEColor(0f,0f,0f,0f)
-        private val bottomRight = CIEColor(0f,0f,0f,0f)
-        private val final = CIEColor(0f,0f,0f,0f)
+        private val colorLeft by lazy { CIEColor(0f,0f,0f,0f) }
+        private val colorRight by lazy { CIEColor(0f,0f,0f,0f) }
+        private val topLeft by lazy { CIEColor(0f,0f,0f,0f) }
+        private val topRight by lazy { CIEColor(0f,0f,0f,0f) }
+        private val bottomLeft by lazy { CIEColor(0f,0f,0f,0f) }
+        private val bottomRight by lazy { CIEColor(0f,0f,0f,0f) }
+        private val final by lazy { CIEColor(0f,0f,0f,0f) }
 
     }
 
