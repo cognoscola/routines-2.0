@@ -175,24 +175,8 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
     private var mAmbientController: AmbientModeSupport.AmbientController? = null
 
     override fun getAmbientCallback(): AmbientModeSupport.AmbientCallback {
-        return TaskListActivity.TaskListAmbient()
+        return TaskListAmbient()
     }
 
-    private class TaskListAmbient : AmbientModeSupport.AmbientCallback() {
 
-        override fun onEnterAmbient(ambientDetails: Bundle?) {
-            // Handle entering ambient mode
-            Log.d("onEnterAmbient","")
-        }
-
-        override fun onExitAmbient() {
-            // Handle exiting ambient mode
-            Log.d("onExitAmbient","")
-        }
-
-        override fun onUpdateAmbient() {
-            // Update the content
-            Log.d("onUpdateAmbient","")
-        }
-    }
 }

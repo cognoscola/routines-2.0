@@ -22,6 +22,10 @@ import com.gorillamoa.routines.views.*
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.math.roundToInt
+import android.os.PowerManager
+import android.content.Intent
+import com.gorillamoa.routines.activity.AlarmActivity
+
 
 /**
  * Updates rate in milliseconds for interactive mode. We update once a second to advance the
@@ -157,10 +161,10 @@ class TaskWatchService : CanvasWatchFaceService() {
         private lateinit var timerView:TimerView
         private var timingObject=CircularTimer()
 
-        var wakeLock:PowerManager.WakeLock? = null
 
         //create a shared preference listener so that we can update the watchface UI when
         //changes to preference variables occur
+        //TODO this doesn't want to trigger sometimes, investigate why
          private val preferenceListener= SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
 
             if (key == isRestAlarmActive) {
@@ -178,6 +182,10 @@ class TaskWatchService : CanvasWatchFaceService() {
                 if (sharedPreferences.getBoolean(key, false)) {
                     turnOnScreen()
                     livingBackground.enableAlarm()
+                }else{
+                    if (livingBackground.isAlarmEnabled()) {
+                        turnOffAlarms()
+                    }
                 }
             }
 
@@ -188,19 +196,25 @@ class TaskWatchService : CanvasWatchFaceService() {
 
                     turnOnScreen()
                     livingBackground.enableAlarm()
+                }else{
+                    if (livingBackground.isAlarmEnabled()) {
+                        turnOffAlarms()
+                    }
                 }
             }
-
-
         }
 
         private fun turnOnScreen(){
-      /*      wakeLock =
-                    (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
-                        newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MyApp::MyWakelockTag").apply {
-                            acquire(30000)
-                        }
-                    }*/
+
+            val intent = Intent(this@TaskWatchService, AlarmActivity::class.java)
+            // This boolean just makes it easier to check if the Activity has been started from
+            // this class
+            intent.putExtra("lock", true)
+            // You need to add this to your intent if you want to start an Activity fromm a class
+            // that is not an Activity itself
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            this@TaskWatchService.startActivity(intent)
+
         }
 
         private val mTimeZoneReceiver = object : BroadcastReceiver() {
@@ -214,8 +228,10 @@ class TaskWatchService : CanvasWatchFaceService() {
         override fun onCreate(holder: SurfaceHolder) {
             super.onCreate(holder)
 
+
             setWatchFaceStyle(WatchFaceStyle.Builder(this@TaskWatchService)
                     .setAcceptsTapEvents(true)
+
                     .build())
 
             mCalendar = Calendar.getInstance()
@@ -294,11 +310,21 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             //TODO MOVE THIS TO alarm extensions
             //clean clear up Allocation issues!
-            getAlarmService().set(
+            /*getAlarmService().set(
                     AlarmManager.RTC_WAKEUP,
                     timeToTrigger,
                     getTimerPendingIntent()
-            )
+            )*/
+
+            //TODO clear this
+
+            Handler().postDelayed({
+                this@TaskWatchService.sendBroadcast(this@TaskWatchService.createAlarmIntent().apply {
+                    action = ACTION_TIMER
+                    putExtra(AlarmReceiver.KEY_ALARM,false)
+                })
+
+            },13000)
 
             saveTimerTime(timeToTrigger)
         }
@@ -562,6 +588,14 @@ class TaskWatchService : CanvasWatchFaceService() {
             )
         }
 
+        /**
+         * Turn off any alarm that may be going on (except the hour alarm)
+         */
+        private fun turnOffAlarms(){
+            livingBackground.disableAlarm()
+            disableTimer()
+            disableRestAlarm()
+        }
 
         /**
          * Captures tap event (and tap type). The [WatchFaceService.TAP_TYPE_TAP] case can be
@@ -580,13 +614,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 WatchFaceService.TAP_TYPE_TAP ->{
                     // The user has completed the tap gesture.
 
-                    if (livingBackground.isAlarmEnabled()) {
-                        livingBackground.disableAlarm()
-                        //TODO disable corresponding alarm
-                        wakeLock?.release()
-                        wakeLock = null
-                        disableTimer()
-                        disableRestAlarm()
+                    if (livingBackground.isAlarmEnabled()) {turnOffAlarms()
                     }else{
 
 

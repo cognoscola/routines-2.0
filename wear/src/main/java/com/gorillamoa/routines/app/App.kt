@@ -84,6 +84,12 @@ class App:Application(){
 
     //TODO DATA TRACKING AND LOGGING for insight (habit building)
 
+    //TODO Alarm must turn on screen
+
+    //TODO Add motion of features
+
+    //TODO add fancier looking arm
+
 
     //later CREATE A BUG CHART
 }

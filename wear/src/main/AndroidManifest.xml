@@ -94,6 +94,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".activity.AlarmActivity"
+            android:theme="@style/Theme.Transparent"/>
+
         <activity
             android:name=".activity.SettingsActivity"
             android:label="@string/onboard_app_name" />

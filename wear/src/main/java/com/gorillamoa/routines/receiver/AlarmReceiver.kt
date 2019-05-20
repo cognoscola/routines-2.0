@@ -99,14 +99,21 @@ class AlarmReceiver:BroadcastReceiver(){
 
                 ACTION_REST -> {
 
-                    context.notificationShowRest()
+
+                    //TODO ususally if watchface is visible, we'll not show the notification
+//                    context.notificationShowRest()
+
                     context.saveAlarmRestTriggerStatus(true)
                 }
 
                 ACTION_TIMER ->{
 
                     //show a notification for the timer
-                    context.notificationShowTimer()
+
+                    //TODO Give option to chose this or that, but not both!
+                    //TODO ususally if watchface is visible, we'll not show the notification
+//                    context.notificationShowTimer()
+
                     //trigger any other listeners
                     context.saveAlarmTimerTriggerStatus(true)
                 }
