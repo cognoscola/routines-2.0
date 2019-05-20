@@ -22,7 +22,6 @@ import com.gorillamoa.routines.views.*
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.math.roundToInt
-import android.os.PowerManager
 import android.content.Intent
 import com.gorillamoa.routines.activity.AlarmActivity
 
@@ -303,28 +302,17 @@ class TaskWatchService : CanvasWatchFaceService() {
                 (60 - currentMinute) + selectedMinute
             }
 
-
             val timeToTrigger = System.currentTimeMillis() + (minutes * 60 * 1000)
             timingObject.setSelectedMinute(System.currentTimeMillis(), timeToTrigger)
 
 
-            //TODO MOVE THIS TO alarm extensions
+             //TODO MOVE THIS TO alarm extensions
             //clean clear up Allocation issues!
-            /*getAlarmService().set(
+            getAlarmService().set(
                     AlarmManager.RTC_WAKEUP,
                     timeToTrigger,
                     getTimerPendingIntent()
-            )*/
-
-            //TODO clear this
-
-            Handler().postDelayed({
-                this@TaskWatchService.sendBroadcast(this@TaskWatchService.createAlarmIntent().apply {
-                    action = ACTION_TIMER
-                    putExtra(AlarmReceiver.KEY_ALARM,false)
-                })
-
-            },13000)
+            )
 
             saveTimerTime(timeToTrigger)
         }
@@ -782,6 +770,9 @@ class TaskWatchService : CanvasWatchFaceService() {
              * Ensure the "seconds" hand is drawn only when we are in interactive mode.
              * Otherwise, we only update the watch face once a minutes.
              */
+
+
+
             if (!mAmbient) {
                 canvas.rotate(secondsRotationDegrees - minutesRotation, mCenterX, mCenterY)
                 secondHand.draw(canvas,mCenterX,mCenterY,bounds,livingBackground,secondsRotationDegrees)
