@@ -23,6 +23,9 @@ allprojects {
         jcenter()
         mavenCentral()
         maven { url "https://kotlin.bintray.com/kotlinx/" }
+        //for ashley
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     }
 }
 

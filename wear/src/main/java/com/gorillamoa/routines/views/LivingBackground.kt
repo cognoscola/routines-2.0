@@ -4,13 +4,20 @@ import android.graphics.*
 import android.os.SystemClock
 import android.util.Log
 import androidx.palette.graphics.Palette
-import com.gorillamoa.routines.utils.lerp
 import java.util.*
 import kotlin.math.roundToInt
 import android.os.VibrationEffect
 import android.os.Vibrator
+import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.core.PooledEngine
+import com.gorillamoa.routines.animation.AlphaComponent
+import com.gorillamoa.routines.animation.EdgeComponent
+import com.gorillamoa.routines.animation.RenderSystem
+import com.gorillamoa.routines.animation.VectorFadeSystem
 import com.gorillamoa.routines.utils.CIEColor
 import com.gorillamoa.routines.utils.CircularTimer
+import com.gorillamoa.routines.utils.HORIZONTAL
+import com.gorillamoa.routines.utils.lerp
 import io.github.jdiemke.triangulation.*
 import kotlin.collections.ArrayList
 import kotlin.math.cos
@@ -47,6 +54,12 @@ class LivingBackground {
     private val morphDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
     private val bgDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_ATOP)
 
+    //FOR animation
+    private var engine= PooledEngine()
+    private var fadeSystem:VectorFadeSystem? = null
+    private var renderSystem:RenderSystem? = null
+
+
     private var morphPath = Path().apply {
         fillType = Path.FillType.EVEN_ODD
 
@@ -75,6 +88,7 @@ class LivingBackground {
     lateinit var vibrator: Vibrator
 
     init {
+
         LivingBackground.topLeft.apply {
             r = 255.0f
             g = 245.0f
@@ -112,6 +126,10 @@ class LivingBackground {
 
     fun disableAlarm() {
         isAlarmOn = false
+    }
+
+    fun toggleTransition(){
+        fadeSystem?.toggleTransition()
     }
 
     fun isAlarmEnabled() = isAlarmOn
@@ -163,6 +181,14 @@ class LivingBackground {
 
     fun getPalette() = palette
 
+    fun drawAlarm(canvas: Canvas,deltaTime:Float){
+
+        renderSystem?.canvas = canvas
+        engine.update(deltaTime)
+
+    }
+
+
     /**
      * Draw the background. There are 3 main steps:
      * 1. Draw the morphed background
@@ -174,6 +200,9 @@ class LivingBackground {
                        mLowBitAmbient: Boolean,
                        mBurnInProtection: Boolean,
                        bounds: Rect, vararg timers:CircularTimer) {
+
+        dt = (SystemClock.uptimeMillis() - lastMeasuredTime) //first dt will be 0
+
 
         if (mAmbient && (mLowBitAmbient || mBurnInProtection)) {
             canvas.drawColor(Color.BLACK)
@@ -216,12 +245,6 @@ class LivingBackground {
 
             if (isAlarmOn) {
 
-                if (lastMeasuredTime == 0L) {
-                    lastMeasuredTime = SystemClock.uptimeMillis()
-                    return
-                }
-
-                dt = (SystemClock.uptimeMillis() - lastMeasuredTime) //first dt will be 0
 
                 if (isAlarmAlphaIncreasing) {
 
@@ -244,9 +267,7 @@ class LivingBackground {
                 currentAlarmAlpha = (currentTimeCounter.toFloat().div(TIME2MAX) * MAXALPHA)
                 if (currentAlarmAlpha > 255.0) currentAlarmAlpha = 255f else if (currentAlarmAlpha < 0) {
                     currentAlarmAlpha = 0f
-
                 }
-                lastMeasuredTime = SystemClock.uptimeMillis()
 
                 mAlarmPaint.alpha = currentAlarmAlpha.roundToInt()
 
@@ -258,11 +279,20 @@ class LivingBackground {
                     canvas.drawLine(it.b.x.toFloat(), it.b.y.toFloat(), it.c.x.toFloat(), it.c.y.toFloat(), mAlarmPaint)
                     canvas.drawLine(it.c.x.toFloat(), it.c.y.toFloat(), it.a.x.toFloat(), it.a.y.toFloat(), mAlarmPaint)
                 }
-
             }
             canvas.restore()
-
         }
+
+        if ((lastMeasuredTime == 0L) or (dt > 100)) {
+            lastMeasuredTime = SystemClock.uptimeMillis()
+            return
+        }
+
+        canvas.save()
+        canvas.scale(scale,scale)
+        drawAlarm(canvas,dt.toFloat())
+        canvas.restore()
+        lastMeasuredTime = SystemClock.uptimeMillis()
     }
 
     fun scaleBackground(width: Int, height: Int) {
@@ -281,6 +311,22 @@ class LivingBackground {
 
         workingBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         workingCanvas = Canvas(workingBitmap)
+
+
+        //prepare ashley
+        engine.apply {
+            fadeSystem =VectorFadeSystem(HORIZONTAL)
+            renderSystem = RenderSystem()
+            addSystem(fadeSystem)
+            addSystem(renderSystem)
+
+//            val testEntity = Entity()
+//            testEntity.add(EdgeComponent(width/2.0f - 30f,height/2.0f - 30f, width/2.0f + 30f,height/2.0f + 30f))
+//            testEntity.add(AlphaComponent())
+//            addEntity(testEntity)
+            //TODO for total number of nonrepeating edges, add the entity
+
+        }
 
     }
 
@@ -466,14 +512,79 @@ class LivingBackground {
         mBackgroundBitmap = generateBitmapFromTriangles(widthD, heightD, triangleSoup!!)
 
 
+        //find all edges once
+        val edges = ArrayList<Edge2D>()
+
+        var noABFound = false
+        var noACFound = false
+        var noBCFound = false
+
+        triangulator.triangleSoup.triangles.forEach{
+
+            //First triangle
+            //TODO we can optimize this slightly by using vector notation instead.
+            //check that any of our current edges matches with any triangle's edge
+
+            if (edges.size == 0) {
+                edges.add(Edge2D(Vector2D(it.a.x, it.a.y), Vector2D(it.b.x, it.b.y)))
+            }
+
+            loop@ for (i in 0 until edges.size) {
+
+                val edge = edges.get(i)
+                if (!((edge.a.x == it.a.x) and (edge.a.y == it.a.y) and (edge.b.x == it.b.x) and (edge.b.y == it.b.y))) {
+                    noABFound = true
+                    break@loop
+                }
+            }
+            if (noABFound) {
+                edges.add(Edge2D(Vector2D(it.a.x, it.a.y), Vector2D(it.b.x, it.b.y)))
+            }
+
+            loop@ for (i in 0 until edges.size) {
+
+                val edge = edges.get(i)
+                if (((edge.a.x == it.a.x) and (edge.a.y == it.a.y) and (edge.b.x == it.c.x) and (edge.b.y == it.c.y))) {
+                    noACFound = true
+                    break@loop
+                }
+            }
+
+            if (noACFound) {
+                edges.add(Edge2D(Vector2D(it.a.x, it.a.y), Vector2D(it.c.x, it.c.y)))
+            }
+
+            loop@ for (i in 0 until edges.size) {
+
+                val edge = edges.get(i)
+                if (!((edge.a.x == it.b.x) and (edge.a.y == it.b.y) and (edge.b.x == it.c.x) and (edge.b.y == it.c.y))) {
+                    noBCFound = true
+                    break@loop
+                }
+            }
+
+            if (noBCFound) {
+                edges.add(Edge2D(Vector2D(it.b.x, it.b.y), Vector2D(it.c.x, it.c.y)))
+            }
+        }
+
+        edges.forEach {
+            val testEntity = Entity()
+            testEntity.add(EdgeComponent(it.a.x.toFloat(),it.a.y.toFloat(), it.b.x.toFloat(),it.b.y.toFloat()))
+            testEntity.add(AlphaComponent().apply {
+
+                delayMillis = ((Math.min(it.a.x, it.b.x) / widthD) * 100.0f).roundToInt()
+                alpha = 0
+                realDelayTime = 0.0f
+            })
+            engine.addEntity(testEntity)
+        }
+
         //generate Morphed background
         //if image is square, height = with, so
         //radius = % * width /2
 
         //100 - 15 / 100 =
-
-
-
 
         val radius = (WORKING_BITMAP_WIDTH.div(2.0) - 15.0).toFloat()
         //now find all the triangles that intersect with this circle, we do this by dividing the circle into tangents
@@ -500,7 +611,6 @@ class LivingBackground {
                         (radius * -cos(Math.toRadians(0.0))) + xCenter)
             }
             point2ds.add(end)
-
         }
 
         triangulator = DelaunayTriangulator(point2ds)
@@ -513,7 +623,7 @@ class LivingBackground {
 
     companion object {
         /**
-         * This is preallocated memory to calculate colors
+         * This is pre-allocated memory to calculate colors
          */
         private val colorLeft by lazy { CIEColor(0f,0f,0f,0f) }
         private val colorRight by lazy { CIEColor(0f,0f,0f,0f) }

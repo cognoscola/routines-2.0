@@ -602,6 +602,8 @@ class TaskWatchService : CanvasWatchFaceService() {
                 WatchFaceService.TAP_TYPE_TAP ->{
                     // The user has completed the tap gesture.
 
+                    livingBackground.toggleTransition()
+
                     if (livingBackground.isAlarmEnabled()) {turnOffAlarms()
                     }else{
 
@@ -671,7 +673,10 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             //draw our bg
             //TODO CALCULATE THINGS WHILE NOT UPDATING!
+
             livingBackground.drawBackground(canvas, mAmbient,mLowBitAmbient,mBurnInProtection, bounds, timingObject)
+
+
 
             if (isTimerEnabled) {
                 timerView.onDraw(canvas,timingObject)
@@ -770,7 +775,6 @@ class TaskWatchService : CanvasWatchFaceService() {
              * Ensure the "seconds" hand is drawn only when we are in interactive mode.
              * Otherwise, we only update the watch face once a minutes.
              */
-
 
 
             if (!mAmbient) {
