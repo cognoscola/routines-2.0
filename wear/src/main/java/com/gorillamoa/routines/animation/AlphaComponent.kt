@@ -1,12 +1,14 @@
 package com.gorillamoa.routines.animation
 
 import com.badlogic.ashley.core.Component
+import com.badlogic.gdx.utils.Pool
 
-class AlphaComponent:Component{
+class AlphaComponent:Component,Pool.Poolable{
 
+    var alpha = 0 //alpha between 0 and 255
 
-    var alpha = 0
-    var delaySecond = 0.0
-    var realDelayTime = 0f
+    override fun reset() {
+        alpha = 0
+    }
 
 }

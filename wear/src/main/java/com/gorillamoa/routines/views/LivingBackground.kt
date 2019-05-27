@@ -9,11 +9,11 @@ import kotlin.math.roundToInt
 import android.os.VibrationEffect
 import android.os.Vibrator
 import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.core.EntityListener
+import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.core.PooledEngine
 import com.gorillamoa.routines.animation.*
-import com.gorillamoa.routines.utils.CIEColor
-import com.gorillamoa.routines.utils.CircularTimer
-import com.gorillamoa.routines.utils.lerp
+import com.gorillamoa.routines.utils.*
 import io.github.jdiemke.triangulation.*
 import kotlin.collections.ArrayList
 
@@ -50,7 +50,7 @@ class LivingBackground {
 
     //FOR animation
     private var engine= PooledEngine()
-    private var fadeSystem:VectorFadeSystem? = null
+    private var fadeSystem:FadeInSystem? = null
     private var renderSystem:RenderSystem? = null
 
     private var morphPath = Path().apply {
@@ -312,7 +312,7 @@ class LivingBackground {
 
         //prepare ashley
         engine.apply {
-            fadeSystem =VectorFadeSystem()
+            fadeSystem =FadeInSystem()
             renderSystem = RenderSystem()
             addSystem(fadeSystem)
             addSystem(renderSystem)
@@ -717,15 +717,48 @@ class LivingBackground {
 
         edges.forEach { edgeEntity ->
 
-            edgeEntity.add(RenderComponent())
-            edgeEntity.add(EdgeComponent())
-            edgeEntity.add(AlphaComponent().apply {
+            edgeEntity.add(engine.createComponent(RenderComponent::class.java))
+            edgeEntity.add(engine.createComponent(EdgeComponent::class.java))
+            edgeEntity.add(engine.createComponent(AlphaComponent::class.java).apply { alpha = 0 })
+            edgeEntity.add(engine.createComponent(FadeInEffectComponent::class.java).apply {
 
-                delaySecond = ((Math.min(edgeEntity.itself.a.x, edgeEntity.itself.b.x) / widthD) * 0.5)
-                alpha = 0
-                realDelayTime = 0.0f
+                startDelaySecond = ((Math.min(edgeEntity.itself.a.x, edgeEntity.itself.b.x) / widthD) * 0.5)
+                fadeRatePerFrame = FORTY_FIVE_INT
             })
+
             engine.addEntity(edgeEntity)
+
+            engine.addEntityListener(Family.one(FadeInEffectComponent::class.java).get(), object :EntityListener{
+                override fun entityAdded(entity: Entity?) {
+                }
+
+                override fun entityRemoved(entity: Entity?) {
+
+
+                    if (entity is EdgeEntity) {
+
+                        if (!entity.latch) {
+                            entity.latch = true
+
+                            getTriangleToLightUpGiven(entity)?.let { triangleEntity ->
+                                //light up the triangle
+                                Log.d("$tag processEntity","Light up Triangle")
+                                triangleEntity.add(engine.createComponent(RenderComponent::class.java))
+                                triangleEntity.add(engine.createComponent(AlphaComponent::class.java).apply {
+                                    alpha = 255
+                                })
+                                triangleEntity.add(engine.createComponent(FadeOutEffectComponent::class.java).apply {
+                                    fadeRatePerFrame = FORTY_FIVE_INT
+                                })
+                            }
+                        }
+
+                        //lets also begin fading out
+                        FadeOutEffectC
+
+                    }
+                }
+            })
         }
 
         triangleNodes.forEach {
@@ -818,10 +851,9 @@ class LivingBackground {
                 color = Color.WHITE
                 isAntiAlias = true
             }
-
             val renderFunction:(Canvas,EdgeEntity)->Any = { canvas, entity ->
                 entity.getComponent(AlphaComponent::class.java).apply {
-                    if (alpha > 0) {
+                    if (alpha > ZERO_INT) {
                         val edge = entity.itself
                         paint.alpha = alpha
                         canvas.drawLine(
@@ -831,8 +863,6 @@ class LivingBackground {
                                 edge.b.y.toFloat(), paint)
                     }
                 }
-
-
             }
         }
     }
@@ -859,9 +889,39 @@ class LivingBackground {
                path.lineTo(entity.itself.qC().x.toFloat(), entity.itself.qC().y.toFloat())
                path.lineTo(entity.itself.qA().x.toFloat(), entity.itself.qA().y.toFloat())
 
-               paint.alpha = entity.getComponent(AlphaV2Component::class.java).alpha
+               paint.alpha = entity.getComponent(AlphaComponent::class.java).alpha
                canvas.drawPath(path, paint)
            }
        }
+    }
+
+    //clean move these functions else where
+    fun getTriangleToLightUpGiven(edgeEntity: LivingBackground.EdgeEntity):LivingBackground.TriangleEntity?{
+        //check the edge's neighbours
+        if (shouldLightUp(edgeEntity.neighbour)) {
+            return edgeEntity.neighbour
+        }
+
+        if (shouldLightUp(edgeEntity.parent)) {
+            return edgeEntity.parent
+        }
+
+        return null
+    }
+
+    fun isEdgeNodeLit(edgeEntity: LivingBackground.EdgeEntity?):Boolean{
+        return edgeEntity?.latch?:true
+    }
+
+    fun shouldLightUp(triangleNode:LivingBackground.TriangleEntity?):Boolean{
+
+        return triangleNode?.let {
+            if (!it.latch) {
+                if (isEdgeNodeLit(it.edgeEntityAB) and isEdgeNodeLit(it.edgeEntityAC) and isEdgeNodeLit(it.edgeEntityBC)) {
+                    it.latch = true
+                }
+            }
+            it.latch
+        }?:false
     }
 }
