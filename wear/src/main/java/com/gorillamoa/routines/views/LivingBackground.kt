@@ -8,10 +8,7 @@ import java.util.*
 import kotlin.math.roundToInt
 import android.os.VibrationEffect
 import android.os.Vibrator
-import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.core.EntityListener
-import com.badlogic.ashley.core.Family
-import com.badlogic.ashley.core.PooledEngine
+import com.badlogic.ashley.core.*
 import com.gorillamoa.routines.animation.*
 import com.gorillamoa.routines.utils.*
 import io.github.jdiemke.triangulation.*
@@ -50,7 +47,7 @@ class LivingBackground {
 
     //FOR animation
     private var engine= PooledEngine()
-    private var fadeSystem:FadeInSystem? = null
+    private var fadeInSystem:FadeInSystem? = null
     private var renderSystem:RenderSystem? = null
 
     private var morphPath = Path().apply {
@@ -122,7 +119,7 @@ class LivingBackground {
     }
 
     fun toggleTransition(){
-        fadeSystem?.toggleTransition()
+        fadeInSystem?.toggleTransition()
     }
 
     fun isAlarmEnabled() = isAlarmOn
@@ -233,9 +230,10 @@ class LivingBackground {
                 }*/
             }
             //TODO delete this
-            mMorphPaint.xfermode = baseDrawingMode
+          //  mMorphPaint.xfermode = baseDrawingMode
 
-            workingCanvas.drawBitmap(mBackgroundBitmap, 0.0f, 0.0f, mMorphPaint)
+            //TODO we'll not draw the bg at the moment
+          /*  workingCanvas.drawBitmap(mBackgroundBitmap, 0.0f, 0.0f, mMorphPaint)
             canvas.drawBitmap(workingBitmap, 0.0f, 0.0f, mBackgroundPaint)
 
             canvas.save()
@@ -278,7 +276,7 @@ class LivingBackground {
                     canvas.drawLine(it.c.x.toFloat(), it.c.y.toFloat(), it.a.x.toFloat(), it.a.y.toFloat(), mAlarmPaint)
                 }
             }
-            canvas.restore()
+            canvas.restore()*/
         }
 
         if ((lastMeasuredTime == 0L) or (dt > 100)) {
@@ -312,11 +310,12 @@ class LivingBackground {
 
         //prepare ashley
         engine.apply {
-            fadeSystem =FadeInSystem()
+            fadeInSystem =FadeInSystem()
             renderSystem = RenderSystem()
-            addSystem(fadeSystem)
-            addSystem(renderSystem)
+            addSystem(fadeInSystem)
             addSystem(FadeOutSystem())
+            addSystem(ColorChangerSystem())
+            addSystem(renderSystem)
         }
     }
 
@@ -406,13 +405,13 @@ class LivingBackground {
             //                    Log.d("$tag generateBackgroundBitmaps","Triangle: A(${it.a.x},${it.a.y}) B(${it.b.x},${it.b.y}) C(${it.c.x},${it.c.y})")
 
             //first find the Center Coordinates
-            centerX = (it.qA().x + it.qB().x + it.qC().x).div(3.0)
-            centerY = (it.qA().y + it.qB().y + it.qC().y).div(3.0)
+            centerX = (it.qA().x + it.qB().x + it.qC().x).div(THREE_FLOAT)
+            centerY = (it.qA().y + it.qB().y + it.qC().y).div(THREE_FLOAT)
 
 //                    Log.d("$tag generateBackgroundBitmaps","Centroid: $centerX, $centerY")
 
             //now use the coordinates to locate the correct color
-            painter.color = getColor(centerX.toFloat(),centerY.toFloat(),width.toFloat(),height.toFloat())
+            painter.color = getColorBasedOnPosition(centerX.toFloat(),centerY.toFloat(),width.toFloat(),height.toFloat())
 
             //draw the centroids
             //  canvas.drawPoint(centerX.toFloat(),centerY.toFloat(),painter)
@@ -431,6 +430,20 @@ class LivingBackground {
         intermidiateBitmap.recycle()
         return finalBitmap
 
+    }
+
+
+    private fun setTriangleColorBasedonPosition(width: Double, height: Double, triangleEntity: TriangleEntity) {
+
+        val component = triangleEntity.getComponent(ColorComponent::class.java)
+                ?: engine.createComponent(ColorComponent::class.java)
+        component.color = getColorBasedOnPosition(
+                triangleEntity.getCenterX(),
+                triangleEntity.getCenterY(),
+                width.toFloat(),
+                height.toFloat()
+        )
+        triangleEntity.add(component)
     }
 
     private fun generateBackgroundBitmaps() {
@@ -719,9 +732,8 @@ class LivingBackground {
 
             edgeEntity.add(engine.createComponent(RenderComponent::class.java))
             edgeEntity.add(engine.createComponent(EdgeComponent::class.java))
-            edgeEntity.add(engine.createComponent(AlphaComponent::class.java).apply { alpha = 0 })
+            edgeEntity.add(engine.createComponent(AlphaComponent::class.java).apply { alpha = ZERO_INT })
             edgeEntity.add(engine.createComponent(FadeInEffectComponent::class.java).apply {
-
                 startDelaySecond = ((Math.min(edgeEntity.itself.a.x, edgeEntity.itself.b.x) / widthD) * 0.5)
                 fadeRatePerFrame = FORTY_FIVE_INT
             })
@@ -747,28 +759,41 @@ class LivingBackground {
                                 triangleEntity.add(engine.createComponent(AlphaComponent::class.java).apply {
                                     alpha = 255
                                 })
-                                triangleEntity.add(engine.createComponent(FadeOutEffectComponent::class.java).apply {
+
+                                //TODO get target color
+                                startColor.apply {
+                                    r = 255.0f
+                                    g = 255.0f
+                                    b = 255.0f
+                                    a = 255.0f
+                                }
+
+                                getColorCIEBasedOnPosition(widthD.toFloat(),heightD.toFloat(), triangleEntity)
+                                ColorChangerSystem.startChanging(
+                                        startColor,
+                                        final,0.369, triangleEntity,engine)
+
+/*                                triangleEntity.add(engine.createComponent(FadeOutEffectComponent::class.java).apply {
                                     fadeRatePerFrame = FORTY_FIVE_INT
-                                })
+                                })*/
                             }
                         }
 
-                        //lets also begin fading out
-                        FadeOutEffectC
-
+                        //lets also remove its visibility
+                        entity.remove(RenderComponent::class.java)
                     }
                 }
             })
         }
 
         triangleNodes.forEach {
+
+            it.setTriangleColor(Color.WHITE,engine)
             engine.addEntity(it)
         }
 
 
         //we have collected our edges to draw, now we must draw the white triangle when All 3 edges are fully at full alpha.
-
-
         //generate Morphed background
         //if image is square, height = with, so
         //radius = % * width /2
@@ -825,11 +850,21 @@ class LivingBackground {
         private val topRight by lazy { CIEColor(0f,0f,0f,0f) }
         private val bottomLeft by lazy { CIEColor(0f,0f,0f,0f) }
         private val bottomRight by lazy { CIEColor(0f,0f,0f,0f) }
+        private val startColor by lazy { CIEColor(0f,0f,0f,0f) }
         private val final by lazy { CIEColor(0f,0f,0f,0f) }
-
     }
 
-    fun getColor(x:Float,y:Float,width:Float,height:Float):Int{
+    fun getColorCIEBasedOnPosition(width:Float, height:Float, triangleEntity: TriangleEntity){
+
+        val y= triangleEntity.getCenterY()
+        val x= triangleEntity.getCenterX()
+
+        topLeft.lerp(bottomLeft, y / height, colorLeft)
+        topRight.lerp(bottomRight, y / height, colorRight)
+        colorLeft.lerp(colorRight, x / width, final)
+    }
+
+    fun getColorBasedOnPosition(x:Float, y:Float, width:Float, height:Float):Int{
         topLeft.lerp(bottomLeft, y / height, colorLeft)
         topRight.lerp(bottomRight, y / height, colorRight)
         colorLeft.lerp(colorRight, x / width, final)
@@ -889,10 +924,28 @@ class LivingBackground {
                path.lineTo(entity.itself.qC().x.toFloat(), entity.itself.qC().y.toFloat())
                path.lineTo(entity.itself.qA().x.toFloat(), entity.itself.qA().y.toFloat())
 
-               paint.alpha = entity.getComponent(AlphaComponent::class.java).alpha
+               paint.color = entity.getComponent(ColorComponent::class.java).color
+
                canvas.drawPath(path, paint)
            }
        }
+
+        fun setTriangleColor(color:Int,engine:Engine){
+
+            val component = getComponent(ColorComponent::class.java)?:engine.createComponent(ColorComponent::class.java).apply {
+                add(this@apply)
+            }
+            component.color = color
+
+        }
+
+        fun getCenterX():Float{
+            return (itself.qA().x + itself.qB().x + itself.qC().x).div(THREE_FLOAT).toFloat()
+        }
+
+        fun getCenterY():Float{
+            return (itself.qA().y + itself.qB().y + itself.qC().y).div(THREE_FLOAT).toFloat()
+        }
     }
 
     //clean move these functions else where
