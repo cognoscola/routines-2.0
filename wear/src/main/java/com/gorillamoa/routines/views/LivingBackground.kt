@@ -10,18 +10,12 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.PooledEngine
-import com.gorillamoa.routines.animation.AlphaComponent
-import com.gorillamoa.routines.animation.EdgeComponent
-import com.gorillamoa.routines.animation.RenderSystem
-import com.gorillamoa.routines.animation.VectorFadeSystem
+import com.gorillamoa.routines.animation.*
 import com.gorillamoa.routines.utils.CIEColor
 import com.gorillamoa.routines.utils.CircularTimer
-import com.gorillamoa.routines.utils.HORIZONTAL
 import com.gorillamoa.routines.utils.lerp
 import io.github.jdiemke.triangulation.*
 import kotlin.collections.ArrayList
-import kotlin.math.cos
-import kotlin.math.sin
 
 private const val WORKING_BITMAP_WIDTH = 200
 
@@ -58,7 +52,6 @@ class LivingBackground {
     private var engine= PooledEngine()
     private var fadeSystem:VectorFadeSystem? = null
     private var renderSystem:RenderSystem? = null
-
 
     private var morphPath = Path().apply {
         fillType = Path.FillType.EVEN_ODD
@@ -181,11 +174,13 @@ class LivingBackground {
 
     fun getPalette() = palette
 
-    fun drawAlarm(canvas: Canvas,deltaTime:Float){
+    /**
+     * delta time is in seconds!
+     */
+    fun drawAlarm(canvas: Canvas,deltaTimeMillis:Float){
 
         renderSystem?.canvas = canvas
-        engine.update(deltaTime)
-
+        engine.update(deltaTimeMillis/1000)
     }
 
 
@@ -213,7 +208,8 @@ class LivingBackground {
             //add a smooth transition
             timers.forEach {
 
-                if (it.isRunning()) {
+                //TODO UNCOMMENT
+              /*  if (it.isRunning()) {
 
                     morphPath.reset()
                     //move to the center
@@ -234,8 +230,10 @@ class LivingBackground {
 
                 }else{
                     mMorphPaint.xfermode = baseDrawingMode
-                }
+                }*/
             }
+            //TODO delete this
+            mMorphPaint.xfermode = baseDrawingMode
 
             workingCanvas.drawBitmap(mBackgroundBitmap, 0.0f, 0.0f, mMorphPaint)
             canvas.drawBitmap(workingBitmap, 0.0f, 0.0f, mBackgroundPaint)
@@ -303,11 +301,10 @@ class LivingBackground {
                 (mBackgroundBitmap.width * scale).toInt(),
                 (mBackgroundBitmap.height * scale).toInt(), true)
 
-        morphedBitmap = Bitmap.createScaledBitmap(morphedBitmap,
+        //TODO may delete this
+/*        morphedBitmap = Bitmap.createScaledBitmap(morphedBitmap,
                 (morphedBitmap.width * scale).toInt(),
-                (morphedBitmap.height * scale).toInt(), true)
-
-
+                (morphedBitmap.height * scale).toInt(), true)*/
 
         workingBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         workingCanvas = Canvas(workingBitmap)
@@ -315,7 +312,7 @@ class LivingBackground {
 
         //prepare ashley
         engine.apply {
-            fadeSystem =VectorFadeSystem(HORIZONTAL)
+            fadeSystem =VectorFadeSystem()
             renderSystem = RenderSystem()
             addSystem(fadeSystem)
             addSystem(renderSystem)
@@ -511,74 +508,242 @@ class LivingBackground {
 
         mBackgroundBitmap = generateBitmapFromTriangles(widthD, heightD, triangleSoup!!)
 
+        //TODO START OF MORPHED BG
 
-        //find all edges once
-        val edges = ArrayList<Edge2D>()
+
+        val edges = ArrayList<EdgeNode>()
+        val triangleNodes = ArrayList<TriangleEntity>()
+//        val edgeNodes = ArrayList<EdgeNode>()
 
         var noABFound = false
         var noACFound = false
         var noBCFound = false
 
-        triangulator.triangleSoup.triangles.forEach{
+        triangulator.triangleSoup.triangles.forEach{ triangle ->
+
+            //We'll create a triangle node so that we know which edges belong to which triangle
+            //This way we can avoid searching for it, and just remember it. saves CPU usage
+            // but takes up memory
+            val triEntity = TriangleEntity(TriangleNode(triangle))
 
             //First triangle
             //TODO we can optimize this slightly by using vector notation instead.
             //check that any of our current edges matches with any triangle's edge
 
             if (edges.size == 0) {
-                edges.add(Edge2D(Vector2D(it.a.x, it.a.y), Vector2D(it.b.x, it.b.y)))
+                val edgeAB = Edge2D(Vector2D(triangle.a.x, triangle.a.y), Vector2D(triangle.b.x, triangle.b.y))
+                triEntity.node.edgeNodeAB = EdgeNode(edgeAB).apply {
+                    parent = triEntity.node
+                    edges.add(this@apply)
+                }
             }
 
             loop@ for (i in 0 until edges.size) {
 
-                val edge = edges.get(i)
-                if (!((edge.a.x == it.a.x) and (edge.a.y == it.a.y) and (edge.b.x == it.b.x) and (edge.b.y == it.b.y))) {
+                val edge = edges.get(i).itself
+                if (!((edge.a.x == triangle.a.x) and (edge.a.y == triangle.a.y) and (edge.b.x == triangle.b.x) and (edge.b.y == triangle.b.y))) {
                     noABFound = true
                     break@loop
                 }
             }
             if (noABFound) {
-                edges.add(Edge2D(Vector2D(it.a.x, it.a.y), Vector2D(it.b.x, it.b.y)))
+                val edgeAB = Edge2D(Vector2D(triangle.a.x, triangle.a.y), Vector2D(triangle.b.x, triangle.b.y))
+                triEntity.node.edgeNodeAB = EdgeNode(edgeAB).apply {
+                    parent = triEntity.node
+                    edges.add(this@apply)
+                }
             }
 
             loop@ for (i in 0 until edges.size) {
 
-                val edge = edges.get(i)
-                if (((edge.a.x == it.a.x) and (edge.a.y == it.a.y) and (edge.b.x == it.c.x) and (edge.b.y == it.c.y))) {
+                val edge = edges.get(i).itself
+                if (((edge.a.x == triangle.a.x) and (edge.a.y == triangle.a.y) and (edge.b.x == triangle.c.x) and (edge.b.y == triangle.c.y))) {
                     noACFound = true
                     break@loop
                 }
             }
 
             if (noACFound) {
-                edges.add(Edge2D(Vector2D(it.a.x, it.a.y), Vector2D(it.c.x, it.c.y)))
+                val edgeAC =Edge2D(Vector2D(triangle.a.x, triangle.a.y), Vector2D(triangle.c.x, triangle.c.y))
+                triEntity.node.edgeNodeAC = EdgeNode(edgeAC).apply {
+                    parent = triEntity.node
+                    edges.add(this@apply)
+                }
             }
 
             loop@ for (i in 0 until edges.size) {
 
-                val edge = edges.get(i)
-                if (!((edge.a.x == it.b.x) and (edge.a.y == it.b.y) and (edge.b.x == it.c.x) and (edge.b.y == it.c.y))) {
+                val edge = edges.get(i).itself
+                if (!((edge.a.x == triangle.b.x) and (edge.a.y == triangle.b.y) and (edge.b.x == triangle.c.x) and (edge.b.y == triangle.c.y))) {
                     noBCFound = true
                     break@loop
                 }
             }
 
             if (noBCFound) {
-                edges.add(Edge2D(Vector2D(it.b.x, it.b.y), Vector2D(it.c.x, it.c.y)))
+                val edgeBC =Edge2D(Vector2D(triangle.b.x, triangle.b.y), Vector2D(triangle.c.x, triangle.c.y))
+                triEntity.node.edgeNodeBC = EdgeNode(edgeBC).apply {
+                    parent =triEntity.node
+                    edges.add( this@apply)
+                }
             }
+
+            //before we add this triangle to the list of triangle nodes, complete any missing information
+            //On nodes we already contain as well as on on the nodes of this triangle node.
+
+            //we'll start with the triangles nodes that already exist.
+            //for each triangle, check that one of our nodes is part of that triangle's edge nodes
+            triangleNodes.forEach {otherTriangleEntities ->
+
+               //for each triangle, check if that triangle is neighbour to this triangle.
+                //check that we haven't found a neighbour first
+                triEntity.node.edgeNodeAB?.let {
+
+                    if (triEntity.node.edgeNodeAB!!.neighbour == null) {
+
+                        if (otherTriangleEntities.node.itself.isNeighbour(triEntity.node.edgeNodeAB!!.itself)) {
+
+                            //lets make this triNode a neighbour of our current triangle
+                            triEntity.node.edgeNodeAB!!.neighbour = otherTriangleEntities.node
+
+                            //we may as well update the neighbour on triNode as well
+                            otherTriangleEntities.node.edgeNodeAB?.let {
+
+                                if (otherTriangleEntities.node.edgeNodeAB!!.neighbour == null) {
+                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeAB!!.itself)) {
+                                        otherTriangleEntities.node.edgeNodeAB!!.neighbour = triEntity.node
+                                    }
+                                }
+                            }
+                            otherTriangleEntities.node.edgeNodeAC?.let {
+
+                                if (otherTriangleEntities.node.edgeNodeAC!!.neighbour == null) {
+                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeAC!!.itself)) {
+                                        otherTriangleEntities.node.edgeNodeAC!!.neighbour = triEntity.node
+                                    }
+                                }
+                            }
+
+                            otherTriangleEntities.node.edgeNodeBC?.let {
+                                if (otherTriangleEntities.node.edgeNodeBC!!.neighbour == null) {
+                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeBC!!.itself)) {
+                                        otherTriangleEntities.node.edgeNodeBC!!.neighbour = triEntity.node
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+
+                //repeat for the other edges of this triangle
+                triEntity.node.edgeNodeAC?.let {
+                    if (triEntity.node.edgeNodeAC!!.neighbour == null) {
+
+                        if (otherTriangleEntities.node.itself.isNeighbour(triEntity.node.edgeNodeAC!!.itself)) {
+
+                            //lets make this triNode a neighbour of our current triangle
+                            triEntity.node.edgeNodeAC!!.neighbour = otherTriangleEntities.node
+
+
+                            //we may as well update the neighbour on triNode as well
+                            otherTriangleEntities.node.edgeNodeAB?.let {
+
+                                if (otherTriangleEntities.node.edgeNodeAB!!.neighbour == null) {
+                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeAB!!.itself)) {
+                                        otherTriangleEntities.node.edgeNodeAB!!.neighbour = triEntity.node
+                                    }
+                                }
+                            }
+                            otherTriangleEntities.node.edgeNodeAC?.let {
+
+                                if (otherTriangleEntities.node.edgeNodeAC!!.neighbour == null) {
+                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeAC!!.itself)) {
+                                        otherTriangleEntities.node.edgeNodeAC!!.neighbour = triEntity.node
+                                    }
+                                }
+                            }
+
+                            otherTriangleEntities.node.edgeNodeBC?.let {
+
+                                if (otherTriangleEntities.node.edgeNodeBC!!.neighbour == null) {
+                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeBC!!.itself)) {
+                                        otherTriangleEntities.node.edgeNodeBC!!.neighbour = triEntity.node
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+                //repeat for the other edges of this triangle
+                triEntity.node.edgeNodeBC?.let {
+                    if (triEntity.node.edgeNodeBC!!.neighbour == null) {
+
+                        if (otherTriangleEntities.node.itself.isNeighbour(triEntity.node.edgeNodeBC!!.itself)) {
+
+                            //lets make this triNode a neighbour of our current triangle
+                            triEntity.node.edgeNodeBC!!.neighbour = otherTriangleEntities.node
+
+                            //we may as well update the neighbour on triNode as well
+                            otherTriangleEntities.node.edgeNodeAB?.let {
+                                if (otherTriangleEntities.node.edgeNodeAB!!.neighbour == null) {
+                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeAB!!.itself)) {
+                                        otherTriangleEntities.node.edgeNodeAB!!.neighbour = triEntity.node
+                                    }
+                                }
+
+                            }
+
+                            otherTriangleEntities.node.edgeNodeAC?.let {
+                                if (otherTriangleEntities.node.edgeNodeAC!!.neighbour == null) {
+                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeAC!!.itself)) {
+                                        otherTriangleEntities.node.edgeNodeAC!!.neighbour = triEntity.node
+                                    }
+                                }
+
+                            }
+
+                            otherTriangleEntities.node.edgeNodeBC?.let {
+                                if (otherTriangleEntities.node.edgeNodeBC!!.neighbour == null) {
+                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeBC!!.itself)) {
+                                        otherTriangleEntities.node.edgeNodeBC!!.neighbour = triEntity.node
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            //now add this triangle to our triangle nodes
+            triangleNodes.add(triEntity)
         }
 
-        edges.forEach {
+        edges.forEach { edgeNode ->
+            val edge = edgeNode.itself
             val testEntity = Entity()
-            testEntity.add(EdgeComponent(it.a.x.toFloat(),it.a.y.toFloat(), it.b.x.toFloat(),it.b.y.toFloat()))
+            testEntity.add(RenderComponent())
+            testEntity.add(EdgeComponent(edgeNode))
             testEntity.add(AlphaComponent().apply {
 
-                delayMillis = ((Math.min(it.a.x, it.b.x) / widthD) * 100.0f).roundToInt()
+                delaySecond = ((Math.min(edge.a.x, edge.b.x) / widthD) * 0.5)
                 alpha = 0
                 realDelayTime = 0.0f
             })
             engine.addEntity(testEntity)
         }
+
+        triangleNodes.forEach {
+            engine.addEntity(it)
+        }
+
+
+        //we have collected our edges to draw, now we must draw the white triangle when All 3 edges are fully at full alpha.
+
 
         //generate Morphed background
         //if image is square, height = with, so
@@ -586,6 +751,8 @@ class LivingBackground {
 
         //100 - 15 / 100 =
 
+        //TODO start of MORPHED BG
+/*
         val radius = (WORKING_BITMAP_WIDTH.div(2.0) - 15.0).toFloat()
         //now find all the triangles that intersect with this circle, we do this by dividing the circle into tangents
         //60 of them since 360/12 = 30 sections
@@ -618,6 +785,9 @@ class LivingBackground {
 
         //We morphed the background slightly, now lets create the bitmap for it.
         morphedBitmap = generateBitmapFromTriangles(widthD, heightD, triangulator.triangles as ArrayList<Triangle2D>)
+*/
+
+        //TODO END OF MORPHED
     }
 
 
@@ -641,5 +811,41 @@ class LivingBackground {
         colorLeft.lerp(colorRight, x / width, final)
 
         return Color.argb(final.a.roundToInt(), final.r.roundToInt(), final.g.roundToInt(), final.b.roundToInt())
+    }
+
+    class TriangleNode(var itself:Triangle2D){
+
+        var edgeNodeAB: EdgeNode? = null
+        var edgeNodeAC: EdgeNode? = null
+        var edgeNodeBC: EdgeNode? = null
+        var latch = false
+    }
+
+    class EdgeNode(var itself: Edge2D){
+
+        var parent:TriangleNode? = null
+        var neighbour:TriangleNode? = null
+        var latch = false
+    }
+
+    class TriangleEntity(val node:TriangleNode):Entity(){
+
+       companion object {
+
+           val paint= Paint().apply {
+               color = Color.WHITE
+               style = Paint.Style.FILL
+           }
+           val path = Path()
+           val renderFunction:(Canvas, TriangleEntity)->Any = { canvas, entity ->
+
+               path.reset()
+               path.moveTo(entity.node.itself.qA().x.toFloat(), entity.node.itself.qA().y.toFloat())
+               path.lineTo(entity.node.itself.qB().x.toFloat(), entity.node.itself.qB().y.toFloat())
+               path.lineTo(entity.node.itself.qC().x.toFloat(), entity.node.itself.qC().y.toFloat())
+               path.lineTo(entity.node.itself.qA().x.toFloat(), entity.node.itself.qA().y.toFloat())
+               canvas.drawPath(path, paint)
+           }
+       }
     }
 }

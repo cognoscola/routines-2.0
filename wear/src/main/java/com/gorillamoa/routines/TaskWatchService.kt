@@ -602,6 +602,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 WatchFaceService.TAP_TYPE_TAP ->{
                     // The user has completed the tap gesture.
 
+                    Log.d("$tag onTapCommand","processEntity TAP COMMAND")
                     livingBackground.toggleTransition()
 
                     if (livingBackground.isAlarmEnabled()) {turnOffAlarms()

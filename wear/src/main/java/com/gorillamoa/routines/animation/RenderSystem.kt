@@ -6,10 +6,12 @@ import android.graphics.Paint
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
+import com.gorillamoa.routines.views.LivingBackground
 
 class RenderSystem:IteratingSystem(Family.all(EdgeComponent::class.java).get()){
 
-
+    @Suppress("unused")
+    private val tag:String = RenderSystem::class.java.name
     var canvas: Canvas? = null
     val painter =  Paint().apply {
 
@@ -20,14 +22,34 @@ class RenderSystem:IteratingSystem(Family.all(EdgeComponent::class.java).get()){
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
 
-        val edge = entity.getComponent(EdgeComponent::class.java)
-        entity.getComponent(AlphaComponent::class.java).apply {
-            if (alpha > 0) {
+        //TODO move edge to its own entity with its own render function
 
-                painter.alpha = alpha
-                canvas?.drawLine(edge.x1, edge.y1, edge.x2, edge.y2, painter)
+        canvas?.let {
+
+            if (entity is LivingBackground.TriangleEntity) {
+                
+                LivingBackground.TriangleEntity.renderFunction.invoke(canvas!!,entity)
+
+            }else{
+                val edgeComponent = entity.getComponent(EdgeComponent::class.java)
+                entity.getComponent(AlphaComponent::class.java).apply {
+                    if (alpha > 0) {
+
+                        val edge = edgeComponent.edgeNode.itself
+                        painter.alpha = alpha
+                        canvas?.drawLine(
+                                edge.a.x.toFloat(),
+                                edge.a.y.toFloat(),
+                                edge.b.x.toFloat(),
+                                edge.b.y.toFloat(), painter)
+                    }
+                }
+
             }
         }
+
+
+
     }
 
 }

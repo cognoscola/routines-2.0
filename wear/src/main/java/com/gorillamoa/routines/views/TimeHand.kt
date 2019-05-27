@@ -2,9 +2,10 @@ package com.gorillamoa.routines.views
 
 import android.graphics.*
 import com.gorillamoa.routines.utils.CircularTimer
+import com.gorillamoa.routines.utils.ZERO_FLOAT
 
 const val OVERLAP_AMOUNT = 0.01f
-const val ZERO = 0f
+
 const val SECOND_HORIZONTAL_DISPLACEMENT = 6.0f
 const val SECOND_VERTICAL_DISPLACEMENT = 10.0f
 const val MINUTE_HORIZONTAL_DISPLACEMENT = 12.0f
@@ -58,8 +59,8 @@ class TimeHand(val type:Int){
 
                         reset()
                         moveTo(mCenterX, mCenterY - radius - SECOND_VERTICAL_DISPLACEMENT)
-                        lineTo(mCenterX - SECOND_HORIZONTAL_DISPLACEMENT, ZERO)
-                        lineTo(mCenterX + SECOND_HORIZONTAL_DISPLACEMENT, ZERO)
+                        lineTo(mCenterX - SECOND_HORIZONTAL_DISPLACEMENT, ZERO_FLOAT)
+                        lineTo(mCenterX + SECOND_HORIZONTAL_DISPLACEMENT, ZERO_FLOAT)
                         lineTo(mCenterX, mCenterY - radius - SECOND_VERTICAL_DISPLACEMENT)
                     }
                     breakLinePaint.setShadowLayer(3.0f, 0.0f, 0.0f, Color.BLACK)
