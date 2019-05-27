@@ -39,7 +39,6 @@ class VectorFadeSystem:SortedIteratingSystem(Family.all(AlphaComponent::class.ja
     override fun processEntity(entity: Entity?, deltaTime: Float) {
 
 
-
         val alphaComponenet = entity?.getComponent(AlphaComponent::class.java)
         alphaComponenet?.let {
 
@@ -73,6 +72,12 @@ class VectorFadeSystem:SortedIteratingSystem(Family.all(AlphaComponent::class.ja
                                 //light up the triangle
                                 Log.d("$tag processEntity","Light up Triangle")
                                 triangleEntity.add(RenderComponent())
+                                triangleEntity.add(AlphaV2Component().apply {
+
+                                    alpha = 255
+                                    fadeRatePerFrame = FORTY_FIVE_INT
+
+                                })
                             }
                         }
                     }

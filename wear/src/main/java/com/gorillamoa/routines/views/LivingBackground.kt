@@ -316,15 +316,8 @@ class LivingBackground {
             renderSystem = RenderSystem()
             addSystem(fadeSystem)
             addSystem(renderSystem)
-
-//            val testEntity = Entity()
-//            testEntity.add(EdgeComponent(width/2.0f - 30f,height/2.0f - 30f, width/2.0f + 30f,height/2.0f + 30f))
-//            testEntity.add(AlphaComponent())
-//            addEntity(testEntity)
-            //TODO for total number of nonrepeating edges, add the entity
-
+            addSystem(FadeOutSystem())
         }
-
     }
 
     /* Check whether segment P0P1 intersects with triangle t0t1t2 */
@@ -865,6 +858,8 @@ class LivingBackground {
                path.lineTo(entity.itself.qB().x.toFloat(), entity.itself.qB().y.toFloat())
                path.lineTo(entity.itself.qC().x.toFloat(), entity.itself.qC().y.toFloat())
                path.lineTo(entity.itself.qA().x.toFloat(), entity.itself.qA().y.toFloat())
+
+               paint.alpha = entity.getComponent(AlphaV2Component::class.java).alpha
                canvas.drawPath(path, paint)
            }
        }
