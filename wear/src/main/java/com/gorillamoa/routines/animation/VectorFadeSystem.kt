@@ -14,11 +14,9 @@ import com.gorillamoa.routines.views.LivingBackground
 class VectorFadeSystem:SortedIteratingSystem(Family.all(AlphaComponent::class.java, EdgeComponent::class.java).get(),{
     entityA,entityB ->
 
-
     //which one has the lowest pt from left to right is the one who will light up first.
-
-    val edgeA = entityA.getComponent(EdgeComponent::class.java).edgeNode.itself
-    val edgeB = entityB.getComponent(EdgeComponent::class.java).edgeNode.itself
+    val edgeA = (entityA as LivingBackground.EdgeEntity).itself
+    val edgeB = (entityB as LivingBackground.EdgeEntity).itself
 
     if (Math.min(edgeA.a.x, edgeA.b.x) < Math.min(edgeB.a.x, edgeB.b.x)) {
         NEG_ONE_INT
@@ -40,6 +38,8 @@ class VectorFadeSystem:SortedIteratingSystem(Family.all(AlphaComponent::class.ja
 
     override fun processEntity(entity: Entity?, deltaTime: Float) {
 
+
+
         val alphaComponenet = entity?.getComponent(AlphaComponent::class.java)
         alphaComponenet?.let {
 
@@ -59,20 +59,20 @@ class VectorFadeSystem:SortedIteratingSystem(Family.all(AlphaComponent::class.ja
                     }
                   }
 
-            entity.getComponent(EdgeComponent::class.java)?.apply {
+            if (entity is LivingBackground.EdgeEntity) {
 
                 if (appearing) {
                     if (it.alpha < TWOFIFTYFIVE) {
                         it.alpha += FORTY_FIVE_INT
                         it.alpha = Math.min(it.alpha, TWOFIFTYFIVE)
 
-                        if ((it.alpha == TWOFIFTYFIVE) and (!edgeNode.latch)) {
-                            edgeNode.latch = true
+                        if ((it.alpha == TWOFIFTYFIVE) and (!entity.latch)) {
+                            entity.latch = true
 
-                            shouldTriangleLightUpGiven(edgeNode).let {
+                            getTriangleToLightUpGiven(entity)?.let { triangleEntity ->
                                 //light up the triangle
                                 Log.d("$tag processEntity","Light up Triangle")
-
+                                triangleEntity.add(RenderComponent())
                             }
                         }
                     }
@@ -84,23 +84,39 @@ class VectorFadeSystem:SortedIteratingSystem(Family.all(AlphaComponent::class.ja
                     }
                 }
             }
+/*
+            entity.getComponent(EdgeComponent::class.java)?.apply {
+
+
+            }
+*/
         }
     }
 
-    fun shouldTriangleLightUpGiven(edgeNode: LivingBackground.EdgeNode):Boolean{
+
+    //clean move these functions else where
+    fun getTriangleToLightUpGiven(edgeEntity: LivingBackground.EdgeEntity):LivingBackground.TriangleEntity?{
         //check the edge's neighbours
-        return shouldLightUp(edgeNode.neighbour).or(shouldLightUp(edgeNode.parent))
+        if (shouldLightUp(edgeEntity.neighbour)) {
+            return edgeEntity.neighbour
+        }
+
+        if (shouldLightUp(edgeEntity.parent)) {
+            return edgeEntity.parent
+        }
+
+        return null
     }
 
-    fun isEdgeNodeLit(edgeNode: LivingBackground.EdgeNode?):Boolean{
-        return edgeNode?.latch?:true
+    fun isEdgeNodeLit(edgeEntity: LivingBackground.EdgeEntity?):Boolean{
+        return edgeEntity?.latch?:true
     }
 
-    fun shouldLightUp(triangleNode:LivingBackground.TriangleNode?):Boolean{
+    fun shouldLightUp(triangleNode:LivingBackground.TriangleEntity?):Boolean{
 
         return triangleNode?.let {
             if (!it.latch) {
-                if (isEdgeNodeLit(it.edgeNodeAB) and isEdgeNodeLit(it.edgeNodeAC) and isEdgeNodeLit(it.edgeNodeBC)) {
+                if (isEdgeNodeLit(it.edgeEntityAB) and isEdgeNodeLit(it.edgeEntityAC) and isEdgeNodeLit(it.edgeEntityBC)) {
                     it.latch = true
                 }
             }

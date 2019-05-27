@@ -510,10 +510,9 @@ class LivingBackground {
 
         //TODO START OF MORPHED BG
 
-
-        val edges = ArrayList<EdgeNode>()
+        val edges = ArrayList<EdgeEntity>()
         val triangleNodes = ArrayList<TriangleEntity>()
-//        val edgeNodes = ArrayList<EdgeNode>()
+//        val edgeNodes = ArrayList<EdgeEntity>()
 
         var noABFound = false
         var noACFound = false
@@ -524,7 +523,7 @@ class LivingBackground {
             //We'll create a triangle node so that we know which edges belong to which triangle
             //This way we can avoid searching for it, and just remember it. saves CPU usage
             // but takes up memory
-            val triEntity = TriangleEntity(TriangleNode(triangle))
+            val triEntity = TriangleEntity(triangle)
 
             //First triangle
             //TODO we can optimize this slightly by using vector notation instead.
@@ -532,8 +531,8 @@ class LivingBackground {
 
             if (edges.size == 0) {
                 val edgeAB = Edge2D(Vector2D(triangle.a.x, triangle.a.y), Vector2D(triangle.b.x, triangle.b.y))
-                triEntity.node.edgeNodeAB = EdgeNode(edgeAB).apply {
-                    parent = triEntity.node
+                triEntity.edgeEntityAB = EdgeEntity(edgeAB).apply {
+                    parent = triEntity
                     edges.add(this@apply)
                 }
             }
@@ -548,8 +547,8 @@ class LivingBackground {
             }
             if (noABFound) {
                 val edgeAB = Edge2D(Vector2D(triangle.a.x, triangle.a.y), Vector2D(triangle.b.x, triangle.b.y))
-                triEntity.node.edgeNodeAB = EdgeNode(edgeAB).apply {
-                    parent = triEntity.node
+                triEntity.edgeEntityAB = EdgeEntity(edgeAB).apply {
+                    parent = triEntity
                     edges.add(this@apply)
                 }
             }
@@ -565,8 +564,8 @@ class LivingBackground {
 
             if (noACFound) {
                 val edgeAC =Edge2D(Vector2D(triangle.a.x, triangle.a.y), Vector2D(triangle.c.x, triangle.c.y))
-                triEntity.node.edgeNodeAC = EdgeNode(edgeAC).apply {
-                    parent = triEntity.node
+                triEntity.edgeEntityAC = EdgeEntity(edgeAC).apply {
+                    parent = triEntity
                     edges.add(this@apply)
                 }
             }
@@ -582,8 +581,8 @@ class LivingBackground {
 
             if (noBCFound) {
                 val edgeBC =Edge2D(Vector2D(triangle.b.x, triangle.b.y), Vector2D(triangle.c.x, triangle.c.y))
-                triEntity.node.edgeNodeBC = EdgeNode(edgeBC).apply {
-                    parent =triEntity.node
+                triEntity.edgeEntityBC = EdgeEntity(edgeBC).apply {
+                    parent =triEntity
                     edges.add( this@apply)
                 }
             }
@@ -597,37 +596,37 @@ class LivingBackground {
 
                //for each triangle, check if that triangle is neighbour to this triangle.
                 //check that we haven't found a neighbour first
-                triEntity.node.edgeNodeAB?.let {
+                triEntity.edgeEntityAB?.let {
 
-                    if (triEntity.node.edgeNodeAB!!.neighbour == null) {
+                    if (triEntity.edgeEntityAB!!.neighbour == null) {
 
-                        if (otherTriangleEntities.node.itself.isNeighbour(triEntity.node.edgeNodeAB!!.itself)) {
+                        if (otherTriangleEntities.itself.isNeighbour(triEntity.edgeEntityAB!!.itself)) {
 
                             //lets make this triNode a neighbour of our current triangle
-                            triEntity.node.edgeNodeAB!!.neighbour = otherTriangleEntities.node
+                            triEntity.edgeEntityAB!!.neighbour = otherTriangleEntities
 
                             //we may as well update the neighbour on triNode as well
-                            otherTriangleEntities.node.edgeNodeAB?.let {
+                            otherTriangleEntities.edgeEntityAB?.let {
 
-                                if (otherTriangleEntities.node.edgeNodeAB!!.neighbour == null) {
-                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeAB!!.itself)) {
-                                        otherTriangleEntities.node.edgeNodeAB!!.neighbour = triEntity.node
+                                if (otherTriangleEntities.edgeEntityAB!!.neighbour == null) {
+                                    if (triEntity.itself.isNeighbour(otherTriangleEntities.edgeEntityAB!!.itself)) {
+                                        otherTriangleEntities.edgeEntityAB!!.neighbour = triEntity
                                     }
                                 }
                             }
-                            otherTriangleEntities.node.edgeNodeAC?.let {
+                            otherTriangleEntities.edgeEntityAC?.let {
 
-                                if (otherTriangleEntities.node.edgeNodeAC!!.neighbour == null) {
-                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeAC!!.itself)) {
-                                        otherTriangleEntities.node.edgeNodeAC!!.neighbour = triEntity.node
+                                if (otherTriangleEntities.edgeEntityAC!!.neighbour == null) {
+                                    if (triEntity.itself.isNeighbour(otherTriangleEntities.edgeEntityAC!!.itself)) {
+                                        otherTriangleEntities.edgeEntityAC!!.neighbour = triEntity
                                     }
                                 }
                             }
 
-                            otherTriangleEntities.node.edgeNodeBC?.let {
-                                if (otherTriangleEntities.node.edgeNodeBC!!.neighbour == null) {
-                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeBC!!.itself)) {
-                                        otherTriangleEntities.node.edgeNodeBC!!.neighbour = triEntity.node
+                            otherTriangleEntities.edgeEntityBC?.let {
+                                if (otherTriangleEntities.edgeEntityBC!!.neighbour == null) {
+                                    if (triEntity.itself.isNeighbour(otherTriangleEntities.edgeEntityBC!!.itself)) {
+                                        otherTriangleEntities.edgeEntityBC!!.neighbour = triEntity
                                     }
                                 }
 
@@ -637,38 +636,38 @@ class LivingBackground {
                 }
 
                 //repeat for the other edges of this triangle
-                triEntity.node.edgeNodeAC?.let {
-                    if (triEntity.node.edgeNodeAC!!.neighbour == null) {
+                triEntity.edgeEntityAC?.let {
+                    if (triEntity.edgeEntityAC!!.neighbour == null) {
 
-                        if (otherTriangleEntities.node.itself.isNeighbour(triEntity.node.edgeNodeAC!!.itself)) {
+                        if (otherTriangleEntities.itself.isNeighbour(triEntity.edgeEntityAC!!.itself)) {
 
                             //lets make this triNode a neighbour of our current triangle
-                            triEntity.node.edgeNodeAC!!.neighbour = otherTriangleEntities.node
+                            triEntity.edgeEntityAC!!.neighbour = otherTriangleEntities
 
 
                             //we may as well update the neighbour on triNode as well
-                            otherTriangleEntities.node.edgeNodeAB?.let {
+                            otherTriangleEntities.edgeEntityAB?.let {
 
-                                if (otherTriangleEntities.node.edgeNodeAB!!.neighbour == null) {
-                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeAB!!.itself)) {
-                                        otherTriangleEntities.node.edgeNodeAB!!.neighbour = triEntity.node
+                                if (otherTriangleEntities.edgeEntityAB!!.neighbour == null) {
+                                    if (triEntity.itself.isNeighbour(otherTriangleEntities.edgeEntityAB!!.itself)) {
+                                        otherTriangleEntities.edgeEntityAB!!.neighbour = triEntity
                                     }
                                 }
                             }
-                            otherTriangleEntities.node.edgeNodeAC?.let {
+                            otherTriangleEntities.edgeEntityAC?.let {
 
-                                if (otherTriangleEntities.node.edgeNodeAC!!.neighbour == null) {
-                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeAC!!.itself)) {
-                                        otherTriangleEntities.node.edgeNodeAC!!.neighbour = triEntity.node
+                                if (otherTriangleEntities.edgeEntityAC!!.neighbour == null) {
+                                    if (triEntity.itself.isNeighbour(otherTriangleEntities.edgeEntityAC!!.itself)) {
+                                        otherTriangleEntities.edgeEntityAC!!.neighbour = triEntity
                                     }
                                 }
                             }
 
-                            otherTriangleEntities.node.edgeNodeBC?.let {
+                            otherTriangleEntities.edgeEntityBC?.let {
 
-                                if (otherTriangleEntities.node.edgeNodeBC!!.neighbour == null) {
-                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeBC!!.itself)) {
-                                        otherTriangleEntities.node.edgeNodeBC!!.neighbour = triEntity.node
+                                if (otherTriangleEntities.edgeEntityBC!!.neighbour == null) {
+                                    if (triEntity.itself.isNeighbour(otherTriangleEntities.edgeEntityBC!!.itself)) {
+                                        otherTriangleEntities.edgeEntityBC!!.neighbour = triEntity
                                     }
                                 }
                             }
@@ -678,37 +677,37 @@ class LivingBackground {
                 }
 
                 //repeat for the other edges of this triangle
-                triEntity.node.edgeNodeBC?.let {
-                    if (triEntity.node.edgeNodeBC!!.neighbour == null) {
+                triEntity.edgeEntityBC?.let {
+                    if (triEntity.edgeEntityBC!!.neighbour == null) {
 
-                        if (otherTriangleEntities.node.itself.isNeighbour(triEntity.node.edgeNodeBC!!.itself)) {
+                        if (otherTriangleEntities.itself.isNeighbour(triEntity.edgeEntityBC!!.itself)) {
 
                             //lets make this triNode a neighbour of our current triangle
-                            triEntity.node.edgeNodeBC!!.neighbour = otherTriangleEntities.node
+                            triEntity.edgeEntityBC!!.neighbour = otherTriangleEntities
 
                             //we may as well update the neighbour on triNode as well
-                            otherTriangleEntities.node.edgeNodeAB?.let {
-                                if (otherTriangleEntities.node.edgeNodeAB!!.neighbour == null) {
-                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeAB!!.itself)) {
-                                        otherTriangleEntities.node.edgeNodeAB!!.neighbour = triEntity.node
+                            otherTriangleEntities.edgeEntityAB?.let {
+                                if (otherTriangleEntities.edgeEntityAB!!.neighbour == null) {
+                                    if (triEntity.itself.isNeighbour(otherTriangleEntities.edgeEntityAB!!.itself)) {
+                                        otherTriangleEntities.edgeEntityAB!!.neighbour = triEntity
                                     }
                                 }
 
                             }
 
-                            otherTriangleEntities.node.edgeNodeAC?.let {
-                                if (otherTriangleEntities.node.edgeNodeAC!!.neighbour == null) {
-                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeAC!!.itself)) {
-                                        otherTriangleEntities.node.edgeNodeAC!!.neighbour = triEntity.node
+                            otherTriangleEntities.edgeEntityAC?.let {
+                                if (otherTriangleEntities.edgeEntityAC!!.neighbour == null) {
+                                    if (triEntity.itself.isNeighbour(otherTriangleEntities.edgeEntityAC!!.itself)) {
+                                        otherTriangleEntities.edgeEntityAC!!.neighbour = triEntity
                                     }
                                 }
 
                             }
 
-                            otherTriangleEntities.node.edgeNodeBC?.let {
-                                if (otherTriangleEntities.node.edgeNodeBC!!.neighbour == null) {
-                                    if (triEntity.node.itself.isNeighbour(otherTriangleEntities.node.edgeNodeBC!!.itself)) {
-                                        otherTriangleEntities.node.edgeNodeBC!!.neighbour = triEntity.node
+                            otherTriangleEntities.edgeEntityBC?.let {
+                                if (otherTriangleEntities.edgeEntityBC!!.neighbour == null) {
+                                    if (triEntity.itself.isNeighbour(otherTriangleEntities.edgeEntityBC!!.itself)) {
+                                        otherTriangleEntities.edgeEntityBC!!.neighbour = triEntity
                                     }
                                 }
 
@@ -723,18 +722,17 @@ class LivingBackground {
             triangleNodes.add(triEntity)
         }
 
-        edges.forEach { edgeNode ->
-            val edge = edgeNode.itself
-            val testEntity = Entity()
-            testEntity.add(RenderComponent())
-            testEntity.add(EdgeComponent(edgeNode))
-            testEntity.add(AlphaComponent().apply {
+        edges.forEach { edgeEntity ->
 
-                delaySecond = ((Math.min(edge.a.x, edge.b.x) / widthD) * 0.5)
+            edgeEntity.add(RenderComponent())
+            edgeEntity.add(EdgeComponent())
+            edgeEntity.add(AlphaComponent().apply {
+
+                delaySecond = ((Math.min(edgeEntity.itself.a.x, edgeEntity.itself.b.x) / widthD) * 0.5)
                 alpha = 0
                 realDelayTime = 0.0f
             })
-            engine.addEntity(testEntity)
+            engine.addEntity(edgeEntity)
         }
 
         triangleNodes.forEach {
@@ -813,22 +811,45 @@ class LivingBackground {
         return Color.argb(final.a.roundToInt(), final.r.roundToInt(), final.g.roundToInt(), final.b.roundToInt())
     }
 
-    class TriangleNode(var itself:Triangle2D){
+    //TODO make sure we remove the properties and make them into components later
+    class EdgeEntity(var itself: Edge2D):Entity(){
 
-        var edgeNodeAB: EdgeNode? = null
-        var edgeNodeAC: EdgeNode? = null
-        var edgeNodeBC: EdgeNode? = null
+        var parent:TriangleEntity? = null
+        var neighbour:TriangleEntity? = null
         var latch = false
+
+        companion object {
+
+            val paint =  Paint().apply {
+                strokeWidth = 1.0f
+                color = Color.WHITE
+                isAntiAlias = true
+            }
+
+            val renderFunction:(Canvas,EdgeEntity)->Any = { canvas, entity ->
+                entity.getComponent(AlphaComponent::class.java).apply {
+                    if (alpha > 0) {
+                        val edge = entity.itself
+                        paint.alpha = alpha
+                        canvas.drawLine(
+                                edge.a.x.toFloat(),
+                                edge.a.y.toFloat(),
+                                edge.b.x.toFloat(),
+                                edge.b.y.toFloat(), paint)
+                    }
+                }
+
+
+            }
+        }
     }
 
-    class EdgeNode(var itself: Edge2D){
+    class TriangleEntity(val itself:Triangle2D):Entity(){
 
-        var parent:TriangleNode? = null
-        var neighbour:TriangleNode? = null
+        var edgeEntityAB: EdgeEntity? = null
+        var edgeEntityAC: EdgeEntity? = null
+        var edgeEntityBC: EdgeEntity? = null
         var latch = false
-    }
-
-    class TriangleEntity(val node:TriangleNode):Entity(){
 
        companion object {
 
@@ -840,10 +861,10 @@ class LivingBackground {
            val renderFunction:(Canvas, TriangleEntity)->Any = { canvas, entity ->
 
                path.reset()
-               path.moveTo(entity.node.itself.qA().x.toFloat(), entity.node.itself.qA().y.toFloat())
-               path.lineTo(entity.node.itself.qB().x.toFloat(), entity.node.itself.qB().y.toFloat())
-               path.lineTo(entity.node.itself.qC().x.toFloat(), entity.node.itself.qC().y.toFloat())
-               path.lineTo(entity.node.itself.qA().x.toFloat(), entity.node.itself.qA().y.toFloat())
+               path.moveTo(entity.itself.qA().x.toFloat(), entity.itself.qA().y.toFloat())
+               path.lineTo(entity.itself.qB().x.toFloat(), entity.itself.qB().y.toFloat())
+               path.lineTo(entity.itself.qC().x.toFloat(), entity.itself.qC().y.toFloat())
+               path.lineTo(entity.itself.qA().x.toFloat(), entity.itself.qA().y.toFloat())
                canvas.drawPath(path, paint)
            }
        }
