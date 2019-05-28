@@ -685,18 +685,18 @@ class TaskWatchService : CanvasWatchFaceService() {
             //draw our bg
             //TODO CALCULATE THINGS WHILE NOT UPDATING!
 
-            if (!mAmbient) {
-                livingBackground.drawBackground(canvas, mAmbient,mLowBitAmbient,mBurnInProtection, bounds, timingObject)
-            }
+
+            livingBackground.drawBackground(canvas, mAmbient, mLowBitAmbient, mBurnInProtection, bounds, timingObject)
+
 
 
 
             if (isTimerEnabled) {
-                timerView.onDraw(canvas,timingObject)
+                timerView.onDraw(canvas, timingObject)
             }
 
-            drawWatchFace(canvas,bounds)
-            drawFeatures(canvas,bounds)
+            drawWatchFace(canvas, bounds)
+            drawFeatures(canvas, bounds)
             foreground.drawButtons(canvas)
         }
 

@@ -11,16 +11,10 @@ import com.gorillamoa.routines.utils.*
 /**
  * We're going to fade the lines from left to right
  */
-class FadeInSystem:IteratingSystem(Family.all(AlphaComponent::class.java).get()) {
+class FadeInSystem:IteratingSystem(Family.all(AlphaComponent::class.java,FadeInEffectComponent::class.java).get()) {
 
     @Suppress("unused")
     private val tag:String = FadeInSystem::class.java.name
-
-    var appearing = true
-
-    fun toggleTransition(){
-        appearing = !appearing
-    }
 
     companion object {
         fun startFadingIn(delaySecond:Double, rate:Int, entity: Entity,engine:Engine) {

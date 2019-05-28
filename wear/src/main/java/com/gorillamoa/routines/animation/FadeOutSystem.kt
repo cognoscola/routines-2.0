@@ -36,7 +36,6 @@ class FadeOutSystem:IteratingSystem(Family.all(AlphaComponent::class.java, FadeO
 
                 if (alpha == ZERO_INT) {
                     entity.remove(FadeOutEffectComponent::class.java)
-                    entity.remove(RenderComponent::class.java)
                 }
             }
         }

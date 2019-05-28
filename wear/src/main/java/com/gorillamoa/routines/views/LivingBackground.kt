@@ -82,15 +82,13 @@ class LivingBackground {
     lateinit var vibrator: Vibrator
 
     val fadeInFinishListener = object :EntityListener{
-        override fun entityAdded(entity: Entity?) {
-
-        }
+        override fun entityAdded(entity: Entity?) {}
 
         override fun entityRemoved(entity: Entity?) {
 
             if (entity is EdgeEntity) {
-                if (!entity.isVisible) {
-                    entity.isVisible = true
+                if (!entity.animationLatch) {
+                    entity.animationLatch = true
 
                     getTriangleToLightUpGiven(entity)?.let { triangleEntity ->
                         //light up the triangle
@@ -99,6 +97,20 @@ class LivingBackground {
                 }
 
                 //lets also remove its visibility
+                entity.remove(RenderComponent::class.java)
+            }
+        }
+    }
+
+    val fadeOutFinishListener = object :EntityListener{
+        override fun entityAdded(entity: Entity?) {
+            Log.d("$tag entityAdded","Added Triangle Entity")
+        }
+
+        override fun entityRemoved(entity: Entity) {
+
+            if (entity is TriangleEntity) {
+                Log.d("$tag entityRemoved","Removed Triangle Entity from FadeOutSystem")
                 entity.remove(RenderComponent::class.java)
             }
         }
@@ -147,10 +159,11 @@ class LivingBackground {
 
     fun comeOutOfAmbient() {
 
+        Log.d("$tag comeOutOfAmbient","Out of ambient")
         edges.forEach { edgeEntity ->
 
             edgeEntity.apply {
-                resetVisibility()
+                resetAnimationLatch()
                 add(engine.createComponent(RenderComponent::class.java))
                 add(engine.createComponent(FadeInEffectComponent::class.java).apply {
                     startDelaySecond = ((Math.min(edgeEntity.itself.a.x, edgeEntity.itself.b.x) / widthD) * POINT_FIVE)
@@ -160,19 +173,25 @@ class LivingBackground {
         }
 
         triangleNodes.forEach {
-            it.resetVisibility()
+            it.resetAnimationLatch()
         }
     }
 
     fun goIntoAmbient(){
+        Log.d("$tag goIntoAmbient","Into Ambient")
 
         edges.forEach {
+            it.resetAnimationLatch()
             it.getComponent(AlphaComponent::class.java).alpha = 0
         }
 
         triangleNodes.forEach {
-            it.setTriangleColor(Color.WHITE,engine)
-            it.remove(RenderComponent::class.java)
+
+            it.resetAnimationLatch()
+            it.add(engine.createComponent(FadeOutEffectComponent::class.java).apply {
+                startDelaySecond = (( it.getCenterX()/ widthD) * POINT_FIVE)
+                fadeRatePerFrame = FORTY_FIVE_INT
+            })
         }
     }
 
@@ -372,8 +391,8 @@ class LivingBackground {
             addSystem(ColorChangerSystem())
             addSystem(renderSystem)
 
-            engine.removeEntityListener(fadeInFinishListener)
             engine.addEntityListener(Family.one(FadeInEffectComponent::class.java).get(), fadeInFinishListener)
+            engine.addEntityListener(Family.one(FadeOutEffectComponent::class.java).get(),fadeOutFinishListener)
         }
     }
 
@@ -890,14 +909,12 @@ class LivingBackground {
 
 
 
-
-
     //TODO make sure we remove the properties and make them into components later
     class EdgeEntity(var itself: Edge2D):Entity(){
 
         var parent:TriangleEntity? = null
         var neighbour:TriangleEntity? = null
-        var isVisible = false
+        var animationLatch = false
 
         companion object {
 
@@ -927,8 +944,8 @@ class LivingBackground {
                 override fun entityRemoved(entity: Entity?) {
 
                     if (entity is EdgeEntity) {
-                        if (!entity.isVisible) {
-                            entity.isVisible = true
+                        if (!entity.animationLatch) {
+                            entity.animationLatch = true
 
                             getTriangleToLightUpGiven(entity)?.let { triangleEntity ->
                                 //light up the triangle
@@ -942,8 +959,8 @@ class LivingBackground {
                 }
             }
         }
-        fun resetVisibility(){
-            isVisible = false
+        fun resetAnimationLatch(){
+            animationLatch = false
         }
 
     }
@@ -953,7 +970,7 @@ class LivingBackground {
         var edgeEntityAB: EdgeEntity? = null
         var edgeEntityAC: EdgeEntity? = null
         var edgeEntityBC: EdgeEntity? = null
-        var isVisible = false
+        var animationLatch = false
 
         companion object {
 
@@ -990,18 +1007,18 @@ class LivingBackground {
             }
 
             fun isEdgeNodeLit(edgeEntity: LivingBackground.EdgeEntity?): Boolean {
-                return edgeEntity?.isVisible ?: true
+                return edgeEntity?.animationLatch ?: true
             }
 
             fun shouldLightUp(triangleNode: LivingBackground.TriangleEntity?): Boolean {
 
                 return triangleNode?.let {
-                    if (!it.isVisible) {
+                    if (!it.animationLatch) {
                         if (isEdgeNodeLit(it.edgeEntityAB) and isEdgeNodeLit(it.edgeEntityAC) and isEdgeNodeLit(it.edgeEntityBC)) {
-                            it.isVisible = true
+                            it.animationLatch = true
                         }
                     }
-                    it.isVisible
+                    it.animationLatch
                 } ?: false
             }
         }
@@ -1042,8 +1059,8 @@ class LivingBackground {
                     final, 0.369, this, engine)
         }
 
-        fun resetVisibility(){
-            isVisible = false
+        fun resetAnimationLatch(){
+            animationLatch = false
         }
 
     }
