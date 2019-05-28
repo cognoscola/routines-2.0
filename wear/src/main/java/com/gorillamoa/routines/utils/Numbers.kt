@@ -9,6 +9,8 @@ const val ONE_FLOAT = 1.0f
 const val NEG_ONE_INT = 1
 const val ZERO_INT = 0
 
+const val POINT_FIVE = 0.5
+
 const val THREE_FLOAT = 3.0f
 const val ZERO_FLOAT = 0.0f
 const val ZERO_D = 0.0

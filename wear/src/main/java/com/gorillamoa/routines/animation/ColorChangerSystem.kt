@@ -33,7 +33,6 @@ class ColorChangerSystem: IteratingSystem(Family.all(ColorComponent::class.java,
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
 
-
         val changeProperties = entity.getComponent(ColorChangerEffectComponent::class.java)
         entity.getComponent(ColorComponent::class.java)?.apply {
 

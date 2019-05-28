@@ -459,6 +459,16 @@ class TaskWatchService : CanvasWatchFaceService() {
             super.onAmbientModeChanged(inAmbientMode)
             mAmbient = inAmbientMode
 
+            if (!inAmbientMode) {
+
+                livingBackground.comeOutOfAmbient()
+
+            }else{
+
+                livingBackground.goIntoAmbient()
+
+            }
+
             updateWatchHandStyle()
 
             // Check and trigger whether or not timer should be running (only
@@ -603,7 +613,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                     // The user has completed the tap gesture.
 
                     Log.d("$tag onTapCommand","processEntity TAP COMMAND")
-                    livingBackground.toggleTransition()
+
 
                     if (livingBackground.isAlarmEnabled()) {turnOffAlarms()
                     }else{
@@ -675,7 +685,9 @@ class TaskWatchService : CanvasWatchFaceService() {
             //draw our bg
             //TODO CALCULATE THINGS WHILE NOT UPDATING!
 
-            livingBackground.drawBackground(canvas, mAmbient,mLowBitAmbient,mBurnInProtection, bounds, timingObject)
+            if (!mAmbient) {
+                livingBackground.drawBackground(canvas, mAmbient,mLowBitAmbient,mBurnInProtection, bounds, timingObject)
+            }
 
 
 

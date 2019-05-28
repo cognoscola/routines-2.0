@@ -26,5 +26,6 @@ class ColorChangerEffectComponent:Component,Pool.Poolable{
             a = 0.0f
         }
         timeToChangeSecond = 0.0
+        timeElapsed = 0.0
     }
 }

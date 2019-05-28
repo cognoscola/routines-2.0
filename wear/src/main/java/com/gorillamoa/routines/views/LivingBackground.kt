@@ -11,6 +11,7 @@ import android.os.Vibrator
 import com.badlogic.ashley.core.*
 import com.gorillamoa.routines.animation.*
 import com.gorillamoa.routines.utils.*
+import com.gorillamoa.routines.views.LivingBackground.TriangleEntity.Companion.getTriangleToLightUpGiven
 import io.github.jdiemke.triangulation.*
 import kotlin.collections.ArrayList
 
@@ -50,6 +51,9 @@ class LivingBackground {
     private var fadeInSystem:FadeInSystem? = null
     private var renderSystem:RenderSystem? = null
 
+    val edges = ArrayList<EdgeEntity>()
+    val triangleNodes = ArrayList<TriangleEntity>()
+
     private var morphPath = Path().apply {
         fillType = Path.FillType.EVEN_ODD
 
@@ -76,6 +80,29 @@ class LivingBackground {
 
     val vibrationEffect = VibrationEffect.createOneShot(1000, VibrationEffect.DEFAULT_AMPLITUDE)
     lateinit var vibrator: Vibrator
+
+    val fadeInFinishListener = object :EntityListener{
+        override fun entityAdded(entity: Entity?) {
+
+        }
+
+        override fun entityRemoved(entity: Entity?) {
+
+            if (entity is EdgeEntity) {
+                if (!entity.isVisible) {
+                    entity.isVisible = true
+
+                    getTriangleToLightUpGiven(entity)?.let { triangleEntity ->
+                        //light up the triangle
+                        triangleEntity.fadeColorFromAmbient(engine)
+                    }
+                }
+
+                //lets also remove its visibility
+                entity.remove(RenderComponent::class.java)
+            }
+        }
+    }
 
     init {
 
@@ -118,8 +145,35 @@ class LivingBackground {
         isAlarmOn = false
     }
 
-    fun toggleTransition(){
-        fadeInSystem?.toggleTransition()
+    fun comeOutOfAmbient() {
+
+        edges.forEach { edgeEntity ->
+
+            edgeEntity.apply {
+                resetVisibility()
+                add(engine.createComponent(RenderComponent::class.java))
+                add(engine.createComponent(FadeInEffectComponent::class.java).apply {
+                    startDelaySecond = ((Math.min(edgeEntity.itself.a.x, edgeEntity.itself.b.x) / widthD) * POINT_FIVE)
+                    fadeRatePerFrame = FORTY_FIVE_INT
+                })
+            }
+        }
+
+        triangleNodes.forEach {
+            it.resetVisibility()
+        }
+    }
+
+    fun goIntoAmbient(){
+
+        edges.forEach {
+            it.getComponent(AlphaComponent::class.java).alpha = 0
+        }
+
+        triangleNodes.forEach {
+            it.setTriangleColor(Color.WHITE,engine)
+            it.remove(RenderComponent::class.java)
+        }
     }
 
     fun isAlarmEnabled() = isAlarmOn
@@ -295,10 +349,11 @@ class LivingBackground {
 
         scale = width.toFloat() / mBackgroundBitmap.width.toFloat()
 
-        mBackgroundBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap,
+        //TODO enable this for low graphics or battery saver mode
+     /*   mBackgroundBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap,
                 (mBackgroundBitmap.width * scale).toInt(),
                 (mBackgroundBitmap.height * scale).toInt(), true)
-
+*/
         //TODO may delete this
 /*        morphedBitmap = Bitmap.createScaledBitmap(morphedBitmap,
                 (morphedBitmap.width * scale).toInt(),
@@ -316,6 +371,9 @@ class LivingBackground {
             addSystem(FadeOutSystem())
             addSystem(ColorChangerSystem())
             addSystem(renderSystem)
+
+            engine.removeEntityListener(fadeInFinishListener)
+            engine.addEntityListener(Family.one(FadeInEffectComponent::class.java).get(), fadeInFinishListener)
         }
     }
 
@@ -516,8 +574,7 @@ class LivingBackground {
 
         //TODO START OF MORPHED BG
 
-        val edges = ArrayList<EdgeEntity>()
-        val triangleNodes = ArrayList<TriangleEntity>()
+
 //        val edgeNodes = ArrayList<EdgeEntity>()
 
         var noABFound = false
@@ -529,7 +586,12 @@ class LivingBackground {
             //We'll create a triangle node so that we know which edges belong to which triangle
             //This way we can avoid searching for it, and just remember it. saves CPU usage
             // but takes up memory
+
+            //TODO add the other components here as well
             val triEntity = TriangleEntity(triangle)
+            triEntity.add(engine.createComponent(AlphaComponent::class.java).apply {
+                alpha = 255
+            })
 
             //First triangle
             //TODO we can optimize this slightly by using vector notation instead.
@@ -733,57 +795,8 @@ class LivingBackground {
             edgeEntity.add(engine.createComponent(RenderComponent::class.java))
             edgeEntity.add(engine.createComponent(EdgeComponent::class.java))
             edgeEntity.add(engine.createComponent(AlphaComponent::class.java).apply { alpha = ZERO_INT })
-            edgeEntity.add(engine.createComponent(FadeInEffectComponent::class.java).apply {
-                startDelaySecond = ((Math.min(edgeEntity.itself.a.x, edgeEntity.itself.b.x) / widthD) * 0.5)
-                fadeRatePerFrame = FORTY_FIVE_INT
-            })
 
             engine.addEntity(edgeEntity)
-
-            engine.addEntityListener(Family.one(FadeInEffectComponent::class.java).get(), object :EntityListener{
-                override fun entityAdded(entity: Entity?) {
-                }
-
-                override fun entityRemoved(entity: Entity?) {
-
-
-                    if (entity is EdgeEntity) {
-
-                        if (!entity.latch) {
-                            entity.latch = true
-
-                            getTriangleToLightUpGiven(entity)?.let { triangleEntity ->
-                                //light up the triangle
-                                Log.d("$tag processEntity","Light up Triangle")
-                                triangleEntity.add(engine.createComponent(RenderComponent::class.java))
-                                triangleEntity.add(engine.createComponent(AlphaComponent::class.java).apply {
-                                    alpha = 255
-                                })
-
-                                //TODO get target color
-                                startColor.apply {
-                                    r = 255.0f
-                                    g = 255.0f
-                                    b = 255.0f
-                                    a = 255.0f
-                                }
-
-                                getColorCIEBasedOnPosition(widthD.toFloat(),heightD.toFloat(), triangleEntity)
-                                ColorChangerSystem.startChanging(
-                                        startColor,
-                                        final,0.369, triangleEntity,engine)
-
-/*                                triangleEntity.add(engine.createComponent(FadeOutEffectComponent::class.java).apply {
-                                    fadeRatePerFrame = FORTY_FIVE_INT
-                                })*/
-                            }
-                        }
-
-                        //lets also remove its visibility
-                        entity.remove(RenderComponent::class.java)
-                    }
-                }
-            })
         }
 
         triangleNodes.forEach {
@@ -840,6 +853,8 @@ class LivingBackground {
     }
 
 
+
+
     companion object {
         /**
          * This is pre-allocated memory to calculate colors
@@ -852,32 +867,37 @@ class LivingBackground {
         private val bottomRight by lazy { CIEColor(0f,0f,0f,0f) }
         private val startColor by lazy { CIEColor(0f,0f,0f,0f) }
         private val final by lazy { CIEColor(0f,0f,0f,0f) }
+
+
+        fun getColorCIEBasedOnPosition(width:Float, height:Float, triangleEntity: TriangleEntity){
+
+            val y= triangleEntity.getCenterY()
+            val x= triangleEntity.getCenterX()
+
+            topLeft.lerp(bottomLeft, y / height, colorLeft)
+            topRight.lerp(bottomRight, y / height, colorRight)
+            colorLeft.lerp(colorRight, x / width, final)
+        }
+
+        fun getColorBasedOnPosition(x:Float, y:Float, width:Float, height:Float):Int{
+            topLeft.lerp(bottomLeft, y / height, colorLeft)
+            topRight.lerp(bottomRight, y / height, colorRight)
+            colorLeft.lerp(colorRight, x / width, final)
+
+            return Color.argb(final.a.roundToInt(), final.r.roundToInt(), final.g.roundToInt(), final.b.roundToInt())
+        }
     }
 
-    fun getColorCIEBasedOnPosition(width:Float, height:Float, triangleEntity: TriangleEntity){
 
-        val y= triangleEntity.getCenterY()
-        val x= triangleEntity.getCenterX()
 
-        topLeft.lerp(bottomLeft, y / height, colorLeft)
-        topRight.lerp(bottomRight, y / height, colorRight)
-        colorLeft.lerp(colorRight, x / width, final)
-    }
 
-    fun getColorBasedOnPosition(x:Float, y:Float, width:Float, height:Float):Int{
-        topLeft.lerp(bottomLeft, y / height, colorLeft)
-        topRight.lerp(bottomRight, y / height, colorRight)
-        colorLeft.lerp(colorRight, x / width, final)
-
-        return Color.argb(final.a.roundToInt(), final.r.roundToInt(), final.g.roundToInt(), final.b.roundToInt())
-    }
 
     //TODO make sure we remove the properties and make them into components later
     class EdgeEntity(var itself: Edge2D):Entity(){
 
         var parent:TriangleEntity? = null
         var neighbour:TriangleEntity? = null
-        var latch = false
+        var isVisible = false
 
         companion object {
 
@@ -899,82 +919,134 @@ class LivingBackground {
                     }
                 }
             }
+
+            fun getFinishFadeInCallback(engine:Engine) = object :EntityListener{
+                override fun entityAdded(entity: Entity?) {
+                }
+
+                override fun entityRemoved(entity: Entity?) {
+
+                    if (entity is EdgeEntity) {
+                        if (!entity.isVisible) {
+                            entity.isVisible = true
+
+                            getTriangleToLightUpGiven(entity)?.let { triangleEntity ->
+                                //light up the triangle
+                                triangleEntity.fadeColorFromAmbient(engine)
+                            }
+                        }
+
+                        //lets also remove its visibility
+                        entity.remove(RenderComponent::class.java)
+                    }
+                }
+            }
         }
+        fun resetVisibility(){
+            isVisible = false
+        }
+
     }
 
-    class TriangleEntity(val itself:Triangle2D):Entity(){
+    class TriangleEntity(val itself:Triangle2D):Entity() {
 
         var edgeEntityAB: EdgeEntity? = null
         var edgeEntityAC: EdgeEntity? = null
         var edgeEntityBC: EdgeEntity? = null
-        var latch = false
+        var isVisible = false
 
-       companion object {
+        companion object {
 
-           val paint= Paint().apply {
-               color = Color.WHITE
-               style = Paint.Style.FILL
-           }
-           val path = Path()
-           val renderFunction:(Canvas, TriangleEntity)->Any = { canvas, entity ->
-
-               path.reset()
-               path.moveTo(entity.itself.qA().x.toFloat(), entity.itself.qA().y.toFloat())
-               path.lineTo(entity.itself.qB().x.toFloat(), entity.itself.qB().y.toFloat())
-               path.lineTo(entity.itself.qC().x.toFloat(), entity.itself.qC().y.toFloat())
-               path.lineTo(entity.itself.qA().x.toFloat(), entity.itself.qA().y.toFloat())
-
-               paint.color = entity.getComponent(ColorComponent::class.java).color
-
-               canvas.drawPath(path, paint)
-           }
-       }
-
-        fun setTriangleColor(color:Int,engine:Engine){
-
-            val component = getComponent(ColorComponent::class.java)?:engine.createComponent(ColorComponent::class.java).apply {
-                add(this@apply)
+            val paint = Paint().apply {
+                color = Color.WHITE
+                style = Paint.Style.FILL
             }
+            val path = Path()
+            val renderFunction: (Canvas, TriangleEntity) -> Any = { canvas, entity ->
+
+                path.reset()
+                path.moveTo(entity.itself.qA().x.toFloat(), entity.itself.qA().y.toFloat())
+                path.lineTo(entity.itself.qB().x.toFloat(), entity.itself.qB().y.toFloat())
+                path.lineTo(entity.itself.qC().x.toFloat(), entity.itself.qC().y.toFloat())
+                path.lineTo(entity.itself.qA().x.toFloat(), entity.itself.qA().y.toFloat())
+
+                paint.color = entity.getComponent(ColorComponent::class.java).color
+
+                canvas.drawPath(path, paint)
+            }
+
+            //clean move these functions else where
+            fun getTriangleToLightUpGiven(edgeEntity: LivingBackground.EdgeEntity): LivingBackground.TriangleEntity? {
+                //check the edge's neighbours
+                if (shouldLightUp(edgeEntity.neighbour)) {
+                    return edgeEntity.neighbour
+                }
+
+                if (shouldLightUp(edgeEntity.parent)) {
+                    return edgeEntity.parent
+                }
+
+                return null
+            }
+
+            fun isEdgeNodeLit(edgeEntity: LivingBackground.EdgeEntity?): Boolean {
+                return edgeEntity?.isVisible ?: true
+            }
+
+            fun shouldLightUp(triangleNode: LivingBackground.TriangleEntity?): Boolean {
+
+                return triangleNode?.let {
+                    if (!it.isVisible) {
+                        if (isEdgeNodeLit(it.edgeEntityAB) and isEdgeNodeLit(it.edgeEntityAC) and isEdgeNodeLit(it.edgeEntityBC)) {
+                            it.isVisible = true
+                        }
+                    }
+                    it.isVisible
+                } ?: false
+            }
+        }
+
+        fun setTriangleColor(color: Int, engine: Engine) {
+
+            val component = getComponent(ColorComponent::class.java)
+                    ?: engine.createComponent(ColorComponent::class.java).apply {
+                        add(this@apply)
+                    }
             component.color = color
 
         }
 
-        fun getCenterX():Float{
+        fun getCenterX(): Float {
             return (itself.qA().x + itself.qB().x + itself.qC().x).div(THREE_FLOAT).toFloat()
         }
 
-        fun getCenterY():Float{
+        fun getCenterY(): Float {
             return (itself.qA().y + itself.qB().y + itself.qC().y).div(THREE_FLOAT).toFloat()
         }
-    }
 
-    //clean move these functions else where
-    fun getTriangleToLightUpGiven(edgeEntity: LivingBackground.EdgeEntity):LivingBackground.TriangleEntity?{
-        //check the edge's neighbours
-        if (shouldLightUp(edgeEntity.neighbour)) {
-            return edgeEntity.neighbour
-        }
+        fun fadeColorFromAmbient(engine: Engine) {
 
-        if (shouldLightUp(edgeEntity.parent)) {
-            return edgeEntity.parent
-        }
+            add(engine.createComponent(RenderComponent::class.java))
 
-        return null
-    }
-
-    fun isEdgeNodeLit(edgeEntity: LivingBackground.EdgeEntity?):Boolean{
-        return edgeEntity?.latch?:true
-    }
-
-    fun shouldLightUp(triangleNode:LivingBackground.TriangleEntity?):Boolean{
-
-        return triangleNode?.let {
-            if (!it.latch) {
-                if (isEdgeNodeLit(it.edgeEntityAB) and isEdgeNodeLit(it.edgeEntityAC) and isEdgeNodeLit(it.edgeEntityBC)) {
-                    it.latch = true
-                }
+            //TODO get target color
+            startColor.apply {
+                r = 255.0f
+                g = 255.0f
+                b = 255.0f
+                a = 255.0f
             }
-            it.latch
-        }?:false
+
+            getColorCIEBasedOnPosition(widthD.toFloat(), heightD.toFloat(), this)
+            ColorChangerSystem.startChanging(
+                    startColor,
+                    final, 0.369, this, engine)
+        }
+
+        fun resetVisibility(){
+            isVisible = false
+        }
+
     }
+
+
 }

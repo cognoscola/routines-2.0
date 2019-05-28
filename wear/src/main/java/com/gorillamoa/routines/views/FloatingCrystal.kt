@@ -80,14 +80,14 @@ class FloatingCrystal {
      */
     fun draw(canvas: Canvas,angleDegrees: Float,bg:LivingBackground) {
 
-        painter1.color = bg.getColorBasedOnPosition(
+        painter1.color = LivingBackground.getColorBasedOnPosition(
                 CircularTimer.getXFromDegree(angleDegrees + DEGREE_COLOR_SEPERATION, radius + COLOR_DISPLACEMENT, width/2.0f),
                 CircularTimer.getYFromDegree(angleDegrees + DEGREE_COLOR_SEPERATION, radius+ COLOR_DISPLACEMENT, height/2.0f),
                 width.toFloat(),
                 height.toFloat()
         )
 
-        painter2.color = bg.getColorBasedOnPosition(
+        painter2.color = LivingBackground.getColorBasedOnPosition(
                 CircularTimer.getXFromDegree(angleDegrees - DEGREE_COLOR_SEPERATION, radius + COLOR_DISPLACEMENT, width/2.0f),
                 CircularTimer.getYFromDegree(angleDegrees - DEGREE_COLOR_SEPERATION, radius + COLOR_DISPLACEMENT, height/2.0f),
                 width.toFloat(),
