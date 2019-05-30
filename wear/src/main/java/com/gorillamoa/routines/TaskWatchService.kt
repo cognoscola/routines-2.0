@@ -685,11 +685,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             //draw our bg
             //TODO CALCULATE THINGS WHILE NOT UPDATING!
 
-
             livingBackground.drawBackground(canvas, mAmbient, mLowBitAmbient, mBurnInProtection, bounds, timingObject)
-
-
-
 
             if (isTimerEnabled) {
                 timerView.onDraw(canvas, timingObject)
@@ -848,7 +844,10 @@ class TaskWatchService : CanvasWatchFaceService() {
          * should only run in active mode.
          */
         private fun shouldTimerBeRunning(): Boolean {
-            return isVisible && !mAmbient
+
+            return true
+            //TODO CHANGE THIS BACK
+//            return isVisible && !mAmbient
         }
 
         /**

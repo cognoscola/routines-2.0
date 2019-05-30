@@ -174,6 +174,8 @@ class LivingBackground {
 
         triangleNodes.forEach {
             it.resetAnimationLatch()
+            //we'll remove any rendering of the backgrounds until we get an edge signal
+         //   it.remove(RenderComponent::class.java)
         }
     }
 
@@ -188,6 +190,8 @@ class LivingBackground {
         triangleNodes.forEach {
 
             it.resetAnimationLatch()
+            //we'll add the render component again because they should be all showing initially
+            it.add(engine.createComponent(RenderComponent::class.java))
             it.add(engine.createComponent(FadeOutEffectComponent::class.java).apply {
                 startDelaySecond = (( it.getCenterX()/ widthD) * POINT_FIVE)
                 fadeRatePerFrame = FORTY_FIVE_INT
@@ -270,9 +274,9 @@ class LivingBackground {
 
 
         if (mAmbient && (mLowBitAmbient || mBurnInProtection)) {
-            canvas.drawColor(Color.BLACK)
+          //  canvas.drawColor(Color.BLACK)
         } else if (mAmbient) {
-            canvas.drawBitmap(mGrayBackgroundBitmap, 0f, 0f, mBackgroundPaint)
+          //  canvas.drawBitmap(mGrayBackgroundBitmap, 0f, 0f, mBackgroundPaint)
         } else {
 
             //add a smooth transition
@@ -937,27 +941,6 @@ class LivingBackground {
                 }
             }
 
-            fun getFinishFadeInCallback(engine:Engine) = object :EntityListener{
-                override fun entityAdded(entity: Entity?) {
-                }
-
-                override fun entityRemoved(entity: Entity?) {
-
-                    if (entity is EdgeEntity) {
-                        if (!entity.animationLatch) {
-                            entity.animationLatch = true
-
-                            getTriangleToLightUpGiven(entity)?.let { triangleEntity ->
-                                //light up the triangle
-                                triangleEntity.fadeColorFromAmbient(engine)
-                            }
-                        }
-
-                        //lets also remove its visibility
-                        entity.remove(RenderComponent::class.java)
-                    }
-                }
-            }
         }
         fun resetAnimationLatch(){
             animationLatch = false
