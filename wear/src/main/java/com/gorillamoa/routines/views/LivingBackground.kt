@@ -93,6 +93,7 @@ class LivingBackground {
     private var dt = 0L
 
     val vibrationEffect = VibrationEffect.createOneShot(1000, VibrationEffect.DEFAULT_AMPLITUDE)
+
     lateinit var vibrator: Vibrator
 
     val fadeInFinishListener = object :EntityListener{
@@ -350,47 +351,7 @@ class LivingBackground {
           /*  workingCanvas.drawBitmap(mBackgroundBitmap, 0.0f, 0.0f, mMorphPaint)
             canvas.drawBitmap(workingBitmap, 0.0f, 0.0f, mBackgroundPaint)
 
-            canvas.save()
-            canvas.scale(scale, scale)
-
-            if (isAlarmOn) {
-
-
-                if (isAlarmAlphaIncreasing) {
-
-                    currentTimeCounter += dt
-                    if (currentTimeCounter > 1000.0) {
-                        currentTimeCounter = 1000
-                        isAlarmAlphaIncreasing = false
-                    }
-                } else {
-                    currentTimeCounter -= dt
-                    if (currentTimeCounter < 0.0) {
-                        currentTimeCounter = 0
-                        isAlarmAlphaIncreasing = true
-
-                        //sound a vibration
-                        vibrator.vibrate(vibrationEffect)
-                    }
-                }
-                //Log.d("$tag drawBackground","Alpha $currentAlarmAlpha")
-                currentAlarmAlpha = (currentTimeCounter.toFloat().div(TIME2MAX) * MAXALPHA)
-                if (currentAlarmAlpha > 255.0) currentAlarmAlpha = 255f else if (currentAlarmAlpha < 0) {
-                    currentAlarmAlpha = 0f
-                }
-
-                mAlarmPaint.alpha = currentAlarmAlpha.roundToInt()
-
-                //TODO find performance between drawing another image on top and drawing these lines
-                triangleSoup?.forEach {
-
-                    //TODO don't draw duplicate triangles
-                    canvas.drawLine(it.a.x.toFloat(), it.a.y.toFloat(), it.b.x.toFloat(), it.b.y.toFloat(), mAlarmPaint)
-                    canvas.drawLine(it.b.x.toFloat(), it.b.y.toFloat(), it.c.x.toFloat(), it.c.y.toFloat(), mAlarmPaint)
-                    canvas.drawLine(it.c.x.toFloat(), it.c.y.toFloat(), it.a.x.toFloat(), it.a.y.toFloat(), mAlarmPaint)
-                }
-            }
-            canvas.restore()*/
+         */
         }
 
         if ((lastMeasuredTime == 0L) or (dt > 100)) {
@@ -398,10 +359,56 @@ class LivingBackground {
             return
         }
 
+
         canvas.save()
         canvas.scale(scale,scale)
         drawAlarm(canvas,dt.toFloat())
         canvas.restore()
+
+
+        //TODO USE the Engine to show this alarm
+        canvas.save()
+        canvas.scale(scale, scale)
+
+        if (isAlarmOn) {
+
+            if (isAlarmAlphaIncreasing) {
+
+                currentTimeCounter += dt
+                if (currentTimeCounter > 1000.0) {
+                    currentTimeCounter = 1000
+                    isAlarmAlphaIncreasing = false
+                }
+            } else {
+                currentTimeCounter -= dt
+                if (currentTimeCounter < 0.0) {
+                    currentTimeCounter = 0
+                    isAlarmAlphaIncreasing = true
+
+                    //sound a vibration
+                    vibrator.vibrate(vibrationEffect)
+                }
+            }
+            //Log.d("$tag drawBackground","Alpha $currentAlarmAlpha")
+            currentAlarmAlpha = (currentTimeCounter.toFloat().div(TIME2MAX) * MAXALPHA)
+            if (currentAlarmAlpha > 255.0) currentAlarmAlpha = 255f else if (currentAlarmAlpha < 0) {
+                currentAlarmAlpha = 0f
+            }
+
+            mAlarmPaint.alpha = currentAlarmAlpha.roundToInt()
+
+            //TODO find performance between drawing another image on top and drawing these lines
+            triangleSoup?.forEach {
+
+                //TODO don't draw duplicate triangles
+                canvas.drawLine(it.a.x.toFloat(), it.a.y.toFloat(), it.b.x.toFloat(), it.b.y.toFloat(), mAlarmPaint)
+                canvas.drawLine(it.b.x.toFloat(), it.b.y.toFloat(), it.c.x.toFloat(), it.c.y.toFloat(), mAlarmPaint)
+                canvas.drawLine(it.c.x.toFloat(), it.c.y.toFloat(), it.a.x.toFloat(), it.a.y.toFloat(), mAlarmPaint)
+            }
+        }
+        canvas.restore()
+
+
         lastMeasuredTime = SystemClock.uptimeMillis()
     }
 

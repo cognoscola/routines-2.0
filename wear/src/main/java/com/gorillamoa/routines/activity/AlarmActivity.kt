@@ -13,10 +13,13 @@ import kotlinx.android.synthetic.main.empty_activity.*
 class AlarmActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider {
 
     private var mAmbientController: AmbientModeSupport.AmbientController? = null
+    @Suppress("unused")
+    private val tag:String = AlarmActivity::class.java.name
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.empty_activity)
+        Log.d("$tag onCreate","Alarm Activity Started!")
 
 
         //TODO ACQUIRE WAKE LOCK

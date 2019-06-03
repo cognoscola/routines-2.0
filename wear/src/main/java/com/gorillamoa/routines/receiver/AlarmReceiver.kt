@@ -20,6 +20,8 @@ import com.gorillamoa.routines.scheduler.TaskScheduler
  */
 class AlarmReceiver:BroadcastReceiver(){
 
+    @Suppress("unused")
+    private val tag:String = AlarmReceiver::class.java.name
     companion object {
 
         /**
@@ -100,7 +102,10 @@ class AlarmReceiver:BroadcastReceiver(){
                 ACTION_REST -> {
 
 
-                    //TODO ususally if watchface is visible, we'll not show the notification
+                    Log.d("$tag onReceive","Rest Timer Went off")
+
+                    //TODO ususally if watchface is visible, we'll not show the notification, create
+                    //a settings option for  this
 //                    context.notificationShowRest()
 
                     context.saveAlarmRestTriggerStatus(true)

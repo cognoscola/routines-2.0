@@ -70,6 +70,8 @@ private const val HAND_TRAVEL_CIRCLE_RADIUS = 0.85
 
 //TODO ADD a seconds timer
 //TODO add a hour timer
+
+//TODO erase Touchable UI in ambient mode
 class TaskWatchService : CanvasWatchFaceService() {
 
     //TODO create pager like effect (or other animation) when switching tasks
@@ -201,6 +203,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 //we're just going to fire off
                 if (sharedPreferences.getBoolean(key, false)) {
 
+                    Log.d("$tag ","Break Alarm trigger")
                     turnOnScreen()
                     livingBackground.enableAlarm()
                 }else{
@@ -285,6 +288,11 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             isRestAlarmEnabled = isRestAlarmActive()
             isTimerEnabled = isTimerAlarmActive()
+
+            if (isRestAlarmEnabled or isTimerEnabled) {
+                saveAlarmRestTriggerStatus(false)
+                saveAlarmTimerTriggerStatus(false)
+            }
 
             TaskScheduler.getNextUncompletedTask(this@TaskWatchService) { task ->
                 foreground.configureTaskUI(task, this@TaskWatchService)
@@ -376,13 +384,17 @@ class TaskWatchService : CanvasWatchFaceService() {
             //TODO move this to alarm extensions
             applicationContext.getAlarmService().cancel(getTimerPendingIntent())
             isTimerEnabled = false
-            applicationContext.saveAlarmTimerTriggerStatus(false)
 
         }
 
-        private fun disableRestAlarm(){
+        /**
+         * Always disable any trigger when the user has interacted with the app
+         */
+        private fun disableAlarmTriggers(){
+            applicationContext.saveAlarmTimerTriggerStatus(false)
             applicationContext.saveAlarmRestTriggerStatus(false)
         }
+
 
         var currentTask:Task? = null
 
@@ -459,8 +471,10 @@ class TaskWatchService : CanvasWatchFaceService() {
                     }
                 }
 
-                Log.d("$tag initializeFeatures","Next Alarm in $minutesTilAlarm minutes")
-
+                Log.d("$tag initializeFeatures","Next Alarm in 10000 seconds")
+                //TODO ALARM DELETE THIS
+//                Log.d("$tag initializeFeatures","Next Alarm in $minutesTilAlarm minutes")
+                //TODO ALARM DELETE THIS
 
 
                 //TODO MOVE THIS TO alarm extensions
@@ -469,8 +483,11 @@ class TaskWatchService : CanvasWatchFaceService() {
                 manager.setRepeating(
                         AlarmManager.RTC_WAKEUP,
                         //set the alarm to go off on the minutes
-                        System.currentTimeMillis() + (minutesTilAlarm * 60 * 1000) - (mCalendar.get(Calendar.SECOND) * 1000),
-                        breakInterval.toLong() * 60L * 1000L,
+                        //TODO CHANGE BACK
+                        //TODO replace numbers
+                        System.currentTimeMillis() + (10  * 1000), //ring in 10 seconds
+//                        System.currentTimeMillis() + (minutesTilAlarm * 60 * 1000) - (mCalendar.get(Calendar.SECOND) * 1000),
+                        60L  * 1000L,
                         getRestPendingIntent()
                 )
             }
@@ -644,7 +661,6 @@ class TaskWatchService : CanvasWatchFaceService() {
         private fun turnOffAlarms(){
             livingBackground.disableAlarm()
             disableTimer()
-            disableRestAlarm()
         }
 
         /**
@@ -666,6 +682,12 @@ class TaskWatchService : CanvasWatchFaceService() {
 
                     Log.d("$tag onTapCommand","processEntity TAP COMMAND")
 
+                    /**Disable any triggers any time the user interacts with the app
+                    This prevents the app from being stuck in a state where the alarm is never fired
+                    because the setting is always stuck on true, and yet we can't disable it
+                    because the alarm is never firing. So just always disable it when we touch
+                    the screen */
+                    disableAlarmTriggers()
 
                     if (livingBackground.isAlarmEnabled()) {turnOffAlarms()
                     }else{

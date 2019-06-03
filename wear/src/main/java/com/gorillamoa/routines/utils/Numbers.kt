@@ -21,3 +21,5 @@ const val FORTY_FIVE_INT = 45
 const val FIFTY_FIVE_INT = 65
 
 const val ONE_THOUSAND_INT = 1000
+
+const val ONE_MINUTE_LONG = 60L * 1000L
