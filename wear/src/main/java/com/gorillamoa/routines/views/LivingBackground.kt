@@ -20,8 +20,19 @@ private const val WORKING_BITMAP_WIDTH = 200
 private const val widthD = WORKING_BITMAP_WIDTH.toDouble()
 private const val heightD = WORKING_BITMAP_WIDTH.toDouble()
 
+
+private const val NUM_TRIANGLES = 98
+private const val MIN_EDGES = 200
+private const val MAX_EDGES = 300
+private const val MIN_COMPONENTS_PER_ENTITY = 3
+private const val MAX_COMPONENTS_PER_ENTITY = 6
+
 //TODO transition between off and on smoothly (by showing edges etc..)
 //one idea is to place different 3 of 4 different bitmaps with varying alphas and just remove
+
+//TODO OPTIMIZE!
+//TODO SEPERATE LOW POWER MODE FUNCTIONALITY WITH HIGH POWER MODE
+//CLEAN UP
 //them one by one
 class LivingBackground {
 
@@ -47,7 +58,11 @@ class LivingBackground {
     private val bgDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_ATOP)
 
     //FOR animation
-    private var engine= PooledEngine()
+    private var engine= PooledEngine(
+            (NUM_TRIANGLES + MIN_EDGES),
+            (NUM_TRIANGLES+ MAX_EDGES),
+            (NUM_TRIANGLES+ MIN_EDGES)* MIN_COMPONENTS_PER_ENTITY,
+            (NUM_TRIANGLES+ MAX_EDGES)* MAX_COMPONENTS_PER_ENTITY )
     private var fadeInSystem:FadeInSystem? = null
     private var renderSystem:RenderSystem? = null
 
@@ -56,7 +71,6 @@ class LivingBackground {
 
     private var morphPath = Path().apply {
         fillType = Path.FillType.EVEN_ODD
-
     }
 
 //    val lab = ColorSpace.get(ColorSpace.Named.CIE_LAB)
@@ -104,13 +118,13 @@ class LivingBackground {
 
     val fadeOutFinishListener = object :EntityListener{
         override fun entityAdded(entity: Entity?) {
-            Log.d("$tag entityAdded","Added Triangle Entity")
+//            Log.d("$tag entityAdded","Added Triangle Entity")
         }
 
         override fun entityRemoved(entity: Entity) {
 
             if (entity is TriangleEntity) {
-                Log.d("$tag entityRemoved","Removed Triangle Entity from FadeOutSystem")
+//                Log.d("$tag entityRemoved","Removed Triangle Entity from FadeOutSystem")
                 entity.remove(RenderComponent::class.java)
             }
         }
@@ -185,8 +199,9 @@ class LivingBackground {
                 resetAnimationLatch()
                 add(engine.createComponent(RenderComponent::class.java))
                 add(engine.createComponent(FadeInEffectComponent::class.java).apply {
-                    startDelaySecond = ((Math.min(edgeEntity.itself.a.x, edgeEntity.itself.b.x) / widthD) * POINT_FIVE)
-                    fadeRatePerFrame = FORTY_FIVE_INT
+                    startDelaySecond = ((Math.min(edgeEntity.itself.a.x, edgeEntity.itself.b.x) / widthD) * POINT_FOUR)
+//                    fadeRatePerFrame = FORTY_FIVE_INT
+                    fadeRatePerFrame = FIFTY_FIVE_INT
                 })
             }
         }
@@ -276,7 +291,7 @@ class LivingBackground {
     fun drawAlarm(canvas: Canvas,deltaTimeMillis:Float){
 
         renderSystem?.canvas = canvas
-        engine.update(deltaTimeMillis/1000)
+        engine.update(deltaTimeMillis/ONE_THOUSAND_INT)
     }
 
 
@@ -608,7 +623,7 @@ class LivingBackground {
         triangleSoup = try {
             triangulator = DelaunayTriangulator(point2ds)
             triangulator.triangulate()
-            Log.d("$tag generateBackgroundBitmaps","Created ${triangulator.triangles.size}")
+            Log.d("$tag generateBackgroundBitmaps","Created ${triangulator.triangles.size}") //SHOULD BE 98
             triangulator.triangles as ArrayList<Triangle2D>
 
         } catch (e: NotEnoughPointsException) {
@@ -853,6 +868,9 @@ class LivingBackground {
             engine.addEntity(it)
         }
 
+        Log.d("$tag generateBackgroundBitmaps","Edge Nodes: ${edges.size}")
+        Log.d("$tag generateBackgroundBitmaps","Triangle Nodes: ${triangleNodes.size}")
+
         //TODO start of MORPHED BG
         //we have collected our edges to draw, now we must draw the white triangle when All 3 edges are fully at full alpha.
         //generate Morphed background
@@ -897,8 +915,6 @@ class LivingBackground {
 
         //TODO END OF MORPHED
     }
-
-
 
 
     companion object {

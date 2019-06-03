@@ -904,6 +904,7 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             return true
             //TODO CHANGE THIS BACK
+            //TODO ADD A CALLBACK TO LET US KNOW WHEN ANIMATION IS FINISHED!
 //            return isVisible && !mAmbient
         }
 
