@@ -24,6 +24,8 @@ import java.util.*
 import kotlin.math.roundToInt
 import android.content.Intent
 import com.gorillamoa.routines.activity.AlarmActivity
+import android.content.BroadcastReceiver
+
 
 
 /**
@@ -160,6 +162,12 @@ class TaskWatchService : CanvasWatchFaceService() {
         private lateinit var timerView:TimerView
         private var timingObject=CircularTimer()
 
+        //TODO GIVING UP FOR NOW. We'll need this to learn when to reverse the display animation
+        /*val displayManager: DisplayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+        val wakeLock: PowerManager.WakeLock =
+                (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
+                    newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Routines:WatchFaceLockTag")}*/
+
 
         //create a shared preference listener so that we can update the watchface UI when
         //changes to preference variables occur
@@ -224,6 +232,46 @@ class TaskWatchService : CanvasWatchFaceService() {
         }
 
 
+/*
+        val displayListener by lazy {
+            return@lazy object : DisplayManager.DisplayListener {
+                override fun onDisplayAdded(displayId: Int) {
+
+                }
+
+                override fun onDisplayRemoved(displayId: Int) {
+
+                }
+
+                override fun onDisplayChanged(displayId: Int) {
+                    Log.d("$tag onDisplayChanged","Display State:${displayManager.getDisplay(displayId).state}")
+
+                    try {
+                        if (displayManager.getDisplay(displayId).state === Display.STATE_ON) {
+//                            updateFaceDisplay(true)
+                            Log.d("$tag onDisplayChanged","Acquired Lock")
+                            wakeLock.acquire(10000)
+                            Handler().postDelayed({
+
+                                if (wakeLock.isHeld) {
+
+                                    Log.d("$tag onDisplayChanged","Release Lock")
+                                    wakeLock.release()
+                                }else{
+                                    Log.d("$tag onDisplayChanged","Lock not held!")
+                                }
+                            },8000)
+                        } else {
+//                            updateFaceDisplay(false)
+                        }
+                    } catch (exception: NullPointerException) {
+                    }
+
+                }
+            }
+        }
+*/
+
         override fun onCreate(holder: SurfaceHolder) {
             super.onCreate(holder)
 
@@ -252,7 +300,13 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             applicationContext.getLocalSettings().registerOnSharedPreferenceChangeListener(preferenceListener)
 
+
+            /*Log.d("$tag onCreate","TimeOut at${            Settings.System.getInt(contentResolver,
+                    Settings.System.SCREEN_OFF_TIMEOUT)
+            }")*/
+
 //            ClickableRectangle.enableDebug()
+//            displayManager.registerDisplayListener(displayListener, null)
         }
 
         private fun measureFeatures(){
@@ -439,6 +493,8 @@ class TaskWatchService : CanvasWatchFaceService() {
         override fun onDestroy() {
             mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME)
             applicationContext.getLocalSettings().unregisterOnSharedPreferenceChangeListener(preferenceListener)
+            //TODO for later to know when to display the Toward Ambient animation
+//            displayManager.unregisterDisplayListener(displayListener)
             super.onDestroy()
         }
 
@@ -460,13 +516,9 @@ class TaskWatchService : CanvasWatchFaceService() {
             mAmbient = inAmbientMode
 
             if (!inAmbientMode) {
-
                 livingBackground.comeOutOfAmbient()
-
             }else{
-
                 livingBackground.goIntoAmbient()
-
             }
 
             updateWatchHandStyle()
@@ -798,19 +850,24 @@ class TaskWatchService : CanvasWatchFaceService() {
         override fun onVisibilityChanged(visible: Boolean) {
             super.onVisibilityChanged(visible)
 
+            Log.d("$tag onVisibilityChanged","Visible $visible")
             if (visible) {
                 registerReceiver()
                 /* Update time zone in case it changed while we weren't visible. */
                 mCalendar.timeZone = TimeZone.getDefault()
+                livingBackground.comeOutOfAmbient()
                 invalidate()
 
             } else {
                 unregisterReceiver()
+                livingBackground.setPresetstoAmbientMode()
             }
 
             /* Check and trigger whether or not timer should be running (only in active mode). */
             updateTimer()
         }
+
+
 
         private fun registerReceiver() {
             if (mRegisteredTimeZoneReceiver) {
@@ -864,6 +921,8 @@ class TaskWatchService : CanvasWatchFaceService() {
                 mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs)
             }
         }
+
+
     }
 }
 

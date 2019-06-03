@@ -18,6 +18,9 @@ class AlarmActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProv
         super.onCreate(savedInstanceState)
         setContentView(R.layout.empty_activity)
 
+
+        //TODO ACQUIRE WAKE LOCK
+
         /* Show a success toast*/
         /* Vibrate shortly */
         // Turn on the screen

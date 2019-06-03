@@ -157,6 +157,24 @@ class LivingBackground {
         isAlarmOn = false
     }
 
+    /**
+     * Immediately sets all visible items to a state as if they were in Ambient mode.
+     * I.e. all edges and triangles should be invisible
+     */
+    fun setPresetstoAmbientMode(){
+
+        edges.forEach {
+            it.resetAnimationLatch()
+            it.remove(RenderComponent::class.java)
+        }
+
+        triangleNodes.forEach {
+
+            it.resetAnimationLatch()
+            it.remove(RenderComponent::class.java)
+        }
+    }
+
     fun comeOutOfAmbient() {
 
         Log.d("$tag comeOutOfAmbient","Out of ambient")
