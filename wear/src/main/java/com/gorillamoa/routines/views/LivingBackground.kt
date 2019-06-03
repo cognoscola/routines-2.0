@@ -29,9 +29,9 @@ class LivingBackground {
     private val tag: String = LivingBackground::class.java.name
 
     private lateinit var mAlarmPaint: Paint
-    private lateinit var mBackgroundBitmap: Bitmap
-    private lateinit var morphedBitmap: Bitmap
-    private lateinit var mGrayBackgroundBitmap: Bitmap
+//    private lateinit var mBackgroundBitmap: Bitmap
+//    private lateinit var morphedBitmap: Bitmap
+//    private lateinit var mGrayBackgroundBitmap: Bitmap
 
     private lateinit var workingBitmap: Bitmap
     private lateinit var workingCanvas: Canvas
@@ -166,6 +166,7 @@ class LivingBackground {
         edges.forEach {
             it.resetAnimationLatch()
             it.remove(RenderComponent::class.java)
+            it.getComponent(AlphaComponent::class.java).alpha = 0
         }
 
         triangleNodes.forEach {
@@ -255,16 +256,19 @@ class LivingBackground {
         generateBackgroundBitmaps()
 
         /* Extracts colors from background image to improve watchface style. */
+        //Not using palette now since no bitmap
+/*
         Palette.from(mBackgroundBitmap).generate {
             it?.apply {
                 palette = it
                 paletteCallback?.invoke(it)
             }
         }.get()
+*/
 
     }
 
-    fun getPalette() = palette
+//    fun getPalette() = palette
 
     /**
      * delta time is in seconds!
@@ -388,7 +392,8 @@ class LivingBackground {
 
     fun scaleBackground(width: Int, height: Int) {
 
-        scale = width.toFloat() / mBackgroundBitmap.width.toFloat()
+        scale = width.toFloat() / widthD.toFloat()
+//        scale = width.toFloat() / mBackgroundBitmap.width.toFloat()
 
         //TODO enable this for low graphics or battery saver mode
      /*   mBackgroundBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap,
@@ -400,8 +405,9 @@ class LivingBackground {
                 (morphedBitmap.width * scale).toInt(),
                 (morphedBitmap.height * scale).toInt(), true)*/
 
-        workingBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        workingCanvas = Canvas(workingBitmap)
+
+//        workingBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+//        workingCanvas = Canvas(workingBitmap)
 
 
         //prepare ashley
@@ -421,6 +427,7 @@ class LivingBackground {
     /* Check whether segment P0P1 intersects with triangle t0t1t2 */
 
     fun initGrayBackgroundBitmap() {
+/*
         mGrayBackgroundBitmap = Bitmap.createBitmap(
                 mBackgroundBitmap.width,
                 mBackgroundBitmap.height,
@@ -432,6 +439,7 @@ class LivingBackground {
         val filter = ColorMatrixColorFilter(colorMatrix)
         grayPaint.colorFilter = filter
         canvas.drawBitmap(mBackgroundBitmap, 0f, 0f, grayPaint)
+*/
     }
 
 /*
@@ -600,10 +608,11 @@ class LivingBackground {
         triangleSoup = try {
             triangulator = DelaunayTriangulator(point2ds)
             triangulator.triangulate()
+            Log.d("$tag generateBackgroundBitmaps","Created ${triangulator.triangles.size}")
             triangulator.triangles as ArrayList<Triangle2D>
 
         } catch (e: NotEnoughPointsException) {
-            Log.d("$tag generateBackgroundBitmaps", "Woops Triangulation")
+            Log.d("$tag generateBackgroundBitmaps", "Triangulation Error")
             null
         }
 
@@ -611,12 +620,10 @@ class LivingBackground {
             return
         }
 
-        mBackgroundBitmap = generateBitmapFromTriangles(widthD, heightD, triangleSoup!!)
+        //TODO IF using LOW_BATTERY MODE
+//        mBackgroundBitmap = generateBitmapFromTriangles(widthD, heightD, triangleSoup!!)
 
-        //TODO START OF MORPHED BG
 
-
-//        val edgeNodes = ArrayList<EdgeEntity>()
 
         var noABFound = false
         var noACFound = false
@@ -846,15 +853,13 @@ class LivingBackground {
             engine.addEntity(it)
         }
 
-
+        //TODO start of MORPHED BG
         //we have collected our edges to draw, now we must draw the white triangle when All 3 edges are fully at full alpha.
         //generate Morphed background
         //if image is square, height = with, so
         //radius = % * width /2
 
-        //100 - 15 / 100 =
-
-        //TODO start of MORPHED BG
+        //100 - 15 / 100
 /*
         val radius = (WORKING_BITMAP_WIDTH.div(2.0) - 15.0).toFloat()
         //now find all the triangles that intersect with this circle, we do this by dividing the circle into tangents

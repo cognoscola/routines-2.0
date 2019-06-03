@@ -542,14 +542,14 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             } else {
 
-                mHourPaint.color = livingBackground.getPalette().getLightVibrantColor(Color.WHITE)
-                mTickAndCirclePaint.color = livingBackground.getPalette().getLightVibrantColor(Color.WHITE)
+//                mHourPaint.color = livingBackground.getPalette().getLightVibrantColor(Color.WHITE)
+//                mTickAndCirclePaint.color = livingBackground.getPalette().getLightVibrantColor(Color.WHITE)
 
 
                 mHourPaint.isAntiAlias = true
                 mTickAndCirclePaint.isAntiAlias = true
 
-                val mWatchHandShadowColor = livingBackground.getPalette().getDarkMutedColor(Color.BLACK)
+//                val mWatchHandShadowColor = livingBackground.getPalette().getDarkMutedColor(Color.BLACK)
 
                 mHourPaint.setShadowLayer(
                         SHADOW_RADIUS, 0f, 0f, mWatchHandShadowColor)
