@@ -3,6 +3,7 @@ package com.gorillamoa.routines.activity
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.WindowManager
 import androidx.fragment.app.FragmentActivity
 import androidx.wear.ambient.AmbientModeSupport
@@ -21,7 +22,6 @@ class AlarmActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProv
         setContentView(R.layout.empty_activity)
         Log.d("$tag onCreate","Alarm Activity Started!")
 
-
         //TODO ACQUIRE WAKE LOCK
 
         /* Show a success toast*/
@@ -33,6 +33,7 @@ class AlarmActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProv
             window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         }
 
+        //prevent the app from being touched?
         window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 
@@ -40,16 +41,32 @@ class AlarmActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProv
         window.setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
                 WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
         mAmbientController = AmbientModeSupport.attach(this)
         mAmbientController!!.setAmbientOffloadEnabled(true)
 
         //TODO create a LOW-POWER ALARM TYPE AS WELL
 
+        background?.setOnTouchListener { view, motionEvent ->
+
+            if (motionEvent.action == MotionEvent.ACTION_UP) {
+                mAmbientController!!.setAmbientOffloadEnabled(false)
+                window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                finish()
+                true
+            }else{
+                false
+            }
+        }
         background?.setOnClickListener {
+            Log.d("$tag onCreate","Background Clicked!")
             mAmbientController!!.setAmbientOffloadEnabled(false)
+            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             finish()
         }
     }
+
 
     override fun getAmbientCallback(): AmbientModeSupport.AmbientCallback {
         return AlarmAmbientCallback()
@@ -61,12 +78,19 @@ class AlarmActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProv
     }
 
     override fun onDestroy() {
-
         super.onDestroy()
     }
 
     override fun onResume() {
         super.onResume()
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+
+        Log.d("$tag onTouchEvent","Captured Touch Event")
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        finish()
+        return super.onTouchEvent(event)
     }
 
     class AlarmAmbientCallback : AmbientModeSupport.AmbientCallback() {

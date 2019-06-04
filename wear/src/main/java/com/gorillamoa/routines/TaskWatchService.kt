@@ -16,7 +16,6 @@ import com.gorillamoa.routines.receiver.AlarmReceiver
 import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_REST
 import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_TIMER
 import com.gorillamoa.routines.scheduler.TaskScheduler
-import com.gorillamoa.routines.utils.CircularTimer
 import com.gorillamoa.routines.views.*
 
 import java.lang.ref.WeakReference
@@ -25,7 +24,7 @@ import kotlin.math.roundToInt
 import android.content.Intent
 import com.gorillamoa.routines.activity.AlarmActivity
 import android.content.BroadcastReceiver
-
+import com.gorillamoa.routines.utils.*
 
 
 /**
@@ -44,8 +43,6 @@ private const val MSG_UPDATE_TIME = 0
 private const val HOUR_STROKE_WIDTH = 5f
 private const val MINUTE_STROKE_WIDTH = 3f
 private const val SECOND_TICK_STROKE_WIDTH = 2f
-
-
 private const val SHADOW_RADIUS = 6f
 
 private const val CENTER_AREA_RADIUS = 0.7
@@ -183,7 +180,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 }
             }
 
-            //TODO ADD A REST ALARM TRIGGER RESPONSE TO THE BREAKS
+            //TODO ADD A REST ALARM TRIGGER RESPONSE TO THE BREAKS (DIFFERENT FROM TIMER)
 
             if (key == isTimerAlarmTriggered) {
 
@@ -318,7 +315,7 @@ class TaskWatchService : CanvasWatchFaceService() {
         }
 
         private fun measureFeatures(){
-            timerView = TimerView(mCenterX.toInt(),mCenterY.toInt(),mCenterX.toInt() - 30)
+            timerView = TimerView(mCenterX.toInt(),mCenterY.toInt(),mCenterX.toInt() - THIRTY_INT)
         }
 
 
@@ -336,7 +333,7 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             else{
                 //activate in 18 minutes from now (it takes about 2 minutes to recognize the activity)
-                (mCalendar.get(Calendar.MINUTE) + 18).rem(60)
+                (mCalendar.get(Calendar.MINUTE) + 18).rem(SIXTY_INT)
             }
 
             initializeFeatures(selectedMinute)
@@ -361,10 +358,10 @@ class TaskWatchService : CanvasWatchFaceService() {
                     if (selectedMinute > currentMinute) {
                 selectedMinute - currentMinute
             }else{
-                (60 - currentMinute) + selectedMinute
+                (SIXTY_INT - currentMinute) + selectedMinute
             }
 
-            val timeToTrigger = System.currentTimeMillis() + (minutes * 60 * 1000)
+            val timeToTrigger = System.currentTimeMillis() + (minutes * ONE_MINUTE_MILLIS_LONG)
             timingObject.setSelectedMinute(System.currentTimeMillis(), timeToTrigger)
 
 
@@ -410,7 +407,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 isAntiAlias = true
                 strokeCap = Paint.Cap.ROUND
                 setShadowLayer(
-                        SHADOW_RADIUS, 0f, 0f, mWatchHandShadowColor)
+                        SHADOW_RADIUS, ZERO_FLOAT, ZERO_FLOAT, mWatchHandShadowColor)
             }
 
             mTickAndCirclePaint = Paint().apply {
@@ -419,7 +416,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 isAntiAlias = true
                 style = Paint.Style.STROKE
                 setShadowLayer(
-                        SHADOW_RADIUS, 0f, 0f, mWatchHandShadowColor)
+                        SHADOW_RADIUS, ZERO_FLOAT, ZERO_FLOAT, mWatchHandShadowColor)
             }
 
             //clean up
@@ -429,21 +426,21 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             if (isRestAlarmEnabled) {
 
-                mSelectedMinuteDegree = minute.times(6f)
+                mSelectedMinuteDegree = minute.times(SIX_FLOAT)
 
                 //todo figure out # of lines to on given arbitrary minutes
                 //60 minutes divided by this interval
-                lines = 60 / breakInterval
-                breakIntervalDegree = 6 * breakInterval.toFloat()
+                lines = SIXTY_INT / breakInterval
+                breakIntervalDegree = SIX_INT * breakInterval.toFloat()
 
                 //Lets find out what our Alarm Intervals are
 
                 val intervals= ArrayList<Int>()
                 intervals.add(minute)
 
-                for (i in 1..(lines - 1)) {
+                for (i in ONE_INT..(lines - ONE_INT)) {
                     //TODO add more indicators
-                    intervals.add((minute + i*breakInterval).rem(60))
+                    intervals.add((minute + i*breakInterval).rem(SIXTY_INT))
                 }
 
                 Log.d("initializeFeatures","Intervals: ${intervals.joinToString(",")}")
@@ -455,15 +452,15 @@ class TaskWatchService : CanvasWatchFaceService() {
                 //else alarm should go off at the lowest of (Intervali - current) that is possible
 
                 //current minutes
-                var minutesTilAlarm = 60
+                var minutesTilAlarm = SIXTY_INT
                 val cMinutes = mCalendar.get(Calendar.MINUTE)
-                if (cMinutes >= intervals.max()?:0) {
-                    minutesTilAlarm = (intervals.min()?:0) + (60 - cMinutes)
+                if (cMinutes >= intervals.max()?: ZERO_INT) {
+                    minutesTilAlarm = (intervals.min()?: ZERO_INT) + (SIXTY_INT - cMinutes)
                 }
                 else {
                     intervals.forEach {
                         val tdiff = it - cMinutes
-                        if (tdiff > 0) {
+                        if (tdiff > ZERO_INT) {
                             if(tdiff < minutesTilAlarm) {
                                 minutesTilAlarm = tdiff
                             }
@@ -471,23 +468,15 @@ class TaskWatchService : CanvasWatchFaceService() {
                     }
                 }
 
-                Log.d("$tag initializeFeatures","Next Alarm in 10000 seconds")
-                //TODO ALARM DELETE THIS
-//                Log.d("$tag initializeFeatures","Next Alarm in $minutesTilAlarm minutes")
-                //TODO ALARM DELETE THIS
-
+                Log.d("$tag initializeFeatures","Next Alarm in $minutesTilAlarm minutes")
 
                 //TODO MOVE THIS TO alarm extensions
                 //clean CLEAR The allocation of memory
                 val manager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
                 manager.setRepeating(
                         AlarmManager.RTC_WAKEUP,
-                        //set the alarm to go off on the minutes
-                        //TODO CHANGE BACK
-                        //TODO replace numbers
-                        System.currentTimeMillis() + (10  * 1000), //ring in 10 seconds
-//                        System.currentTimeMillis() + (minutesTilAlarm * 60 * 1000) - (mCalendar.get(Calendar.SECOND) * 1000),
-                        60L  * 1000L,
+                        System.currentTimeMillis() + (minutesTilAlarm * ONE_MINUTE_MILLIS_LONG) - (mCalendar.get(Calendar.SECOND) * ONE_THOUSAND_INT),
+                        breakInterval * ONE_MINUTE_MILLIS_LONG,
                         getRestPendingIntent()
                 )
             }
@@ -496,14 +485,14 @@ class TaskWatchService : CanvasWatchFaceService() {
         private fun getTimerPendingIntent():PendingIntent{
             return Intent(this@TaskWatchService, AlarmReceiver::class.java).let {
                 it.action = ACTION_TIMER
-                PendingIntent.getBroadcast(this@TaskWatchService, 0, it,PendingIntent.FLAG_UPDATE_CURRENT)
+                PendingIntent.getBroadcast(this@TaskWatchService, ZERO_INT, it,PendingIntent.FLAG_UPDATE_CURRENT)
             }
         }
 
         private fun getRestPendingIntent():PendingIntent{
             return Intent(this@TaskWatchService, AlarmReceiver::class.java).let {
                 it.action = ACTION_REST
-                PendingIntent.getBroadcast(this@TaskWatchService, 0, it,PendingIntent.FLAG_UPDATE_CURRENT)
+                PendingIntent.getBroadcast(this@TaskWatchService, ZERO_INT, it,PendingIntent.FLAG_UPDATE_CURRENT)
             }
         }
 
@@ -749,8 +738,8 @@ class TaskWatchService : CanvasWatchFaceService() {
 
             //measure some things , aka second
             //TODO remove this and switch to minutes
-            seconds = mCalendar.get(Calendar.SECOND) + mCalendar.get(Calendar.MILLISECOND) / 1000f
-            secondsRotationDegrees = seconds * 6f
+            seconds = mCalendar.get(Calendar.SECOND) + mCalendar.get(Calendar.MILLISECOND) / ONE_THOUSAND_FLOAT
+            secondsRotationDegrees = seconds * SIX_FLOAT
 
 
             timingObject.calculateAngles(mCalendar)
@@ -803,7 +792,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 //calculate the X, Y position of the indicated triangle so we can find out the correct colod
                 breakIndicator.draw(canvas,currentDegree,livingBackground)
                 //now we rotate break interval amount
-                for (i in 1..(lines - 1)) {
+                for (i in ONE_INT..(lines - ONE_INT)) {
                     canvas.rotate(breakIntervalDegree , mCenterX,mCenterY)
                     currentDegree +=breakIntervalDegree
                     breakIndicator.draw(canvas,currentDegree,livingBackground)
@@ -835,11 +824,9 @@ class TaskWatchService : CanvasWatchFaceService() {
              * These calculations reflect the rotation in degrees per unit of time, e.g.,
              * 360 / 60 = 6 and 360 / 12 = 30.
              */
-
-
-            val minutesRotation = mCalendar.get(Calendar.MINUTE) * 6f
-            val hourHandOffset = mCalendar.get(Calendar.MINUTE) / 2f
-            val hoursRotation = mCalendar.get(Calendar.HOUR) * 30 + hourHandOffset
+            val minutesRotation = mCalendar.get(Calendar.MINUTE) * SIX_FLOAT
+            val hourHandOffset = mCalendar.get(Calendar.MINUTE) / TWO_FLOAT
+            val hoursRotation = mCalendar.get(Calendar.HOUR) * THIRTY_INT + hourHandOffset
 
             /*
              * Save the canvas state before we can begin to rotate it.
@@ -858,7 +845,6 @@ class TaskWatchService : CanvasWatchFaceService() {
              * Ensure the "seconds" hand is drawn only when we are in interactive mode.
              * Otherwise, we only update the watch face once a minutes.
              */
-
 
             if (!mAmbient) {
                 canvas.rotate(secondsRotationDegrees - minutesRotation, mCenterX, mCenterY)

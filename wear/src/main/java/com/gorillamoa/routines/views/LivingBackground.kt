@@ -365,7 +365,6 @@ class LivingBackground {
         drawAlarm(canvas,dt.toFloat())
         canvas.restore()
 
-
         //TODO USE the Engine to show this alarm
         canvas.save()
         canvas.scale(scale, scale)
@@ -1059,7 +1058,6 @@ class LivingBackground {
                         add(this@apply)
                     }
             component.color = color
-
         }
 
         fun getCenterX(): Float {
