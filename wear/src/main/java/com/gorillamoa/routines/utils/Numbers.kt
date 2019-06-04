@@ -2,6 +2,7 @@ package com.gorillamoa.routines.utils
 
 const val ZERO_FLOAT = 0.0f
 const val ZERO_INT = 0
+const val ZERO_D = 0.0
 
 const val ONE_INT = 1
 const val ONE_FLOAT = 1.0f
