@@ -9,7 +9,6 @@ import android.os.Build
 import com.gorillamoa.routines.extensions.NOTIFICATION_CHANNEL_ONE
 import com.gorillamoa.routines.provider.TaskProvider
 
-
 /**
  * We'll configure notification channels every time the app starts
  */
@@ -46,6 +45,7 @@ class App:Application(){
     }
 
     //TODO Create options menu
+
     //TODO In options menu create Notifications Behaviour sections
     //TODO Dismiss behaviour - cannot dismiss, finish task, do nothing, snooze
     //TODO Get statistic to see what people choose best.
@@ -88,8 +88,12 @@ class App:Application(){
 
     //TODO add fancier looking arm
 
-
     //later CREATE A BUG CHART
+
+    //FUTURE FEATURES:
+    //TODO TRACK TIME SPENT ON A TASK
+
+
 }
 
 fun Context.getTaskPRovider():TaskProvider{

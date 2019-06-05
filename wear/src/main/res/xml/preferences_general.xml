@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <PreferenceCategory
+        app:title="Notifications">
+
+        <SwitchPreferenceCompat
+            app:key="pref_notifications"
+            app:title="Enable Notifications"
+            app:layout="@layout/switch_custom"
+            />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="Appearance">
+
+        <SwitchPreferenceCompat
+            app:key="pref_graphics_low"
+            app:title="Use Battery Friendly Graphics"
+            app:layout="@layout/switch_custom"
+            />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="help_category"
+        app:title="Help">
+
+        <Preference
+            app:key="feedback"
+            app:summary="Report technical issues or suggest new features"
+            app:title="Send feedback"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -10,15 +10,16 @@
     tools:context=".activity.SettingsActivity"
     tools:deviceIds="wear"
     tools:background="#9A4AEB"
-    app:layout_box="all">
+    app:layout_box="all"
+   >
 
-    <!--<TextView
-        app:boxedEdges="all"
+    <FrameLayout
+        app:boxedEdges="top|bottom"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:text="A siupe rlong text that doesn't seem to be boxed in.."
-        android:visibility="gone"
-        />-->
+        android:id="@+id/fragmentContainer">
+
+    </FrameLayout>
 
 
 </androidx.wear.widget.BoxInsetLayout>

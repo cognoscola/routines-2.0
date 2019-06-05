@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Routines</string>
     <string name="onboard_app_name">Routines OnBoard</string>
+    <string name="app_settings_name">Routines Settings</string>
 
 
     <!-- Receiver names -->

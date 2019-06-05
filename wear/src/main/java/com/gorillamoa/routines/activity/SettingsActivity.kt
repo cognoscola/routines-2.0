@@ -1,15 +1,18 @@
 package com.gorillamoa.routines.activity
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+
 import androidx.fragment.app.FragmentActivity
 import com.gorillamoa.routines.R
-import com.gorillamoa.routines.fragment.TimePickerFragment
+import com.gorillamoa.routines.fragment.GeneralSettingsFragment
 
 
 //TODO change this to a general activity full of options
+//TODO CREATE SETTINGS BUTTON IN THE MAIN ACTIVITY
+//TODO CREATE SETTINGS Activity launcher in app launcher
+//todo create settings activity launcher from the watchface settings
+
 class SettingsActivity:FragmentActivity(){
 
      override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,6 +21,11 @@ class SettingsActivity:FragmentActivity(){
          setContentView(R.layout.activity_settings)
          setResult(Activity.RESULT_CANCELED)
 
+         supportFragmentManager.beginTransaction()
+                 .add(R.id.fragmentContainer, GeneralSettingsFragment())
+                 .commit()
+
+/*
          supportFragmentManager.beginTransaction()
                  .add(R.id.fragmentContainerInsetLayout,TimePickerFragment().apply {
 
@@ -36,6 +44,7 @@ class SettingsActivity:FragmentActivity(){
                      }
                  })
                  .commit()
+*/
     }
 
 }
