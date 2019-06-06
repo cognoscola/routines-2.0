@@ -1,12 +1,20 @@
 package com.gorillamoa.routines.fragment
 
 import android.os.Bundle
-import androidx.preference.PreferenceFragmentCompat
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.gorillamoa.routines.R
 
-class GeneralSettingsFragment: PreferenceFragmentCompat(){
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.preferences_general, rootKey)
+class GeneralSettingsFragment: Fragment(){
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.preference_general,container,false)
     }
 }

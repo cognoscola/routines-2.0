@@ -30,6 +30,8 @@ private const val MAX_COMPONENTS_PER_ENTITY = 6
 //TODO transition between off and on smoothly (by showing edges etc..)
 //one idea is to place different 3 of 4 different bitmaps with varying alphas and just remove
 
+//TODO make the edges be same color as DARK color chosen
+
 //TODO OPTIMIZE!
 //TODO SEPERATE LOW POWER MODE FUNCTIONALITY WITH HIGH POWER MODE
 //CLEAN UP

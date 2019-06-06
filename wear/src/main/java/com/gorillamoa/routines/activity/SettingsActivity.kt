@@ -2,8 +2,8 @@ package com.gorillamoa.routines.activity
 
 import android.app.Activity
 import android.os.Bundle
-
 import androidx.fragment.app.FragmentActivity
+
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.fragment.GeneralSettingsFragment
 
@@ -13,7 +13,7 @@ import com.gorillamoa.routines.fragment.GeneralSettingsFragment
 //TODO CREATE SETTINGS Activity launcher in app launcher
 //todo create settings activity launcher from the watchface settings
 
-class SettingsActivity:FragmentActivity(){
+class SettingsActivity: FragmentActivity(){
 
      override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

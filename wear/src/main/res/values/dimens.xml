@@ -21,4 +21,8 @@
     <dimen name="add_buttons_height">58dp</dimen>
     <dimen name="picker_button_stroke_radius_addtask">40dp</dimen>
 
+    <!-- preferences -->
+    <dimen name="pref_padding_start">20dp</dimen>
+    <dimen name="pref_padding_end">5dp</dimen>
+
 </resources>

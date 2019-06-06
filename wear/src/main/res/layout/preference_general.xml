@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/pref_padding_start"
+        android:paddingEnd="@dimen/pref_padding_end"
+        android:textColor="@color/pref_category_text_color"
+        android:text="@string/pref_notification_category"/>
+
+    <com.gorillamoa.routines.views.SwitchPreference
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/pref_padding_start"
+        android:paddingEnd="@dimen/pref_padding_end"
+        android:text="@string/pref_show_notification_description"
+        app:key ="pref_show_notifications"/>
+
+</LinearLayout>

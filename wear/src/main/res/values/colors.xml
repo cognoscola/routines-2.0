@@ -3,4 +3,6 @@
 
     <color name="picker_stroke">#AAAAAA</color>
     <color name="picker_press_fill">#888888</color>
+
+    <color name="pref_category_text_color">#2196F3</color>
 </resources>
