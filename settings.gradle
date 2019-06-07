@@ -1,1 +1,1 @@
-include ':mobile', ':wear', ':delauney-triangulator'
+include ':mobile', ':wear', ':delauney-triangulator', ':core'

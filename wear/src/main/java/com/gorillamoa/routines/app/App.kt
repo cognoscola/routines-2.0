@@ -46,7 +46,7 @@ class App:Application(){
 
     //TODO Create options menu
     //TODO automatically show notifications if the user doesn't have watchface on.
-
+    //TODO give option to show permanent or dismiss notification
 
     //TODO ADD options to select notifications or other methods durin oboard method
     //TODO While onboarding, show triangles slowly come together after each steps of the process
