@@ -12,6 +12,8 @@ import com.gorillamoa.routines.fragment.GeneralSettingsFragment
 //TODO CREATE SETTINGS BUTTON IN THE MAIN ACTIVITY
 //TODO CREATE SETTINGS Activity launcher in app launcher
 //todo create settings activity launcher from the watchface settings
+//TODO create color picker
+//TODO create help/feedback section
 
 class SettingsActivity: FragmentActivity(){
 

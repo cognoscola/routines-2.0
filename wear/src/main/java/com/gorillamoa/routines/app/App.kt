@@ -45,6 +45,11 @@ class App:Application(){
     }
 
     //TODO Create options menu
+    //TODO automatically show notifications if the user doesn't have watchface on.
+
+
+    //TODO ADD options to select notifications or other methods durin oboard method
+    //TODO While onboarding, show triangles slowly come together after each steps of the process
 
     //TODO In options menu create Notifications Behaviour sections
     //TODO Dismiss behaviour - cannot dismiss, finish task, do nothing, snooze
@@ -63,7 +68,7 @@ class App:Application(){
     //TODO ADD LIST OF UNKNOWN TASKS - no deadline, so it probably wasn't important
     //TODO the system should generate a list of tasks, for these goals and habits depending on frequency specified
     //TODO and deadline, tasks closer to deadline should appear more frequently.
-    //TODO Add feature so that we LIMIT a task
+    //TODO Add feature so that we LIMIT a task's time
 
     //TODO since you can't use custom UIs on notifications, try image generation.
     //make seamless backgrounds, text, etc. through image generation.
@@ -74,19 +79,15 @@ class App:Application(){
 
     //TODO I finished a task but I am unable to check it off because notification is not there! It is showing a different task!
 
-    //TODO MAKE ABILITY TO SHOW TASK AND BROWSE ON WATCHFACE
 
     //TODO clear task notifications sometime between Sleep and Wake Notifications
 
-    //TODO add progress bar around the circumference of the app
+    //TODO add days' progress bar around the circumference of the app
 
     //TODO DATA TRACKING AND LOGGING for insight (habit building)
 
     //TODO Alarm must turn on screen
 
-    //TODO Add motion of features
-
-    //TODO add fancier looking arm
 
     //later CREATE A BUG CHART
 
@@ -96,6 +97,10 @@ class App:Application(){
 
     //FUTURE FEATURES:
     //TODO TRACK TIME SPENT ON A TASK
+
+    //TODO PORT TO ANDROID
+
+    //DEBUG - ADD DEBUG CLOCKING, so we can TEST
 
 
 }
