@@ -6,7 +6,7 @@ import android.util.Log
 import android.widget.Switch
 import com.gorillamoa.routines.R
 
-import com.gorillamoa.routines.extensions.getLocalSettings
+import com.gorillamoa.routines.core.extensions.getLocalSettings
 
 class SwitchPreference: Switch {
 

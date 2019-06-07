@@ -128,29 +128,29 @@
         </activity>
 
         <receiver
-            android:name=".receiver.SimpleBootReceiver"
+            android:name=".core.receiver.SimpleBootReceiver"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".receiver.TimeChangedReceiver">
+        <receiver android:name=".core.receiver.TimeChangedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".receiver.AlarmReceiver"
+            android:name=".core.receiver.AlarmReceiver"
             android:exported="false" />
         <receiver
-            android:name=".receiver.NotificationDismissReceiver"
+            android:name=".core.receiver.NotificationDismissReceiver"
             android:exported="false" />
         <receiver
-            android:name=".receiver.TaskActionReceiver"
+            android:name=".core.receiver.TaskActionReceiver"
             android:exported="false" />
 
-        <receiver android:name=".receiver.ActivityReceiver"
+        <receiver android:name=".core.receiver.ActivityReceiver"
             android:exported="false"/>
     </application>
 

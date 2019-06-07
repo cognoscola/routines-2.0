@@ -8,7 +8,7 @@ import android.view.WindowManager
 import androidx.fragment.app.FragmentActivity
 import androidx.wear.ambient.AmbientModeSupport
 import com.gorillamoa.routines.R
-import com.gorillamoa.routines.extensions.saveAlarmTimerTriggerStatus
+import com.gorillamoa.routines.core.extensions.saveAlarmTimerTriggerStatus
 import kotlinx.android.synthetic.main.empty_activity.*
 
 class AlarmActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider {

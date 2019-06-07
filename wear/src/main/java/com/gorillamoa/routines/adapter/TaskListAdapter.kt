@@ -13,7 +13,8 @@ import android.widget.TextView
 
 import androidx.recyclerview.widget.RecyclerView
 import com.gorillamoa.routines.R
-import com.gorillamoa.routines.data.Task
+import com.gorillamoa.routines.core.data.Task
+
 import java.util.*
 import kotlin.collections.ArrayList
 

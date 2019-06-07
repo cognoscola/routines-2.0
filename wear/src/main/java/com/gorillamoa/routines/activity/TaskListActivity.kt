@@ -13,12 +13,12 @@ import androidx.wear.widget.WearableLinearLayoutManager
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.adapter.DrawerAdapter
 import com.gorillamoa.routines.adapter.TaskListAdapter
-import com.gorillamoa.routines.data.Task
-import com.gorillamoa.routines.data.TaskType
-import com.gorillamoa.routines.data.TypeConverters
-import com.gorillamoa.routines.extensions.*
-import com.gorillamoa.routines.scheduler.TaskScheduler
-import com.gorillamoa.routines.viewmodel.TaskViewModel
+import com.gorillamoa.routines.core.data.Task
+import com.gorillamoa.routines.core.data.TaskType
+import com.gorillamoa.routines.core.data.TypeConverters
+import com.gorillamoa.routines.core.extensions.*
+
+import com.gorillamoa.routines.core.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_task_list.*
 import java.lang.Exception
 
@@ -35,6 +35,7 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
     private var isCreating = false
 
     private val preferenceListener= SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+
 
         if (key == getTaskListKey()) {
             (taskListWearableRecyclerView?.adapter as TaskListAdapter).updateRemainingList(getDayTaskList())
@@ -54,6 +55,7 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
         taskViewModel = ViewModelProviders.of(this@TaskListActivity).get(TaskViewModel::class.java)
         taskViewModel.loadTasks()
         taskViewModel.tasks.observe(this, Observer {
+
 
 
             //TODO fetch only scheduled tasks!!
@@ -89,17 +91,17 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
 
                         //TODO REMOVE THE NOTIFICATION IF IT EXISTS
                         if (isDone) {
-                            TaskScheduler.completeTask(context, tid)
+                            com.gorillamoa.routines.core.scheduler.TaskScheduler.completeTask(context, tid)
                         } else {
-                            TaskScheduler.uncompleteTask(context, tid)
+                            com.gorillamoa.routines.core.scheduler.TaskScheduler.uncompleteTask(context, tid)
                         }
                     },
                     scheduledCallback = { id, isScheduled ->
 
                         if (isScheduled) {
-                            TaskScheduler.scheduleTask(this@TaskListActivity,id)
+                            com.gorillamoa.routines.core.scheduler.TaskScheduler.scheduleTask(this@TaskListActivity,id)
                         }else{
-                            TaskScheduler.unscheduleTask(this@TaskListActivity,id)
+                            com.gorillamoa.routines.core.scheduler.TaskScheduler.unscheduleTask(this@TaskListActivity,id)
                         }
                     },
 
@@ -154,7 +156,7 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
 
                 isCreating = true
                 data?.apply {
-                    val type:TaskType = TypeConverters().IntToType(getIntExtra("type", 0))!!
+                    val type: TaskType = TypeConverters().IntToType(getIntExtra("type", 0))!!
                     taskViewModel.insertAndReturnList(
                             Task(
                                     name = getStringExtra("name"),

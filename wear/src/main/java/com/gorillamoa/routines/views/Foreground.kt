@@ -8,8 +8,8 @@ import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import com.gorillamoa.routines.R
-import com.gorillamoa.routines.data.Task
-import com.gorillamoa.routines.scheduler.TaskScheduler
+import com.gorillamoa.routines.core.data.Task
+import com.gorillamoa.routines.core.scheduler.TaskScheduler
 import java.lang.StringBuilder
 import java.util.*
 
@@ -138,7 +138,7 @@ class Foreground{
 
     }
 
-    fun configureTaskUI(task: Task?,context:Context){
+    fun configureTaskUI(task: Task?, context:Context){
 
         //create new text for the task name
         task?.apply {
@@ -154,7 +154,7 @@ class Foreground{
             staticLayout = sb.build()
 
             //make sure our complete button shows the correct status
-            if (TaskScheduler.isComplete(context, task.id ?: -1)) {
+            if (com.gorillamoa.routines.core.scheduler.TaskScheduler.isComplete(context, task.id ?: -1)) {
                 centerButton?.setState(COMPLETE)
             }else centerButton?.setState(INCOMPLETE)
 

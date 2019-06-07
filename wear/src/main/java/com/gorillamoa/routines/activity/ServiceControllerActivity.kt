@@ -10,13 +10,11 @@ import android.util.Log
 import androidx.lifecycle.Observer
 
 import com.gorillamoa.routines.R
-import com.gorillamoa.routines.data.Task
-import com.gorillamoa.routines.extensions.*
+import com.gorillamoa.routines.core.data.Task
+import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.fragment.TimePickerFragment
-import com.gorillamoa.routines.scheduler.TaskScheduler
-import com.gorillamoa.routines.viewmodel.TaskViewModel
+import com.gorillamoa.routines.core.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_service_controller.*
-import java.lang.StringBuilder
 import java.util.*
 
 
@@ -56,9 +54,12 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
         taskViewModel.loadTasks()
         taskViewModel.tasks.observe(this, Observer {
 
+            //TODO UNCOMMENT PORT
+/*
             notificationShowWakeUp(
                     StringBuilder().stringifyTasks(it),
                     createNotificationMainIntentForWakeUp())
+*/
         })
 
         /**get the view model object */
@@ -119,7 +120,7 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
         //clean truncate notificationShowTask function
         taskNotificationButton?.setOnClickListener {
-            TaskScheduler.getNextUncompletedTask(this) { task ->
+            com.gorillamoa.routines.core.scheduler.TaskScheduler.getNextUncompletedTask(this) { task ->
                 task?.let {
                     notificationShowTask(it)
                 }
@@ -127,19 +128,22 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
         }
 
         wakeUpButton?.setOnClickListener {
-            TaskScheduler.schedule(this){ taskString ->
+            com.gorillamoa.routines.core.scheduler.TaskScheduler.schedule(this){ taskString ->
 
+                //TODO UNCOMMENT PORT
+/*
                 notificationShowWakeUp(
                         taskString,
                          createNotificationMainIntentForWakeUp(),
                          createNotificationDeleteIntentForWakeUp()
                 )
+*/
             }
         }
 
         sleepButton?.setOnClickListener {
             notificationShowSleep()
-            TaskScheduler.endDay(this)
+            com.gorillamoa.routines.core.scheduler.TaskScheduler.endDay(this)
         }
 
 

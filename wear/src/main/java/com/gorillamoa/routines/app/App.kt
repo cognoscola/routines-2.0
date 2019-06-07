@@ -6,23 +6,14 @@ import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
-import com.gorillamoa.routines.extensions.NOTIFICATION_CHANNEL_ONE
-import com.gorillamoa.routines.provider.TaskProvider
+import com.gorillamoa.routines.core.extensions.NOTIFICATION_CHANNEL_ONE
+
 
 /**
  * We'll configure notification channels every time the app starts
  */
 class App:Application(){
 
-    //TODO use dagger to inject a Provider
-    var taskProvider:TaskProvider?= null
-
-    fun getTasksProvider():TaskProvider{
-        if (taskProvider == null) {
-            taskProvider = TaskProvider()
-        }
-        return taskProvider!!
-    }
 
     override fun onCreate() {
         super.onCreate()
@@ -103,8 +94,4 @@ class App:Application(){
     //DEBUG - ADD DEBUG CLOCKING, so we can TEST
 
 
-}
-
-fun Context.getTaskPRovider():TaskProvider{
-    return (applicationContext as App).getTasksProvider()
 }

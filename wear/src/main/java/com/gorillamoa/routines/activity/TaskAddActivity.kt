@@ -7,8 +7,8 @@ import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.wear.widget.BoxInsetLayout
 import com.gorillamoa.routines.R
-import com.gorillamoa.routines.data.TaskType
-import com.gorillamoa.routines.data.TypeConverters
+import com.gorillamoa.routines.core.data.TaskType
+import com.gorillamoa.routines.core.data.TypeConverters
 import com.gorillamoa.routines.fragment.DatePickerFragment
 import com.gorillamoa.routines.fragment.FrequencyPickerFragment
 import com.gorillamoa.routines.fragment.NamePickerFragment
@@ -23,7 +23,7 @@ class TaskAddActivity : FragmentActivity() {
 
     //TODO if its the first time opening this, explain show a fragment explaining what the symbols mean
 
-    lateinit var type:TaskType
+    lateinit var type: TaskType
     lateinit var name:String
     var frequency:Float = 1.0f
     private var isDateSet = false
@@ -128,8 +128,9 @@ class TaskAddActivity : FragmentActivity() {
 
         setResult(Activity.RESULT_OK, Intent().apply {
 
-            putExtra("name",name)
-            putExtra("type",TypeConverters().TypeToInt(this@TaskAddActivity.type))
+            putExtra("name",name
+            )
+            putExtra("type", TypeConverters().TypeToInt(this@TaskAddActivity.type))
             putExtra("frequency",frequency)
             putExtra("date", if(isDateSet)this@TaskAddActivity.date.timeInMillis else 0L)
 

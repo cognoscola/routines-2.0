@@ -10,12 +10,10 @@ import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
 import android.util.Log
 import android.view.SurfaceHolder
-import com.gorillamoa.routines.data.Task
-import com.gorillamoa.routines.extensions.*
-import com.gorillamoa.routines.receiver.AlarmReceiver
-import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_REST
-import com.gorillamoa.routines.receiver.AlarmReceiver.Companion.ACTION_TIMER
-import com.gorillamoa.routines.scheduler.TaskScheduler
+import com.gorillamoa.routines.core.data.Task
+
+import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.ACTION_REST
+import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.ACTION_TIMER
 import com.gorillamoa.routines.views.*
 
 import java.lang.ref.WeakReference
@@ -24,6 +22,8 @@ import kotlin.math.roundToInt
 import android.content.Intent
 import com.gorillamoa.routines.activity.AlarmActivity
 import android.content.BroadcastReceiver
+import com.gorillamoa.routines.core.extensions.*
+
 import com.gorillamoa.routines.utils.*
 
 
@@ -196,7 +196,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 }
             }
 
-            if (key == isBreakAlarmTriggered) {
+            if (key == com.gorillamoa.routines.core.extensions.isBreakAlarmTriggered) {
 
                 //we're just going to fire off
                 if (sharedPreferences.getBoolean(key, false)) {
@@ -292,7 +292,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 saveAlarmTimerTriggerStatus(false)
             }
 
-            TaskScheduler.getNextUncompletedTask(this@TaskWatchService) { task ->
+            com.gorillamoa.routines.core.scheduler.TaskScheduler.getNextUncompletedTask(this@TaskWatchService) { task ->
                 foreground.configureTaskUI(task, this@TaskWatchService)
                 invalidate()
             }
@@ -484,14 +484,14 @@ class TaskWatchService : CanvasWatchFaceService() {
         }
 
         private fun getTimerPendingIntent():PendingIntent{
-            return Intent(this@TaskWatchService, AlarmReceiver::class.java).let {
+            return Intent(this@TaskWatchService, com.gorillamoa.routines.core.receiver.AlarmReceiver::class.java).let {
                 it.action = ACTION_TIMER
                 PendingIntent.getBroadcast(this@TaskWatchService, ZERO_INT, it,PendingIntent.FLAG_UPDATE_CURRENT)
             }
         }
 
         private fun getRestPendingIntent():PendingIntent{
-            return Intent(this@TaskWatchService, AlarmReceiver::class.java).let {
+            return Intent(this@TaskWatchService, com.gorillamoa.routines.core.receiver.AlarmReceiver::class.java).let {
                 it.action = ACTION_REST
                 PendingIntent.getBroadcast(this@TaskWatchService, ZERO_INT, it,PendingIntent.FLAG_UPDATE_CURRENT)
             }
@@ -620,7 +620,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             foreground.measureTouchables(this@TaskWatchService, width, height,
                     stateButtonCallback = { invalidate() },
                     leftButtonCallback = {
-                        TaskScheduler.getPreviousOrderedTask(this@TaskWatchService, currentTask?.id
+                        com.gorillamoa.routines.core.scheduler.TaskScheduler.getPreviousOrderedTask(this@TaskWatchService, currentTask?.id
                                 ?: 0) {
                             foreground.configureTaskUI(it,this@TaskWatchService)
                             currentTask = it
@@ -628,7 +628,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                         }
                     },
                     rightButtonCallback = {
-                        TaskScheduler.getNextOrderedTask(this@TaskWatchService, currentTask?.id
+                        com.gorillamoa.routines.core.scheduler.TaskScheduler.getNextOrderedTask(this@TaskWatchService, currentTask?.id
                                 ?: 0) {
                             foreground.configureTaskUI(it, this@TaskWatchService)
                             currentTask = it
@@ -637,9 +637,9 @@ class TaskWatchService : CanvasWatchFaceService() {
                     },
                     centerButtonCallback = { isComplete ->
                         if (isComplete) {
-                            TaskScheduler.completeTask(this@TaskWatchService,currentTask?.id?:-1)}
+                            com.gorillamoa.routines.core.scheduler.TaskScheduler.completeTask(this@TaskWatchService,currentTask?.id?:-1)}
                         else{
-                            TaskScheduler.uncompleteTask(this@TaskWatchService, currentTask?.id?:-1)
+                            com.gorillamoa.routines.core.scheduler.TaskScheduler.uncompleteTask(this@TaskWatchService, currentTask?.id?:-1)
                         }
                         invalidate()}
             )

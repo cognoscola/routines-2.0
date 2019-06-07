@@ -5,9 +5,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import com.gorillamoa.routines.R
-import com.gorillamoa.routines.extensions.alarmSetRepeatWithCal
-import com.gorillamoa.routines.extensions.broadcastShowWakeUpTest
-import com.gorillamoa.routines.extensions.setWakeTimeToCalendarAndStore
+import com.gorillamoa.routines.core.extensions.alarmSetRepeatWithCal
+import com.gorillamoa.routines.core.extensions.broadcastShowWakeUpTest
+import com.gorillamoa.routines.core.extensions.setWakeTimeToCalendarAndStore
 import com.gorillamoa.routines.fragment.InformationFragment
 import com.gorillamoa.routines.fragment.SplashFragment
 import com.gorillamoa.routines.fragment.TimePickerFragment

@@ -7,9 +7,9 @@ import android.support.wearable.activity.WearableActivity
 import android.util.Log
 import com.google.android.gms.location.*
 import com.gorillamoa.routines.R
-import com.gorillamoa.routines.extensions.isRecognitionOn
-import com.gorillamoa.routines.extensions.saveRecognitionStatus
-import com.gorillamoa.routines.receiver.ActivityReceiver
+import com.gorillamoa.routines.core.extensions.isRecognitionOn
+import com.gorillamoa.routines.core.extensions.saveRecognitionStatus
+import com.gorillamoa.routines.core.receiver.ActivityReceiver
 import kotlinx.android.synthetic.main.activity_recognition.*
 
 class RecognitionActivity : WearableActivity() {
@@ -35,7 +35,7 @@ class RecognitionActivity : WearableActivity() {
     }
 
     private fun getRecognitionPendingIntent():PendingIntent{
-        return Intent(this@RecognitionActivity,ActivityReceiver::class.java).let {
+        return Intent(this@RecognitionActivity, com.gorillamoa.routines.core.receiver.ActivityReceiver::class.java).let {
             PendingIntent.getBroadcast(this@RecognitionActivity,0,it,PendingIntent.FLAG_UPDATE_CURRENT)
         }
     }
