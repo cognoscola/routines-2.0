@@ -23,6 +23,12 @@ import androidx.core.content.ContextCompat.startActivity
 
 public const val TASK_ID ="TaskId"
 
+/**
+ * The user is coming from a notification. This notification is a wake-up attempt from
+ * the onboard process.
+ */
+const val ACTION_TEST_WAKE_UP="N0"
+
 //TODO COMMENT THIS PAGE
 
 
@@ -61,13 +67,22 @@ fun Context.createAlarmIntent():Intent{
  * creates the notification's main intent (when the notification is clicked)
  * such that we are directed to the onboard
  */
-fun Context.createNotificationMainIntentForOnboarding():PendingIntent?{
+fun Context.createNotificationMainIntentForOnboarding(startingActivityName: String):PendingIntent?{
 
-    return null
     //TODO ACCEPT STRING INTENT AND DON"T RETURN NULL
-//    val mainIntent = Intent(this, OnboardActivity::class.java)
-//    mainIntent.action = OnboardActivity.ACTION_TEST_WAKE_UP
-//    return PendingIntent.getActivity(this, 0, mainIntent, PendingIntent.FLAG_ONE_SHOT)
+
+    return try {
+        val c = Class.forName(startingActivityName)
+        val intent = Intent(this, c)
+        intent.action = ACTION_TEST_WAKE_UP
+        PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
+    } catch (ignored: ClassNotFoundException) {
+        Log.e("Unknown Activity Name",ignored.message)
+        null
+    }
+
+
+
 
 }
 

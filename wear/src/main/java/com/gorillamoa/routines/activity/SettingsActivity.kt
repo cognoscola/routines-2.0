@@ -15,6 +15,8 @@ import com.gorillamoa.routines.fragment.GeneralSettingsFragment
 //TODO create color picker
 //TODO create help/feedback section
 
+//TODO CREATE STUBBORN OPTION (makes notifications more annoying and not dismissable)
+
 class SettingsActivity: FragmentActivity(){
 
      override fun onCreate(savedInstanceState: Bundle?) {

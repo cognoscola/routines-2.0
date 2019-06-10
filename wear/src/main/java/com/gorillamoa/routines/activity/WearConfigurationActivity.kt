@@ -104,6 +104,10 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
             }
         }
 
+        /**
+         * Here we should what would happen when we receive a
+         * broadcast with the WAKE UP COMMANDß
+         */
         wakeNotificationButton?.setOnClickListener {
             broadcastShowWakeUp()
         }
@@ -122,13 +126,19 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
             }
         }
 
+        /**
+         * Here we show a sample of what should happen when we want to wake up.
+         * There is no broadcasting happening
+         */
         wakeUpButton?.setOnClickListener {
             com.gorillamoa.routines.core.scheduler.TaskScheduler.schedule(this){ taskString ->
 
+                Log.d("$tag onCreate","Wake Up Scheduler Call back")
                 notificationShowWakeUp(
                         taskString,
-                         createNotificationMainIntentForWakeUp(OnboardActivity::class.java.name),
-                         createNotificationDeleteIntentForWakeUp()
+                         createNotificationMainIntentForWakeUp(WearConfigurationActivity::class.java.name),
+                         createNotificationDeleteIntentForWakeUp(),
+                        false
                 )
             }
         }

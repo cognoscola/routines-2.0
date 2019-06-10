@@ -39,23 +39,30 @@ const val NOTIFICATION_TAG = "routines"
  */
 fun Context.notificationShowWakeUp(tasks:String,
                                    mainPendingIntent: PendingIntent?,
-                                   dismissPendingIntent:PendingIntent? = null){
+                                   dismissPendingIntent:PendingIntent? = null,
+                                   dismissable:Boolean = true) {
 
-        //TODO ENSURE 1.0+ compatibility, right now it only works on 2.0
+    //TODO ENSURE 1.0+ compatibility, right now it only works on 2.0
 
-        val manager = getNotificationManager()
-        val mainBuilder = getBuilder()
+    val manager = getNotificationManager()
+    val mainBuilder = getBuilder()
 
-        mainBuilder.setStyle(prepareBigTextStyle(tasks,"Today's tasks &#128170;"))
-        mainBuilder.setContentIntent(mainPendingIntent)
+    mainBuilder.setStyle(prepareBigTextStyle(tasks, "Today's tasks &#128170;"))
+    mainBuilder.setContentIntent(mainPendingIntent)
 
-        //TODO make the dismiss action optional
-        dismissPendingIntent?.let { mainBuilder.setDeleteIntent(it) }
+    if (!dismissable) {
 
-        manager.notify(
-                NOTIFICATION_TAG,
-                WAKE_UP_NOTIFICATION_ID,
-                mainBuilder.build())
+        mainBuilder.setAutoCancel(false)
+        mainBuilder.setOngoing(true)
+    }
+
+    //TODO make the dismiss action optional
+    dismissPendingIntent?.let { mainBuilder.setDeleteIntent(it) }
+
+    manager.notify(
+            NOTIFICATION_TAG,
+            WAKE_UP_NOTIFICATION_ID,
+            mainBuilder.build())
 
 }
 

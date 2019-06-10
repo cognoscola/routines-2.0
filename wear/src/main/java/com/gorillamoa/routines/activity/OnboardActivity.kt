@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import com.gorillamoa.routines.R
+import com.gorillamoa.routines.core.extensions.ACTION_TEST_WAKE_UP
 import com.gorillamoa.routines.core.extensions.alarmSetRepeatWithCal
 import com.gorillamoa.routines.core.extensions.broadcastShowWakeUpTest
 import com.gorillamoa.routines.core.extensions.setWakeTimeToCalendarAndStore
@@ -52,11 +53,7 @@ class OnboardActivity:FragmentActivity(){
     private var state:OnboardState = OnboardState.Other
 
     companion object {
-        /**
-         * The user is coming from a notification. This notification is a wake-up attempt from
-         * the onboard process.
-         */
-        const val ACTION_TEST_WAKE_UP="N0"
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

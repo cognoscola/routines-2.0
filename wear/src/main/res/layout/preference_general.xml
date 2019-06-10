@@ -22,7 +22,6 @@
         android:paddingBottom="@dimen/pref_item_vertical_padding"
         android:layout_width="match_parent"
         android:layout_height="@dimen/pref_height"
-
         android:text="@string/pref_show_notification_description"
         app:key ="pref_show_notifications"
         />

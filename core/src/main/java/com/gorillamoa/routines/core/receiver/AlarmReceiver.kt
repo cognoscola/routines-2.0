@@ -72,10 +72,13 @@ class AlarmReceiver:BroadcastReceiver(){
                 ACTION_ONBOARD ->{
                     Log.d("onReceive", "ACTION_ONBOARD")
 
-                    //TODO UNCOMMENT
-/*                    context.notificationShowWakeUp(StringBuilder().apply {
+
+                    context.notificationShowWakeUp(StringBuilder().apply {
                         addTaskLine("Plant Seed", "0/1") }.toString()
-                    ,context.createNotificationMainIntentForOnboarding())*/
+                    ,context.createNotificationMainIntentForOnboarding(
+                            //TODO LAUNCH VIA INTENT FILTER NAME instead of class name
+                            "com.gorillamoa.routines.activity.OnboardActivity"
+                    ))
                 }
 
                 ACTION_DEFAULT -> {
@@ -84,14 +87,14 @@ class AlarmReceiver:BroadcastReceiver(){
 
                     TaskScheduler.schedule(context){ taskString ->
 
-                        //TODO UNCOMMENT
-/*
+                        //TODO USE INTENT FILTER NAME
                         context.notificationShowWakeUp(
                                 taskString,
-                                context.createNotificationMainIntentForWakeUp(),
+                                context.createNotificationMainIntentForWakeUp(
+                                        "com.gorillamoa.routines.activity.TaskViewActivity"
+                                ),
                                 context.createNotificationDeleteIntentForWakeUp()
                         )
-*/
                     }
                 }
 
