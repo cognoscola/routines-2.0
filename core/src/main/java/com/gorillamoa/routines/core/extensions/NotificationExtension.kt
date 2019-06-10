@@ -4,9 +4,11 @@ import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
-import android.graphics.drawable.Icon
+import android.os.Build
 import android.text.Html
+import android.text.Spanned
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import com.gorillamoa.routines.core.R
 
 import com.gorillamoa.routines.core.data.Task
@@ -36,14 +38,15 @@ const val NOTIFICATION_TAG = "routines"
  * @param dismissPendingIntent is what happens when the user dismisses
  */
 fun Context.notificationShowWakeUp(tasks:String,
-                                   mainPendingIntent: PendingIntent,
+                                   mainPendingIntent: PendingIntent?,
                                    dismissPendingIntent:PendingIntent? = null){
 
         //TODO ENSURE 1.0+ compatibility, right now it only works on 2.0
 
         val manager = getNotificationManager()
         val mainBuilder = getBuilder()
-        mainBuilder.style =prepareBigTextStyle(tasks,"Today's tasks &#128170;")
+
+        mainBuilder.setStyle(prepareBigTextStyle(tasks,"Today's tasks &#128170;"))
         mainBuilder.setContentIntent(mainPendingIntent)
 
         //TODO make the dismiss action optional
@@ -71,6 +74,7 @@ fun Context.notificationShowTask(task: Task,
 
         Log.d("schedule","Showing Notification id: ${task.id}")
 
+
         addTaskAction(this@notificationShowTask,"Done      ", ACTION_DONE,task.id!!)
         addTaskAction(this@notificationShowTask,"Delay     ", ACTION_SKIP_SHORT,task.id!!)
         addTaskAction(this@notificationShowTask,"Skip Today", ACTION_SKIP_TODAY,task.id!!)
@@ -83,15 +87,14 @@ fun Context.notificationShowTask(task: Task,
     }
 }
 
-fun Notification.Builder.addTaskAction(context: Context,actionText:String, action:String,tid:Int){
+fun NotificationCompat.Builder.addTaskAction(context: Context,actionText:String, action:String,tid:Int){
 
-
-    //TODO UNCOMMENT
-    /*addAction(Notification.Action.Builder(
-            Icon.createWithResource(context , R.mipmap.ic_launcher),
+    addAction(NotificationCompat.Action.Builder(
+            R.mipmap.ic_launcher,
+//            Icon.createWithResource(context , R.mipmap.ic_launcher),
             actionText,
             context.createNotificationActionPendingIntent(tid,action)
-    ).build())*/
+    ).build())
 }
 //TODO ADD common functionality to remove notifications!
 //TODO when switching between tasks, make notification priority low so it doesn't show up all the time
@@ -102,7 +105,7 @@ fun Context.notificationShowTimer(){
 
     getBuilder().apply {
 
-        setContentTitle(Html.fromHtml("Times up!", Html.FROM_HTML_MODE_COMPACT))
+        setContentTitle(getHtml("Times up!"))
         setAutoCancel(true)
         setCategory(Notification.CATEGORY_REMINDER)
 
@@ -122,7 +125,7 @@ fun Context.notificationShowRest(){
 
     getBuilder().apply {
 
-        setContentTitle(Html.fromHtml("Rest!", Html.FROM_HTML_MODE_COMPACT))
+        setContentTitle(getHtml("Rest!"))
 //                setContentTitle(Html.fromHtml("All done! &#127769", Html.FROM_HTML_MODE_COMPACT))
 
         val calendar = Calendar.getInstance()
@@ -147,7 +150,7 @@ fun Context.notificationShowActivity(activity:String, int:Int){
 
     getBuilder().apply {
 
-        setContentTitle(Html.fromHtml("$activity! $int", Html.FROM_HTML_MODE_COMPACT))
+        setContentTitle(getHtml("$activity! $int"))
 //                setContentTitle(Html.fromHtml("All done! &#127769", Html.FROM_HTML_MODE_COMPACT))
 
         val calendar = Calendar.getInstance()
@@ -178,7 +181,7 @@ fun Context.notificationShowSleep(){
                 //TODO launch with alarm OR with task completion
 
                 //TODO change text depending on above condition
-                setContentTitle(Html.fromHtml("All done! &#127881", Html.FROM_HTML_MODE_COMPACT))
+                setContentTitle(getHtml("All done! &#127881"))
 //                setContentTitle(Html.fromHtml("All done! &#127769", Html.FROM_HTML_MODE_COMPACT))
                 //TODO change text depending on above conditions
                 setContentText("See Today's Accomplishments ")
@@ -188,7 +191,7 @@ fun Context.notificationShowSleep(){
                 val uncompleted = getDayTaskList()
                 val total = completed.size + uncompleted.size
 
-                style =prepareBigTextStyle("$completed/$total Tasks Completed!","Results:")
+                setStyle(prepareBigTextStyle("$completed/$total Tasks Completed!","Results:"))
                 setAutoCancel(true)
                 setCategory(Notification.CATEGORY_SOCIAL)
 //                setDeleteIntent(dimissPendingIntent)
@@ -206,29 +209,36 @@ fun Context.notificationShowSleep(){
 
 
 
-fun Context.prepareBigTextStyle(tasks:String,title:String):Notification.BigTextStyle{
-        return Notification.BigTextStyle()
-         .setBigContentTitle(Html.fromHtml(title, Html.FROM_HTML_MODE_COMPACT))
-         .bigText(Html.fromHtml(tasks, Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST))
+fun prepareBigTextStyle(tasks:String,title:String):NotificationCompat.BigTextStyle{
+        return NotificationCompat.BigTextStyle()
+         .setBigContentTitle(getHtml(title))
+         .bigText(getHtml(tasks))
 }
 
-fun Context.getBuilder():Notification.Builder{
+fun Context.getBuilder():NotificationCompat.Builder{
 
-
-    return Notification.Builder(this, NOTIFICATION_CHANNEL_ONE)
 
     //TODO UNCOMMENTAND DELETE ABOVE
-/*
-        return Notification.Builder(this,NOTIFICATION_CHANNEL_ONE)
+        return NotificationCompat.Builder(this,NOTIFICATION_CHANNEL_ONE)
 
                 //TODO show weather in one icon in the notification title
-                .setContentTitle(Html.fromHtml("Good morning! &#127780", Html.FROM_HTML_MODE_COMPACT))
-                .setSmallIcon(com.gorillamoa.routines.R.mipmap.ic_launcher)
+                .setContentTitle(getHtml("Good morning! &#127780"))
+                .setSmallIcon(com.gorillamoa.routines.core.R.mipmap.ic_launcher)
                 .setContentText("See today's schedule")
                 .setAutoCancel(true)
                 .setCategory(Notification.CATEGORY_REMINDER)
-*/
 //                                .setDeleteIntent(dismissPendingIntent)
+}
+
+fun getHtml(htmlString:String): Spanned {
+    //24 and above
+    if(Build.VERSION.SDK_INT > Build.VERSION_CODES.N){
+        return Html.fromHtml(htmlString,Html.FROM_HTML_MODE_COMPACT)
+    }
+    //below
+    else{
+        return Html.fromHtml(htmlString)
+    }
 }
 
 /**

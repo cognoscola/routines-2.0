@@ -2,7 +2,6 @@ package com.gorillamoa.routines.activity
 
 import android.app.Activity
 import android.content.Intent
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import androidx.wear.ambient.AmbientModeSupport
@@ -24,10 +23,10 @@ import java.util.*
  * ViewModelProvider only supports these types of activities.
  * Note also that we must use  LiveData from android.arch.livecycle and NOT androidx
  */
-class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider {
+class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider {
 
     @Suppress("unused")
-    private val tag = ServiceControllerActivity::class.java.name
+    private val tag = WearConfigurationActivity::class.java.name
 
     private lateinit var taskViewModel: TaskViewModel
 
@@ -48,18 +47,14 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_service_controller)
 
-        mAmbientController = AmbientModeSupport.attach(this@ServiceControllerActivity)
+        mAmbientController = AmbientModeSupport.attach(this@WearConfigurationActivity)
 
-        taskViewModel = ViewModelProviders.of(this@ServiceControllerActivity).get(TaskViewModel::class.java)
-        taskViewModel.loadTasks()
+        taskViewModel = connectAndLoadViewModel()
         taskViewModel.tasks.observe(this, Observer {
 
-            //TODO UNCOMMENT PORT
-/*
             notificationShowWakeUp(
                     StringBuilder().stringifyTasks(it),
-                    createNotificationMainIntentForWakeUp())
-*/
+                    createNotificationMainIntentForWakeup(WearConfigurationActivity::class.java.name))
         })
 
         /**get the view model object */
@@ -130,14 +125,11 @@ class ServiceControllerActivity : FragmentActivity(), AmbientModeSupport.Ambient
         wakeUpButton?.setOnClickListener {
             com.gorillamoa.routines.core.scheduler.TaskScheduler.schedule(this){ taskString ->
 
-                //TODO UNCOMMENT PORT
-/*
                 notificationShowWakeUp(
                         taskString,
-                         createNotificationMainIntentForWakeUp(),
+                         createNotificationMainIntentForWakeUp(OnboardActivity::class.java.name),
                          createNotificationDeleteIntentForWakeUp()
                 )
-*/
             }
         }
 

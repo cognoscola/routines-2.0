@@ -1,8 +1,10 @@
 package com.gorillamoa.routines.core.extensions
 
 import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 
 import com.gorillamoa.routines.core.receiver.AlarmReceiver
 import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.ACTION_DEFAULT
@@ -11,6 +13,9 @@ import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.SLEEP_INTEN
 import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.WAKE_UP_INTENT_CODE
 import com.gorillamoa.routines.core.receiver.NotificationDismissReceiver
 import com.gorillamoa.routines.core.receiver.TaskActionReceiver
+import androidx.core.content.ContextCompat.startActivity
+
+
 
 /**
  * A place to store all the Intent and PendingIntent extensions
@@ -58,9 +63,7 @@ fun Context.createAlarmIntent():Intent{
  */
 fun Context.createNotificationMainIntentForOnboarding():PendingIntent?{
 
-
     return null
-
     //TODO ACCEPT STRING INTENT AND DON"T RETURN NULL
 //    val mainIntent = Intent(this, OnboardActivity::class.java)
 //    mainIntent.action = OnboardActivity.ACTION_TEST_WAKE_UP
@@ -73,18 +76,40 @@ fun Context.createWakeUpRecieverIntent():Intent{
     return Intent(this, AlarmReceiver::class.java)
 }
 
+
+/**
+ * create aa wake up's notificiation Main Intent.
+ * @param startingActivityName is the name of the activity to start.
+ */
+fun Context.createNotificationMainIntentForWakeup(startingActivityName:String):PendingIntent?{
+
+    return try {
+        val c = Class.forName(startingActivityName)
+        val intent = Intent(this, c)
+        PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    } catch (ignored: ClassNotFoundException) {
+        Log.e("Unknown Activity Name",ignored.message)
+        null
+    }
+
+}
+
+
 /**
  * create the notification's main intent
  * when user clicks on a wake up notification
  */
 //TODO redirect to another activity
-fun Context.createNotificationMainIntentForWakeUp():PendingIntent?{
+fun Context.createNotificationMainIntentForWakeUp(className:String):PendingIntent?{
 
-    return null
-    //UNCOMENT AND DON"T RETURN NULL
-
-//    val mainIntent = Intent(this, OnboardActivity::class.java)
-//    return PendingIntent.getActivity(this, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+    return try {
+        val c = Class.forName(className)
+        val intent = Intent(this, c)
+        PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    } catch (ignored: ClassNotFoundException) {
+        Log.e("Unknown Activity Name",ignored.message)
+        null
+    }
 }
 
 /**
