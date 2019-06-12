@@ -66,6 +66,11 @@ fun Context.notificationShowWakeUp(tasks:String,
 
 }
 
+fun Context.notificationDissmissWakeUp(){
+
+    getNotificationManager().cancel(NOTIFICATION_TAG, WAKE_UP_NOTIFICATION_ID)
+}
+
 fun Context.notificationShowTask(task: Task,
                                  mainPendingIntent: PendingIntent? = null,
                                  dimissPendingIntent: PendingIntent? = null) {
