@@ -1,10 +1,10 @@
-package com.gorillamoa.routines.views
+package com.gorillamoa.routines.core.views
 
 import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import android.widget.Switch
-import com.gorillamoa.routines.R
+import com.gorillamoa.routines.core.R
 
 import com.gorillamoa.routines.core.extensions.getLocalSettings
 

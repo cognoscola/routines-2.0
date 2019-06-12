@@ -11,6 +11,8 @@ import androidx.lifecycle.Observer
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
+import com.gorillamoa.routines.core.scheduler.Functions
+import com.gorillamoa.routines.core.scheduler.assignFunction
 import com.gorillamoa.routines.fragment.TimePickerFragment
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_service_controller.*
@@ -108,14 +110,12 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
          * Here we should what would happen when we receive a
          * broadcast with the WAKE UP COMMANDß
          */
-        wakeNotificationButton?.setOnClickListener {
-            broadcastShowWakeUp()
-        }
+        wakeNotificationButton?.setOnClickListener { broadcastShowWakeUp() }
 
-        //Show the sleep notification
-        sleepNotificationButton?.setOnClickListener {
-            notificationShowSleep()
-        }
+        /**
+         * What should happen when we receive a broadcast with the Sleep Command
+         */
+        sleepNotificationButton?.setOnClickListener { notificationShowSleep() }
 
         //clean truncate notificationShowTask function
         taskNotificationButton?.setOnClickListener {
@@ -130,18 +130,8 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
          * Here we show a sample of what should happen when we want to wake up.
          * There is no broadcasting happening
          */
-        wakeUpButton?.setOnClickListener {
-            com.gorillamoa.routines.core.scheduler.TaskScheduler.schedule(this){ taskString ->
 
-                Log.d("$tag onCreate","Wake Up Scheduler Call back")
-                notificationShowWakeUp(
-                        taskString,
-                         createNotificationMainIntentForWakeUp(WearConfigurationActivity::class.java.name),
-                         createNotificationDeleteIntentForWakeUp(),
-                        false
-                )
-            }
-        }
+        wakeUpButton.assignFunction(Functions.showWakeUpNotificationFunction())
 
         sleepButton?.setOnClickListener {
             notificationShowSleep()
@@ -159,18 +149,15 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
 //            taskViewModel.insert()
         }
 
+
         clearTask?.setOnClickListener {
             //TODO show better notification on empty tasks
             taskViewModel.clearReturnList()
             clearSavedArrays()
         }
 
-        dummy?.setOnClickListener {
-
-            //We'll create several dummy tasks on to which we can test things
-            taskViewModel.dummy()
-
-        }
+        //We'll create several dummy tasks on to which we can test things
+        dummy?.setOnClickListener { taskViewModel.dummy() }
 
     }
 

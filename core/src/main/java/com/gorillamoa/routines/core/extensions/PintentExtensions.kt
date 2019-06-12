@@ -114,13 +114,14 @@ fun Context.createNotificationMainIntentForWakeup(startingActivityName:String):P
  * create the notification's main intent
  * when user clicks on a wake up notification
  */
-//TODO redirect to another activity
-fun Context.createNotificationMainIntentForWakeUp(className:String):PendingIntent?{
+//TODO create Task view Activity in Mobile
+fun Context.createNotificationMainIntentForWakeUp():PendingIntent?{
 
     return try {
-        val c = Class.forName(className)
-        val intent = Intent(this, c)
-        PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+//        val c = Class.forName("com.gorillamoa.routines.activity.TaskViewActivity")
+//        val intent = Intent(this, c)
+//        PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        null
     } catch (ignored: ClassNotFoundException) {
         Log.e("Unknown Activity Name",ignored.message)
         null

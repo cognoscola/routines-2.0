@@ -90,9 +90,7 @@ class AlarmReceiver:BroadcastReceiver(){
                         //TODO USE INTENT FILTER NAME
                         context.notificationShowWakeUp(
                                 taskString,
-                                context.createNotificationMainIntentForWakeUp(
-                                        "com.gorillamoa.routines.activity.TaskViewActivity"
-                                ),
+                                context.createNotificationMainIntentForWakeUp(),
                                 context.createNotificationDeleteIntentForWakeUp()
                         )
                     }

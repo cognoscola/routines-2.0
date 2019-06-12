@@ -7,7 +7,6 @@ import androidx.fragment.app.FragmentActivity
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.fragment.GeneralSettingsFragment
 
-
 //TODO change this to a general activity full of options
 //TODO CREATE SETTINGS BUTTON IN THE MAIN ACTIVITY
 //TODO CREATE SETTINGS Activity launcher in app launcher

@@ -17,13 +17,22 @@
         android:textColor="@color/pref_category_text_color"
         android:text="@string/pref_notification_category"/>
 
-    <com.gorillamoa.routines.views.SwitchPreference
+    <com.gorillamoa.routines.core.views.SwitchPreference
         android:paddingTop="@dimen/pref_item_vertical_padding"
         android:paddingBottom="@dimen/pref_item_vertical_padding"
         android:layout_width="match_parent"
         android:layout_height="@dimen/pref_height"
         android:text="@string/pref_show_notification_description"
         app:key ="pref_show_notifications"
+        />
+
+    <com.gorillamoa.routines.core.views.SwitchPreference
+        android:paddingTop="@dimen/pref_item_vertical_padding"
+        android:paddingBottom="@dimen/pref_item_vertical_padding"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/pref_height"
+        android:text="@string/pref_show_notification_description"
+        app:key ="pref_notifications_stubborn"
         />
 
 
@@ -33,7 +42,7 @@
         android:textColor="@color/pref_category_text_color"
         android:text="@string/pref_graphics_category"/>
 
-    <com.gorillamoa.routines.views.SwitchPreference
+    <com.gorillamoa.routines.core.views.SwitchPreference
         android:layout_width="match_parent"
         android:layout_height="@dimen/pref_height"
         android:text="@string/pref_low_graphics_description"

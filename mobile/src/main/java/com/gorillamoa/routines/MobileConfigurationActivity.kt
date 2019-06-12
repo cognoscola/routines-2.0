@@ -4,14 +4,12 @@ import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import com.gorillamoa.routines.core.extensions.*
-import com.gorillamoa.routines.core.scheduler.ConfigurationFunctions
-import com.gorillamoa.routines.core.scheduler.TaskScheduler
+import com.gorillamoa.routines.core.scheduler.Functions
 import com.gorillamoa.routines.core.scheduler.assignFunction
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_routine_runner.*
 
 
-//TODO fetch functions from a STATIC class
 class MobileConfigurationActivity : FragmentActivity() {
 
     lateinit var taskViewModel:TaskViewModel
@@ -28,12 +26,10 @@ class MobileConfigurationActivity : FragmentActivity() {
                     createNotificationMainIntentForWakeup(MobileConfigurationActivity::class.java.canonicalName!!))
         })
 
-        notification_show.assignFunction(ConfigurationFunctions.showWakeUpNotificationFunction(),MobileConfigurationActivity::class.java.canonicalName!!)
+        notification_show.assignFunction(Functions.showWakeUpNotificationFunction())
+        notification_hide.assignFunction(Functions.dismissWakeUpNotificationFunction())
+        dummy.setOnClickListener { taskViewModel.dummy() }
+        clear.setOnClickListener { Functions.clearTasks(this,taskViewModel) }
 
-
-        notification_hide?.setOnClickListener {
-
-            notificationDissmissWakeUp()
-        }
     }
 }
