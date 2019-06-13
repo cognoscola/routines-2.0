@@ -4,9 +4,15 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.widget.Toast
+import com.gorillamoa.routines.core.extensions.createNotificationDeleteIntentForTask
+import com.gorillamoa.routines.core.extensions.notificationShowTask
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
 
-class TaskActionReceiver:BroadcastReceiver(){
+class NotificationActionReceiver:BroadcastReceiver(){
+    @Suppress("unused")
+    private val tag:String = NotificationActionReceiver::class.java.name
+
     companion object {
 
         //clean comment
@@ -15,6 +21,12 @@ class TaskActionReceiver:BroadcastReceiver(){
         const val ACTION_SKIP_SHORT = "task.skip.short"
         const val ACTION_SKIP_TODAY = "task.skip.today"
         const val ACTION_INTO_FUTURE = "task.skip.long"
+
+        const val ACTION_START_DAY = "wakeup.start"
+        const val ACTION_START_MODIFY = "wakeup.modify"
+
+        const val ACTION_EDIT_ORDER = "edit.sort"
+        const val ACTION_EDIT_SCHEDULE = "edit.schedule"
     }
 
     override fun onReceive(context: Context, intent: Intent?) {
@@ -22,6 +34,8 @@ class TaskActionReceiver:BroadcastReceiver(){
         intent?.let {
 
             val tid = intent.getIntExtra(com.gorillamoa.routines.core.extensions.TASK_ID,-1)
+
+            Log.d("$tag onReceive","We received.. at least")
 
             when (intent.action) {
                 ACTION_DONE -> {
@@ -52,6 +66,27 @@ class TaskActionReceiver:BroadcastReceiver(){
                     }else{
                         Log.d("onReceive","ACTION_SKIP_TODAY")
                     }
+                }
+
+                ACTION_START_DAY->{
+
+                    Toast.makeText(context,"Start day",Toast.LENGTH_SHORT).show()
+                    TaskScheduler.approve(context)
+                    TaskScheduler.getNextUncompletedTask(context) { task ->
+
+                        task?.let {
+
+                            context.notificationShowTask(
+                                    task,
+                                    dimissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!)
+                            )
+                        }
+                    }
+                }
+
+                ACTION_START_MODIFY ->{
+
+
                 }
 
                 else -> {

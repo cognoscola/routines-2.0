@@ -1,7 +1,6 @@
 package com.gorillamoa.routines.core.extensions
 
 import android.app.PendingIntent
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -12,9 +11,7 @@ import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.ACTION_SLEE
 import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.SLEEP_INTENT_CODE
 import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.WAKE_UP_INTENT_CODE
 import com.gorillamoa.routines.core.receiver.NotificationDismissReceiver
-import com.gorillamoa.routines.core.receiver.TaskActionReceiver
-import androidx.core.content.ContextCompat.startActivity
-
+import com.gorillamoa.routines.core.receiver.NotificationActionReceiver
 
 
 /**
@@ -153,14 +150,13 @@ fun Context.createNotificationDeleteIntentForTask(tid: Int):PendingIntent{
 
 }
 
-
 /**
  * create a notification action which will mark the displayed task as done
  * @param tid is the task id of the task currently being displayed
  */
 fun Context.createNotificationActionPendingIntent(tid:Int,action:String):PendingIntent{
 
-    val doneIntent = Intent(this, TaskActionReceiver::class.java)
+    val doneIntent = Intent(this, NotificationActionReceiver::class.java)
     doneIntent.action = action
     doneIntent.putExtra(TASK_ID,tid)
     return PendingIntent.getBroadcast(this, tid,doneIntent,PendingIntent.FLAG_ONE_SHOT)

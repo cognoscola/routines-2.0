@@ -31,5 +31,6 @@ class MobileConfigurationActivity : FragmentActivity() {
         dummy.setOnClickListener { taskViewModel.dummy() }
         clear.setOnClickListener { Functions.clearTasks(this,taskViewModel) }
 
+        extra.setOnClickListener {notificationShowSleep() }
     }
 }

@@ -1,4 +1,4 @@
-package com.gorillamoa.routines.app
+package com.gorillamoa.routines.core.app
 
 import android.app.Application
 import android.app.NotificationChannel
@@ -7,6 +7,7 @@ import android.content.Context
 import android.graphics.Color
 import android.os.Build
 import com.gorillamoa.routines.core.extensions.NOTIFICATION_CHANNEL_ONE
+import com.gorillamoa.routines.core.extensions.NOTIFICATION_CHANNEL_TWO
 
 
 /**
@@ -24,11 +25,21 @@ class App:Application(){
             val channelName = "Routine Notifications"
             val channelDescriptorText = "Routines Tasks for Channel"
 
-            NotificationChannel(NOTIFICATION_CHANNEL_ONE,channelName, NotificationManager.IMPORTANCE_HIGH).apply {
+
+            NotificationChannel(NOTIFICATION_CHANNEL_ONE,channelName, NotificationManager.IMPORTANCE_DEFAULT).apply {
                 enableLights(true)
                 lightColor = Color.RED
                 enableVibration(true)
                  description = channelDescriptorText
+                (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(this)
+
+            }
+
+            NotificationChannel(NOTIFICATION_CHANNEL_TWO,channelName, NotificationManager.IMPORTANCE_HIGH).apply {
+                enableLights(true)
+                lightColor = Color.RED
+                enableVibration(true)
+                description = channelDescriptorText
                 (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(this)
 
             }
@@ -90,6 +101,11 @@ class App:Application(){
     //TODO TRACK TIME SPENT ON A TASK
 
     //TODO PORT TO ANDROID
+
+
+    //BUG LIST
+    //TODO clicking on the alarm, the background also captures the event. Dont' do this!
+
 
     //DEBUG - ADD DEBUG CLOCKING, so we can TEST
 

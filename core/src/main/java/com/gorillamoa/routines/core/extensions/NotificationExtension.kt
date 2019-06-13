@@ -12,9 +12,11 @@ import androidx.core.app.NotificationCompat
 import com.gorillamoa.routines.core.R
 
 import com.gorillamoa.routines.core.data.Task
-import com.gorillamoa.routines.core.receiver.TaskActionReceiver.Companion.ACTION_DONE
-import com.gorillamoa.routines.core.receiver.TaskActionReceiver.Companion.ACTION_SKIP_SHORT
-import com.gorillamoa.routines.core.receiver.TaskActionReceiver.Companion.ACTION_SKIP_TODAY
+import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_DONE
+import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_SKIP_SHORT
+import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_SKIP_TODAY
+import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_START_DAY
+import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_START_MODIFY
 
 import java.util.*
 
@@ -25,6 +27,7 @@ const val ACTIVITY_NOTIFICATION_ID = 65533
 const val TIMER_NOTIFICATION_ID = 65532
 
 public const val NOTIFICATION_CHANNEL_ONE  = "channel"
+public const val NOTIFICATION_CHANNEL_TWO  = "channel_MAX"
 const val NOTIFICATION_TAG = "routines"
 
 
@@ -45,24 +48,46 @@ fun Context.notificationShowWakeUp(tasks:String,
     //TODO ENSURE 1.0+ compatibility, right now it only works on 2.0
 
     val manager = getNotificationManager()
-    val mainBuilder = getBuilder()
+    getBuilder().apply {
 
-    mainBuilder.setStyle(prepareBigTextStyle(tasks, "Today's tasks &#128170;"))
-    mainBuilder.setContentIntent(mainPendingIntent)
+        if (isWatch()) {
+            setStyle(prepareBigTextStyle(tasks, "Today's tasks &#128170;"))
+        }else{
 
-    if (!dismissable) {
+            //TODO set custom views for small and big!
+        }
 
-        mainBuilder.setAutoCancel(false)
-        mainBuilder.setOngoing(true)
+
+        setContentIntent(mainPendingIntent)
+        if (!dismissable) {
+
+            setAutoCancel(false)
+            setOngoing(true)
+
+            //set priority Level to stay on TOP of other notifications
+            setChannelId(NOTIFICATION_CHANNEL_TWO)
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                priority = Notification.PRIORITY_HIGH
+            }
+        }
+
+
+
+        addTaskAction(this@notificationShowWakeUp,"Start Day", ACTION_START_DAY, WAKE_UP_NOTIFICATION_ID!!)
+        addTaskAction(this@notificationShowWakeUp,"Edit", ACTION_START_MODIFY, WAKE_UP_NOTIFICATION_ID!!)
+
+        //TODO make the dismiss action optional, as in let user decide how a dismiss behaviour works!
+        //Give option to do nothing or to go forward or cancel
+        dismissPendingIntent?.let { setDeleteIntent(it) }
+
+        manager.notify(
+                NOTIFICATION_TAG,
+                WAKE_UP_NOTIFICATION_ID,
+                build())
     }
 
-    //TODO make the dismiss action optional
-    dismissPendingIntent?.let { mainBuilder.setDeleteIntent(it) }
 
-    manager.notify(
-            NOTIFICATION_TAG,
-            WAKE_UP_NOTIFICATION_ID,
-            mainBuilder.build())
 
 }
 
@@ -98,6 +123,7 @@ fun Context.notificationShowTask(task: Task,
         )
     }
 }
+
 
 fun NotificationCompat.Builder.addTaskAction(context: Context,actionText:String, action:String,tid:Int){
 
