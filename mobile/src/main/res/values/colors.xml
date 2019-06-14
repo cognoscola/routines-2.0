@@ -11,5 +11,6 @@
     <color name="notification_title_text_color">#FFFFFF</color>
     <color name="notification_description_text_color">#A3A3A3</color>
 
+    <color name="notification_button_text_color">#A3A3A3</color>
 
 </resources>

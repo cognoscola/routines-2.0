@@ -4,13 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="horizontal"
-    android:padding="8dp"
-    android:paddingStart="10dp"
-    android:paddingEnd="10dp"
+    android:padding="9dp"
     android:background="@color/notification_bg_color"
     android:id="@+id/notificationContainer"
     android:gravity="center_vertical"
-
     >
 <LinearLayout
 
@@ -39,13 +36,20 @@
 
 </LinearLayout>
 
+    <include layout="@layout/remote_group_star_edit"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        />
+<!--
     <Button
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:background="#FF333333"
         android:layout_toStartOf="@id/edit"
         android:id="@+id/start"
-        android:layout_marginEnd="10dp"
+
         android:layout_centerVertical="true"
         />
     <Button
@@ -56,4 +60,5 @@
         android:layout_marginStart="10dp"
         android:background="#FF333333"
         android:layout_centerVertical="true"/>
+        -->
 </RelativeLayout>

@@ -4,4 +4,6 @@
     <dimen name="notification_title_text_size">17sp</dimen>
     <dimen name="notification_description_text_size">13sp</dimen>
 
+    <dimen name="notification_button_text_size">11sp</dimen>
+
 </resources>

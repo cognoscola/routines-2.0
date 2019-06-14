@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="256dp"
     tools:background="#555555"
-    android:padding="10dp"
+    android:padding="9dp"
     android:background="@color/notification_bg_color">
 
     <TextView
@@ -23,7 +23,13 @@
         android:id="@+id/bigContent"
         android:layout_below="@id/title"/>
 
-    <LinearLayout
+
+    <include layout="@layout/remote_group_star_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"/>
+    <!--<LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -54,7 +60,7 @@
             android:paddingEnd="10dp"
             android:paddingStart="10dp"
             android:background="#FF333333" />
-    </LinearLayout>
+    </LinearLayout>-->
 
 
 </RelativeLayout>

@@ -5,4 +5,7 @@
     <string name="wake_up_description">"Expand to see today's schedule"</string>
 
     <string name="wake_up_large_title">"Today's tasks &amp;#128170"</string>
+
+    <string name="notification_start">Start</string>
+    <string name="notification_edit">Edit</string>
 </resources>
