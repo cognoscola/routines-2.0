@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Routines</string>
+
+    <string name="wake_up_title">"Good morning! &amp;#127780"</string>
+    <string name="wake_up_description">"Expand to see today's schedule"</string>
+
+    <string name="wake_up_large_title">"Today's tasks &amp;#128170"</string>
 </resources>

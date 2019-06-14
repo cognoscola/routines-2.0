@@ -8,6 +8,7 @@ import android.os.Build
 import android.text.Html
 import android.text.Spanned
 import android.util.Log
+import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.gorillamoa.routines.core.R
 
@@ -15,8 +16,6 @@ import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_DONE
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_SKIP_SHORT
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_SKIP_TODAY
-import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_START_DAY
-import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_START_MODIFY
 
 import java.util.*
 
@@ -43,7 +42,9 @@ const val NOTIFICATION_TAG = "routines"
 fun Context.notificationShowWakeUp(tasks:String,
                                    mainPendingIntent: PendingIntent?,
                                    dismissPendingIntent:PendingIntent? = null,
-                                   dismissable:Boolean = true) {
+                                   dismissable:Boolean = true,
+                                   smallRemoteView:RemoteViews? = null,
+                                   bigRemoteView:RemoteViews?= null) {
 
     //TODO ENSURE 1.0+ compatibility, right now it only works on 2.0
 
@@ -54,13 +55,18 @@ fun Context.notificationShowWakeUp(tasks:String,
             setStyle(prepareBigTextStyle(tasks, "Today's tasks &#128170;"))
         }else{
             setCategory(Notification.CATEGORY_SERVICE)
-            setStyle(androidx.media.app.NotificationCompat.MediaStyle())
+            setStyle(NotificationCompat.BigTextStyle())
 
-
-            //TODO set custom views for small and big!
+            //lets add RemoteView
+            setCustomContentView(smallRemoteView)
+            setCustomBigContentView(bigRemoteView)
 
         }
 
+        //M = 23
+        //N = 24
+        //O = 26
+        //P = 28
 
         setContentIntent(mainPendingIntent)
         if (!dismissable) {
@@ -74,12 +80,14 @@ fun Context.notificationShowWakeUp(tasks:String,
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                 priority = Notification.PRIORITY_MAX
             }
+
+
         }
 
 
 
-        addTaskAction(this@notificationShowWakeUp,"Start Day", ACTION_START_DAY, WAKE_UP_NOTIFICATION_ID!!)
-        addTaskAction(this@notificationShowWakeUp,"Edit", ACTION_START_MODIFY, WAKE_UP_NOTIFICATION_ID!!)
+//        addTaskAction(this@notificationShowWakeUp,"Start Day", ACTION_START_DAY, WAKE_UP_NOTIFICATION_ID!!)
+//        addTaskAction(this@notificationShowWakeUp,"Edit", ACTION_START_MODIFY, WAKE_UP_NOTIFICATION_ID!!)
 
         //TODO make the dismiss action optional, as in let user decide how a dismiss behaviour works!
         //Give option to do nothing or to go forward or cancel
@@ -247,8 +255,6 @@ fun Context.notificationShowSleep(){
 
 
 }
-
-
 
 
 fun prepareBigTextStyle(tasks:String,title:String):NotificationCompat.BigTextStyle{
