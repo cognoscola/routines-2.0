@@ -14,11 +14,13 @@ import com.gorillamoa.routines.core.receiver.NotificationDismissReceiver
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver
 
 
+
 /**
  * A place to store all the Intent and PendingIntent extensions
  */
 
 public const val TASK_ID ="TaskId"
+public const val TASK_DATA = "taskDataString"
 
 /**
  * The user is coming from a notification. This notification is a wake-up attempt from
@@ -103,8 +105,9 @@ fun Context.createNotificationMainIntentForWakeup(startingActivityName:String):P
         Log.e("Unknown Activity Name",ignored.message)
         null
     }
-
 }
+
+
 
 
 /**

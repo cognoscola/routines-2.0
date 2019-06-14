@@ -4,9 +4,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.widget.RemoteViews
 import android.widget.Toast
-import com.gorillamoa.routines.core.extensions.createNotificationDeleteIntentForTask
-import com.gorillamoa.routines.core.extensions.notificationShowTask
+import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
 
 class NotificationActionReceiver:BroadcastReceiver(){
@@ -89,6 +89,11 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
                 }
 
+                /**
+                 * Expand the currently showing notification
+                 */
+
+
                 else -> {
                     Log.d("onReceive","Unknown Action on Task ${intent.getIntExtra(com.gorillamoa.routines.core.extensions.TASK_ID,-1)}")
                 }
@@ -96,3 +101,5 @@ class NotificationActionReceiver:BroadcastReceiver(){
         }
     }
 }
+
+

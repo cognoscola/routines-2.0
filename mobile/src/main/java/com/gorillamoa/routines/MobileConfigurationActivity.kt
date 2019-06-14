@@ -1,11 +1,11 @@
 package com.gorillamoa.routines
 
 import android.os.Bundle
-import android.widget.RemoteViews
+
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import com.gorillamoa.routines.core.extensions.*
-import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_START_DAY
+
 import com.gorillamoa.routines.core.scheduler.Functions
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
 import com.gorillamoa.routines.core.scheduler.assignFunction
@@ -36,8 +36,8 @@ class MobileConfigurationActivity : FragmentActivity() {
                         null,
                         null,
                         false,
-                        getRemoteView(),
-                        getLargeRemoteView(it))
+                        getRemoteView().createExpandFunction(this,it),
+                        null)
 
             }
         }
@@ -50,26 +50,5 @@ class MobileConfigurationActivity : FragmentActivity() {
         extra.setOnClickListener { notificationShowSleep() }
     }
 
-    fun getRemoteView(): RemoteViews {
 
-        val remoteViews = RemoteViews(packageName, R.layout.remote_wakeup)
-        remoteViews.setTextViewText(R.id.title, getHtml(getString(R.string.wake_up_title)))
-        remoteViews.setTextViewText(R.id.description, getHtml(getString(R.string.wake_up_description)))
-        setStartFunction(remoteViews)
-        return remoteViews
-    }
-
-    fun getLargeRemoteView(bigStringContent: String): RemoteViews {
-        val remoteViews = RemoteViews(packageName, R.layout.remote_wakeup_large)
-        remoteViews.setTextViewText(R.id.title, getHtml(getString(R.string.wake_up_large_title)))
-        remoteViews.setTextViewText(R.id.bigContent, getHtml(bigStringContent))
-        setStartFunction(remoteViews)
-        return remoteViews
-    }
-
-    fun setStartFunction(remoteViews: RemoteViews) {
-
-        remoteViews.setOnClickPendingIntent(R.id.start, createNotificationActionPendingIntent(-1, ACTION_START_DAY))
-
-    }
 }

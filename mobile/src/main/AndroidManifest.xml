@@ -27,6 +27,9 @@
             android:name=".core.receiver.NotificationActionReceiver"
             android:exported="false" />
 
+        <receiver android:name=".MobileNotificationBehaviourReceiver"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

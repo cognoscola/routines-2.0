@@ -53,41 +53,26 @@ fun Context.notificationShowWakeUp(tasks:String,
 
         if (isWatch()) {
             setStyle(prepareBigTextStyle(tasks, "Today's tasks &#128170;"))
+
+            //addTaskAction(this@notificationShowWakeUp,"Start Day", ACTION_START_DAY, WAKE_UP_NOTIFICATION_ID!!)
+            //addTaskAction(this@notificationShowWakeUp,"Edit", ACTION_START_MODIFY, WAKE_UP_NOTIFICATION_ID!!)
         }else{
             setCategory(Notification.CATEGORY_SERVICE)
-            setStyle(NotificationCompat.BigTextStyle())
 
             //lets add RemoteView
-            setCustomContentView(smallRemoteView)
-            setCustomBigContentView(bigRemoteView)
-
-        }
-
-        //M = 23
-        //N = 24
-        //O = 26
-        //P = 28
-
-        setContentIntent(mainPendingIntent)
-        if (!dismissable) {
-
-            setAutoCancel(false)
-            setOngoing(true)
-
-            //set priority Level to stay on TOP of other notifications
-            setChannelId(NOTIFICATION_CHANNEL_TWO)
-
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                priority = Notification.PRIORITY_MAX
+            smallRemoteView?.let {
+                setCustomContentView(smallRemoteView)
             }
 
+            bigRemoteView?.let {
+                setCustomBigContentView(bigRemoteView)
+            }
 
         }
 
+        setContentIntent(mainPendingIntent)
 
-
-//        addTaskAction(this@notificationShowWakeUp,"Start Day", ACTION_START_DAY, WAKE_UP_NOTIFICATION_ID!!)
-//        addTaskAction(this@notificationShowWakeUp,"Edit", ACTION_START_MODIFY, WAKE_UP_NOTIFICATION_ID!!)
+        determineOnGoingAbility(this@apply,dismissable)
 
         //TODO make the dismiss action optional, as in let user decide how a dismiss behaviour works!
         //Give option to do nothing or to go forward or cancel
@@ -102,6 +87,29 @@ fun Context.notificationShowWakeUp(tasks:String,
 
 
 }
+
+fun determineOnGoingAbility(builder:NotificationCompat.Builder, dismissable:Boolean){
+
+    if (!dismissable) {
+
+        builder.apply {
+
+            setAutoCancel(false)
+            setOngoing(true)
+
+            //set priority Level to stay on TOP of other notifications
+            setChannelId(NOTIFICATION_CHANNEL_TWO)
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                priority = Notification.PRIORITY_MAX
+            }
+        }
+    }
+}
+
+
+
+
 
 fun Context.notificationDissmissWakeUp(){
 
