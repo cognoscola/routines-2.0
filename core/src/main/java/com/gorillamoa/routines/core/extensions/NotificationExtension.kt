@@ -53,8 +53,12 @@ fun Context.notificationShowWakeUp(tasks:String,
         if (isWatch()) {
             setStyle(prepareBigTextStyle(tasks, "Today's tasks &#128170;"))
         }else{
+            setCategory(Notification.CATEGORY_SERVICE)
+            setStyle(androidx.media.app.NotificationCompat.MediaStyle())
+
 
             //TODO set custom views for small and big!
+
         }
 
 
@@ -68,7 +72,7 @@ fun Context.notificationShowWakeUp(tasks:String,
             setChannelId(NOTIFICATION_CHANNEL_TWO)
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                priority = Notification.PRIORITY_HIGH
+                priority = Notification.PRIORITY_MAX
             }
         }
 
