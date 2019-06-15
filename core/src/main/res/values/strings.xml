@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Core</string>
+
+    <string name="pref_stubborn_key">pref_notifications_stubborn</string>
 </resources>

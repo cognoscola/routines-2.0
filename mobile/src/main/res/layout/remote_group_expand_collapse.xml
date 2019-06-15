@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="5dp"
+    android:layout_marginEnd="5dp"
+    android:id="@+id/behaviourButton">
+
+    <ImageView
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:id="@+id/behaviourImage"
+        android:src="@drawable/ic_expand_more_black_24dp"
+
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Details"
+        android:id="@+id/behaviourText"
+        android:text="@string/notification_start"
+        android:textSize="@dimen/notification_button_text_size"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/notification_button_text_color"
+        />
+
+</LinearLayout>

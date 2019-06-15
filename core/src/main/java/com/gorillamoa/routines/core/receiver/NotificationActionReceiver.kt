@@ -70,6 +70,13 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
                 ACTION_START_DAY->{
 
+
+                    //TODO UNCOMMENT BOOLEAN CHECK
+
+//                    if (context.isNotificationStubborn()) {
+                        context.getNotificationManager().cancel(NOTIFICATION_TAG, WAKE_UP_NOTIFICATION_ID)
+//                    }
+
                     Toast.makeText(context,"Start day",Toast.LENGTH_SHORT).show()
                     TaskScheduler.approve(context)
                     TaskScheduler.getNextUncompletedTask(context) { task ->
@@ -78,7 +85,8 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
                             context.notificationShowTask(
                                     task,
-                                    dimissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!)
+                                    dimissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!),
+                                    dismissable = false
                             )
                         }
                     }

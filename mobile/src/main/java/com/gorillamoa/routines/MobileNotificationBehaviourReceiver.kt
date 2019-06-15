@@ -60,7 +60,7 @@ class MobileNotificationBehaviourReceiver: BroadcastReceiver(){
                                     //TODO record the dismissal
                                     null,
                                     false,
-                                    getRemoteView(),
+                                    getRemoteView().createExpandFunction(this,intent.getStringExtra(TASK_DATA)),
                                     getLargeRemoteView(intent.getStringExtra(TASK_DATA))
                                             .createCollapseFunction(this,intent.getStringExtra(TASK_DATA))
                             )

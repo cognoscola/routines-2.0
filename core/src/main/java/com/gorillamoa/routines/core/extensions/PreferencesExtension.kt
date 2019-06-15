@@ -330,3 +330,10 @@ fun Context.DisableScheduler(){
 }
 
 
+//SOME USER PREFERENCES
+//TODO find a way to share these values across xml and across modules
+fun Context.isNotificationStubborn():Boolean{
+    return getLocalSettings().getBoolean("pref_notifications_stubbon",false)
+}
+
+

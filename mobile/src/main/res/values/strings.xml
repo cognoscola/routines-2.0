@@ -6,6 +6,10 @@
 
     <string name="wake_up_large_title">"Today's tasks &amp;#128170"</string>
 
+    <!-- Notification Texts -->
     <string name="notification_start">Start</string>
     <string name="notification_edit">Edit</string>
+
+    <string name="expand">Details</string>
+    <string name="collapse">Less</string>
 </resources>

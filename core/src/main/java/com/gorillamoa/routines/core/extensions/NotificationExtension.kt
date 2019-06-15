@@ -54,6 +54,7 @@ fun Context.notificationShowWakeUp(tasks:String,
         if (isWatch()) {
             setStyle(prepareBigTextStyle(tasks, "Today's tasks &#128170;"))
 
+            //TODO UNCOMMENT FOR WATCH
             //addTaskAction(this@notificationShowWakeUp,"Start Day", ACTION_START_DAY, WAKE_UP_NOTIFICATION_ID!!)
             //addTaskAction(this@notificationShowWakeUp,"Edit", ACTION_START_MODIFY, WAKE_UP_NOTIFICATION_ID!!)
         }else{
@@ -70,10 +71,9 @@ fun Context.notificationShowWakeUp(tasks:String,
 
         }
 
-        setContentIntent(mainPendingIntent)
-
         determineOnGoingAbility(this@apply,dismissable)
 
+        mainPendingIntent?.let { setContentIntent(mainPendingIntent) }
         //TODO make the dismiss action optional, as in let user decide how a dismiss behaviour works!
         //Give option to do nothing or to go forward or cancel
         dismissPendingIntent?.let { setDeleteIntent(it) }
@@ -94,6 +94,7 @@ fun determineOnGoingAbility(builder:NotificationCompat.Builder, dismissable:Bool
 
         builder.apply {
 
+            setCategory(Notification.CATEGORY_SERVICE)
             setAutoCancel(false)
             setOngoing(true)
 
@@ -118,19 +119,27 @@ fun Context.notificationDissmissWakeUp(){
 
 fun Context.notificationShowTask(task: Task,
                                  mainPendingIntent: PendingIntent? = null,
-                                 dimissPendingIntent: PendingIntent? = null) {
+                                 dimissPendingIntent: PendingIntent? = null,
+                                 dismissable: Boolean = true) {
 
     val manager = getNotificationManager()
     getBuilder().apply {
 
+        if (isWatch()) {
+
+            setAutoCancel(true)
+            setCategory(Notification.CATEGORY_REMINDER)
+        }else{
+
+        }
+
         setContentTitle(task.name)
         setContentText(task.description)
-        setAutoCancel(true)
-        setCategory(Notification.CATEGORY_REMINDER)
         setDeleteIntent(dimissPendingIntent)
 
         Log.d("schedule","Showing Notification id: ${task.id}")
 
+        determineOnGoingAbility(this,dismissable)
 
         addTaskAction(this@notificationShowTask,"Done      ", ACTION_DONE,task.id!!)
         addTaskAction(this@notificationShowTask,"Delay     ", ACTION_SKIP_SHORT,task.id!!)
