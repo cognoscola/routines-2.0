@@ -19,9 +19,10 @@
     >
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="32dp"
         android:id="@+id/title"
         tools:text="Good morning!"
+        android:gravity="center_vertical"
         android:textColor="@color/notification_title_text_color"
         android:textSize="@dimen/notification_title_text_size"
         />
@@ -36,36 +37,18 @@
 
 </LinearLayout>
 
-    <include layout="@layout/remote_group_expand_collapse"
+  <!--  <include layout="@layout/remote_group_expand_collapse"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:layout_toStartOf="@+id/startGroup"/>
+        android:layout_toStartOf="@+id/startGroup"/>-->
 
 
-    <include layout="@layout/remote_group_star_edit"
-        android:layout_height="wrap_content"
+    <include layout="@layout/remote_group_start_edit"
+        android:layout_height="64dp"
         android:layout_width="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:id="@+id/startGroup"
-        />
-<!--
-    <Button
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:background="#FF333333"
-        android:layout_toStartOf="@id/edit"
-        android:id="@+id/start"
 
+        android:id="@+id/startGroup"
         android:layout_centerVertical="true"
         />
-    <Button
-        android:id="@+id/edit"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="10dp"
-        android:background="#FF333333"
-        android:layout_centerVertical="true"/>
-        -->
 </RelativeLayout>

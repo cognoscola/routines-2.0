@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.activity_service_controller.*
 import java.util.*
 
 
+
 /**
  * A few notes on this class.
  * We use support FragmentActivity instead of WearableActivity() because the
@@ -58,6 +59,7 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
                     StringBuilder().stringifyTasks(it),
                     createNotificationMainIntentForWakeup(WearConfigurationActivity::class.java.name))
         })
+
 
         /**get the view model object */
 
@@ -161,6 +163,8 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
     }
 
+
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -170,6 +174,7 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
                     //TODO truncate these codes
                     val cal = Calendar.getInstance()
+
 
                     setWakeTimeToCalendarAndStore(cal,
                             data?.getIntExtra(TimePickerFragment.HOUR,-1)?:-1,

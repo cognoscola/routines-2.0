@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
+import com.gorillamoa.routines.app.App
+import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
 
 /**
@@ -30,6 +32,17 @@ class MobileNotificationBehaviourReceiver: BroadcastReceiver(){
          * The user has the option of keeping the notification only collapsed
          */
         const val ACTION_WAKEUP_COLLAPSE = "wakeup.collapse"
+
+        /**
+         * Action to take when the user clicks on the notification
+         */
+        const val ACTION_TASK_EXPAND = "task.expand"
+
+        /**
+         * Action to take when the user clicks on the collapse button
+         */
+        const val ACTION_TASK_COLLAPSE = "task.collapse"
+
     }
 
     override fun onReceive(context: Context, intent: Intent?) {
@@ -60,8 +73,8 @@ class MobileNotificationBehaviourReceiver: BroadcastReceiver(){
                                     //TODO record the dismissal
                                     null,
                                     false,
-                                    getRemoteView().createExpandFunction(this,intent.getStringExtra(TASK_DATA)),
-                                    getLargeRemoteView(intent.getStringExtra(TASK_DATA))
+//                                    getWakeupRemoteView().createFunction(this,intent.getStringExtra(TASK_DATA)),
+                                    bigRemoteView = getLargeWakeUpRemoteView(intent.getStringExtra(TASK_DATA))
                                             .createCollapseFunction(this,intent.getStringExtra(TASK_DATA))
                             )
                         }
@@ -83,13 +96,38 @@ class MobileNotificationBehaviourReceiver: BroadcastReceiver(){
                                     //TODO record the dismissal
                                     null,
                                     false,
-                                    getRemoteView().createExpandFunction(context,intent.getStringExtra(TASK_DATA)),
+                                    getWakeupRemoteView().createFunction(context,intent.getStringExtra(TASK_DATA), ACTION_WAKEUP_EXPAND),
                                     null)
-
                         }
                     } else {
                         //TODO OPEN UP THE TASK VIEW ACTIVITY
                     }
+                }
+                ACTION_TASK_EXPAND->{
+                    if (intent.hasExtra(TASK_DATA)) {
+                        context.apply {
+
+                            getNotificationManager().cancel(NOTIFICATION_TAG,tid)
+
+                            val task = (applicationContext as App).gson.fromJson(intent.getStringExtra(TASK_DATA), Task::class.java)
+
+                            notificationShowTask(
+                                    task,
+                                    mainPendingIntent = null,
+                                    dismissPendingIntent = null,
+                                    dismissable = false,
+                                    //TODO just delete this and return null
+                                    smallRemoteView = getTaskRemoteView(task),
+                                    bigRemoteView = null
+                            )
+                        }
+                    }else{
+                        //TODO OPEN UP TASK VIEW ACTIVITY
+                    }
+
+                }
+                ACTION_TASK_COLLAPSE ->{
+
                 }
 
                 else -> {

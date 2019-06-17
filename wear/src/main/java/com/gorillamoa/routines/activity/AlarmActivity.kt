@@ -11,6 +11,9 @@ import com.gorillamoa.routines.R
 import com.gorillamoa.routines.core.extensions.saveAlarmTimerTriggerStatus
 import kotlinx.android.synthetic.main.empty_activity.*
 
+
+
+
 class AlarmActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider {
 
     private var mAmbientController: AmbientModeSupport.AmbientController? = null
@@ -20,7 +23,7 @@ class AlarmActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProv
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.empty_activity)
-        Log.d("$tag onCreate","Alarm Activity Started!")
+        Log.d("$tag onCreate", "Alarm Activity Started!")
 
         //TODO ACQUIRE WAKE LOCK
 
@@ -48,6 +51,10 @@ class AlarmActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProv
 
         //TODO create a LOW-POWER ALARM TYPE AS WELL
 
+
+
+
+
         background?.setOnTouchListener { view, motionEvent ->
 
             if (motionEvent.action == MotionEvent.ACTION_UP) {
@@ -55,12 +62,14 @@ class AlarmActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProv
                 window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 finish()
                 true
-            }else{
+            } else {
                 false
             }
         }
+
+
         background?.setOnClickListener {
-            Log.d("$tag onCreate","Background Clicked!")
+            Log.d("$tag onCreate", "Background Clicked!")
             mAmbientController!!.setAmbientOffloadEnabled(false)
             window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             finish()

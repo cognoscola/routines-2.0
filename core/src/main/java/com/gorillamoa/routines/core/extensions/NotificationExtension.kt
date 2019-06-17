@@ -119,31 +119,40 @@ fun Context.notificationDissmissWakeUp(){
 
 fun Context.notificationShowTask(task: Task,
                                  mainPendingIntent: PendingIntent? = null,
-                                 dimissPendingIntent: PendingIntent? = null,
-                                 dismissable: Boolean = true) {
+                                 dismissPendingIntent: PendingIntent? = null,
+                                 dismissable: Boolean = true,
+                                 smallRemoteView: RemoteViews? = null,
+                                 bigRemoteView: RemoteViews? = null) {
 
     val manager = getNotificationManager()
+
+
+
     getBuilder().apply {
 
         if (isWatch()) {
 
             setAutoCancel(true)
             setCategory(Notification.CATEGORY_REMINDER)
+
+            addTaskAction(this@notificationShowTask,"Done      ", ACTION_DONE,task.id!!)
+            addTaskAction(this@notificationShowTask,"Delay     ", ACTION_SKIP_SHORT,task.id!!)
+            addTaskAction(this@notificationShowTask,"Skip Today", ACTION_SKIP_TODAY,task.id!!)
         }else{
+
+            setCategory(Notification.CATEGORY_SERVICE)
+            smallRemoteView?.let { setCustomContentView(smallRemoteView) }
+            bigRemoteView?.let { setCustomBigContentView(bigRemoteView) }
 
         }
 
         setContentTitle(task.name)
         setContentText(task.description)
-        setDeleteIntent(dimissPendingIntent)
+        setDeleteIntent(dismissPendingIntent)
 
         Log.d("schedule","Showing Notification id: ${task.id}")
 
         determineOnGoingAbility(this,dismissable)
-
-        addTaskAction(this@notificationShowTask,"Done      ", ACTION_DONE,task.id!!)
-        addTaskAction(this@notificationShowTask,"Delay     ", ACTION_SKIP_SHORT,task.id!!)
-        addTaskAction(this@notificationShowTask,"Skip Today", ACTION_SKIP_TODAY,task.id!!)
 
         manager.notify(
                 NOTIFICATION_TAG,

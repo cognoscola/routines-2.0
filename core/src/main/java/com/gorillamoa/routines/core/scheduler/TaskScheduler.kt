@@ -414,7 +414,7 @@ class TaskScheduler{
                 task?.let {
                     context.notificationShowTask(
                             it,
-                            dimissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!)
+                            dismissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!)
                     )
 
                     //first time using this notation, so just to clarify. Since task was null the

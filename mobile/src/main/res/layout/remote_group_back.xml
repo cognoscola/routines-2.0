@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="@dimen/button_horizontal_margin"
+    android:layout_marginStart="@dimen/button_horizontal_margin"
+    android:id="@+id/buttonBack">
+
+    <ImageView
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:id="@+id/behaviourImage"
+        android:src="@drawable/ic_chevron_left_black_24dp"
+        android:layout_gravity="center_horizontal"
+        />
+
+    <TextView
+        android:gravity="center_horizontal"
+        android:layout_width="@dimen/button_text_width"
+        android:layout_height="wrap_content"
+        android:id="@+id/behaviourText"
+        android:text="@string/previous"
+        android:textSize="@dimen/notification_button_text_size"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/notification_button_text_color"
+        />
+
+</LinearLayout>

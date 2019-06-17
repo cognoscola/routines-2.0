@@ -1,4 +1,4 @@
-package com.gorillamoa.routines.core.app
+package com.gorillamoa.routines.app
 
 import android.app.Application
 import android.app.NotificationChannel

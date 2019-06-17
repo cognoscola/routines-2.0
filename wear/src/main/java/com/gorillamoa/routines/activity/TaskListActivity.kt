@@ -34,6 +34,8 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
     private lateinit var taskViewModel: TaskViewModel
     private var isCreating = false
 
+
+
     private val preferenceListener= SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
 
 
@@ -57,7 +59,6 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
         taskViewModel.tasks.observe(this, Observer {
 
 
-
             //TODO fetch only scheduled tasks!!
             (taskListWearableRecyclerView?.adapter as TaskListAdapter).apply {
                 setTaskData(
@@ -69,10 +70,10 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
             if (isCreating) {
                 isCreating = false
                 try {
-                    taskListWearableRecyclerView?.scrollToPosition(it.size -1 )
+                    taskListWearableRecyclerView?.scrollToPosition(it.size - 1)
 
                 } catch (e: Exception) {
-                    Log.d("$tag onCreate","Can't scroll for some reason",e)
+                    Log.d("$tag onCreate", "Can't scroll for some reason", e)
                 }
             }
 
@@ -99,18 +100,19 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
                     scheduledCallback = { id, isScheduled ->
 
                         if (isScheduled) {
-                            com.gorillamoa.routines.core.scheduler.TaskScheduler.scheduleTask(this@TaskListActivity,id)
-                        }else{
-                            com.gorillamoa.routines.core.scheduler.TaskScheduler.unscheduleTask(this@TaskListActivity,id)
+                            com.gorillamoa.routines.core.scheduler.TaskScheduler.scheduleTask(this@TaskListActivity, id)
+                        } else {
+                            com.gorillamoa.routines.core.scheduler.TaskScheduler.unscheduleTask(this@TaskListActivity, id)
                         }
                     },
 
-                    addButtonCallback = { isExisting -> //pick a task from existing tasks
+                    addButtonCallback = { isExisting ->
+                        //pick a task from existing tasks
 
                         //add button call back
                         if (isExisting) {
                             (adapter as TaskListAdapter).setPickerMode()
-                        }else{
+                        } else {
                             startActivityForResult(
                                     Intent(this@TaskListActivity, TaskAddActivity::class.java),
                                     TaskAddActivity.REQUEST_CODE)
@@ -123,16 +125,17 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
             //TODO make the navigation drawer open as the user finishes scrolling to the top
         }
 
+
         top_navigation_drawer.apply {
 
             setAdapter(DrawerAdapter(this@TaskListActivity))
             addOnItemSelectedListener { position ->
 
-                when(position){
+                when (position) {
                     0 -> (taskListWearableRecyclerView?.adapter as TaskListAdapter).setDailyMode()
                     1 -> (taskListWearableRecyclerView?.adapter as TaskListAdapter).setAllMode()
                 }
-                Log.d("NavigationDrawer","Clicked Position: $position")
+                Log.d("NavigationDrawer", "Clicked Position: $position")
             }
             controller.peekDrawer()
         }
@@ -153,6 +156,7 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == TaskAddActivity.REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
+
 
                 isCreating = true
                 data?.apply {

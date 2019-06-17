@@ -39,6 +39,8 @@ class DoubleRowSelectAdapter(
             itemClickedCallback?.invoke(options[position])
         }
 
+
+
         when (style) {
             STYLE_LONGTEXT ->{
 

@@ -42,6 +42,9 @@ dependencies {
     implementation project(':delauney-triangulator')
     implementation project(':core')
 
+    //GSON
+    implementation 'com.google.code.gson:gson:2.8.2'
+
 
 
 }

@@ -30,6 +30,8 @@ class TaskAddActivity : FragmentActivity() {
     lateinit var date:Calendar
 
 
+
+
     val editCallback:()->Any? = {
 
         Log.d("$tag ","Edit!")

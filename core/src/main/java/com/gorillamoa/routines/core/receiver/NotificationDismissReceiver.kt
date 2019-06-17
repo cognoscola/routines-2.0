@@ -72,7 +72,7 @@ class NotificationDismissReceiver:BroadcastReceiver() {
 
                             context.notificationShowTask(
                                     task,
-                                    dimissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!)
+                                    dismissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!)
                             )
                         }
 

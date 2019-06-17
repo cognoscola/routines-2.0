@@ -4,6 +4,7 @@ import android.os.Bundle
 
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
+import com.gorillamoa.routines.MobileNotificationBehaviourReceiver.Companion.ACTION_WAKEUP_EXPAND
 import com.gorillamoa.routines.core.extensions.*
 
 import com.gorillamoa.routines.core.scheduler.Functions
@@ -26,7 +27,7 @@ class MobileConfigurationActivity : FragmentActivity() {
             notificationShowWakeUp(
                     StringBuilder().stringifyTasks(it),
                     createNotificationMainIntentForWakeup(MobileConfigurationActivity::class.java.canonicalName!!),
-                    smallRemoteView = getRemoteView())
+                    smallRemoteView = getWakeupRemoteView())
         })
 
         notification_show.setOnClickListener {
@@ -36,7 +37,7 @@ class MobileConfigurationActivity : FragmentActivity() {
                         null,
                         null,
                         false,
-                        getRemoteView().createExpandFunction(this,it),
+                        getWakeupRemoteView().createFunction(this,it,ACTION_WAKEUP_EXPAND),
                         null)
 
             }

@@ -37,6 +37,7 @@ class OnboardActivity:FragmentActivity(){
 
     //TODO change the activity launcher name (what the user sees)
 
+
     private val TEXT_FRAGMENT_TAG = "textfrag"
 
     enum class OnboardState{
@@ -65,6 +66,7 @@ class OnboardActivity:FragmentActivity(){
         fragmentManager.beginTransaction()
                 .add(R.id.fragmentContainerInsetLayout, SplashFragment())
                 .commit()
+
 
         GlobalScope.launch {
 

@@ -17,7 +17,7 @@ import com.gorillamoa.routines.fragment.GeneralSettingsFragment
 //TODO CREATE STUBBORN OPTION (makes notifications more annoying and not dismissable)
 
 class SettingsActivity: FragmentActivity(){
-
+    
      override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
