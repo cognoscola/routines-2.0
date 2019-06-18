@@ -428,5 +428,12 @@ class TaskScheduler{
                 showNext(context)
             }
         }
+
+        fun isDayComplete(context: Context):Boolean{
+
+            val list = context.getDayTaskList()
+            val finishedList = context.getCompletedTaskList()
+            return ((list.size == 0).and(finishedList.size > 0))
+        }
     }
 }

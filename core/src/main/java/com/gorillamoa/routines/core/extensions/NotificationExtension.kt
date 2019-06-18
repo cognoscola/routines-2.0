@@ -265,7 +265,7 @@ fun Context.notificationShowActivity(activity:String, int:Int){
 
 
 
-fun Context.notificationShowSleep(){
+fun Context.notificationShowSleep(dismissable: Boolean = true){
 
         val manager = getNotificationManager()
         getBuilder().apply {
@@ -287,6 +287,8 @@ fun Context.notificationShowSleep(){
                 setAutoCancel(true)
                 setCategory(Notification.CATEGORY_SOCIAL)
 //                setDeleteIntent(dimissPendingIntent)
+
+                determineOnGoingAbility(this@apply,dismissable)
 
                 manager.notify(
                         NOTIFICATION_TAG,

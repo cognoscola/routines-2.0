@@ -3,6 +3,7 @@ package com.gorillamoa.routines.core.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
 import android.util.Log
 import android.widget.Toast
 
@@ -63,13 +64,32 @@ class NotificationActionReceiver:BroadcastReceiver(){
                     if (TaskScheduler.completeTask(context, currentTid)) {
 
                         val task = context.getTaskFromString(intent.getStringExtra(TASK_DATA))
+
                         context.showMobileNotificationTask(task)
+                        //Check if we finish the day
+                        if (TaskScheduler.isDayComplete(context)) {
+
+                            //This will either show a next task or a the sleep Notification
+                            context.notificationShowSleep(dismissable = false)
+                            TaskScheduler.endDay(context)
+
+                            Handler().postDelayed({
+                                context.getNotificationManager().cancel(NOTIFICATION_TAG,currentTid)
+
+                            },2000)
+
+                        }else{
+
+                            //we'll just show the same TASK
+
+                        }
 
                         //TODO MAKE THIS OPTIONAL
 //                        TaskScheduler.showNext(context)
                     }else{
                         Log.e("onReceive","Something wont wrong Completeing task! UH OH")
                     }
+
                 }
 
                 ACTION_TASK_UNCOMPLETE ->{
@@ -148,6 +168,9 @@ class NotificationActionReceiver:BroadcastReceiver(){
                 ACTION_TASK_NEXT -> {
 
                     Log.d("$tag onReceive", "ACTION_NEXT")
+
+
+
                     TaskScheduler.getNextOrderedTask(context, currentTid) { task ->
                         task?.let {
                             context.getNotificationManager().cancel(NOTIFICATION_TAG, currentTid)
