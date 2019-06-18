@@ -51,7 +51,7 @@ class MobileNotificationBehaviourReceiver: BroadcastReceiver(){
 
             val tid = intent.getIntExtra(com.gorillamoa.routines.core.extensions.TASK_ID,-1)
 
-            Log.d("$tag onReceive","We received.. at least")
+            Log.d("$tag Mobile onReceive","We received.. at least")
 
             when (intent.action) {
                 /**

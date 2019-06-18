@@ -46,7 +46,7 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
         intent?.let {
 
-            val tid = intent.getIntExtra(com.gorillamoa.routines.core.extensions.TASK_ID,-1)
+            val currentTid = intent.getIntExtra(com.gorillamoa.routines.core.extensions.TASK_ID,-1)
 
             Log.d("$tag onReceive","We received.. at least")
 
@@ -54,7 +54,7 @@ class NotificationActionReceiver:BroadcastReceiver(){
                 ACTION_DONE -> {
                     Log.d("onReceive","ACTION DONE")
                     //mark the task as done.
-                    if (TaskScheduler.completeTask(context, tid)) {
+                    if (TaskScheduler.completeTask(context, currentTid)) {
                         TaskScheduler.showNext(context)
                     }else{
                         Log.e("onReceive","Something wont wrong Completeing task! UH OH")
@@ -65,13 +65,13 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
                     //Dismiss the notification
                     //TODO stubborn check
-                    context.getNotificationManager().cancel(NOTIFICATION_TAG,tid)
+                    context.getNotificationManager().cancel(NOTIFICATION_TAG,currentTid)
 
 
-                    Log.d("schedule:SKIP","receiver got id ${tid}")
-                    TaskScheduler.skipAndShowNext(context,tid)
+                    Log.d("schedule:SKIP","receiver got id ${currentTid}")
+                    TaskScheduler.skipAndShowNext(context,currentTid)
 
-                    if (TaskScheduler.scheduleNTasksForward(context, tid, 2)) {
+                    if (TaskScheduler.scheduleNTasksForward(context, currentTid, 2)) {
                         TaskScheduler.showNext(context)
                     }else{
                         Log.d("onReceive","ACTION_SKIP_SHORT")
@@ -80,7 +80,7 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
                 ACTION_SKIP_TODAY ->{
 
-                    if (TaskScheduler.scheduleForNextAvailableDay(context, tid)) {
+                    if (TaskScheduler.scheduleForNextAvailableDay(context, currentTid)) {
                         TaskScheduler.showNext(context)
                     }else{
                         Log.d("onReceive","ACTION_SKIP_TODAY")
@@ -88,7 +88,6 @@ class NotificationActionReceiver:BroadcastReceiver(){
                 }
 
                 ACTION_START_DAY->{
-
 
                     //TODO UNCOMMENT BOOLEAN CHECK
                     context.apply {
@@ -116,8 +115,6 @@ class NotificationActionReceiver:BroadcastReceiver(){
                                 }
                             }
                     }
-
-//
                 }
 
                 ACTION_START_MODIFY ->{
@@ -125,21 +122,29 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
                 }
 
-                ACTION_TASK_NEXT ->{
+                ACTION_TASK_NEXT -> {
 
-                    TaskScheduler.getNextOrderedTask(context, tid) {task ->
-
-                    Toast.makeText(context,"NEXT:${task!!.id}",Toast.LENGTH_SHORT).show()
-                            task.let { showMobileNotificationTask(context,task) }
+                    Log.d("$tag onReceive", "ACTION_NEXT")
+                    TaskScheduler.getNextOrderedTask(context, currentTid) { task ->
+                        task?.let {
+                            context.getNotificationManager().cancel(NOTIFICATION_TAG, currentTid)
+                            showMobileNotificationTask(context, task)
+                        }
 
                     }
                 }
 
                 ACTION_TASK_PREVIOUS ->{
 
-                    TaskScheduler.getPreviousOrderedTask(context, tid) { task ->
-                        Toast.makeText(context,"PREVIOUS:${task!!.id}",Toast.LENGTH_SHORT).show()
-                        task.let { showMobileNotificationTask(context,task) }
+
+
+                    Log.d("$tag onReceive","ACTION_PREVIOUS")
+                    TaskScheduler.getPreviousOrderedTask(context, currentTid) { task ->
+
+                        task?.let {
+                            context.getNotificationManager().cancel(NOTIFICATION_TAG, currentTid)
+                            showMobileNotificationTask(context,task)
+                        }
                     }
                     //TODO What happens when TID Is -1?
                 }
@@ -157,7 +162,6 @@ class NotificationActionReceiver:BroadcastReceiver(){
     private fun showMobileNotificationTask(context:Context, task: Task){
         context.apply {
 
-            getNotificationManager().cancel(NOTIFICATION_TAG, WAKE_UP_NOTIFICATION_ID)
             val smallRemoteView = (context.applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.getSmallTaskRemoteView(task)
 
             context.notificationShowTask(

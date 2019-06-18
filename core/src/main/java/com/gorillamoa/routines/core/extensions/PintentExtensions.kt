@@ -162,6 +162,8 @@ fun Context.createNotificationActionPendingIntent(tid:Int,action:String):Pending
     val doneIntent = Intent(this, NotificationActionReceiver::class.java)
     doneIntent.action = action
     doneIntent.putExtra(TASK_ID,tid)
+    Log.d("ActionPendingIntent","ACTION:$action")
+
     return PendingIntent.getBroadcast(this, tid,doneIntent,PendingIntent.FLAG_ONE_SHOT)
 
 }

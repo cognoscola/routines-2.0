@@ -86,7 +86,6 @@ fun Context.getWakeupRemoteView(): RemoteViews {
     remoteViews.setTextViewText(R.id.title, getHtml(getString(R.string.wake_up_title)))
     remoteViews.setTextViewText(R.id.description, getHtml(getString(R.string.wake_up_description)))
     remoteViews.setImageViewResource(R.id.behaviourImage, R.drawable.ic_expand_more_black_24dp)
-//    remoteViews.setTextViewText(R.id.behaviourText, getString(R.string.expand))
 
     setStartFunction(remoteViews)
     return remoteViews
@@ -96,7 +95,6 @@ fun Context.getTaskRemoteView(task:Task):RemoteViews{
     val remoteViews = RemoteViews(packageName, R.layout.remote_task)
     remoteViews.setTextViewText(R.id.title, task.name)
     remoteViews.setTextViewText(R.id.description, task.description)
-    remoteViews.setTextViewText(R.id.behaviourText,getString(R.string.expand))
 
     setDirectionFunctions(task,remoteViews)
     //TODO MOVE THIS OUT OF HERE, we may want to create a notification without having this function
@@ -110,8 +108,8 @@ fun Context.getTaskRemoteView(task:Task):RemoteViews{
 
 fun Context.setDirectionFunctions(task:Task,remoteView:RemoteViews){
 
-    remoteView.setOnClickPendingIntent(R.id.buttonNext,createNotificationActionPendingIntent(task.id?:0, ACTION_TASK_NEXT))
-    remoteView.setOnClickPendingIntent(R.id.buttonBack,createNotificationActionPendingIntent(task.id?:0, ACTION_TASK_PREVIOUS))
+    remoteView.setOnClickPendingIntent(R.id.nextGroup,createNotificationActionPendingIntent(task.id?:0, ACTION_TASK_NEXT))
+    remoteView.setOnClickPendingIntent(R.id.previousGroup,createNotificationActionPendingIntent(task.id?:0, ACTION_TASK_PREVIOUS))
 
 
 }
