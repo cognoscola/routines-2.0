@@ -43,6 +43,10 @@ class App:Application(),RemoteInjectorHelper.RemoteGraphProvider
             override fun getLargeTaskRemoteView(taskList:String): RemoteViews {
                 return this@App.getLargeWakeUpRemoteView(taskList)
             }
+
+            override fun getGson(): Gson {
+                return gson
+            }
         }
 
 

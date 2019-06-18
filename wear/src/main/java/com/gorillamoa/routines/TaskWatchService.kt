@@ -641,7 +641,8 @@ class TaskWatchService : CanvasWatchFaceService() {
                         else{
                             com.gorillamoa.routines.core.scheduler.TaskScheduler.uncompleteTask(this@TaskWatchService, currentTask?.id?:-1)
                         }
-                        invalidate()}
+                        invalidate()
+                    }
             )
         }
 

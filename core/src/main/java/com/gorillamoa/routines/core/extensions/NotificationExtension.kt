@@ -16,6 +16,7 @@ import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_DONE
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_SKIP_SHORT
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_SKIP_TODAY
+import com.gorillamoa.routines.core.views.RemoteInjectorHelper
 
 import java.util.*
 
@@ -127,17 +128,15 @@ fun Context.notificationShowTask(task: Task,
     val manager = getNotificationManager()
 
 
-
     getBuilder().apply {
 
         if (isWatch()) {
-
             setAutoCancel(true)
             setCategory(Notification.CATEGORY_REMINDER)
 
-            addTaskAction(this@notificationShowTask,"Done      ", ACTION_DONE,task.id!!)
-            addTaskAction(this@notificationShowTask,"Delay     ", ACTION_SKIP_SHORT,task.id!!)
-            addTaskAction(this@notificationShowTask,"Skip Today", ACTION_SKIP_TODAY,task.id!!)
+            addTaskAction(this@notificationShowTask,"Done      ", ACTION_DONE,task)
+            addTaskAction(this@notificationShowTask,"Delay     ", ACTION_SKIP_SHORT,task)
+            addTaskAction(this@notificationShowTask,"Skip Today", ACTION_SKIP_TODAY,task)
         }else{
 
             setCategory(Notification.CATEGORY_SERVICE)
@@ -163,13 +162,30 @@ fun Context.notificationShowTask(task: Task,
 }
 
 
-fun NotificationCompat.Builder.addTaskAction(context: Context,actionText:String, action:String,tid:Int){
+fun Context.showMobileNotificationTask(task: Task){
+
+
+        val smallRemoteView = (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.getSmallTaskRemoteView(task)
+
+        notificationShowTask(
+                task,
+                dismissPendingIntent = createNotificationDeleteIntentForTask(task.id!!),
+                //TODO USE stubborn check
+                dismissable = false,
+                smallRemoteView = smallRemoteView,
+                bigRemoteView = null
+        )
+}
+
+
+
+fun NotificationCompat.Builder.addTaskAction(context: Context,actionText:String, action:String,task:Task){
 
     addAction(NotificationCompat.Action.Builder(
             R.mipmap.ic_launcher,
 //            Icon.createWithResource(context , R.mipmap.ic_launcher),
             actionText,
-            context.createNotificationActionPendingIntent(tid,action)
+            context.createNotificationActionPendingIntent(task,action)
     ).build())
 }
 //TODO ADD common functionality to remove notifications!

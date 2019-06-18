@@ -412,11 +412,7 @@ class TaskScheduler{
             getNextUncompletedTask(context) { task ->
 
                 task?.let {
-                    context.notificationShowTask(
-                            it,
-                            dismissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!)
-                    )
-
+                    context.showMobileNotificationTask(task)
                     //first time using this notation, so just to clarify. Since task was null the
                     //commands on the right side of the elvis (?:) notation was executed
 

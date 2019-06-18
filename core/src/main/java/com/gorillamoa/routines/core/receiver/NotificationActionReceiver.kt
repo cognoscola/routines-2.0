@@ -5,11 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import com.gorillamoa.routines.core.data.Task
 
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
-import com.gorillamoa.routines.core.views.RemoteInjectorHelper
 
 class NotificationActionReceiver:BroadcastReceiver(){
     @Suppress("unused")
@@ -18,7 +16,10 @@ class NotificationActionReceiver:BroadcastReceiver(){
     companion object {
 
         //clean comment
-        const val ACTION_DONE = "task.done"
+        /**
+         * Marks the task as completed
+         */
+        const val ACTION_DONE = "task.action.done"
 
         const val ACTION_SKIP_SHORT = "task.skip.short"
         const val ACTION_SKIP_TODAY = "task.skip.today"
@@ -33,20 +34,25 @@ class NotificationActionReceiver:BroadcastReceiver(){
          * Displays the previous task for today
          */
          const val ACTION_TASK_PREVIOUS = "task.action.previous"
-        
+
+        /**
+         * Set the task is NOT completed
+         */
+        const val ACTION_TASK_UNCOMPLETE = "task.action.uncomplete"
 
         const val ACTION_START_DAY = "wakeup.start"
         const val ACTION_START_MODIFY = "wakeup.modify"
 
         const val ACTION_EDIT_ORDER = "edit.sort"
         const val ACTION_EDIT_SCHEDULE = "edit.schedule"
+
     }
 
     override fun onReceive(context: Context, intent: Intent?) {
 
         intent?.let {
 
-            val currentTid = intent.getIntExtra(com.gorillamoa.routines.core.extensions.TASK_ID,-1)
+            val currentTid = intent.getIntExtra(TASK_ID,-1)
 
             Log.d("$tag onReceive","We received.. at least")
 
@@ -55,9 +61,26 @@ class NotificationActionReceiver:BroadcastReceiver(){
                     Log.d("onReceive","ACTION DONE")
                     //mark the task as done.
                     if (TaskScheduler.completeTask(context, currentTid)) {
-                        TaskScheduler.showNext(context)
+
+                        val task = context.getTaskFromString(intent.getStringExtra(TASK_DATA))
+                        context.showMobileNotificationTask(task)
+
+                        //TODO MAKE THIS OPTIONAL
+//                        TaskScheduler.showNext(context)
                     }else{
                         Log.e("onReceive","Something wont wrong Completeing task! UH OH")
+                    }
+                }
+
+                ACTION_TASK_UNCOMPLETE ->{
+
+                    if (TaskScheduler.uncompleteTask(context, currentTid)) {
+
+                        val task = context.getTaskFromString(intent.getStringExtra(TASK_DATA))
+                        context.showMobileNotificationTask(task)
+
+                    }else{
+
                     }
                 }
 
@@ -102,7 +125,7 @@ class NotificationActionReceiver:BroadcastReceiver(){
                                 task?.let {
 
                                     //Prepare our small remote view
-                                    val smallRemoteView = (context.applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.getSmallTaskRemoteView(task)
+                                    val smallRemoteView = context.getSmallTaskRemoteView(task)
 
                                     context.notificationShowTask(
                                             task,
@@ -128,22 +151,19 @@ class NotificationActionReceiver:BroadcastReceiver(){
                     TaskScheduler.getNextOrderedTask(context, currentTid) { task ->
                         task?.let {
                             context.getNotificationManager().cancel(NOTIFICATION_TAG, currentTid)
-                            showMobileNotificationTask(context, task)
+                            context.showMobileNotificationTask(task)
                         }
-
                     }
                 }
 
                 ACTION_TASK_PREVIOUS ->{
-
-
 
                     Log.d("$tag onReceive","ACTION_PREVIOUS")
                     TaskScheduler.getPreviousOrderedTask(context, currentTid) { task ->
 
                         task?.let {
                             context.getNotificationManager().cancel(NOTIFICATION_TAG, currentTid)
-                            showMobileNotificationTask(context,task)
+                            context.showMobileNotificationTask(task)
                         }
                     }
                     //TODO What happens when TID Is -1?
@@ -159,21 +179,7 @@ class NotificationActionReceiver:BroadcastReceiver(){
         }
     }
 
-    private fun showMobileNotificationTask(context:Context, task: Task){
-        context.apply {
 
-            val smallRemoteView = (context.applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.getSmallTaskRemoteView(task)
-
-            context.notificationShowTask(
-                    task,
-                    dismissPendingIntent = createNotificationDeleteIntentForTask(task.id!!),
-                    //TODO USE stubborn check
-                    dismissable = false,
-                    smallRemoteView = smallRemoteView,
-                    bigRemoteView = null
-            )
-        }
-    }
 }
 
 

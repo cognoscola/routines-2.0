@@ -16,6 +16,14 @@ import com.gorillamoa.routines.core.extensions.getHtml
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_START_DAY
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_NEXT
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_PREVIOUS
+import com.gorillamoa.routines.core.scheduler.TaskScheduler
+
+import android.graphics.Paint
+import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_DONE
+import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_UNCOMPLETE
+import java.lang.reflect.Array.setInt
+
+
 
 fun Context.getLargeWakeUpRemoteView(bigStringContent: String): RemoteViews {
     val remoteViews = RemoteViews(packageName, R.layout.remote_wakeup_large)
@@ -32,7 +40,7 @@ fun Context.getLargeWakeUpRemoteView(bigStringContent: String): RemoteViews {
 
 fun Context.setStartFunction(remoteViews: RemoteViews) {
 
-        remoteViews.setOnClickPendingIntent(R.id.start, createNotificationActionPendingIntent(-1, ACTION_START_DAY))
+        remoteViews.setOnClickPendingIntent(R.id.start, createNotificationActionPendingIntent(null, ACTION_START_DAY))
 }
 
 //TODO CONFIGURE appearance for empty tasks
@@ -96,20 +104,37 @@ fun Context.getTaskRemoteView(task:Task):RemoteViews{
     remoteViews.setTextViewText(R.id.title, task.name)
     remoteViews.setTextViewText(R.id.description, task.description)
 
+    setTaskCompletionStatus(task,remoteViews)
+
     setDirectionFunctions(task,remoteViews)
     //TODO MOVE THIS OUT OF HERE, we may want to create a notification without having this function
     remoteViews.createFunction(this, (applicationContext as App).gson.toJson(task),ACTION_TASK_EXPAND,task.id!!)
 
-//    remoteViews.setImageViewResource(R.id.behaviourImage, R.drawable.ic_expand_more_black_24dp)
-//    remoteViews.setTextViewText(R.id.behaviourText, getString(R.string.expand))
-//    setStartFunction(remoteViews)
     return remoteViews
+}
+
+fun Context.setTaskCompletionStatus(task:Task, remoteView: RemoteViews){
+
+    if(TaskScheduler.isComplete(this, task.id!!)){
+
+        remoteView.setImageViewResource(R.id.statusImage,R.drawable.ic_check_box_black_24dp)
+        remoteView.setInt(R.id.title, "setPaintFlags", Paint.STRIKE_THRU_TEXT_FLAG or Paint.ANTI_ALIAS_FLAG)
+        //we're completed so the next Intent should "Uncomplete" the task
+        remoteView.setOnClickPendingIntent(R.id.statusButton,createNotificationActionPendingIntent(task,ACTION_TASK_UNCOMPLETE))
+
+    }else{
+
+        //we aren't complete so next intent should complete the task
+        remoteView.setImageViewResource(R.id.statusImage,R.drawable.ic_crop_square_black_24dp)
+        remoteView.setInt(R.id.title, "setPaintFlags", Paint.ANTI_ALIAS_FLAG)
+        remoteView.setOnClickPendingIntent(R.id.statusButton,createNotificationActionPendingIntent(task,ACTION_DONE))
+    }
 }
 
 fun Context.setDirectionFunctions(task:Task,remoteView:RemoteViews){
 
-    remoteView.setOnClickPendingIntent(R.id.nextGroup,createNotificationActionPendingIntent(task.id?:0, ACTION_TASK_NEXT))
-    remoteView.setOnClickPendingIntent(R.id.previousGroup,createNotificationActionPendingIntent(task.id?:0, ACTION_TASK_PREVIOUS))
+    remoteView.setOnClickPendingIntent(R.id.nextGroup,createNotificationActionPendingIntent(task, ACTION_TASK_NEXT))
+    remoteView.setOnClickPendingIntent(R.id.previousGroup,createNotificationActionPendingIntent(task, ACTION_TASK_PREVIOUS))
 
 
 }
