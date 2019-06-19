@@ -39,7 +39,7 @@
         </activity>
 
         <service
-            android:name=".TaskWatchService"
+            android:name=".services.TaskWatchService"
             android:label="@string/my_analog_name"
             android:permission="android.permission.BIND_WALLPAPER">
             <meta-data
@@ -56,6 +56,14 @@
                 <action android:name="android.service.wallpaper.WallpaperService" />
 
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
+            </intent-filter>
+        </service>
+
+        <service android:name=".services.DataLayerListenerService">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <data android:scheme="wear" android:host="*"
+                    android:path="/day" />
             </intent-filter>
         </service>
 

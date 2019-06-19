@@ -89,7 +89,6 @@ class NotificationActionReceiver:BroadcastReceiver(){
                     }else{
                         Log.e("onReceive","Something wont wrong Completeing task! UH OH")
                     }
-
                 }
 
                 ACTION_TASK_UNCOMPLETE ->{

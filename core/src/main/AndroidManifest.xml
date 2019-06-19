@@ -1,2 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.gorillamoa.routines.core" />
+    package="com.gorillamoa.routines.core">
+
+    <application>
+        <activity android:name=".activities.MainActivity"></activity>
+    </application>
+
+</manifest>

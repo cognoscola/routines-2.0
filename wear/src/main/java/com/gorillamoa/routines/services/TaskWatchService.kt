@@ -1,4 +1,4 @@
-package com.gorillamoa.routines
+package com.gorillamoa.routines.services
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -78,8 +78,8 @@ class TaskWatchService : CanvasWatchFaceService() {
         return Engine()
     }
 
-    private class EngineHandler(reference: TaskWatchService.Engine) : Handler() {
-        private val mWeakReference: WeakReference<TaskWatchService.Engine> = WeakReference(reference)
+    private class EngineHandler(reference: Engine) : Handler() {
+        private val mWeakReference: WeakReference<Engine> = WeakReference(reference)
 
         override fun handleMessage(msg: Message) {
             val engine = mWeakReference.get()
