@@ -28,6 +28,14 @@
             android:name="com.google.android.wearable.standalone"
             android:value="true" />
 
+        <!-- Our notifications behave differently than Android Bridging Notifications
+            There for we'll disable briding and create our own notifications
+        -->
+
+  <!--      <meta-data
+            android:name="com.google.android.wearable.notificationBridgeMode"
+            android:value="BRIDGING" />
+-->
         <activity
             android:name=".activity.RecognitionActivity"
             android:label="@string/title_activity_recognition">
