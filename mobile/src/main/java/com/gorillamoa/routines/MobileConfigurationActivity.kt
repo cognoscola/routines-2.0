@@ -5,6 +5,7 @@ import android.util.Log
 
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
+import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.*
 import com.gorillamoa.routines.MobileNotificationBehaviourReceiver.Companion.ACTION_WAKEUP_EXPAND
@@ -16,6 +17,7 @@ import com.gorillamoa.routines.core.scheduler.assignFunction
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_routine_runner.*
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_DONE
+import com.gorillamoa.routines.core.services.remoteWakeUp
 
 
 class MobileConfigurationActivity : FragmentActivity(),
@@ -35,6 +37,15 @@ class MobileConfigurationActivity : FragmentActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_routine_runner)
+
+        /**
+        * Event Buttons
+        * */
+        wakeUpEventButton?.setOnClickListener { view ->
+
+            broadcastShowWakeUp()
+        }
+
 
         taskViewModel = connectAndLoadViewModel()
         taskViewModel.tasks.observe(this, Observer {

@@ -6,6 +6,9 @@ import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
+import com.gorillamoa.routines.core.extensions.broadcastShowWakeUp
+import com.gorillamoa.routines.core.extensions.notificationShowWakeUp
+import com.gorillamoa.routines.core.scheduler.TaskScheduler
 
 /**
  * Listens for data changes (in case we are synchronized with the mobile)
@@ -30,6 +33,14 @@ class DataLayerListenerService:WearableListenerService(){
          */
         const val EVENT_WAKEUP = "event.wakeup"
 
+
+        //TODO we need to monitor the data layer isWakeUpShowing variable. whenever it changes we just behave accordingly
+        //much simpler than sending alot of messages across
+        /**
+         * The device should hide the notification
+         */
+        const val EVENT_HIDE_WAKEUP = "event.wakeup.hide"
+
         /**
          * Another device has received the sleep event, so lets show the sleep
          * notification here as well
@@ -41,7 +52,7 @@ class DataLayerListenerService:WearableListenerService(){
          */
         const val EVENT_TASK_HISTORY_CHANGED = "event.task_info_change"
 
-        /**A task has its info changed
+        /**A task has its info changed, requires synchronization
          * One of: frequency, name, type has changed so update the local database
          */
         const val EVENT_TASK_INFO_CHANGED ="event.task_settings_change"
@@ -85,11 +96,27 @@ class DataLayerListenerService:WearableListenerService(){
 
     }
 
-    override fun onMessageReceived(messageEvent: MessageEvent?) {
+    override fun onMessageReceived(messageEvent: MessageEvent) {
         super.onMessageReceived(messageEvent)
 
+        // Check to see if the message is to launch the
+        when (messageEvent.path) {
+            EVENT_WAKEUP -> {
 
+                TaskScheduler.schedule(this) {
+                    notificationShowWakeUp(
+                            it,
+                            null,
+                            null,
+                            false,
+                            smallRemoteView = null,
+                            bigRemoteView = null)
 
+                }
+            }
+            else -> {
+            }
+        }
     }
 
 

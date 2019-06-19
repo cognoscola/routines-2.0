@@ -7,6 +7,8 @@ import android.util.Log
 import com.gorillamoa.routines.core.extensions.*
 
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
+import com.gorillamoa.routines.core.services.DataSyncrhonizationService
+import com.gorillamoa.routines.core.services.remoteWakeUp
 
 
 /**
@@ -34,11 +36,11 @@ class AlarmReceiver:BroadcastReceiver(){
         const val ACTION_ONBOARD = "W0"
 
         /**
-         * When the receiver has an intent with a type ACTION_DEFAULT, it
+         * When the receiver has an intent with a type EVENT_WAKEUP, it
          * means that the receiver should process the intent normally.
          * I.e. schedule tasks as normal
          */
-        const val ACTION_DEFAULT  = "W1"
+        const val EVENT_WAKEUP  = "W1"
 
 
         const val ACTION_SLEEP = "S1"
@@ -81,9 +83,15 @@ class AlarmReceiver:BroadcastReceiver(){
                     ))
                 }
 
-                ACTION_DEFAULT -> {
+                EVENT_WAKEUP -> {
 
-                    Log.d("onReceive", "ACTION_DEFAULT")
+                    Log.d("onReceive", "EVENT_WAKEUP")
+
+                    //TODO CHECK IF WE HAVEN"T ALREADY RECEIVED THIS EVENT. USE THE DATA LAYER
+                    // we don't want to receive two wake up events from both the Alarm and the
+                    //event from the network..in which case we should just use the data layer
+                    //to manage the synchronization task...
+
 
                     TaskScheduler.schedule(context){ taskString ->
 
@@ -93,6 +101,9 @@ class AlarmReceiver:BroadcastReceiver(){
                                 context.createNotificationMainIntentForWakeUp(),
                                 context.createNotificationDeleteIntentForWakeUp()
                         )
+
+
+                        context.remoteWakeUp()
                     }
                 }
 

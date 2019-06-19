@@ -7,7 +7,7 @@ import android.util.Log
 import com.gorillamoa.routines.core.data.Task
 
 import com.gorillamoa.routines.core.receiver.AlarmReceiver
-import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.ACTION_DEFAULT
+import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.EVENT_WAKEUP
 import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.ACTION_SLEEP
 import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.SLEEP_INTENT_CODE
 import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.WAKE_UP_INTENT_CODE
@@ -37,7 +37,7 @@ const val ACTION_TEST_WAKE_UP="N0"
 fun Context.createWakeUpAlarmPendingIntent():PendingIntent{
 
     return createAlarmPendingIntent(createAlarmIntent()
-            .apply { action = ACTION_DEFAULT }, WAKE_UP_INTENT_CODE)
+            .apply { action = EVENT_WAKEUP }, WAKE_UP_INTENT_CODE)
 }
 
 fun Context.createSleepAlarmPendingIntent():PendingIntent{
