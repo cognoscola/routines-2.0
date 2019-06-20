@@ -80,7 +80,8 @@ class MobileConfigurationActivity : FragmentActivity(),
         sendDataButton?.setOnClickListener { view ->
 
             val putDataReq: PutDataRequest = PutDataMapRequest.create("/day").run {
-                dataMap.putString("NOTIFICATION_ACTION", outDataEditText.text.toString())
+                dataMap.putBoolean("event.wakeup.visibility", true)
+
                 asPutDataRequest()
             }
             val putDataTask: Task<DataItem> = dataClient.putDataItem(putDataReq)

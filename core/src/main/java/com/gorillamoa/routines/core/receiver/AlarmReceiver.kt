@@ -92,7 +92,6 @@ class AlarmReceiver:BroadcastReceiver(){
                     //event from the network..in which case we should just use the data layer
                     //to manage the synchronization task...
 
-
                     TaskScheduler.schedule(context){ taskString ->
 
                         //TODO USE INTENT FILTER NAME
@@ -101,9 +100,6 @@ class AlarmReceiver:BroadcastReceiver(){
                                 context.createNotificationMainIntentForWakeUp(),
                                 context.createNotificationDeleteIntentForWakeUp()
                         )
-
-
-                        context.remoteWakeUp()
                     }
                 }
 

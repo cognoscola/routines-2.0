@@ -79,10 +79,6 @@ fun Context.createNotificationMainIntentForOnboarding(startingActivityName: Stri
         Log.e("Unknown Activity Name",ignored.message)
         null
     }
-
-
-
-
 }
 
 

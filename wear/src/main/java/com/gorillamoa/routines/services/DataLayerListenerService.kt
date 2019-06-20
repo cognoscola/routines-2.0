@@ -2,12 +2,8 @@ package com.gorillamoa.routines.services
 
 import android.util.Log
 import android.widget.Toast
-import com.google.android.gms.wearable.DataEvent
-import com.google.android.gms.wearable.DataEventBuffer
-import com.google.android.gms.wearable.MessageEvent
-import com.google.android.gms.wearable.WearableListenerService
-import com.gorillamoa.routines.core.extensions.broadcastShowWakeUp
-import com.gorillamoa.routines.core.extensions.notificationShowWakeUp
+import com.google.android.gms.wearable.*
+import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
 
 /**
@@ -19,6 +15,9 @@ import com.gorillamoa.routines.core.scheduler.TaskScheduler
 //TODO SYNCRHONIZE HISTORY
 //TODO SYNCHRONIZE CURRENT VISIBLE TASK
 //TODO SYNCHRONIZE SLEEP
+
+//TODO make this Listener available to both mobile and wear,
+//and that way mobile can be updated when Wear commands are taken
 
 class DataLayerListenerService:WearableListenerService(){
 
@@ -36,6 +35,12 @@ class DataLayerListenerService:WearableListenerService(){
 
         //TODO we need to monitor the data layer isWakeUpShowing variable. whenever it changes we just behave accordingly
         //much simpler than sending alot of messages across
+        /**
+         * Determine wether the wake up notification should show
+         */
+        const val isWakeShowing = "event.wakeup.visibility"
+
+
         /**
          * The device should hide the notification
          */
@@ -120,6 +125,7 @@ class DataLayerListenerService:WearableListenerService(){
     }
 
 
+
     override fun onDataChanged(dataEvents: DataEventBuffer) {
        Log.d("$tag onDataChanged","$dataEvents")
 
@@ -129,8 +135,17 @@ class DataLayerListenerService:WearableListenerService(){
 
             when (it.type) {
                 DataEvent.TYPE_CHANGED -> {
-
-
+                    it.dataItem.also {item ->
+                        if (item.uri.path.compareTo("/day") == 0) {
+                            DataMapItem.fromDataItem(item).dataMap.apply {
+                                if(getBoolean(isWakeShowing,false)){
+                                   broadcastShowWakeUp()
+                                }else{
+                                    getNotificationManager().cancel(NOTIFICATION_TAG, WAKE_UP_NOTIFICATION_ID)
+                                }
+                            }
+                        }
+                    }
 
                 }
                 DataEvent.TYPE_DELETED ->{
