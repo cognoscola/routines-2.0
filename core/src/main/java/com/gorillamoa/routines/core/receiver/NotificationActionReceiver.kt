@@ -125,33 +125,32 @@ class NotificationActionReceiver:BroadcastReceiver(){
                     }
                 }
 
-                ACTION_WAKE_START_DAY->{
+                ACTION_WAKE_START_DAY-> {
 
-                    //TODO UNCOMMENT BOOLEAN CHECK
                     context.apply {
-//                        if (context.isNotificationStubborn()) {
-                            getNotificationManager().cancel(NOTIFICATION_TAG, WAKE_UP_NOTIFICATION_ID)
-//                    }
 
-                            Toast.makeText(this@apply,"Start day",Toast.LENGTH_SHORT).show()
-                            TaskScheduler.approve(this@apply)
-                            TaskScheduler.getNextUncompletedTask(this@apply) { task ->
+                        //Always attempt to cancel the wake up notification on all ends
+                        notificationDismissWakeUpMirror()
 
-                                task?.let {
+                        Toast.makeText(this@apply, "Start day", Toast.LENGTH_SHORT).show()
+                        TaskScheduler.approve(this@apply)
+                        TaskScheduler.getNextUncompletedTask(this@apply) { task ->
 
-                                    //Prepare our small remote view
-                                    val smallRemoteView = context.getSmallTaskRemoteView(task)
+                            task?.let {
 
-                                    context.notificationShowTask(
-                                            task,
-                                            dismissPendingIntent = createNotificationDeleteIntentForTask(task.id!!),
-                                            //TODO USE stubborn check
-                                            dismissable = false,
-                                            smallRemoteView = smallRemoteView,
-                                            bigRemoteView = null
-                                    )
-                                }
+                                //Prepare our small remote view
+                                val smallRemoteView = context.getSmallTaskRemoteView(task)
+
+                                context.notificationShowTask(
+                                        task,
+                                        dismissPendingIntent = createNotificationDeleteIntentForTask(task.id!!),
+                                        //TODO USE stubborn check
+                                        dismissable = false,
+                                        smallRemoteView = smallRemoteView,
+                                        bigRemoteView = null
+                                )
                             }
+                        }
                     }
                 }
 

@@ -39,7 +39,7 @@ class AlarmReceiver:BroadcastReceiver(){
          * means that the receiver should process the intent normally.
          * I.e. schedule tasks as normal
          */
-        const val EVENT_WAKEUP  = "W1"
+        const val EVENT_WAKEUP  = "event.wakeup"
 
 
         const val ACTION_SLEEP = "S1"
@@ -60,7 +60,7 @@ class AlarmReceiver:BroadcastReceiver(){
     }
 
     override fun onReceive(context: Context, intent: Intent?) {
-        Log.d("onReceive","Woken up...")
+        Log.d("$tag onReceive","${intent?.action}")
         
         intent?.let {
 
@@ -71,8 +71,6 @@ class AlarmReceiver:BroadcastReceiver(){
             when (it.action) {
 
                 ACTION_ONBOARD ->{
-                    Log.d("onReceive", "ACTION_ONBOARD")
-
 
                     context.notificationShowWakeUp(StringBuilder().apply {
                         addTaskLine("Plant Seed", "0/1") }.toString()
@@ -84,25 +82,12 @@ class AlarmReceiver:BroadcastReceiver(){
 
                 EVENT_WAKEUP -> {
 
-                    Log.d("onReceive", "EVENT_WAKEUP")
-
                     //TODO CHECK IF WE HAVEN"T ALREADY RECEIVED THIS EVENT. USE THE DATA LAYER
                     // we don't want to receive two wake up events from both the Alarm and the
                     //event from the network..in which case we should just use the data layer
                     //to manage the synchronization task...
-
                     TaskScheduler.schedule(context){ taskString ->
-
                         context.notificationShowWakeUpMirror(taskString)
-
-                        //TODO USE INTENT FILTER NAME
-/*
-                        context.notificationShowWakeUp(
-                                taskString,
-                                context.createNotificationMainIntentForWakeUp(),
-                                context.createNotificationDeleteIntentForWakeUp()
-                        )
-*/
                     }
                 }
 

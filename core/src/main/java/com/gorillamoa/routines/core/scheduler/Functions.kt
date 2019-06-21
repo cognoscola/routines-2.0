@@ -3,7 +3,7 @@ package com.gorillamoa.routines.core.scheduler
 import android.content.Context
 import android.view.View
 import com.gorillamoa.routines.core.extensions.clearSavedArrays
-import com.gorillamoa.routines.core.extensions.notificationDissmissWakeUp
+import com.gorillamoa.routines.core.extensions.notificationDismissWakeUp
 import com.gorillamoa.routines.core.extensions.notificationShowWakeUp
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
 

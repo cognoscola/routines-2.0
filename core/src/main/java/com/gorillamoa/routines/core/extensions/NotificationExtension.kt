@@ -70,7 +70,7 @@ fun Context.notificationShowWakeUp(tasks:String,
             setStyle(prepareBigTextStyle(tasks, "Today's tasks &#128170;"))
 
             //TODO UNCOMMENT FOR WATCH
-            addWakeUpAction(this@notificationShowWakeUp,"Start Day", ACTION_WAKE_START_DAY,tasks)
+            addWakeUpAction(this@notificationShowWakeUp,"Start Day", ACTION_WAKE_START_DAY)
             //addTaskAction(this@notificationShowWakeUp,"Edit", ACTION_START_MODIFY, WAKE_UP_NOTIFICATION_ID!!)
         }else{
             setCategory(Notification.CATEGORY_SERVICE)
@@ -135,24 +135,48 @@ fun Context.notificationShowWakeLocal(tasks:String){
     )
 }
 
+/**
+ * Notify remote nodes that they should remove their Wake Up Notifications
+ * if they are displaying one
+ */
 fun Context.notificationDismissWakeUpRemote(){
 
     val dataItemUri = Uri.Builder().scheme(WEAR_URI_SCHEME).path(WAKE_UP_PATH).build()
     Wearable.getDataClient(this).deleteDataItems(dataItemUri)
 }
 
-
-fun Context.notificationDissmissWakeUp(){
+/**
+ * Convenience
+ * Cancels (removes) the Wake up Notification if there is one
+ */
+fun Context.notificationDismissWakeUp(){
 
     getNotificationManager().cancel(NOTIFICATION_TAG, WAKE_UP_NOTIFICATION_ID)
 }
 
-fun NotificationCompat.Builder.addWakeUpAction(context: Context,actionText:String, action:String,tasks:String){
+/**
+ * Convenience method to dismiss all wake up notifications across devices
+ */
+fun Context.notificationDismissWakeUpMirror(){
+
+    notificationDismissWakeUpRemote()
+    notificationDismissWakeUp()
+}
+
+/**
+ * Create an Action button for a notification
+ * Note: Dismiss Intent is fired if one of these actions is clicked. We should take care
+ * to create dismiss funtions for custom actions on RemoteView
+ * @param context is the application context
+ * @param actionText is the text to display on the button
+ * @param action is the Intent action that will redirect to the proper functoin
+ */
+fun NotificationCompat.Builder.addWakeUpAction(context: Context,actionText:String, action:String){
 
     addAction(NotificationCompat.Action.Builder(
             R.mipmap.ic_launcher,
             actionText,
-            context.createNotificationActionPendingIntentForWakeUp(tasks,action)
+            context.createNotificationActionPendingIntentForWakeUp(action)
     ).build())
 }
 

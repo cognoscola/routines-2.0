@@ -34,7 +34,12 @@
             android:exported="false"/>
 
         <receiver android:name=".core.receiver.AlarmReceiver"
-            android:exported="false"/>
+            android:exported="false">
+            <intent-filter>
+                <action android:name="event.wakeup" />
+            </intent-filter>
+
+        </receiver>
         <receiver android:name=".core.receiver.NotificationDismissReceiver"
             android:exported="false"/>
 

@@ -35,7 +35,7 @@ fun Context.getLargeWakeUpRemoteView(bigStringContent: String): RemoteViews {
 
 fun Context.setStartFunction(remoteViews: RemoteViews) {
 
-        remoteViews.setOnClickPendingIntent(R.id.start, createNotificationActionPendingIntent(null, ACTION_WAKE_START_DAY))
+        remoteViews.setOnClickPendingIntent(R.id.start, createNotificationActionPendingIntentForWakeUp(ACTION_WAKE_START_DAY))
 }
 
 //TODO CONFIGURE appearance for empty tasks
@@ -81,7 +81,6 @@ fun RemoteViews.createCollapseFunction(context: Context,tasks: String?):RemoteVi
     }
     return this
 }
-
 
 fun Context.getWakeupRemoteView(taskLength:Int): RemoteViews {
 

@@ -170,12 +170,11 @@ fun Context.createNotificationDeleteIntentForTask(tid: Int):PendingIntent{
 /****************************************************************
  * Functions for WAKE UP EVENTS
  *****************************************************************/
-fun Context.createNotificationActionPendingIntentForWakeUp(tasks:String, action:String):PendingIntent{
+fun Context.createNotificationActionPendingIntentForWakeUp(action:String):PendingIntent{
     Log.d("ActionPendingIntent","ACTION:$action")
 
     val intent = Intent(this,NotificationActionReceiver::class.java)
     intent.action = action
-    intent.putExtra(TASK_DATA, tasks)
     return PendingIntent.getBroadcast(this, 0,intent,PendingIntent.FLAG_ONE_SHOT)
 
 }

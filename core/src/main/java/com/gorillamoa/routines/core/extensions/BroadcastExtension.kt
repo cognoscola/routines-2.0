@@ -14,7 +14,6 @@ fun Context.broadcastShowWakeUp(){
     /** We indicate that the receiver should treat the intent as
      * part of a normal Wake up
      */
-
     sendBroadcast(createWakeUpRecieverIntent().setAction(AlarmReceiver.EVENT_WAKEUP))
 }
 

@@ -40,10 +40,8 @@ class MobileConfigurationActivity : FragmentActivity(),
         * Event Buttons
         * */
         wakeUpEventButton?.setOnClickListener { view ->
-
             broadcastShowWakeUp()
         }
-
 
         taskViewModel = connectAndLoadViewModel()
         taskViewModel.tasks.observe(this, Observer {
@@ -71,7 +69,7 @@ class MobileConfigurationActivity : FragmentActivity(),
 
         notification_hide?.setOnClickListener { view ->
 
-            notificationDissmissWakeUp()
+            notificationDismissWakeUp()
 
             remoteNotifyWakeUpActioned(this)
         }

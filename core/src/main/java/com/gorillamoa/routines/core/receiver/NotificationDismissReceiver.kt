@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.gorillamoa.routines.core.extensions.notificationDismissWakeUpRemote
-import com.gorillamoa.routines.core.extensions.notificationDissmissWakeUp
+import com.gorillamoa.routines.core.extensions.notificationDismissWakeUp
 
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
 

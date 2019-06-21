@@ -117,7 +117,7 @@ class DataLayerListenerService:WearableListenerService(){
                 DataEvent.TYPE_DELETED -> {
 
                     if (DataLayerConstant.WAKE_UP_PATH.equals(it.dataItem.uri.path)) {
-                        notificationDissmissWakeUp()
+                        notificationDismissWakeUp()
                     }
                 }
                 else -> {
