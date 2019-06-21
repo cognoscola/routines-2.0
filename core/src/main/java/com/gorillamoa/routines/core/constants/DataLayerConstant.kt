@@ -4,13 +4,15 @@ package com.gorillamoa.routines.core.constants
 
      companion object {
          /**
-          * Path to show notification on Both devices
+          * Path to show notifications on both devices
           */
-         const val BOTH_PATH = "/both"
-
+         const val WAKE_UP_PATH = "/wakeup"
+         const val TASK_PATH = "/task"
+         const val SLEEP_PATH  = "/sleep"
 
          /**
-          * Contains information regarding tasks.
+          * Field to contain information about tasks
+          * Used by, Wake, Task and Sleep notifications
           */
          const val KEY_TASK_DATA = "task_data"
 

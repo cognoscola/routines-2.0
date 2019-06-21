@@ -11,13 +11,12 @@ import android.text.Spanned
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
-import com.google.android.gms.wearable.DataItem
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.PutDataRequest
 import com.google.android.gms.wearable.PutDataRequest.WEAR_URI_SCHEME
 import com.google.android.gms.wearable.Wearable
 import com.gorillamoa.routines.core.R
-import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.BOTH_PATH
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.WAKE_UP_PATH
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
 
 import com.gorillamoa.routines.core.data.Task
@@ -100,15 +99,9 @@ fun Context.notificationShowWakeUp(tasks:String,
     }
 }
 
-fun Context.notificationShowWakeUpRemote(tasks:String, path:String){
 
-    val putDataReq: PutDataRequest = PutDataMapRequest.create(path).run {
-        dataMap.putString(KEY_TASK_DATA, tasks)
-        asPutDataRequest()
-    }
-    putDataReq.setUrgent()
-    val putDataTask = Wearable.getDataClient(this).putDataItem(putDataReq)
-}
+fun Context.notificationShowWakeUpRemote(tasks:String){ notificationShowRemote(tasks,WAKE_UP_PATH) }
+
 
 /**
  * Builds a mirrored notification both on the Local device and on
@@ -121,9 +114,7 @@ fun Context.notificationShowWakeUpMirror(tasks:String){
     notificationShowWakeLocal(tasks)
 
     //Next lets build a remote notification
-    notificationShowWakeUpRemote(tasks,BOTH_PATH)
-
-
+    notificationShowWakeUpRemote(tasks)
 }
 
 /**
@@ -143,7 +134,7 @@ fun Context.notificationShowWakeLocal(tasks:String){
 
 fun Context.notificationDismissWakeUpRemote(){
 
-    val dataItemUri = Uri.Builder().scheme(WEAR_URI_SCHEME).path(BOTH_PATH).build()
+    val dataItemUri = Uri.Builder().scheme(WEAR_URI_SCHEME).path(WAKE_UP_PATH).build()
     Wearable.getDataClient(this).deleteDataItems(dataItemUri)
 }
 
@@ -157,6 +148,20 @@ fun Context.notificationDissmissWakeUp(){
 /********************************************************************************
  * TASK NOTIFICATION FUNCTIONS
  *********************************************************************************/
+
+fun Context.notificationShowRemote(taskData:String, path:String){
+
+    val putDataReq: PutDataRequest = PutDataMapRequest.create(path).run {
+        dataMap.putString(KEY_TASK_DATA, taskData)
+        asPutDataRequest()
+    }
+    putDataReq.setUrgent()
+    val putDataTask = Wearable.getDataClient(this).putDataItem(putDataReq)
+}
+/********************************************************************************
+ * GENERIC NOTIFICATION FUNCTIONS
+ *********************************************************************************/
+
 
 fun determineOnGoingAbility(builder:NotificationCompat.Builder, dismissable:Boolean){
 

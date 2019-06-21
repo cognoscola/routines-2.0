@@ -3,7 +3,6 @@ package com.gorillamoa.routines.core.services
 import android.util.Log
 import com.google.android.gms.wearable.*
 import com.gorillamoa.routines.core.constants.DataLayerConstant
-import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.BOTH_PATH
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
 import com.gorillamoa.routines.core.extensions.*
 
@@ -26,13 +25,6 @@ class DataLayerListenerService:WearableListenerService(){
     private val tag:String = DataLayerListenerService::class.java.name
 
     companion object {
-
-        /**
-         * Another device has received the wake up event, so lets show the wake up
-         * event here as well
-         */
-//        const val EVENT_WAKEUP = "/event/wakeup"
-
 
         //TODO we need to monitor the data layer isWakeUpShowing variable. whenever it changes we just behave accordingly
         //much simpler than sending alot of messages across
@@ -116,30 +108,15 @@ class DataLayerListenerService:WearableListenerService(){
                     val dataMap = DataMapItem.fromDataItem(it.dataItem).dataMap
                     val tasks = dataMap.getString(KEY_TASK_DATA)
 
-                    if (DataLayerConstant.BOTH_PATH.equals(it.dataItem.uri.path)) {
+                    if (DataLayerConstant.WAKE_UP_PATH.equals(it.dataItem.uri.path)) {
 
                         notificationShowWakeLocal(tasks)
-
                     }
 
-
-/*
-                    it.dataItem.also { item ->
-                        if (item.uri.path.compareTo("/day") == 0) {
-                            DataMapItem.fromDataItem(item).dataMap.apply {
-                                if (getBoolean(EVENT_WAKEUP, false)) {
-                                    broadcastShowWakeUp()
-                                } else {
-                                    getNotificationManager().cancel(NOTIFICATION_TAG, WAKE_UP_NOTIFICATION_ID)
-                                }
-                            }
-                        }
-                    }
-*/
                 }
                 DataEvent.TYPE_DELETED -> {
 
-                    if (DataLayerConstant.BOTH_PATH.equals(it.dataItem.uri.path)) {
+                    if (DataLayerConstant.WAKE_UP_PATH.equals(it.dataItem.uri.path)) {
                         notificationDissmissWakeUp()
                     }
                 }
