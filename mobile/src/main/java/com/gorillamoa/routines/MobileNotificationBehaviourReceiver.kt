@@ -97,7 +97,7 @@ class MobileNotificationBehaviourReceiver: BroadcastReceiver(){
                                     //TODO record the dismissal
                                     null,
                                     false,
-                                    getWakeupRemoteView().createFunction(context,intent.getStringExtra(TASK_DATA), ACTION_WAKEUP_EXPAND),
+                                    getWakeupRemoteView(0).createFunction(context,intent.getStringExtra(TASK_DATA), ACTION_WAKEUP_EXPAND),
                                     null)
                         }
                     } else {

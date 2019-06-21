@@ -51,7 +51,7 @@ class MobileConfigurationActivity : FragmentActivity(),
             notificationShowWakeUp(
                     StringBuilder().stringifyTasks(it),
                     createNotificationMainIntentForWakeup(MobileConfigurationActivity::class.java.canonicalName!!),
-                    smallRemoteView = getWakeupRemoteView())
+                    smallRemoteView = getWakeupRemoteView(it.size))
         })
 
         notification_show.setOnClickListener {
@@ -63,7 +63,7 @@ class MobileConfigurationActivity : FragmentActivity(),
                         null,
                         null,
                         false,
-                        getWakeupRemoteView().createFunction(this,it,ACTION_WAKEUP_EXPAND),
+                        getWakeupRemoteView(0).createFunction(this,it,ACTION_WAKEUP_EXPAND),
                         null)
 
             }

@@ -21,6 +21,8 @@ import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companio
 import com.gorillamoa.routines.core.views.RemoteInjectorHelper
 import java.lang.reflect.Array.setInt
 
+
+//TODO Set Height of remote view  to MIN of (WRAP_CONTENT, 256dp )
 fun Context.getLargeWakeUpRemoteView(bigStringContent: String): RemoteViews {
     val remoteViews = RemoteViews(packageName, R.layout.remote_wakeup_large)
     remoteViews.setTextViewText(R.id.title, getHtml(getString(R.string.wake_up_large_title)))
@@ -84,11 +86,11 @@ fun RemoteViews.createCollapseFunction(context: Context,tasks: String?):RemoteVi
 }
 
 
-fun Context.getWakeupRemoteView(): RemoteViews {
+fun Context.getWakeupRemoteView(taskLength:Int): RemoteViews {
 
     val remoteViews = RemoteViews(packageName, R.layout.remote_wakeup)
     remoteViews.setTextViewText(R.id.title, getHtml(getString(R.string.wake_up_title)))
-    remoteViews.setTextViewText(R.id.description, getHtml(getString(R.string.wake_up_description)))
+    remoteViews.setTextViewText(R.id.description, getHtml(getString(R.string.wake_up_description, taskLength )))
     remoteViews.setImageViewResource(R.id.behaviourImage, R.drawable.ic_expand_more_black_24dp)
 
     setStartFunction(remoteViews)

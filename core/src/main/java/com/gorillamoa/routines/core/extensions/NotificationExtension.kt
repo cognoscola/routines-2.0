@@ -60,8 +60,6 @@ fun Context.notificationShowWakeUp(tasks:String,
                                    smallRemoteView:RemoteViews? = null,
                                    bigRemoteView:RemoteViews?= null) {
 
-    //TODO ENSURE 1.0+ compatibility, right now it only works on 2.0
-
     val manager = getNotificationManager()
     getBuilder().apply {
 
@@ -126,8 +124,10 @@ fun Context.notificationShowWakeLocal(tasks:String){
             tasks,
             mainPendingIntent = null,
             dismissPendingIntent = createNotificationDeleteIntentForWakeUp(),
-            dismissable = true,
-            smallRemoteView = if(!isWatch())remoteGetSmallWakeUpView()else null,
+            //TODO CHECK IF WE SHOULD ALLOW DISMISSAL
+            dismissable = false,
+            //TODO get the actual task length
+            smallRemoteView = if(!isWatch())remoteGetSmallWakeUpView(3)else null,
             bigRemoteView = if(!isWatch())remoteGetLargeWakeUpView(tasks) else null
     )
 }
@@ -149,6 +149,11 @@ fun Context.notificationDissmissWakeUp(){
  * TASK NOTIFICATION FUNCTIONS
  *********************************************************************************/
 
+/********************************************************************************
+ * GENERIC NOTIFICATION FUNCTIONS
+ *********************************************************************************/
+
+
 fun Context.notificationShowRemote(taskData:String, path:String){
 
     val putDataReq: PutDataRequest = PutDataMapRequest.create(path).run {
@@ -158,10 +163,6 @@ fun Context.notificationShowRemote(taskData:String, path:String){
     putDataReq.setUrgent()
     val putDataTask = Wearable.getDataClient(this).putDataItem(putDataReq)
 }
-/********************************************************************************
- * GENERIC NOTIFICATION FUNCTIONS
- *********************************************************************************/
-
 
 fun determineOnGoingAbility(builder:NotificationCompat.Builder, dismissable:Boolean){
 
