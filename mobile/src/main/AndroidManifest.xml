@@ -43,6 +43,8 @@
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/wakeup"/>
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/task"/>
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/sleep"/>
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/data"/>
+
             </intent-filter>
         </service>
     </application>

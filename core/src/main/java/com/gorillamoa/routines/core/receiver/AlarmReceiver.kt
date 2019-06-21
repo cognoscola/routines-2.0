@@ -91,6 +91,7 @@ class AlarmReceiver:BroadcastReceiver(){
                     //event from the network..in which case we should just use the data layer
                     //to manage the synchronization task...
                     TaskScheduler.schedule(context){ tasks ->
+
                         tasks?.let{context.notificationShowWakeUpMirror(tasks!!)}
                     }
                 }

@@ -74,8 +74,9 @@
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/wakeup"/>
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/task"/>
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/sleep"/>
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/data"/>
 
-                <!--What only paths, I have yet to find a situation for this.. but maybe later-->
+                <!--Watch only paths, I have yet to find a situation for this.. but maybe later-->
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/watch-only"/>
 
             </intent-filter>

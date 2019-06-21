@@ -78,7 +78,12 @@ class TaskScheduler{
 
                 //TODO wait for approval of user
                 context.EnableScheduler()
-                scheduleCallback.invoke(taskList)
+
+                if (taskList?.isEmpty()?:true) {
+                    scheduleCallback.invoke(generateEmptyVisibleList())
+                }else{
+                    scheduleCallback.invoke(taskList)
+                }
             }
         }
 
@@ -446,6 +451,10 @@ class TaskScheduler{
                     type = TaskType.TYPE_SPECIAL,
                     id = 1000
             )
+        }
+
+        fun generateEmptyVisibleList():List<Task>{
+           return List(1){ generateEmptyTaskObject()}
         }
     }
 }

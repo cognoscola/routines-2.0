@@ -44,10 +44,11 @@ class MobileConfigurationActivity : FragmentActivity(),
 
         taskViewModel = connectAndLoadViewModel()
         taskViewModel.tasks.observe(this, Observer {
-
             if (it.isNotEmpty()) {
                 Log.d("notificationRoutine","onCreate Observer")
                 notificationShowWakeUpMirror(it)
+            }else{
+                notificationShowWakeUpMirror(TaskScheduler.generateEmptyVisibleList())
             }
         })
 

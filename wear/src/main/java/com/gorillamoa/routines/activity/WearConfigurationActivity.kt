@@ -16,6 +16,7 @@ import com.google.android.gms.wearable.Wearable
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
+import com.gorillamoa.routines.core.scheduler.TaskScheduler
 import com.gorillamoa.routines.core.services.DataLayerListenerService.Companion.EVENT_WAKEUP
 import com.gorillamoa.routines.fragment.TimePickerFragment
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
@@ -69,8 +70,10 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
         taskViewModel.tasks.observe(this, Observer {
             if (it.isNotEmpty()) {
                 notificationShowWakeUpMirror(it)
+            }else{
+                notificationShowWakeUpMirror(TaskScheduler.generateEmptyVisibleList())
             }
-            })
+        })
 
         /**get the view model object */
 
