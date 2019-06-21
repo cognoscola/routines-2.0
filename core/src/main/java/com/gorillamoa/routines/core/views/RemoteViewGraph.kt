@@ -11,5 +11,4 @@ interface RemoteViewGraph{
     fun remoteGetSmallWakeUpView(taskLength:Int):RemoteViews
     fun remoteGetLargeWakeUpView(tasks:String):RemoteViews
 
-
 }

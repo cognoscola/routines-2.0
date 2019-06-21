@@ -41,7 +41,7 @@ class NotificationActionReceiver:BroadcastReceiver(){
          */
         const val ACTION_TASK_UNCOMPLETE = "task.action.uncomplete"
 
-        const val ACTION_START_DAY = "wakeup.start"
+        const val ACTION_WAKE_START_DAY = "wake.startday"
         const val ACTION_START_MODIFY = "wakeup.modify"
 
         const val ACTION_EDIT_ORDER = "edit.sort"
@@ -55,11 +55,10 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
             val currentTid = intent.getIntExtra(TASK_ID,-1)
 
-            Log.d("$tag onReceive","We received.. at least")
+            Log.d("$tag onReceive","${intent.action}")
 
             when (intent.action) {
                 ACTION_DONE -> {
-                    Log.d("onReceive","ACTION DONE")
                     //mark the task as done.
                     if (TaskScheduler.completeTask(context, currentTid)) {
 
@@ -79,9 +78,7 @@ class NotificationActionReceiver:BroadcastReceiver(){
                             },2000)
 
                         }else{
-
                             //we'll just show the same TASK
-
                         }
 
                         //TODO MAKE THIS OPTIONAL
@@ -109,7 +106,6 @@ class NotificationActionReceiver:BroadcastReceiver(){
                     //TODO stubborn check
                     context.getNotificationManager().cancel(NOTIFICATION_TAG,currentTid)
 
-
                     Log.d("schedule:SKIP","receiver got id ${currentTid}")
                     TaskScheduler.skipAndShowNext(context,currentTid)
 
@@ -129,7 +125,7 @@ class NotificationActionReceiver:BroadcastReceiver(){
                     }
                 }
 
-                ACTION_START_DAY->{
+                ACTION_WAKE_START_DAY->{
 
                     //TODO UNCOMMENT BOOLEAN CHECK
                     context.apply {
@@ -161,13 +157,9 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
                 ACTION_START_MODIFY ->{
 
-
                 }
 
                 ACTION_TASK_NEXT -> {
-
-                    Log.d("$tag onReceive", "ACTION_NEXT")
-
 
 
                     TaskScheduler.getNextOrderedTask(context, currentTid) { task ->
@@ -180,7 +172,6 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
                 ACTION_TASK_PREVIOUS ->{
 
-                    Log.d("$tag onReceive","ACTION_PREVIOUS")
                     TaskScheduler.getPreviousOrderedTask(context, currentTid) { task ->
 
                         task?.let {

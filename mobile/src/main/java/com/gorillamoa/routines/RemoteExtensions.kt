@@ -7,9 +7,8 @@ import android.util.Log
 import android.widget.RemoteViews
 import com.gorillamoa.routines.MobileNotificationBehaviourReceiver.Companion.ACTION_TASK_EXPAND
 import com.gorillamoa.routines.MobileNotificationBehaviourReceiver.Companion.ACTION_WAKEUP_COLLAPSE
-import com.gorillamoa.routines.app.App
 import com.gorillamoa.routines.core.data.Task
-import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_START_DAY
+import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_WAKE_START_DAY
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_NEXT
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_PREVIOUS
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
@@ -18,8 +17,6 @@ import android.graphics.Paint
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_DONE
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_UNCOMPLETE
-import com.gorillamoa.routines.core.views.RemoteInjectorHelper
-import java.lang.reflect.Array.setInt
 
 
 //TODO Set Height of remote view  to MIN of (WRAP_CONTENT, 256dp )
@@ -38,7 +35,7 @@ fun Context.getLargeWakeUpRemoteView(bigStringContent: String): RemoteViews {
 
 fun Context.setStartFunction(remoteViews: RemoteViews) {
 
-        remoteViews.setOnClickPendingIntent(R.id.start, createNotificationActionPendingIntent(null, ACTION_START_DAY))
+        remoteViews.setOnClickPendingIntent(R.id.start, createNotificationActionPendingIntent(null, ACTION_WAKE_START_DAY))
 }
 
 //TODO CONFIGURE appearance for empty tasks

@@ -23,6 +23,7 @@ import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_DONE
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_SKIP_SHORT
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_SKIP_TODAY
+import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_WAKE_START_DAY
 import com.gorillamoa.routines.core.views.RemoteInjectorHelper
 
 import java.util.*
@@ -37,6 +38,8 @@ const val TIMER_NOTIFICATION_ID = 65532
 public const val NOTIFICATION_CHANNEL_ONE  = "channel"
 public const val NOTIFICATION_CHANNEL_TWO  = "channel_MAX"
 const val NOTIFICATION_TAG = "routines"
+
+
 
 
 /** Prepare the intent for when user dismisses the notification **/
@@ -67,7 +70,7 @@ fun Context.notificationShowWakeUp(tasks:String,
             setStyle(prepareBigTextStyle(tasks, "Today's tasks &#128170;"))
 
             //TODO UNCOMMENT FOR WATCH
-            //addTaskAction(this@notificationShowWakeUp,"Start Day", ACTION_START_DAY, WAKE_UP_NOTIFICATION_ID!!)
+            addWakeUpAction(this@notificationShowWakeUp,"Start Day", ACTION_WAKE_START_DAY,tasks)
             //addTaskAction(this@notificationShowWakeUp,"Edit", ACTION_START_MODIFY, WAKE_UP_NOTIFICATION_ID!!)
         }else{
             setCategory(Notification.CATEGORY_SERVICE)
@@ -124,8 +127,8 @@ fun Context.notificationShowWakeLocal(tasks:String){
             tasks,
             mainPendingIntent = null,
             dismissPendingIntent = createNotificationDeleteIntentForWakeUp(),
-            //TODO CHECK IF WE SHOULD ALLOW DISMISSAL
-            dismissable = false,
+            //TODO CHECK IF WE SHOULD ALLOW DISMISSAL with stubborn settings
+            dismissable = true,
             //TODO get the actual task length
             smallRemoteView = if(!isWatch())remoteGetSmallWakeUpView(3)else null,
             bigRemoteView = if(!isWatch())remoteGetLargeWakeUpView(tasks) else null
@@ -142,6 +145,15 @@ fun Context.notificationDismissWakeUpRemote(){
 fun Context.notificationDissmissWakeUp(){
 
     getNotificationManager().cancel(NOTIFICATION_TAG, WAKE_UP_NOTIFICATION_ID)
+}
+
+fun NotificationCompat.Builder.addWakeUpAction(context: Context,actionText:String, action:String,tasks:String){
+
+    addAction(NotificationCompat.Action.Builder(
+            R.mipmap.ic_launcher,
+            actionText,
+            context.createNotificationActionPendingIntentForWakeUp(tasks,action)
+    ).build())
 }
 
 

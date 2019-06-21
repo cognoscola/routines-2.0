@@ -170,12 +170,17 @@
         <receiver
             android:name=".core.receiver.NotificationDismissReceiver"
             android:exported="false" />
-        <receiver
-            android:name=".core.receiver.NotificationActionReceiver"
-            android:exported="false" />
 
         <receiver android:name=".core.receiver.ActivityReceiver"
             android:exported="false"/>
+
+        <receiver
+            android:name=".core.receiver.NotificationActionReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="wake.startday" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

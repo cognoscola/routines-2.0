@@ -139,6 +139,23 @@ fun Context.createNotificationDeleteIntentForWakeUp():PendingIntent{
 }
 
 /**
+ * create a notification action which will mark the displayed task as done
+ * @param tid is the task id of the task currently being displayed
+ */
+fun Context.createNotificationActionPendingIntent(task: Task?, action:String):PendingIntent{
+    Log.d("ActionPendingIntent","ACTION:$action")
+
+    val intent = Intent(action)
+    if (task != null) {
+        intent.putExtra(TASK_ID,task.id?:-1)
+        intent.putExtra(TASK_DATA, getGson().toJson(task))
+    }
+
+    return PendingIntent.getBroadcast(this, task?.id?:-1,intent,PendingIntent.FLAG_ONE_SHOT)
+
+}
+
+/**
  * The user dismisses a Task notification.
  * @param tid is the id of the task being dismissed
  */
@@ -150,20 +167,15 @@ fun Context.createNotificationDeleteIntentForTask(tid: Int):PendingIntent{
 
 }
 
-/**
- * create a notification action which will mark the displayed task as done
- * @param tid is the task id of the task currently being displayed
- */
-fun Context.createNotificationActionPendingIntent(task: Task?, action:String):PendingIntent{
-
-    val doneIntent = Intent(this, NotificationActionReceiver::class.java)
-    doneIntent.action = action
-    if (task != null) {
-        doneIntent.putExtra(TASK_ID,task.id?:-1)
-        doneIntent.putExtra(TASK_DATA, getGson().toJson(task))
-    }
+/****************************************************************
+ * Functions for WAKE UP EVENTS
+ *****************************************************************/
+fun Context.createNotificationActionPendingIntentForWakeUp(tasks:String, action:String):PendingIntent{
     Log.d("ActionPendingIntent","ACTION:$action")
 
-    return PendingIntent.getBroadcast(this, task?.id?:-1,doneIntent,PendingIntent.FLAG_ONE_SHOT)
+    val intent = Intent(this,NotificationActionReceiver::class.java)
+    intent.action = action
+    intent.putExtra(TASK_DATA, tasks)
+    return PendingIntent.getBroadcast(this, 0,intent,PendingIntent.FLAG_ONE_SHOT)
 
 }
