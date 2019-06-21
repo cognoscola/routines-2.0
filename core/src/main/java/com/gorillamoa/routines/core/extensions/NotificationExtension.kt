@@ -56,7 +56,7 @@ const val NOTIFICATION_TAG = "routines"
  * @param mainPendingIntent is the Main notification intent
  * @param dismissPendingIntent is what happens when the user dismisses
  */
-fun Context.notificationShowWakeUp(tasks:String,
+fun Context.notificationShowWakeUp(tasks:List<Task>,
                                    mainPendingIntent: PendingIntent?,
                                    dismissPendingIntent:PendingIntent? = null,
                                    dismissable:Boolean = true,
@@ -67,7 +67,8 @@ fun Context.notificationShowWakeUp(tasks:String,
     getBuilder().apply {
 
         if (isWatch()) {
-            setStyle(prepareBigTextStyle(tasks, "Today's tasks &#128170;"))
+            //TODO bring Stringbuilder from dagger()
+            setStyle(prepareBigTextStyle(StringBuilder().stringifyTasks(tasks), "Today's tasks &#128170;"))
 
             //TODO UNCOMMENT FOR WATCH
             addWakeUpAction(this@notificationShowWakeUp,"Start Day", ACTION_WAKE_START_DAY)
@@ -101,7 +102,7 @@ fun Context.notificationShowWakeUp(tasks:String,
 }
 
 
-fun Context.notificationShowWakeUpRemote(tasks:String){ notificationShowRemote(tasks,WAKE_UP_PATH) }
+fun Context.notificationShowWakeUpRemote(tasks:List<Task>){ notificationShowRemote(tasks,WAKE_UP_PATH) }
 
 
 /**
@@ -109,10 +110,10 @@ fun Context.notificationShowWakeUpRemote(tasks:String){ notificationShowRemote(t
  * other connected nodes. When either is ACTIONED, the same action occurs on both devices.
  * @param tasks is the tasks sas string
  */
-fun Context.notificationShowWakeUpMirror(tasks:String){
+fun Context.notificationShowWakeUpMirror(tasks:List<Task>){
 
     //First lets build a local notification
-    notificationShowWakeLocal(tasks)
+    notificationShowWakeUpLocal(tasks)
 
     //Next lets build a remote notification
     notificationShowWakeUpRemote(tasks)
@@ -122,7 +123,7 @@ fun Context.notificationShowWakeUpMirror(tasks:String){
  * Builds a local notification
  * @param tasks is the string of tasks to display
  */
-fun Context.notificationShowWakeLocal(tasks:String){
+fun Context.notificationShowWakeUpLocal(tasks:List<Task>){
     notificationShowWakeUp(
             tasks,
             mainPendingIntent = null,
@@ -130,8 +131,9 @@ fun Context.notificationShowWakeLocal(tasks:String){
             //TODO CHECK IF WE SHOULD ALLOW DISMISSAL with stubborn settings
             dismissable = true,
             //TODO get the actual task length
-            smallRemoteView = if(!isWatch())remoteGetSmallWakeUpView(3)else null,
-            bigRemoteView = if(!isWatch())remoteGetLargeWakeUpView(tasks) else null
+            smallRemoteView = if(!isWatch())remoteGetSmallWakeUpView(tasks.size)else null,
+            //TODO Get stringbuilder from dagger singleton
+            bigRemoteView = if(!isWatch())remoteGetLargeWakeUpView(StringBuilder().stringifyTasks(tasks)) else null
     )
 }
 
@@ -190,10 +192,10 @@ fun NotificationCompat.Builder.addWakeUpAction(context: Context,actionText:Strin
  *********************************************************************************/
 
 
-fun Context.notificationShowRemote(taskData:String, path:String){
+fun Context.notificationShowRemote(tasks:List<Task>, path:String){
 
     val putDataReq: PutDataRequest = PutDataMapRequest.create(path).run {
-        dataMap.putString(KEY_TASK_DATA, taskData)
+        dataMap.putString(KEY_TASK_DATA,  StringBuilder().stringifyTasks(tasks))
         asPutDataRequest()
     }
     putDataReq.setUrgent()

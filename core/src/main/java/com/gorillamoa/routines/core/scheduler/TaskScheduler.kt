@@ -54,7 +54,7 @@ class TaskScheduler{
          * TaskString - is the list of tasks for the day as a string
          * tid - is the first task to start
          */
-        fun schedule(context: Context, scheduleCallback: (taskString: String)->Any){
+        fun schedule(context: Context, scheduleCallback: (tasks: List<Task>?)->Unit?){
 
             val repository = context.getDataRepository()
 
@@ -80,7 +80,7 @@ class TaskScheduler{
 
                 //TODO wait for approval of user
                 context.EnableScheduler()
-                scheduleCallback.invoke(StringBuilder().stringifyTasks(taskList))
+                scheduleCallback.invoke(taskList)
             }
         }
 

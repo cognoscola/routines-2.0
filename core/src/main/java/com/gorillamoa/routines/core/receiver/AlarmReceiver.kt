@@ -72,12 +72,16 @@ class AlarmReceiver:BroadcastReceiver(){
 
                 ACTION_ONBOARD ->{
 
+                    //TODO FIX THIS
+                    //TODO bring th string builder from dagger
+/*
                     context.notificationShowWakeUp(StringBuilder().apply {
                         addTaskLine("Plant Seed", "0/1") }.toString()
                     ,context.createNotificationMainIntentForOnboarding(
                             //TODO LAUNCH VIA INTENT FILTER NAME instead of class name
                             "com.gorillamoa.routines.activity.OnboardActivity"
                     ))
+*/
                 }
 
                 EVENT_WAKEUP -> {
@@ -86,8 +90,9 @@ class AlarmReceiver:BroadcastReceiver(){
                     // we don't want to receive two wake up events from both the Alarm and the
                     //event from the network..in which case we should just use the data layer
                     //to manage the synchronization task...
-                    TaskScheduler.schedule(context){ taskString ->
-                        context.notificationShowWakeUpMirror(taskString)
+                    TaskScheduler.schedule(context){ tasks ->
+
+                        tasks?.let{context.notificationShowWakeUpMirror(tasks!!)}
                     }
                 }
 

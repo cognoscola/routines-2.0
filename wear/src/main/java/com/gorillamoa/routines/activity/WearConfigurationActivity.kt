@@ -16,8 +16,6 @@ import com.google.android.gms.wearable.Wearable
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
-import com.gorillamoa.routines.core.scheduler.Functions
-import com.gorillamoa.routines.core.scheduler.assignFunction
 import com.gorillamoa.routines.core.services.DataLayerListenerService.Companion.EVENT_WAKEUP
 import com.gorillamoa.routines.fragment.TimePickerFragment
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
@@ -68,15 +66,7 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
         mAmbientController = AmbientModeSupport.attach(this@WearConfigurationActivity)
 
         taskViewModel = connectAndLoadViewModel()
-        taskViewModel.tasks.observe(this, Observer {
-
-            notificationShowWakeUp(
-                    StringBuilder().stringifyTasks(it),
-                    createNotificationMainIntentForWakeup(WearConfigurationActivity::class.java.name),
-                    createNotificationDeleteIntentForWakeUp())
-        })
-
-
+        taskViewModel.tasks.observe(this, Observer { notificationShowWakeUpMirror(it) })
 
         /**get the view model object */
 
@@ -150,7 +140,9 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
          * There is no broadcasting happening
          */
 
-        wakeUpButton.assignFunction(Functions.showWakeUpNotificationFunction())
+        wakeUpButton.setOnClickListener{
+            broadcastShowWakeUp()
+        }
 
         sleepButton?.setOnClickListener {
             notificationShowSleep()

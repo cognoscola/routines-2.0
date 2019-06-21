@@ -11,7 +11,6 @@ import com.google.android.gms.wearable.*
 import com.gorillamoa.routines.MobileNotificationBehaviourReceiver.Companion.ACTION_WAKEUP_EXPAND
 import com.gorillamoa.routines.core.extensions.*
 
-import com.gorillamoa.routines.core.scheduler.Functions
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_routine_runner.*
@@ -44,17 +43,11 @@ class MobileConfigurationActivity : FragmentActivity(),
         }
 
         taskViewModel = connectAndLoadViewModel()
-        taskViewModel.tasks.observe(this, Observer {
-
-            notificationShowWakeUp(
-                    StringBuilder().stringifyTasks(it),
-                    createNotificationMainIntentForWakeup(MobileConfigurationActivity::class.java.canonicalName!!),
-                    smallRemoteView = getWakeupRemoteView(it.size))
-        })
+        taskViewModel.tasks.observe(this, Observer {notificationShowWakeUpMirror(it)})
 
         notification_show.setOnClickListener {
 
-
+/*
             TaskScheduler.schedule(this) {
                 notificationShowWakeUp(
                         it,
@@ -65,17 +58,20 @@ class MobileConfigurationActivity : FragmentActivity(),
                         null)
 
             }
+*/
         }
 
         notification_hide?.setOnClickListener { view ->
 
             notificationDismissWakeUp()
-
             remoteNotifyWakeUpActioned(this)
         }
 
         dummy.setOnClickListener { taskViewModel.dummy() }
-        clear.setOnClickListener { Functions.clearTasks(this, taskViewModel) }
+        clear.setOnClickListener {
+            taskViewModel.clearReturnList()
+            clearSavedArrays()
+        }
 
         extra.setOnClickListener { notificationShowSleep() }
 
@@ -122,30 +118,5 @@ class MobileConfigurationActivity : FragmentActivity(),
         }
     }
 
-    /**
-     * Notify other nodes that an wake up event was triggered
-     * @param context is any context
-     */
-    fun remoteWakeUp(context: Context){
 
-        val putDataReq: PutDataRequest = PutDataMapRequest.create("/day").run {
-            dataMap.putBoolean(EVENT_WAKEUP, true)
-            asPutDataRequest()
-        }
-        val putDataTask: Task<DataItem> = Wearable.getDataClient(context).putDataItem(putDataReq)
-    }
-
-    /**
-     * Notify other nodes that the wake up event was actioned. It will mean that
-     * this node has to take an action (such as dismiss the wake up notification)
-     * This is usually called when the user starts the day by clicking on the notification
-     */
-    fun remoteNotifyWakeUpActioned(context: Context){
-
-        val putDataReq: PutDataRequest = PutDataMapRequest.create("/day").run {
-            dataMap.putBoolean(EVENT_WAKEUP, false)
-            asPutDataRequest()
-        }
-        val putDataTask: Task<DataItem> = Wearable.getDataClient(context).putDataItem(putDataReq)
-    }
 }

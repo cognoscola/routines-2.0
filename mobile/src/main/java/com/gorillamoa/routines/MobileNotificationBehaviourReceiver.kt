@@ -63,10 +63,11 @@ class MobileNotificationBehaviourReceiver: BroadcastReceiver(){
                     //Show bigger intent
                     Toast.makeText(context, "Expand", Toast.LENGTH_SHORT).show()
 
+                    //TODO FIX THIS LATER Not important now
+/*
                     if (intent.hasExtra(TASK_DATA)) {
                         context.apply {
                             getNotificationManager().cancel(NOTIFICATION_TAG, WAKE_UP_NOTIFICATION_ID)
-
                             notificationShowWakeUp(
                                     intent.getStringExtra(TASK_DATA),
                                     //TODO MAKE notification click go to task list
@@ -82,9 +83,12 @@ class MobileNotificationBehaviourReceiver: BroadcastReceiver(){
                     } else {
                         //TODO OPEN UP THE TASK VIEW ACTIVITY
                     }
+*/
                 }
                 ACTION_WAKEUP_COLLAPSE ->{
 
+                    //TODO do this later
+/*
                     Toast.makeText(context, "Collapse", Toast.LENGTH_SHORT).show()
                     if (intent.hasExtra(TASK_DATA)) {
                         context.apply {
@@ -103,6 +107,7 @@ class MobileNotificationBehaviourReceiver: BroadcastReceiver(){
                     } else {
                         //TODO OPEN UP THE TASK VIEW ACTIVITY
                     }
+*/
                 }
                 ACTION_TASK_EXPAND->{
                     if (intent.hasExtra(TASK_DATA)) {

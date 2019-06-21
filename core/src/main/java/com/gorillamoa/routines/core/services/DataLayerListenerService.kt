@@ -6,6 +6,8 @@ import com.gorillamoa.routines.core.constants.DataLayerConstant
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
 import com.gorillamoa.routines.core.extensions.*
 
+import com.gorillamoa.routines.core.scheduler.TaskScheduler
+
 /**
  * Listens for data changes (in case we are synchronized with the mobile)
  */
@@ -110,7 +112,11 @@ class DataLayerListenerService:WearableListenerService(){
 
                     if (DataLayerConstant.WAKE_UP_PATH.equals(it.dataItem.uri.path)) {
 
-                        notificationShowWakeLocal(tasks)
+                        //We'll use the scheduler to get the task list,
+                        //TODO but we must synchronize task completion data somewhere else
+                        TaskScheduler.schedule(this){ tasks ->
+                            tasks?.let{notificationShowWakeUpLocal(it)}
+                        }
                     }
 
                 }
