@@ -93,12 +93,16 @@ class AlarmReceiver:BroadcastReceiver(){
 
                     TaskScheduler.schedule(context){ taskString ->
 
+                        context.notificationShowWakeUpMirror(taskString)
+
                         //TODO USE INTENT FILTER NAME
+/*
                         context.notificationShowWakeUp(
                                 taskString,
                                 context.createNotificationMainIntentForWakeUp(),
                                 context.createNotificationDeleteIntentForWakeUp()
                         )
+*/
                     }
                 }
 

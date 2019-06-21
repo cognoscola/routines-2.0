@@ -43,12 +43,21 @@ class App:Application(),RemoteInjectorHelper.RemoteGraphProvider, RemoteInjector
 
         graph = object:AppComponent{
 
-            override fun getSmallTaskRemoteView(task: Task): RemoteViews {
+            override fun remoteGetSmallTaskView(task: Task): RemoteViews {
                 return this@App.getTaskRemoteView(task)
             }
 
-            override fun getLargeTaskRemoteView(taskList:String): RemoteViews {
+            override fun remoteGetLargeTaskView(taskList:String): RemoteViews {
                 return this@App.getLargeWakeUpRemoteView(taskList)
+            }
+
+
+            override fun remoteGetLargeWakeUpView(tasks:String): RemoteViews {
+                return this@App.getLargeWakeUpRemoteView(tasks)
+            }
+
+            override fun remoteGetSmallWakeUpView(): RemoteViews {
+                return this@App.getWakeupRemoteView()
             }
 
 

@@ -6,8 +6,10 @@ import com.gorillamoa.routines.core.data.Task
 
 interface RemoteViewGraph{
 
-    fun getSmallTaskRemoteView(task: Task):RemoteViews
-    fun getLargeTaskRemoteView(taskList:String):RemoteViews
+    fun remoteGetSmallTaskView(task: Task):RemoteViews
+    fun remoteGetLargeTaskView(taskList:String):RemoteViews
+    fun remoteGetSmallWakeUpView():RemoteViews
+    fun remoteGetLargeWakeUpView(tasks:String):RemoteViews
 
 
 }

@@ -2,6 +2,9 @@ package com.gorillamoa.routines.core.services
 
 import android.util.Log
 import com.google.android.gms.wearable.*
+import com.gorillamoa.routines.core.constants.DataLayerConstant
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.BOTH_PATH
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
 import com.gorillamoa.routines.core.extensions.*
 
 /**
@@ -99,36 +102,51 @@ class DataLayerListenerService:WearableListenerService(){
 
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
-       Log.d("$tag onDataChanged ","$dataEvents")
-        Log.d("$tag onDataChanged ","I AM ${if(isWatch())"Watch" else "MOBILE"}")
+        Log.d("$tag onDataChanged ", "$dataEvents")
+        Log.d("$tag onDataChanged ", "I AM ${if (isWatch()) "Watch" else "MOBILE"}")
 
         dataEvents.forEach {
 
-            Log.d("$tag onDataChanged","Host: ${it.dataItem.uri.host}")
-/*
+            Log.d("$tag onDataChanged", "Host: ${it.dataItem.uri.host}")
+
             when (it.type) {
                 DataEvent.TYPE_CHANGED -> {
-                    it.dataItem.also {item ->
+
+                    //first lets get the data if any
+                    val dataMap = DataMapItem.fromDataItem(it.dataItem).dataMap
+                    val tasks = dataMap.getString(KEY_TASK_DATA)
+
+                    if (DataLayerConstant.BOTH_PATH.equals(it.dataItem.uri.path)) {
+
+                        notificationShowWakeLocal(tasks)
+
+                    }
+
+
+/*
+                    it.dataItem.also { item ->
                         if (item.uri.path.compareTo("/day") == 0) {
                             DataMapItem.fromDataItem(item).dataMap.apply {
-                                if(getBoolean(EVENT_WAKEUP,false)){
-                                   broadcastShowWakeUp()
-                                }else{
+                                if (getBoolean(EVENT_WAKEUP, false)) {
+                                    broadcastShowWakeUp()
+                                } else {
                                     getNotificationManager().cancel(NOTIFICATION_TAG, WAKE_UP_NOTIFICATION_ID)
                                 }
                             }
                         }
                     }
-
+*/
                 }
-                DataEvent.TYPE_DELETED ->{
+                DataEvent.TYPE_DELETED -> {
 
+                    if (DataLayerConstant.BOTH_PATH.equals(it.dataItem.uri.path)) {
+                        notificationDissmissWakeUp()
+                    }
                 }
                 else -> {
 
                 }
             }
-*/
         }
     }
 

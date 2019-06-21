@@ -4,13 +4,21 @@ import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.text.Html
 import android.text.Spanned
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import com.google.android.gms.wearable.DataItem
+import com.google.android.gms.wearable.PutDataMapRequest
+import com.google.android.gms.wearable.PutDataRequest
+import com.google.android.gms.wearable.PutDataRequest.WEAR_URI_SCHEME
+import com.google.android.gms.wearable.Wearable
 import com.gorillamoa.routines.core.R
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.BOTH_PATH
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
 
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_DONE
@@ -21,6 +29,7 @@ import com.gorillamoa.routines.core.views.RemoteInjectorHelper
 import java.util.*
 
 const val WAKE_UP_NOTIFICATION_ID =1
+
 const val SLEEP_NOTIFICATION_ID =65535
 const val REST_NOTIFICATION_ID =65534
 const val ACTIVITY_NOTIFICATION_ID = 65533
@@ -34,9 +43,14 @@ const val NOTIFICATION_TAG = "routines"
 /** Prepare the intent for when user dismisses the notification **/
 //TODO obfuscate strings later using obfuscation library
 
+
+/********************************************************************************
+ * WAKE UP NOTIFICATION FUNCTIONS
+ *********************************************************************************/
+
 /**
- * Show the notification to the user
- * @param tasks is the task list as a string
+ * Show a local notification to the user which displays ""WAKEUP" information
+ * @param tasks is the task list as a strin
  * @param mainPendingIntent is the Main notification intent
  * @param dismissPendingIntent is what happens when the user dismisses
  */
@@ -84,10 +98,65 @@ fun Context.notificationShowWakeUp(tasks:String,
                 WAKE_UP_NOTIFICATION_ID,
                 build())
     }
+}
 
+fun Context.notificationShowWakeUpRemote(tasks:String, path:String){
+
+    val putDataReq: PutDataRequest = PutDataMapRequest.create(path).run {
+        dataMap.putString(KEY_TASK_DATA, tasks)
+        asPutDataRequest()
+    }
+    putDataReq.setUrgent()
+    val putDataTask = Wearable.getDataClient(this).putDataItem(putDataReq)
+}
+
+/**
+ * Builds a mirrored notification both on the Local device and on
+ * other connected nodes. When either is ACTIONED, the same action occurs on both devices.
+ * @param tasks is the tasks sas string
+ */
+fun Context.notificationShowWakeUpMirror(tasks:String){
+
+    //First lets build a local notification
+    notificationShowWakeLocal(tasks)
+
+    //Next lets build a remote notification
+    notificationShowWakeUpRemote(tasks,BOTH_PATH)
 
 
 }
+
+/**
+ * Builds a local notification
+ * @param tasks is the string of tasks to display
+ */
+fun Context.notificationShowWakeLocal(tasks:String){
+    notificationShowWakeUp(
+            tasks,
+            mainPendingIntent = null,
+            dismissPendingIntent = createNotificationDeleteIntentForWakeUp(),
+            dismissable = true,
+            smallRemoteView = if(!isWatch())remoteGetSmallWakeUpView()else null,
+            bigRemoteView = if(!isWatch())remoteGetLargeWakeUpView(tasks) else null
+    )
+}
+
+fun Context.notificationDismissWakeUpRemote(){
+
+    val dataItemUri = Uri.Builder().scheme(WEAR_URI_SCHEME).path(BOTH_PATH).build()
+    Wearable.getDataClient(this).deleteDataItems(dataItemUri)
+}
+
+
+fun Context.notificationDissmissWakeUp(){
+
+    getNotificationManager().cancel(NOTIFICATION_TAG, WAKE_UP_NOTIFICATION_ID)
+}
+
+
+/********************************************************************************
+ * TASK NOTIFICATION FUNCTIONS
+ *********************************************************************************/
 
 fun determineOnGoingAbility(builder:NotificationCompat.Builder, dismissable:Boolean){
 
@@ -112,11 +181,6 @@ fun determineOnGoingAbility(builder:NotificationCompat.Builder, dismissable:Bool
 
 
 
-
-fun Context.notificationDissmissWakeUp(){
-
-    getNotificationManager().cancel(NOTIFICATION_TAG, WAKE_UP_NOTIFICATION_ID)
-}
 
 fun Context.notificationShowTask(task: Task,
                                  mainPendingIntent: PendingIntent? = null,
@@ -165,7 +229,7 @@ fun Context.notificationShowTask(task: Task,
 fun Context.showMobileNotificationTask(task: Task){
 
 
-        val smallRemoteView = (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.getSmallTaskRemoteView(task)
+        val smallRemoteView = (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetSmallTaskView(task)
 
         notificationShowTask(
                 task,

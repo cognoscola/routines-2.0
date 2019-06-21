@@ -37,6 +37,14 @@ fun Context.getTaskFromString(taskString:String):Task{
 
 fun Context.getSmallTaskRemoteView(task: Task):RemoteViews{
 
-    return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.getSmallTaskRemoteView(task)
+    return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetSmallTaskView(task)
 
+}
+
+fun Context.remoteGetSmallWakeUpView():RemoteViews{
+    return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetSmallWakeUpView()
+}
+
+fun Context.remoteGetLargeWakeUpView(tasks:String):RemoteViews{
+    return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetLargeWakeUpView(tasks)
 }

@@ -129,6 +129,7 @@ fun Context.createNotificationMainIntentForWakeUp():PendingIntent?{
  * For now We'll just launch the first task.
  */
 fun Context.createNotificationDeleteIntentForWakeUp():PendingIntent{
+
     val dismissIntent = Intent(this, NotificationDismissReceiver::class.java)
     //signal the receiver that it came from a wake up notification
     dismissIntent.action = NotificationDismissReceiver.TYPE_WAKE_UP

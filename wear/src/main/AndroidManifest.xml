@@ -31,11 +31,10 @@
         <!-- Our notifications behave differently than Android Bridging Notifications
             There for we'll disable briding and create our own notifications
         -->
-
-  <!--      <meta-data
+        <meta-data
             android:name="com.google.android.wearable.notificationBridgeMode"
-            android:value="BRIDGING" />
--->
+            android:value="NO_BRIDGING" />
+
         <activity
             android:name=".activity.RecognitionActivity"
             android:label="@string/title_activity_recognition">
@@ -70,11 +69,10 @@
         <service android:name=".core.services.DataLayerListenerService">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
-                <data android:scheme="wear" android:host="*"
-                    android:path="/day" />
 
-                <data android:scheme="wear" android:host="*"
-                    android:path="/event"/>
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/both"/>
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/watch-only"/>
+
             </intent-filter>
 
 

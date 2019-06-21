@@ -55,6 +55,8 @@ class MobileConfigurationActivity : FragmentActivity(),
         })
 
         notification_show.setOnClickListener {
+
+
             TaskScheduler.schedule(this) {
                 notificationShowWakeUp(
                         it,
@@ -98,14 +100,14 @@ class MobileConfigurationActivity : FragmentActivity(),
 
     override fun onResume() {
         super.onResume()
-        dataClient = Wearable.getDataClient(this)
-        dataClient.addListener(this)
+//        dataClient = Wearable.getDataClient(this)
+//        dataClient.addListener(this)
     }
 
 
     override fun onPause() {
         super.onPause()
-        Wearable.getDataClient(this).removeListener(this)
+//        Wearable.getDataClient(this).removeListener(this)
     }
 
     override fun onDataChanged(dataEventBuffer: DataEventBuffer){

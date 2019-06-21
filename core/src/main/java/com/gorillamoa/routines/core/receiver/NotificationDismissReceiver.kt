@@ -4,6 +4,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.gorillamoa.routines.core.extensions.notificationDismissWakeUpRemote
+import com.gorillamoa.routines.core.extensions.notificationDissmissWakeUp
+
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
 
 
@@ -35,8 +38,6 @@ class NotificationDismissReceiver:BroadcastReceiver() {
          * - the user swiped, if so, why did they swipe?
          *
          */
-
-
     }
 
     override fun onReceive(context: Context, intent: Intent?) {
@@ -59,14 +60,19 @@ class NotificationDismissReceiver:BroadcastReceiver() {
                 TYPE_WAKE_UP -> {
                     Log.d("onReceive","Wake Up Dismissal")
 
+                    //Dismiss Any Remote Notifications
+                    context.notificationDismissWakeUpRemote()
+
                     //TODO we automatically approve the schedule on dismissal of notification, make this optional
 //                    if (context.EnableScheduler()) {
-                        TaskScheduler.approve(context)
+                    //TODO UNCOMMENT THIS
+//                        TaskScheduler.approve(context)
 //                    }
 
 //                    DataLayerListenerService.remoteNotifyWakeUpActioned(context)
 
-                    TaskScheduler.getNextUncompletedTask(context) { task ->
+                    //TODO UNCOMMENT THIS
+//                    TaskScheduler.getNextUncompletedTask(context) { task ->
 
                         //TODO this is bugging out
 /*
@@ -79,7 +85,7 @@ class NotificationDismissReceiver:BroadcastReceiver() {
                         }
 */
 
-                    }
+//                    }
                 }
                 else ->{
                     Log.d("onReceive","Unknown Dimissal Type")

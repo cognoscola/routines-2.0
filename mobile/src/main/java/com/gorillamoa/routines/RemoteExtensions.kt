@@ -21,8 +21,6 @@ import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companio
 import com.gorillamoa.routines.core.views.RemoteInjectorHelper
 import java.lang.reflect.Array.setInt
 
-
-
 fun Context.getLargeWakeUpRemoteView(bigStringContent: String): RemoteViews {
     val remoteViews = RemoteViews(packageName, R.layout.remote_wakeup_large)
     remoteViews.setTextViewText(R.id.title, getHtml(getString(R.string.wake_up_large_title)))
