@@ -67,7 +67,7 @@
             </intent-filter>
         </service>
 
-        <service android:name=".services.DataLayerListenerService">
+        <service android:name=".core.services.DataLayerListenerService">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
                 <data android:scheme="wear" android:host="*"

@@ -1,6 +1,7 @@
 package com.gorillamoa.routines.core.views
 
 import android.app.Application
+import com.google.gson.Gson
 
 class RemoteInjectorHelper{
 
@@ -17,5 +18,9 @@ class RemoteInjectorHelper{
 
     interface RemoteGraphProvider{
         val remoteViewGraph:RemoteViewGraph
+    }
+
+    interface RemoteGsonProvider{
+        fun getGson():Gson
     }
 }

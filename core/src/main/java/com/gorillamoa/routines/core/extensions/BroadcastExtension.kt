@@ -5,7 +5,6 @@ import android.content.Intent
 import android.util.Log
 import com.gorillamoa.routines.core.receiver.AlarmReceiver
 
-
 /**
  * Send a broadcast to the Wake up Receiver.
  * the intent indicates a DEFAULT WAKE UP
@@ -32,9 +31,6 @@ fun Context.broadcastShowWakeUpTest(){
 }
 //TODO Launch task notification from UI
 fun Context.broadcastShowRandomTask(){
-
-
-
 
 
     Log.d("broadcastShowRandomTask","")

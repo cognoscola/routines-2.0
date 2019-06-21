@@ -35,7 +35,7 @@ class Functions {
 
         fun dismissWakeUpNotificationFunction(): (Context) -> Any {
             return { context: Context ->
-                context.notificationDissmissWakeUp()
+
 
 
             }

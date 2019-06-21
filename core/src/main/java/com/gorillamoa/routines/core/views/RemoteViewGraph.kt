@@ -8,6 +8,6 @@ interface RemoteViewGraph{
 
     fun getSmallTaskRemoteView(task: Task):RemoteViews
     fun getLargeTaskRemoteView(taskList:String):RemoteViews
-    fun getGson(): Gson
+
 
 }

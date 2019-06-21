@@ -9,18 +9,16 @@ import com.gorillamoa.routines.MobileNotificationBehaviourReceiver.Companion.ACT
 import com.gorillamoa.routines.MobileNotificationBehaviourReceiver.Companion.ACTION_WAKEUP_COLLAPSE
 import com.gorillamoa.routines.app.App
 import com.gorillamoa.routines.core.data.Task
-import com.gorillamoa.routines.core.extensions.TASK_DATA
-import com.gorillamoa.routines.core.extensions.TASK_ID
-import com.gorillamoa.routines.core.extensions.createNotificationActionPendingIntent
-import com.gorillamoa.routines.core.extensions.getHtml
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_START_DAY
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_NEXT
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_PREVIOUS
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
 
 import android.graphics.Paint
+import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_DONE
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_UNCOMPLETE
+import com.gorillamoa.routines.core.views.RemoteInjectorHelper
 import java.lang.reflect.Array.setInt
 
 
@@ -108,7 +106,7 @@ fun Context.getTaskRemoteView(task:Task):RemoteViews{
 
     setDirectionFunctions(task,remoteViews)
     //TODO MOVE THIS OUT OF HERE, we may want to create a notification without having this function
-    remoteViews.createFunction(this, (applicationContext as App).gson.toJson(task),ACTION_TASK_EXPAND,task.id!!)
+    remoteViews.createFunction(this, getGson().toJson(task),ACTION_TASK_EXPAND,task.id!!)
 
     return remoteViews
 }

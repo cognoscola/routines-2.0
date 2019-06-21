@@ -1,10 +1,8 @@
-package com.gorillamoa.routines.services
+package com.gorillamoa.routines.core.services
 
 import android.util.Log
-import android.widget.Toast
 import com.google.android.gms.wearable.*
 import com.gorillamoa.routines.core.extensions.*
-import com.gorillamoa.routines.core.scheduler.TaskScheduler
 
 /**
  * Listens for data changes (in case we are synchronized with the mobile)
@@ -30,7 +28,7 @@ class DataLayerListenerService:WearableListenerService(){
          * Another device has received the wake up event, so lets show the wake up
          * event here as well
          */
-        const val EVENT_WAKEUP = "event.wakeup"
+//        const val EVENT_WAKEUP = "/event/wakeup"
 
 
         //TODO we need to monitor the data layer isWakeUpShowing variable. whenever it changes we just behave accordingly
@@ -38,7 +36,7 @@ class DataLayerListenerService:WearableListenerService(){
         /**
          * Determine wether the wake up notification should show
          */
-        const val isWakeShowing = "event.wakeup.visibility"
+        const val EVENT_WAKEUP = "event.wakeup.visibility"
 
 
         /**
@@ -97,48 +95,23 @@ class DataLayerListenerService:WearableListenerService(){
          * Sync the "current" viewing task
          */
         const val ACTION_VIEW_TASK = "action.viewchange"
-
-
     }
-
-    override fun onMessageReceived(messageEvent: MessageEvent) {
-        super.onMessageReceived(messageEvent)
-
-        // Check to see if the message is to launch the
-        when (messageEvent.path) {
-            EVENT_WAKEUP -> {
-
-                TaskScheduler.schedule(this) {
-                    notificationShowWakeUp(
-                            it,
-                            null,
-                            null,
-                            false,
-                            smallRemoteView = null,
-                            bigRemoteView = null)
-
-                }
-            }
-            else -> {
-            }
-        }
-    }
-
 
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
-       Log.d("$tag onDataChanged","$dataEvents")
-
-        Toast.makeText(applicationContext,"Received",Toast.LENGTH_SHORT).show()
+       Log.d("$tag onDataChanged ","$dataEvents")
+        Log.d("$tag onDataChanged ","I AM ${if(isWatch())"Watch" else "MOBILE"}")
 
         dataEvents.forEach {
 
+            Log.d("$tag onDataChanged","Host: ${it.dataItem.uri.host}")
+/*
             when (it.type) {
                 DataEvent.TYPE_CHANGED -> {
                     it.dataItem.also {item ->
                         if (item.uri.path.compareTo("/day") == 0) {
                             DataMapItem.fromDataItem(item).dataMap.apply {
-                                if(getBoolean(isWakeShowing,false)){
+                                if(getBoolean(EVENT_WAKEUP,false)){
                                    broadcastShowWakeUp()
                                 }else{
                                     getNotificationManager().cancel(NOTIFICATION_TAG, WAKE_UP_NOTIFICATION_ID)
@@ -155,7 +128,10 @@ class DataLayerListenerService:WearableListenerService(){
 
                 }
             }
+*/
         }
     }
+
+
 
 }

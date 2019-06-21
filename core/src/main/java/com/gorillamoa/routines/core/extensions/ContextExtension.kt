@@ -27,7 +27,8 @@ fun Context.isWatch():Boolean{
 }
 
 fun Context.getGson(): Gson {
-    return (this.applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.getGson()
+
+    return (applicationContext as RemoteInjectorHelper.RemoteGsonProvider).getGson()
 }
 
 fun Context.getTaskFromString(taskString:String):Task{

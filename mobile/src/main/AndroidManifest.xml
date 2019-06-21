@@ -30,6 +30,19 @@
         <receiver android:name=".MobileNotificationBehaviourReceiver"
             android:exported="false"/>
 
+        <service android:name=".core.services.DataLayerListenerService">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <data android:scheme="wear" android:host="*"
+                    android:path="/day" />
+
+                <data android:scheme="wear" android:host="*"
+                    android:path="/event"/>
+            </intent-filter>
+
+
+        </service>
+
     </application>
 
 </manifest>

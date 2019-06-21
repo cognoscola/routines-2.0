@@ -1,18 +1,24 @@
 package com.gorillamoa.routines.activity
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import androidx.wear.ambient.AmbientModeSupport
 import android.util.Log
 import androidx.lifecycle.Observer
+import com.google.android.gms.wearable.DataItem
+import com.google.android.gms.wearable.PutDataMapRequest
+import com.google.android.gms.wearable.PutDataRequest
+import com.google.android.gms.wearable.Wearable
 
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.scheduler.Functions
 import com.gorillamoa.routines.core.scheduler.assignFunction
+import com.gorillamoa.routines.core.services.DataLayerListenerService.Companion.EVENT_WAKEUP
 import com.gorillamoa.routines.fragment.TimePickerFragment
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_service_controller.*
@@ -46,6 +52,15 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
     private var mAmbientController: AmbientModeSupport.AmbientController? = null
 
 
+    fun remoteNotifyWakeUpActioned(context: Context){
+
+        val putDataReq: PutDataRequest = PutDataMapRequest.create("/day").run {
+            dataMap.putBoolean(EVENT_WAKEUP, false)
+            asPutDataRequest()
+        }
+        val putDataTask: com.google.android.gms.tasks.Task<DataItem> = Wearable.getDataClient(context).putDataItem(putDataReq)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_service_controller)
@@ -57,8 +72,10 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
             notificationShowWakeUp(
                     StringBuilder().stringifyTasks(it),
-                    createNotificationMainIntentForWakeup(WearConfigurationActivity::class.java.name))
+                    createNotificationMainIntentForWakeup(WearConfigurationActivity::class.java.name),
+                    createNotificationDeleteIntentForWakeUp())
         })
+
 
 
         /**get the view model object */
@@ -160,6 +177,11 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
         //We'll create several dummy tasks on to which we can test things
         dummy?.setOnClickListener { taskViewModel.dummy() }
+
+        dataLayer?.setOnClickListener { view ->
+
+            remoteNotifyWakeUpActioned(this)
+        }
 
     }
 

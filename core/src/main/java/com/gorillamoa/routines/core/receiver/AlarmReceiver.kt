@@ -7,8 +7,7 @@ import android.util.Log
 import com.gorillamoa.routines.core.extensions.*
 
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
-import com.gorillamoa.routines.core.services.DataSyncrhonizationService
-import com.gorillamoa.routines.core.services.remoteWakeUp
+
 
 
 /**

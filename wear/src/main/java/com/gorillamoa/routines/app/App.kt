@@ -6,15 +6,27 @@ import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
+import com.google.gson.Gson
 import com.gorillamoa.routines.core.extensions.NOTIFICATION_CHANNEL_ONE
 import com.gorillamoa.routines.core.extensions.NOTIFICATION_CHANNEL_TWO
+import com.gorillamoa.routines.core.views.RemoteInjectorHelper
 
 
 /**
  * We'll configure notification channels every time the app starts
  */
-class App:Application(){
+class App:Application(), RemoteInjectorHelper.RemoteGsonProvider{
 
+    //TODO provide this VIA DAGGER!
+    override fun getGson():Gson {
+        return gsonObject
+    }
+
+    private val gsonObject by lazy {
+        return@lazy Gson()
+    }
+
+//    private val gson by lazy { return@lazy Gson() }
 
     override fun onCreate() {
         super.onCreate()

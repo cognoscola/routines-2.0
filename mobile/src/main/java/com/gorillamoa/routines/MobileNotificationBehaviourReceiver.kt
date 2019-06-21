@@ -8,6 +8,7 @@ import android.widget.Toast
 import com.gorillamoa.routines.app.App
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
+import com.gorillamoa.routines.core.views.RemoteInjectorHelper
 
 /**
  * This class exists because we wish to modify how to the noficiation will behave on
@@ -109,7 +110,7 @@ class MobileNotificationBehaviourReceiver: BroadcastReceiver(){
 
                             getNotificationManager().cancel(NOTIFICATION_TAG,tid)
 
-                            val task = (applicationContext as App).gson.fromJson(intent.getStringExtra(TASK_DATA), Task::class.java)
+                            val task = context.getGson().fromJson(intent.getStringExtra(TASK_DATA), Task::class.java)
 
                             notificationShowTask(
                                     task,

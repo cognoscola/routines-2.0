@@ -4,8 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.gorillamoa.routines.core.extensions.createNotificationDeleteIntentForTask
-import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
 
 
@@ -66,8 +64,12 @@ class NotificationDismissReceiver:BroadcastReceiver() {
                         TaskScheduler.approve(context)
 //                    }
 
+//                    DataLayerListenerService.remoteNotifyWakeUpActioned(context)
+
                     TaskScheduler.getNextUncompletedTask(context) { task ->
 
+                        //TODO this is bugging out
+/*
                         task?.let {
 
                             context.notificationShowTask(
@@ -75,6 +77,7 @@ class NotificationDismissReceiver:BroadcastReceiver() {
                                     dismissPendingIntent = context.createNotificationDeleteIntentForTask(task.id!!)
                             )
                         }
+*/
 
                     }
                 }

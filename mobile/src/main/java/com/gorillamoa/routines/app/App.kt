@@ -21,7 +21,7 @@ import com.gorillamoa.routines.getWakeupRemoteView
 /**
  * We'll configure notification channels every time the app starts
  */
-class App:Application(),RemoteInjectorHelper.RemoteGraphProvider
+class App:Application(),RemoteInjectorHelper.RemoteGraphProvider, RemoteInjectorHelper.RemoteGsonProvider
 {
 
     lateinit var graph:AppComponent
@@ -29,7 +29,14 @@ class App:Application(),RemoteInjectorHelper.RemoteGraphProvider
     override val remoteViewGraph:RemoteViewGraph
         get() = graph
 
-     public val gson by lazy { return@lazy Gson()}
+
+    override fun getGson():Gson {
+        return gsonObject
+    }
+
+    private val gsonObject by lazy {
+        return@lazy Gson()
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -44,9 +51,7 @@ class App:Application(),RemoteInjectorHelper.RemoteGraphProvider
                 return this@App.getLargeWakeUpRemoteView(taskList)
             }
 
-            override fun getGson(): Gson {
-                return gson
-            }
+
         }
 
 

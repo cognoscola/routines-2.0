@@ -1,11 +1,11 @@
 package com.gorillamoa.routines
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
-import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.*
 import com.gorillamoa.routines.MobileNotificationBehaviourReceiver.Companion.ACTION_WAKEUP_EXPAND
@@ -13,12 +13,10 @@ import com.gorillamoa.routines.core.extensions.*
 
 import com.gorillamoa.routines.core.scheduler.Functions
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
-import com.gorillamoa.routines.core.scheduler.assignFunction
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_routine_runner.*
-import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_DONE
-import com.gorillamoa.routines.core.services.remoteWakeUp
 
+const val EVENT_WAKEUP = "event.wakeup.visibility"
 
 class MobileConfigurationActivity : FragmentActivity(),
         DataClient.OnDataChangedListener{
@@ -69,7 +67,13 @@ class MobileConfigurationActivity : FragmentActivity(),
             }
         }
 
-        notification_hide.assignFunction(Functions.dismissWakeUpNotificationFunction())
+        notification_hide?.setOnClickListener { view ->
+
+            notificationDissmissWakeUp()
+
+            remoteNotifyWakeUpActioned(this)
+        }
+
         dummy.setOnClickListener { taskViewModel.dummy() }
         clear.setOnClickListener { Functions.clearTasks(this, taskViewModel) }
 
@@ -79,12 +83,7 @@ class MobileConfigurationActivity : FragmentActivity(),
         configureDataLayer()
         sendDataButton?.setOnClickListener { view ->
 
-            val putDataReq: PutDataRequest = PutDataMapRequest.create("/day").run {
-                dataMap.putBoolean("event.wakeup.visibility", true)
-
-                asPutDataRequest()
-            }
-            val putDataTask: Task<DataItem> = dataClient.putDataItem(putDataReq)
+            remoteWakeUp(this)
             //TODO Check if task completed etc...
         }
     }
@@ -121,5 +120,32 @@ class MobileConfigurationActivity : FragmentActivity(),
                 
             }
         }
+    }
+
+    /**
+     * Notify other nodes that an wake up event was triggered
+     * @param context is any context
+     */
+    fun remoteWakeUp(context: Context){
+
+        val putDataReq: PutDataRequest = PutDataMapRequest.create("/day").run {
+            dataMap.putBoolean(EVENT_WAKEUP, true)
+            asPutDataRequest()
+        }
+        val putDataTask: Task<DataItem> = Wearable.getDataClient(context).putDataItem(putDataReq)
+    }
+
+    /**
+     * Notify other nodes that the wake up event was actioned. It will mean that
+     * this node has to take an action (such as dismiss the wake up notification)
+     * This is usually called when the user starts the day by clicking on the notification
+     */
+    fun remoteNotifyWakeUpActioned(context: Context){
+
+        val putDataReq: PutDataRequest = PutDataMapRequest.create("/day").run {
+            dataMap.putBoolean(EVENT_WAKEUP, false)
+            asPutDataRequest()
+        }
+        val putDataTask: Task<DataItem> = Wearable.getDataClient(context).putDataItem(putDataReq)
     }
 }
