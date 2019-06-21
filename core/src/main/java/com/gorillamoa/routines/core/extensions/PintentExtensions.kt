@@ -93,6 +93,7 @@ fun Context.createWakeUpRecieverIntent():Intent{
  */
 fun Context.createNotificationMainIntentForWakeup(startingActivityName:String):PendingIntent?{
 
+    //TODO we'll show a common activity, but bring different fragments depending on the device
     return try {
         val c = Class.forName(startingActivityName)
         val intent = Intent(this, c)
@@ -105,23 +106,15 @@ fun Context.createNotificationMainIntentForWakeup(startingActivityName:String):P
 
 
 
+/****************************************************************
+ * Functions for WAKE UP Notifications
+ *****************************************************************/
+fun Context.createNotificationActionPendingIntentForWakeUp(action:String):PendingIntent{
+    Log.d("notificationRoutine","createNotificationActionPendingIntentForWakeUp ACTION:$action")
 
-/**
- * create the notification's main intent
- * when user clicks on a wake up notification
- */
-//TODO create Task view Activity in Mobile
-fun Context.createNotificationMainIntentForWakeUp():PendingIntent?{
-
-    return try {
-//        val c = Class.forName("com.gorillamoa.routines.activity.TaskViewActivity")
-//        val intent = Intent(this, c)
-//        PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-        null
-    } catch (ignored: ClassNotFoundException) {
-        Log.e("Unknown Activity Name",ignored.message)
-        null
-    }
+    val intent = Intent(this,NotificationActionReceiver::class.java)
+    intent.action = action
+    return PendingIntent.getBroadcast(this, 0,intent,PendingIntent.FLAG_ONE_SHOT)
 }
 
 /**
@@ -129,6 +122,7 @@ fun Context.createNotificationMainIntentForWakeUp():PendingIntent?{
  * For now We'll just launch the first task.
  */
 fun Context.createNotificationDeleteIntentForWakeUp():PendingIntent{
+    Log.d("notificationRoutine","createNotificationDeleteIntentForWakeUp")
 
     val dismissIntent = Intent(this, NotificationDismissReceiver::class.java)
     //signal the receiver that it came from a wake up notification
@@ -138,43 +132,37 @@ fun Context.createNotificationDeleteIntentForWakeUp():PendingIntent{
 
 }
 
+/****************************************************************
+ * Functions for TASK  notifications
+ *****************************************************************/
+
+
 /**
  * create a notification action which will mark the displayed task as done
  * @param tid is the task id of the task currently being displayed
  */
-fun Context.createNotificationActionPendingIntent(task: Task?, action:String):PendingIntent{
-    Log.d("ActionPendingIntent","ACTION:$action")
+fun Context.createNotificationActionPendingIntentForTask(task: Task?, action:String):PendingIntent{
+    Log.d("notificationRoutine","createNotificationActionPendingIntentForTask")
 
-    val intent = Intent(action)
+    val intent = Intent(this,NotificationActionReceiver::class.java)
+    intent.action = action
     if (task != null) {
         intent.putExtra(TASK_ID,task.id?:-1)
         intent.putExtra(TASK_DATA, getGson().toJson(task))
     }
 
     return PendingIntent.getBroadcast(this, task?.id?:-1,intent,PendingIntent.FLAG_ONE_SHOT)
-
 }
 
 /**
  * The user dismisses a Task notification.
  * @param tid is the id of the task being dismissed
  */
-fun Context.createNotificationDeleteIntentForTask(tid: Int):PendingIntent{
-    val dismissIntent = Intent(this, NotificationDismissReceiver::class.java)
+fun Context.createNotificationDeleteIntentForTask(task:Task):PendingIntent{
+    Log.d("notificationRoutine","createNotificationDeleteIntentForTask ${task.id}")
+    val dismissIntent = Intent(this.applicationContext, NotificationDismissReceiver::class.java)
     dismissIntent.action = NotificationDismissReceiver.TYPE_TASK
-    dismissIntent.putExtra(TASK_ID,tid)
-    return PendingIntent.getBroadcast(this,tid, dismissIntent,PendingIntent.FLAG_ONE_SHOT)
-
-}
-
-/****************************************************************
- * Functions for WAKE UP EVENTS
- *****************************************************************/
-fun Context.createNotificationActionPendingIntentForWakeUp(action:String):PendingIntent{
-    Log.d("ActionPendingIntent","ACTION:$action")
-
-    val intent = Intent(this,NotificationActionReceiver::class.java)
-    intent.action = action
-    return PendingIntent.getBroadcast(this, 0,intent,PendingIntent.FLAG_ONE_SHOT)
+    dismissIntent.putExtra(TASK_ID,task.id)
+    return PendingIntent.getBroadcast(this.applicationContext,task.id?:0, dismissIntent,PendingIntent.FLAG_ONE_SHOT)
 
 }

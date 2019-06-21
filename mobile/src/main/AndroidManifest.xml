@@ -24,22 +24,14 @@
         </activity>
         <receiver
             android:name=".core.receiver.NotificationActionReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="wake.startday" />
-            </intent-filter>
-        </receiver>
+            android:exported="false"/>
 
         <receiver android:name=".MobileNotificationBehaviourReceiver"
             android:exported="false"/>
 
         <receiver android:name=".core.receiver.AlarmReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="event.wakeup" />
-            </intent-filter>
+            android:exported="false"/>
 
-        </receiver>
         <receiver android:name=".core.receiver.NotificationDismissReceiver"
             android:exported="false"/>
 
@@ -47,13 +39,11 @@
             <intent-filter>
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/wakeup"/>
                 <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/wakeup"/>
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/task"/>
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/sleep"/>
             </intent-filter>
-
-
         </service>
-
     </application>
-
 </manifest>

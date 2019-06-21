@@ -37,10 +37,8 @@ fun Context.getTaskFromString(taskString:String):Task{
     return getGson().fromJson(taskString, Task::class.java)
 }
 
-fun Context.getSmallTaskRemoteView(task: Task):RemoteViews{
-
+fun Context.remoteGetSmallTaskView(task: Task):RemoteViews{
     return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetSmallTaskView(task)
-
 }
 
 fun Context.remoteGetSmallWakeUpView(taskLength:Int):RemoteViews{

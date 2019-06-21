@@ -43,7 +43,13 @@ class MobileConfigurationActivity : FragmentActivity(),
         }
 
         taskViewModel = connectAndLoadViewModel()
-        taskViewModel.tasks.observe(this, Observer {notificationShowWakeUpMirror(it)})
+        taskViewModel.tasks.observe(this, Observer {
+
+            if (it.isNotEmpty()) {
+                Log.d("notificationRoutine","onCreate Observer")
+                notificationShowWakeUpMirror(it)
+            }
+        })
 
         notification_show.setOnClickListener {
 
@@ -63,8 +69,6 @@ class MobileConfigurationActivity : FragmentActivity(),
 
         notification_hide?.setOnClickListener { view ->
 
-            notificationDismissWakeUp()
-            remoteNotifyWakeUpActioned(this)
         }
 
         dummy.setOnClickListener { taskViewModel.dummy() }
@@ -79,7 +83,6 @@ class MobileConfigurationActivity : FragmentActivity(),
         configureDataLayer()
         sendDataButton?.setOnClickListener { view ->
 
-            remoteWakeUp(this)
             //TODO Check if task completed etc...
         }
     }

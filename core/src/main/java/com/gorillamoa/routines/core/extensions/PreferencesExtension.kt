@@ -1,8 +1,10 @@
 package com.gorillamoa.routines.core.extensions
 
+import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import android.service.notification.StatusBarNotification
 import android.util.Log
 import java.util.*
 import kotlin.collections.ArrayList
@@ -34,6 +36,8 @@ private const val SLEEP_PHASE = "sleep_phase"
 private const val TASK_INCOMPLETE = "INCOMPLETE" // tasks not yet completed
 private const val TASK_COMPLETE = "COMPLETE" //which tasks completed
 private const val TASK_ORDER = "order" //task order
+
+private const val KEY_TASK_VISIBLE ="taskShowing"
 
 
 private const val IS_ACTIVE = "ready" //wether the app is currently working on not
@@ -334,6 +338,11 @@ fun Context.DisableScheduler(){
 //TODO find a way to share these values across xml and across modules
 fun Context.isNotificationStubborn():Boolean{
     return getLocalSettings().getBoolean("pref_notifications_stubbon",false)
+}
+
+@TargetApi(23)
+fun Context.getAllTaskShowing():Array<StatusBarNotification>{
+    return getNotificationManager().activeNotifications
 }
 
 

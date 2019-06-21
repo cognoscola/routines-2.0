@@ -66,7 +66,11 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
         mAmbientController = AmbientModeSupport.attach(this@WearConfigurationActivity)
 
         taskViewModel = connectAndLoadViewModel()
-        taskViewModel.tasks.observe(this, Observer { notificationShowWakeUpMirror(it) })
+        taskViewModel.tasks.observe(this, Observer {
+            if (it.isNotEmpty()) {
+                notificationShowWakeUpMirror(it)
+            }
+            })
 
         /**get the view model object */
 

@@ -1,9 +1,13 @@
 package com.gorillamoa.routines.core.services
 
+import android.annotation.TargetApi
+import android.content.Context
+import android.os.Build
 import android.util.Log
 import com.google.android.gms.wearable.*
 import com.gorillamoa.routines.core.constants.DataLayerConstant
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
+import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
 
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
@@ -103,27 +107,60 @@ class DataLayerListenerService:WearableListenerService(){
 
             Log.d("$tag onDataChanged", "Host: ${it.dataItem.uri.host}")
 
+            val dataMap = DataMapItem.fromDataItem(it.dataItem).dataMap
             when (it.type) {
                 DataEvent.TYPE_CHANGED -> {
 
                     //first lets get the data if any
-                    val dataMap = DataMapItem.fromDataItem(it.dataItem).dataMap
-                    val tasks = dataMap.getString(KEY_TASK_DATA)
+
+                    val taskData = dataMap.getString(KEY_TASK_DATA)
+
+                    //In Any case we'll check the time it was issued
+
+                    Log.d("$tag onDataChanged", " Changed Time Issued: ${dataMap.getString(DataLayerConstant.KEY_TIME)}")
 
                     if (DataLayerConstant.WAKE_UP_PATH.equals(it.dataItem.uri.path)) {
 
                         //We'll use the scheduler to get the task list,
                         //TODO but we must synchronize task completion data somewhere else
                         TaskScheduler.schedule(this){ tasks ->
-                            tasks?.let{notificationShowWakeUpLocal(it)}
+                            tasks?.let{
+                                Log.d("notificationRoutine","onDataChanged")
+
+                                if (!isAlreadyShowing(WAKE_UP_NOTIFICATION_ID)) {
+                                    notificationShowWakeUpLocal(it)
+                                }
+                            }
                         }
                     }
 
+                    else if(DataLayerConstant.TASK_PATH.equals(it.dataItem.uri.path)){
+
+                        //Here task data is of type task
+                        val task = getGson().fromJson(taskData, Task::class.java)
+                        if (!isAlreadyShowing(task.id!!)) {
+                            notificationShowTaskLocal(task)
+                        }
+                    }
                 }
                 DataEvent.TYPE_DELETED -> {
 
+                    //TODO test situation where we may get a delete issue after a
+                    //new notification issue b/c of network lag
+                    Log.d("notificationRoutine","onDataChanged Delete issued")
+
                     if (DataLayerConstant.WAKE_UP_PATH.equals(it.dataItem.uri.path)) {
+                        Log.d("notificationRoutine","WAKE")
                         notificationDismissWakeUp()
+                    }else if (DataLayerConstant.TASK_PATH.equals(it.dataItem.uri.path)){
+
+                        Log.d("notificationRoutine","TASK")
+                        getAllTaskShowing().forEach {
+
+                            //we only show 1 task, so we'll take this opportunity to dismiss ALL
+                            //task notifications
+                            notificationDismissTask(it.id)
+                        }
                     }
                 }
                 else -> {
@@ -133,6 +170,21 @@ class DataLayerListenerService:WearableListenerService(){
         }
     }
 
+    @TargetApi(23)
+    private fun isAlreadyShowing(id:Int):Boolean {
+        return if (getNotificationManager().activeNotifications.find {
+                    //Check if we aren't already displaying a notification
+                    Log.d("notificationRoutine", "onDataChanged check: ${it.id}")
+                    it.id == id
+                } == null) {
+            false
+        } else {
+            Log.d("notificationRoutine", "onDataChanged We're already showing $id")
+            true
+        }
+
+
+    }
 
 
 }

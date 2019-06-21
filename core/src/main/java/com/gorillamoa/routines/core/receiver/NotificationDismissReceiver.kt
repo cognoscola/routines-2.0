@@ -5,9 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.gorillamoa.routines.core.extensions.notificationDismissWakeUpRemote
-import com.gorillamoa.routines.core.extensions.notificationDismissWakeUp
-
-import com.gorillamoa.routines.core.scheduler.TaskScheduler
+import com.gorillamoa.routines.core.extensions.notificationDismissTaskRemote
 
 
 /**
@@ -15,6 +13,9 @@ import com.gorillamoa.routines.core.scheduler.TaskScheduler
  * This class determines that
  */
 class NotificationDismissReceiver:BroadcastReceiver() {
+
+    @Suppress("unused")
+    private val tag:String = NotificationDismissReceiver::class.java.name
 
     companion object {
         /**
@@ -24,14 +25,14 @@ class NotificationDismissReceiver:BroadcastReceiver() {
          * Types:
          *
          * NOTIFICATION_TYPE_WAKEUP - the user receives at beginning of each day. */
-        const val TYPE_WAKE_UP = "wakeup"
+        const val TYPE_WAKE_UP = "dismiss.wakeup"
         /**
          * NOTIFICATION_TYPE_TASK - the user receives when a new task is present */
-        const val TYPE_TASK = "task"
+        const val TYPE_TASK = "dismiss.task"
         /**
          *
          * NOTIFICATION_TYPE_SLEEP - the user receives when its time to end the day. */
-         const val TYPE_SLEEP = "sleep"
+         const val TYPE_SLEEP = "dismiss.sleep"
          /**
          * Next we should consider why the notification dismissed:
          * - the user clicked on the notification, and it went into the app.
@@ -42,26 +43,29 @@ class NotificationDismissReceiver:BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent?) {
 
+
         intent?.let {
+            Log.d("$tag onReceive",intent.action)
 
             val tid = it.getIntExtra(com.gorillamoa.routines.core.extensions.TASK_ID,-1)
 
             when (intent.action) {
                 TYPE_SLEEP -> {
-                    Log.d("onReceive","Sleep Dismissal")
+
                 }
                 TYPE_TASK -> {
-                    Log.d("schedule:Dismiss","Task Dismissal")
-                    //we dismissed a task. We'll fetch a future task, while pushing the task back
+                    //TODO this behaviour is determined by notification behaviour settings
+//                    TaskScheduler.skipAndShowNext(context,tid)
 
-                    TaskScheduler.skipAndShowNext(context,tid)
+                        context.notificationDismissTaskRemote()
+
+
                 }
 
                 TYPE_WAKE_UP -> {
-                    Log.d("onReceive","Wake Up Dismissal")
 
-                    //Dismiss Any Remote Notifications
-                    context.notificationDismissWakeUpRemote()
+                    //Dismiss Remotely if we're not a watch Remote Notifications
+                        context.notificationDismissWakeUpRemote()
 
                     //TODO we automatically approve the schedule on dismissal of notification, make this optional
 //                    if (context.EnableScheduler()) {

@@ -114,21 +114,21 @@ fun Context.setTaskCompletionStatus(task:Task, remoteView: RemoteViews){
         remoteView.setImageViewResource(R.id.statusImage,R.drawable.ic_check_box_black_24dp)
         remoteView.setInt(R.id.title, "setPaintFlags", Paint.STRIKE_THRU_TEXT_FLAG or Paint.ANTI_ALIAS_FLAG)
         //we're completed so the next Intent should "Uncomplete" the task
-        remoteView.setOnClickPendingIntent(R.id.statusButton,createNotificationActionPendingIntent(task,ACTION_TASK_UNCOMPLETE))
+        remoteView.setOnClickPendingIntent(R.id.statusButton,createNotificationActionPendingIntentForTask(task,ACTION_TASK_UNCOMPLETE))
 
     }else{
 
         //we aren't complete so next intent should complete the task
         remoteView.setImageViewResource(R.id.statusImage,R.drawable.ic_crop_square_black_24dp)
         remoteView.setInt(R.id.title, "setPaintFlags", Paint.ANTI_ALIAS_FLAG)
-        remoteView.setOnClickPendingIntent(R.id.statusButton,createNotificationActionPendingIntent(task,ACTION_DONE))
+        remoteView.setOnClickPendingIntent(R.id.statusButton,createNotificationActionPendingIntentForTask(task,ACTION_DONE))
     }
 }
 
 fun Context.setDirectionFunctions(task:Task,remoteView:RemoteViews){
 
-    remoteView.setOnClickPendingIntent(R.id.nextGroup,createNotificationActionPendingIntent(task, ACTION_TASK_NEXT))
-    remoteView.setOnClickPendingIntent(R.id.previousGroup,createNotificationActionPendingIntent(task, ACTION_TASK_PREVIOUS))
+    remoteView.setOnClickPendingIntent(R.id.nextGroup,createNotificationActionPendingIntentForTask(task, ACTION_TASK_NEXT))
+    remoteView.setOnClickPendingIntent(R.id.previousGroup,createNotificationActionPendingIntentForTask(task, ACTION_TASK_PREVIOUS))
 
 
 }

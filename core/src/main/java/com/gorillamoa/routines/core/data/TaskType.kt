@@ -39,5 +39,11 @@ enum class TaskType{
      * they wrote it down in a hurry.. If they do nothing, it was probably negligible.
      * (not that important to them)
      */
-    TYPE_UNKNOWN
+    TYPE_UNKNOWN,
+
+    /**
+     * This is a special type for when we want the user to execute a particular action inside
+     * the app, For instance, we'll see make this TYPE to force the user to make a new task
+     */
+    TYPE_SPECIAL
 }

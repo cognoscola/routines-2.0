@@ -16,30 +16,14 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
     companion object {
 
-        //clean comment
-        /**
-         * Marks the task as completed
-         */
-        const val ACTION_DONE = "task.action.done"
+        const val ACTION_SKIP_SHORT = "task.short"
+        const val ACTION_SKIP_TODAY = "task.skiptoday"
+        const val ACTION_INTO_FUTURE = "task.skiplong"
 
-        const val ACTION_SKIP_SHORT = "task.skip.short"
-        const val ACTION_SKIP_TODAY = "task.skip.today"
-        const val ACTION_INTO_FUTURE = "task.skip.long"
-        
-        /**
-         * Display the next task
-         */
-        const val ACTION_TASK_NEXT = "task.action.next"
-        
-        /**
-         * Displays the previous task for today
-         */
-         const val ACTION_TASK_PREVIOUS = "task.action.previous"
-
-        /**
-         * Set the task is NOT completed
-         */
-        const val ACTION_TASK_UNCOMPLETE = "task.action.uncomplete"
+        const val ACTION_TASK_NEXT = "task.next"
+        const val ACTION_TASK_PREVIOUS = "task.previous"
+        const val ACTION_TASK_UNCOMPLETE = "task.uncomplete"
+        const val ACTION_DONE = "task.done"
 
         const val ACTION_WAKE_START_DAY = "wake.startday"
         const val ACTION_START_MODIFY = "wakeup.modify"
@@ -60,6 +44,8 @@ class NotificationActionReceiver:BroadcastReceiver(){
             when (intent.action) {
                 ACTION_DONE -> {
                     //mark the task as done.
+                    //TODO DONE FUNCTION
+/*
                     if (TaskScheduler.completeTask(context, currentTid)) {
 
                         val task = context.getTaskFromString(intent.getStringExtra(TASK_DATA))
@@ -86,10 +72,13 @@ class NotificationActionReceiver:BroadcastReceiver(){
                     }else{
                         Log.e("onReceive","Something wont wrong Completeing task! UH OH")
                     }
+*/
                 }
 
                 ACTION_TASK_UNCOMPLETE ->{
 
+                    //TODO DO THIS
+/*
                     if (TaskScheduler.uncompleteTask(context, currentTid)) {
 
                         val task = context.getTaskFromString(intent.getStringExtra(TASK_DATA))
@@ -98,10 +87,12 @@ class NotificationActionReceiver:BroadcastReceiver(){
                     }else{
 
                     }
+*/
                 }
 
                 ACTION_SKIP_SHORT ->{
 
+/*
                     //Dismiss the notification
                     //TODO stubborn check
                     context.getNotificationManager().cancel(NOTIFICATION_TAG,currentTid)
@@ -114,6 +105,7 @@ class NotificationActionReceiver:BroadcastReceiver(){
                     }else{
                         Log.d("onReceive","ACTION_SKIP_SHORT")
                     }
+*/
                 }
 
                 ACTION_SKIP_TODAY ->{
@@ -130,25 +122,15 @@ class NotificationActionReceiver:BroadcastReceiver(){
                     context.apply {
 
                         //Always attempt to cancel the wake up notification on all ends
-                        notificationDismissWakeUpMirror()
+                        if(!context.isWatch()){
+                            context.notificationDismissWakeUpRemote()
+                        }
 
                         Toast.makeText(this@apply, "Start day", Toast.LENGTH_SHORT).show()
                         TaskScheduler.approve(this@apply)
                         TaskScheduler.getNextUncompletedTask(this@apply) { task ->
-
                             task?.let {
-
-                                //Prepare our small remote view
-                                val smallRemoteView = context.getSmallTaskRemoteView(task)
-
-                                context.notificationShowTask(
-                                        task,
-                                        dismissPendingIntent = createNotificationDeleteIntentForTask(task.id!!),
-                                        //TODO USE stubborn check
-                                        dismissable = false,
-                                        smallRemoteView = smallRemoteView,
-                                        bigRemoteView = null
-                                )
+                                notificationShowTaskMirror(task)
                             }
                         }
                     }
@@ -160,12 +142,14 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
                 ACTION_TASK_NEXT -> {
 
-
                     TaskScheduler.getNextOrderedTask(context, currentTid) { task ->
+                        //TODO action next
+/*
                         task?.let {
                             context.getNotificationManager().cancel(NOTIFICATION_TAG, currentTid)
                             context.showMobileNotificationTask(task)
                         }
+*/
                     }
                 }
 
@@ -173,10 +157,13 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
                     TaskScheduler.getPreviousOrderedTask(context, currentTid) { task ->
 
+                        //TODO sort this out
+/*
                         task?.let {
                             context.getNotificationManager().cancel(NOTIFICATION_TAG, currentTid)
                             context.showMobileNotificationTask(task)
                         }
+*/
                     }
                     //TODO What happens when TID Is -1?
                 }

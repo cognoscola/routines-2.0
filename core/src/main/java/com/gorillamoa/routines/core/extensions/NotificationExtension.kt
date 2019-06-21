@@ -16,7 +16,9 @@ import com.google.android.gms.wearable.PutDataRequest
 import com.google.android.gms.wearable.PutDataRequest.WEAR_URI_SCHEME
 import com.google.android.gms.wearable.Wearable
 import com.gorillamoa.routines.core.R
+import com.gorillamoa.routines.core.constants.DataLayerConstant
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.WAKE_UP_PATH
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.TASK_PATH
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
 
 import com.gorillamoa.routines.core.data.Task
@@ -38,8 +40,6 @@ const val TIMER_NOTIFICATION_ID = 65532
 public const val NOTIFICATION_CHANNEL_ONE  = "channel"
 public const val NOTIFICATION_CHANNEL_TWO  = "channel_MAX"
 const val NOTIFICATION_TAG = "routines"
-
-
 
 
 /** Prepare the intent for when user dismisses the notification **/
@@ -72,7 +72,7 @@ fun Context.notificationShowWakeUp(tasks:List<Task>,
 
             //TODO UNCOMMENT FOR WATCH
             addWakeUpAction(this@notificationShowWakeUp,"Start Day", ACTION_WAKE_START_DAY)
-            //addTaskAction(this@notificationShowWakeUp,"Edit", ACTION_START_MODIFY, WAKE_UP_NOTIFICATION_ID!!)
+            //addWakeUpAction(this@notificationShowWakeUp,"Edit", ACTION_START_MODIFY, WAKE_UP_NOTIFICATION_ID!!)
         }else{
             setCategory(Notification.CATEGORY_SERVICE)
 
@@ -102,15 +102,21 @@ fun Context.notificationShowWakeUp(tasks:List<Task>,
 }
 
 
-fun Context.notificationShowWakeUpRemote(tasks:List<Task>){ notificationShowRemote(tasks,WAKE_UP_PATH) }
+/**
+ * Notify other devices that they should build a notification of type WAKE UP
+ */
+fun Context.notificationShowWakeUpRemote(tasks:List<Task>){
+    notificationShowRemote(StringBuilder().stringifyTasks(tasks),WAKE_UP_PATH)
+}
 
 
 /**
  * Builds a mirrored notification both on the Local device and on
  * other connected nodes. When either is ACTIONED, the same action occurs on both devices.
- * @param tasks is the tasks sas string
+ * @param tasks is the task list to show
  */
 fun Context.notificationShowWakeUpMirror(tasks:List<Task>){
+    Log.d("notificationRoutine","notificationShowWakeUpMirror")
 
     //First lets build a local notification
     notificationShowWakeUpLocal(tasks)
@@ -124,6 +130,7 @@ fun Context.notificationShowWakeUpMirror(tasks:List<Task>){
  * @param tasks is the string of tasks to display
  */
 fun Context.notificationShowWakeUpLocal(tasks:List<Task>){
+    Log.d("notificationRoutine","notificationShowWakeUpLocal")
     notificationShowWakeUp(
             tasks,
             mainPendingIntent = null,
@@ -166,7 +173,7 @@ fun Context.notificationDismissWakeUpMirror(){
 }
 
 /**
- * Create an Action button for a notification
+ * Create an Action button for a task notification
  * Note: Dismiss Intent is fired if one of these actions is clicked. We should take care
  * to create dismiss funtions for custom actions on RemoteView
  * @param context is the application context
@@ -187,45 +194,6 @@ fun NotificationCompat.Builder.addWakeUpAction(context: Context,actionText:Strin
  * TASK NOTIFICATION FUNCTIONS
  *********************************************************************************/
 
-/********************************************************************************
- * GENERIC NOTIFICATION FUNCTIONS
- *********************************************************************************/
-
-
-fun Context.notificationShowRemote(tasks:List<Task>, path:String){
-
-    val putDataReq: PutDataRequest = PutDataMapRequest.create(path).run {
-        dataMap.putString(KEY_TASK_DATA,  StringBuilder().stringifyTasks(tasks))
-        asPutDataRequest()
-    }
-    putDataReq.setUrgent()
-    val putDataTask = Wearable.getDataClient(this).putDataItem(putDataReq)
-}
-
-fun determineOnGoingAbility(builder:NotificationCompat.Builder, dismissable:Boolean){
-
-    if (!dismissable) {
-
-        builder.apply {
-
-            setCategory(Notification.CATEGORY_SERVICE)
-            setAutoCancel(false)
-            setOngoing(true)
-
-            //set priority Level to stay on TOP of other notifications
-            setChannelId(NOTIFICATION_CHANNEL_TWO)
-
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                priority = Notification.PRIORITY_MAX
-            }
-        }
-    }
-}
-
-
-
-
-
 fun Context.notificationShowTask(task: Task,
                                  mainPendingIntent: PendingIntent? = null,
                                  dismissPendingIntent: PendingIntent? = null,
@@ -234,7 +202,6 @@ fun Context.notificationShowTask(task: Task,
                                  bigRemoteView: RemoteViews? = null) {
 
     val manager = getNotificationManager()
-
 
     getBuilder().apply {
 
@@ -269,33 +236,131 @@ fun Context.notificationShowTask(task: Task,
     }
 }
 
+/**
+ * Builds a mirrored notification both on the Local device and on
+ * other connected nodes. When either is ACTIONED, the same action occurs on both devices.
+ * @param task is the task to show
+ */
+fun Context.notificationShowTaskMirror(task:Task){
+    Log.d("notificationRoutine","notificationShowTaskMirror")
 
-fun Context.showMobileNotificationTask(task: Task){
+    //lets show a local notification first
+    notificationShowTaskLocal(task)
 
-
-        val smallRemoteView = (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetSmallTaskView(task)
-
-        notificationShowTask(
-                task,
-                dismissPendingIntent = createNotificationDeleteIntentForTask(task.id!!),
-                //TODO USE stubborn check
-                dismissable = false,
-                smallRemoteView = smallRemoteView,
-                bigRemoteView = null
-        )
+    //lets show a remote notification now
+    notificationShowTaskRemote(task)
 }
 
+fun Context.notificationShowTaskLocal(task:Task){
+    Log.d("notificationRoutine"," notificationShowTaskLocal Task:${task.id}")
+    notificationShowTask(
+            task,
+            mainPendingIntent = null,
+            dismissPendingIntent = createNotificationDeleteIntentForTask(task),
+            //TODO check stubborn to see if we should dismiss
+            dismissable = true,
+            smallRemoteView = if(!isWatch())remoteGetSmallTaskView(task)else null,
+            //TODO make a big remote view for tasks
+            bigRemoteView= null
+            )
+}
 
+/**
+ * Show a task remotely
+ */
+fun Context.notificationShowTaskRemote(task:Task){
+    Log.d("notificationRoutine","notificationShowTaskRemote")
 
-fun NotificationCompat.Builder.addTaskAction(context: Context,actionText:String, action:String,task:Task){
+    notificationShowRemote(getGson().toJson(task), TASK_PATH)
+}
+
+/**
+ * Convenience
+ * Cancels (removes) the Task  Notification if there is one
+ * @param task is the task to remove
+ */
+fun Context.notificationDismissTask(tid:Int) {
+    Log.d("notificationRoutine", "notificationDismissTask $tid")
+
+    getNotificationManager().cancel(NOTIFICATION_TAG, tid)
+}
+
+/**
+ * Notify remote nodes that they should remove their task Notifications
+ * if they are displaying one
+ */
+fun Context.notificationDismissTaskRemote(){
+    Log.d("notificationRoutine","notificationDismissTaskRemote")
+
+    val dataItemUri = Uri.Builder().scheme(WEAR_URI_SCHEME).path(TASK_PATH).build()
+    Wearable.getDataClient(this).deleteDataItems(dataItemUri)
+}
+
+/**
+ * Create an Action button for a task notification
+ * Note: Dismiss Intent is fired if one of these actions is clicked. We should take care
+ * to create dismiss funtions for custom actions on RemoteView
+ * @param context is the application context
+ * @param actionText is the text to display on the button
+ * @param action is the Intent action that will redirect to the proper functoin
+ */
+fun NotificationCompat.Builder.addTaskAction(context: Context,actionText:String, action:String, task:Task){
+    Log.d("notificationRoutine","addTaskAction")
 
     addAction(NotificationCompat.Action.Builder(
             R.mipmap.ic_launcher,
-//            Icon.createWithResource(context , R.mipmap.ic_launcher),
             actionText,
-            context.createNotificationActionPendingIntent(task,action)
+            context.createNotificationActionPendingIntentForTask(task, action)
     ).build())
 }
+
+/********************************************************************************
+ * GENERIC NOTIFICATION FUNCTIONS
+ *********************************************************************************/
+
+
+/**
+ * A generic function for showing a specific notification remotely
+ * @param taskData is the task data to send over
+ * @param path is the item for which the Data Layer will action upon
+ */
+fun Context.notificationShowRemote(taskData:String, path:String){
+
+    val putDataReq: PutDataRequest = PutDataMapRequest.create(path).run {
+        dataMap.putString(KEY_TASK_DATA, taskData )
+
+        //save the time
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = System.currentTimeMillis()
+        dataMap.putString(DataLayerConstant.KEY_TIME, "${cal.get(Calendar.HOUR)}:${cal.get(Calendar.MINUTE)}:${cal.get(Calendar.SECOND)}")
+
+        asPutDataRequest()
+    }
+    putDataReq.setUrgent()
+    val putDataTask = Wearable.getDataClient(this).putDataItem(putDataReq)
+}
+
+fun determineOnGoingAbility(builder:NotificationCompat.Builder, dismissable:Boolean){
+
+    if (!dismissable) {
+
+        builder.apply {
+
+            setCategory(Notification.CATEGORY_SERVICE)
+            setAutoCancel(false)
+            setOngoing(true)
+
+            //set priority Level to stay on TOP of other notifications
+            setChannelId(NOTIFICATION_CHANNEL_TWO)
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                priority = Notification.PRIORITY_MAX
+            }
+        }
+    }
+}
+
+
 //TODO ADD common functionality to remove notifications!
 //TODO when switching between tasks, make notification priority low so it doesn't show up all the time
 

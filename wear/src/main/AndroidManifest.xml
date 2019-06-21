@@ -177,9 +177,6 @@
         <receiver
             android:name=".core.receiver.NotificationActionReceiver"
             android:exported="false">
-            <intent-filter>
-                <action android:name="wake.startday" />
-            </intent-filter>
         </receiver>
     </application>
 

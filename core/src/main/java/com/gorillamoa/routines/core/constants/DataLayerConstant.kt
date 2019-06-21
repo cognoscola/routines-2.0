@@ -15,6 +15,8 @@ package com.gorillamoa.routines.core.constants
           * Used by, Wake, Task and Sleep notifications
           */
          const val KEY_TASK_DATA = "task_data"
+         const val KEY_TASK_ID = "Task.data.id"
+         const val KEY_TIME = "data.time"
 
      }
 

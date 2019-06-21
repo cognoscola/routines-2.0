@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import com.gorillamoa.routines.core.extensions.DisableScheduler
 import com.gorillamoa.routines.core.extensions.EnableScheduler
-import com.gorillamoa.routines.core.extensions.createNotificationDeleteIntentForTask
 import com.gorillamoa.routines.core.extensions.getCompletedTaskList
 import com.gorillamoa.routines.core.extensions.getDataRepository
 import com.gorillamoa.routines.core.extensions.getDayTaskList
@@ -13,11 +12,10 @@ import com.gorillamoa.routines.core.extensions.saveCompletedTaskList
 import com.gorillamoa.routines.core.extensions.saveOrder
 import com.gorillamoa.routines.core.extensions.saveTaskList
 import com.gorillamoa.routines.core.extensions.saveTaskLists
-import com.gorillamoa.routines.core.extensions.stringifyTasks
 import com.gorillamoa.routines.core.data.Task
+import com.gorillamoa.routines.core.data.TaskType
 import com.gorillamoa.routines.core.extensions.*
 
-import java.lang.StringBuilder
 import java.util.*
 
 /**
@@ -376,11 +374,12 @@ class TaskScheduler{
                 com.gorillamoa.routines.core.coroutines.Coroutines.ioThenMain({repository.getTaskById(nextTid)}){
                     scheduleCallback.invoke(it)
                 }
+
             }else{
 
                 Log.d("getNextUncompletedTask","Out of tasks!")
                 //TODO check if any tasks were completed, if not don't show sleep notification
-                    scheduleCallback.invoke(null)
+                    scheduleCallback.invoke(generateEmptyTaskObject())
                 //TODO schedule alarm at some point S
             }
         }
@@ -411,6 +410,9 @@ class TaskScheduler{
         fun showNext(context:Context){
             getNextUncompletedTask(context) { task ->
 
+                //TODO May delete this or move it somewhere else because the scheduler
+                //should not have to handle showing anything
+/*
                 task?.let {
                     context.showMobileNotificationTask(task)
                     //first time using this notation, so just to clarify. Since task was null the
@@ -420,6 +422,7 @@ class TaskScheduler{
                     context.notificationShowSleep()
                     endDay(context)
                 }
+*/
             }
         }
 
@@ -434,6 +437,15 @@ class TaskScheduler{
             val list = context.getDayTaskList()
             val finishedList = context.getCompletedTaskList()
             return ((list.size == 0).and(finishedList.size > 0))
+        }
+
+        fun generateEmptyTaskObject():Task{
+            return Task(
+                    name = "Schedule A task!",
+                    description = "Start off simple!",
+                    type = TaskType.TYPE_SPECIAL,
+                    id = 1000
+            )
         }
     }
 }
