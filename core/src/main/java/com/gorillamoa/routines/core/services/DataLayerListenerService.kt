@@ -112,7 +112,6 @@ class DataLayerListenerService:WearableListenerService(){
                 DataEvent.TYPE_CHANGED -> {
 
                     //first lets get the data if any
-
                     val taskData = dataMap.getString(KEY_TASK_DATA)
 
                     //In Any case we'll check the time it was issued

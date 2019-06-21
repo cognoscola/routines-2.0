@@ -143,13 +143,14 @@ class NotificationActionReceiver:BroadcastReceiver(){
                 ACTION_TASK_NEXT -> {
 
                     TaskScheduler.getNextOrderedTask(context, currentTid) { task ->
-                        //TODO action next
-/*
+
                         task?.let {
-                            context.getNotificationManager().cancel(NOTIFICATION_TAG, currentTid)
-                            context.showMobileNotificationTask(task)
+                            //First dismiss both locally and remotely
+                            context.notificationDismissTaskMirror(currentTid)
+
+                            //now lets show a new task on both screens
+                            context.notificationShowTaskMirror(task)
                         }
-*/
                     }
                 }
 
@@ -157,15 +158,15 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
                     TaskScheduler.getPreviousOrderedTask(context, currentTid) { task ->
 
-                        //TODO sort this out
-/*
                         task?.let {
-                            context.getNotificationManager().cancel(NOTIFICATION_TAG, currentTid)
-                            context.showMobileNotificationTask(task)
+                            //First dismiss both locally and remotely
+                            context.notificationDismissTaskMirror(currentTid)
+
+                            //now lets show a new task on both screens
+                            context.notificationShowTaskMirror(task)
+
                         }
-*/
                     }
-                    //TODO What happens when TID Is -1?
                 }
 
                 /**

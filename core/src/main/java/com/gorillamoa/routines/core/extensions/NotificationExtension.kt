@@ -253,6 +253,9 @@ fun Context.notificationShowTaskMirror(task:Task){
 
 fun Context.notificationShowTaskLocal(task:Task){
     Log.d("notificationRoutine"," notificationShowTaskLocal Task:${task.id}")
+
+
+
     notificationShowTask(
             task,
             mainPendingIntent = null,
@@ -272,6 +275,12 @@ fun Context.notificationShowTaskRemote(task:Task){
     Log.d("notificationRoutine","notificationShowTaskRemote")
 
     notificationShowRemote(getGson().toJson(task), TASK_PATH)
+}
+
+fun Context.notificationDismissTaskMirror(tid:Int){
+
+    notificationDismissTask(tid)
+    notificationDismissTaskRemote()
 }
 
 /**
