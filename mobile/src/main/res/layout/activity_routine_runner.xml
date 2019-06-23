@@ -141,6 +141,19 @@
         android:text="Create"
         android:id="@+id/createTask"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Update Last"
+        android:id="@+id/updateLast"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete Last"
+        android:id="@+id/deleteLast"/>
+
+
 
 
 </LinearLayout>

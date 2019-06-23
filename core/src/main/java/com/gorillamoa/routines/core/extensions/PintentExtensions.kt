@@ -151,7 +151,7 @@ fun Context.createNotificationActionPendingIntentForTask(task: Task?, action:Str
         intent.putExtra(TASK_DATA, getGson().toJson(task))
     }
 
-    return PendingIntent.getBroadcast(this, task?.id?:-1,intent,PendingIntent.FLAG_ONE_SHOT)
+    return PendingIntent.getBroadcast(this, task?.id?.toInt()?:-1,intent,PendingIntent.FLAG_ONE_SHOT)
 }
 
 /**
@@ -163,6 +163,6 @@ fun Context.createNotificationDeleteIntentForTask(task:Task):PendingIntent{
     val dismissIntent = Intent(this.applicationContext, NotificationDismissReceiver::class.java)
     dismissIntent.action = NotificationDismissReceiver.TYPE_TASK
     dismissIntent.putExtra(TASK_ID,task.id)
-    return PendingIntent.getBroadcast(this.applicationContext,task.id?:0, dismissIntent,PendingIntent.FLAG_ONE_SHOT)
+    return PendingIntent.getBroadcast(this.applicationContext,task.id?.toInt()?:0, dismissIntent,PendingIntent.FLAG_ONE_SHOT)
 
 }

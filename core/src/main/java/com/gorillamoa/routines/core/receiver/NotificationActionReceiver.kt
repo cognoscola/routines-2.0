@@ -37,7 +37,7 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
         intent?.let {
 
-            val currentTid = intent.getIntExtra(TASK_ID,-1)
+            val currentTid = intent.getLongExtra(TASK_ID,-1)
 
             Log.d("$tag onReceive","${intent.action}")
 

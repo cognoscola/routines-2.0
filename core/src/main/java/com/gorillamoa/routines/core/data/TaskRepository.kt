@@ -19,8 +19,8 @@ import java.util.*
 class TaskRepository(private val taskdao:TaskDao){
 
     fun insertMirror(context: Context, task: Task){
-        Coroutines.ioThenMain({insert(task)}){
-            DataLayerListenerService.insertRemotely(context,task)
+        Coroutines.ioThenMain({insert(task)}){ tid ->
+            DataLayerListenerService.insertRemotely(context,task.apply { id = tid  })
         }
     }
 
@@ -37,12 +37,12 @@ class TaskRepository(private val taskdao:TaskDao){
     }
 
     @WorkerThread
-    fun getTaskById(tid:Int):Task{
+    fun getTaskById(tid:Long):Task{
         return taskdao.getTask(tid)
     }
 
     @WorkerThread
-    fun getTaskByIds(ids:ArrayDeque<Int>):List<Task>{
+    fun getTaskByIds(ids:ArrayDeque<Long>):List<Task>{
         return taskdao.getTaskByIds(ids.toList())
     }
 
@@ -56,14 +56,14 @@ class TaskRepository(private val taskdao:TaskDao){
      * take care to insert remotely
      */
     @WorkerThread
-    fun insert(task: Task) {
-        //delete locally
-        return taskdao.insertTasks(task)
+    fun insert(task: Task):Long {
+
+        return taskdao.insertTask(task)
     }
 
     @WorkerThread
     fun delete(task:Task){
-        return taskdao.deleteTask(task)
+        taskdao.deleteTask(task)
     }
 
     @WorkerThread
@@ -77,6 +77,19 @@ class TaskRepository(private val taskdao:TaskDao){
         insert(task)
         return taskdao.getTasks()
     }
+
+    @WorkerThread
+    fun deleteAndReturnList(task:Task):List<Task>{
+        delete(task)
+        return taskdao.getTasks()
+    }
+
+    @WorkerThread
+    fun updateAndReturnList(task:Task):List<Task>{
+        update(task)
+        return taskdao.getTasks()
+    }
+
 
     @WorkerThread
     fun clearAndReturnList():List<Task>{

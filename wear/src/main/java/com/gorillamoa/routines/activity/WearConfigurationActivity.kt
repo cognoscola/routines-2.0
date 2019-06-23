@@ -122,9 +122,14 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
         /**
          * Here we should what would happen when we receive a
-         * broadcast with the WAKE UP COMMANDß
+         * broadcast with the WAKE UP COMMANDß NT WAKEUP
          */
-        wakeNotificationButton?.setOnClickListener { broadcastShowWakeUp() }
+        wakeNotificationButton?.setOnClickListener {
+//            broadcastShowWakeUp()
+
+            taskViewModel.loadTasks()
+//            notificationShowWakeUpMirror(taskViewModel.tasks.value!!)
+        }
 
         /**
          * What should happen when we receive a broadcast with the Sleep Command
@@ -176,10 +181,32 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
         //We'll create several dummy tasks on to which we can test things
         dummy?.setOnClickListener { taskViewModel.dummy() }
 
-        dataLayer?.setOnClickListener { view ->
+        deleteLast?.setOnClickListener { view ->
 
-            remoteNotifyWakeUpActioned(this)
+//            remoteNotifyWakeUpActioned(this)
+            taskViewModel.tasks.value?.lastOrNull()?.let {
+                getDataRepository().deleteMirror(this, it)
+            }
         }
+
+        updateLast?.setOnClickListener {
+
+            taskViewModel.tasks.value?.lastOrNull()?.let {
+
+                val updatedTask = Task(
+                        id = it.id,
+                        name = "** ${it.name}",
+                        description = it.description,
+                        type = it.type,
+                        frequency = it.frequency,
+                        date = it.date
+                )
+                getDataRepository().updateMirror(this,updatedTask)
+            }
+        }
+
+
+
 
     }
 

@@ -9,16 +9,19 @@ interface TaskDao{
     fun getTasks(): List<Task>
 
     @Query("SELECT * FROM TASK WHERE id = :tid")
-    fun getTask(tid:Int):Task
+    fun getTask(tid:Long):Task
 
     @Query("SELECT * FROM TASK WHERE id IN (:ids)")
-    fun getTaskByIds(ids: List<Int>): List<Task>
+    fun getTaskByIds(ids: List<Long>): List<Task>
 
     @Update
     fun updateTask(task: Task)
 
-    @Insert
-    fun insertTasks(vararg task:Task)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertTasks(vararg task: Task)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertTask(task:Task):Long
 
     @Delete
     fun deleteTask(task: Task)

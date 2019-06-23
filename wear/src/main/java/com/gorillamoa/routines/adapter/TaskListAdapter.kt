@@ -35,17 +35,17 @@ const val MODE_PICKER = 2 //pick an existing unscheduled task
  * @param addButtonCallback is when the user presses the + button on the item header
  */
 class TaskListAdapter(
-        private val itemClickedCallback:((Int)->Unit)? = null,
-        private val completionCallback:((Int, Boolean)->Any?)? =null,
-        private val scheduledCallback:((Int,Boolean)->Any?)? = null,
+        private val itemClickedCallback:((Long)->Unit)? = null,
+        private val completionCallback:((Long, Boolean)->Any?)? =null,
+        private val scheduledCallback:((Long,Boolean)->Any?)? = null,
         private val addButtonCallback:((Boolean)->Any?)? = null): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     @Suppress("unused")
     private val tag:String = TaskListAdapter::class.java.name
 
     private var tasks:List<Task>? = null          //All tasks to display
-    private var finished:ArrayDeque<Int>? = null      //A list of tasks to mark as finished
-    private var unfinished:ArrayDeque<Int>? = null //A list of tasks to mark as not finished
+    private var finished:ArrayDeque<Long>? = null      //A list of tasks to mark as finished
+    private var unfinished:ArrayDeque<Long>? = null //A list of tasks to mark as not finished
     private var order : ArrayList<Int> = ArrayList()
 
     private var mode = MODE_DAILY
@@ -63,7 +63,7 @@ class TaskListAdapter(
      * @param unfinished all tasks not finished
      * @param finished all tasks finished
      */
-    fun setTaskData(task:List<Task>, unfinished:ArrayDeque<Int>, finished:ArrayDeque<Int>){
+    fun setTaskData(task:List<Task>, unfinished:ArrayDeque<Long>, finished:ArrayDeque<Long>){
 
         tasks = task
         this.unfinished = unfinished
@@ -79,7 +79,7 @@ class TaskListAdapter(
      * not by other means) so that means only one item changed. But it its not the case then
      * just update all items.
      */
-    fun updateFinishedList(finished: ArrayDeque<Int>){
+    fun updateFinishedList(finished: ArrayDeque<Long>){
 
         this.finished = finished
        // calculateOrder()
@@ -118,7 +118,7 @@ class TaskListAdapter(
      * not by other means) so that means only one item changed. But it its not the case then
      * just update all items.
      */
-    fun updateRemainingList(unfinished: ArrayDeque<Int>) {
+    fun updateRemainingList(unfinished: ArrayDeque<Long>) {
 
         this.unfinished = unfinished
         if (recentlyInteracted()) {
@@ -225,7 +225,7 @@ class TaskListAdapter(
                         MODE_DAILY -> {
                             styleForDailyAppearance(holder,task,position)
                             taskTextView.setOnClickListener {
-                                itemClickedCallback?.invoke(task.id?:-1)
+                                itemClickedCallback?.invoke(task.id?:-1L)
                             }
                         }
                         MODE_ALL -> {

@@ -29,7 +29,7 @@ import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companio
 
 import java.util.*
 
-const val WAKE_UP_NOTIFICATION_ID =1
+const val WAKE_UP_NOTIFICATION_ID =1L
 
 const val SLEEP_NOTIFICATION_ID =65535
 const val REST_NOTIFICATION_ID =65534
@@ -95,7 +95,7 @@ fun Context.notificationShowWakeUp(tasks:List<Task>,
 
         manager.notify(
                 NOTIFICATION_TAG,
-                WAKE_UP_NOTIFICATION_ID,
+                WAKE_UP_NOTIFICATION_ID.toInt(),
                 build())
     }
 }
@@ -159,7 +159,7 @@ fun Context.notificationDismissWakeUpRemote(){
  */
 fun Context.notificationDismissWakeUp(){
 
-    getNotificationManager().cancel(NOTIFICATION_TAG, WAKE_UP_NOTIFICATION_ID)
+    getNotificationManager().cancel(NOTIFICATION_TAG, WAKE_UP_NOTIFICATION_ID.toInt())
 }
 
 /**
@@ -229,7 +229,7 @@ fun Context.notificationShowTask(task: Task,
 
         manager.notify(
                 NOTIFICATION_TAG,
-                task.id!!,
+                task.id!!.toInt(),
                 build()
         )
     }
@@ -276,9 +276,9 @@ fun Context.notificationShowTaskRemote(task:Task){
     notificationShowRemote(getGson().toJson(task), TASK_PATH)
 }
 
-fun Context.notificationDismissTaskMirror(tid:Int){
+fun Context.notificationDismissTaskMirror(tid:Long){
 
-    notificationDismissTask(tid)
+    notificationDismissTask(tid.toInt())
     notificationDismissTaskRemote()
 }
 

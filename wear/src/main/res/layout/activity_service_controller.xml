@@ -153,11 +153,16 @@
 
 
             <Button
-                android:id="@+id/dataLayer"
+                android:id="@+id/deleteLast"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:text="Data Test" />
+                android:text="delete last" />
 
+            <Button
+                android:id="@+id/updateLast"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="update last" />
 
         </LinearLayout>
 

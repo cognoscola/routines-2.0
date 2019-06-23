@@ -45,7 +45,7 @@ class TaskViewModel(application: Application): AndroidViewModel(application){
     }
 
     @UiThread
-    fun loadTasks(list:ArrayDeque<Int>):LiveData<List<Task>>{
+    fun loadTasks(list:ArrayDeque<Long>):LiveData<List<Task>>{
 
         com.gorillamoa.routines.core.coroutines.Coroutines.ioThenMain({repository.getTaskByIds(list)}){
             _tasks.value = it

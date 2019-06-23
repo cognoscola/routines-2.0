@@ -64,8 +64,8 @@ class TaskScheduler{
                 //throughout the day, for now just place them in the order that they appear
                 //TODO FETCH some habits
                 //TODO FETCH Some goals
-                val queue = ArrayDeque<Int>()
-                val orderList = ArrayList<Int>()
+                val queue = ArrayDeque<Long>()
+                val orderList = ArrayList<Long>()
                 //save the empty list to the Completed list
 
                 taskList?.forEach {
@@ -87,7 +87,7 @@ class TaskScheduler{
             }
         }
 
-        fun isComplete(context: Context, tid: Int):Boolean {
+        fun isComplete(context: Context, tid: Long):Boolean {
 
             val completedList = context.getCompletedTaskList()
             return completedList.contains(tid)
@@ -97,7 +97,7 @@ class TaskScheduler{
          * Unschedule a specified Task.
          * @param tid is the task id
          */
-        fun unscheduleTask(context:Context, tid:Int){
+        fun unscheduleTask(context:Context, tid:Long){
 
 
             val unfinished = context.getDayTaskList()
@@ -125,7 +125,7 @@ class TaskScheduler{
          * Schedule a specific task indicated by the user
          * @param tid is the task id
          */
-        fun scheduleTask(context:Context, tid:Int){
+        fun scheduleTask(context:Context, tid:Long){
 
             //TODO determine where to put this (which order)
             //for now just put it at the end
@@ -159,7 +159,7 @@ class TaskScheduler{
          * list
          * @return true is we should fetch another task
          */
-        fun scheduleForNextAvailableDay(context:Context, tid:Int):Boolean{
+        fun scheduleForNextAvailableDay(context:Context, tid:Long):Boolean{
 
             var shouldFetch = false
             val taskList = context.getDayTaskList()
@@ -185,9 +185,9 @@ class TaskScheduler{
          *
          */
         //TODO determine if we should skip all the way back or just a few tasks
-        fun scheduleNTasksForward(context: Context, tid:Int,steps:Int):Boolean{
+        fun scheduleNTasksForward(context: Context, tid:Long,steps:Int):Boolean{
 
-            if (tid != -1) {
+            if (tid != -1L) {
 
                 val taskList = context.getDayTaskList()
                 //does this task exist in the list?
@@ -208,7 +208,7 @@ class TaskScheduler{
                         //for now lets just move the 2nd one to the front
 
                         var skipSteps = Math.min(taskList.size, steps)
-                        val tempArray = ArrayDeque<Int>(skipSteps)
+                        val tempArray = ArrayDeque<Long>(skipSteps)
 
                         val current = taskList.removeLast()
 
@@ -240,9 +240,9 @@ class TaskScheduler{
          * @param tid is the task id
          * @return wether the operation was succesfful or not
          */
-        fun uncompleteTask(context:Context, tid:Int):Boolean{
+        fun uncompleteTask(context:Context, tid:Long):Boolean{
 
-            if (tid == -1) {
+            if (tid == -1L) {
                 return false// nothing to do here
             }
 
@@ -253,7 +253,7 @@ class TaskScheduler{
             Log.d("uncompleteTask","Unfinished: ${taskList.joinToString(",")}")
             Log.d("uncompleteTask","finished: ${doneList.joinToString(",")}")
 
-            if (tid != -1) {
+            if (tid != -1L) {
                 //we'll fetch the next tid from prefs
                 if(doneList.removeFirstOccurrence(tid)){
 
@@ -272,12 +272,12 @@ class TaskScheduler{
          * @param context is the application context
          * @param tid is the id of the task completed
          */
-        fun completeTask(context: Context, tid: Int):Boolean {
+        fun completeTask(context: Context, tid: Long):Boolean {
 
             val taskList = context.getDayTaskList()
             val doneList = context.getCompletedTaskList()
 
-            if (tid != -1) {
+            if (tid != -1L) {
                 //we'll fetch the next tid from prefs
                 if(taskList.removeFirstOccurrence(tid)){
 
@@ -294,9 +294,9 @@ class TaskScheduler{
          * Returns the previous task in the scheduled day. If the current Task is the first of the day
          * the call will return the last scheduled task
          */
-        fun getPreviousOrderedTask(context: Context, currentTid: Int,schedulerCallback: (task: Task?) -> Any?){
+        fun getPreviousOrderedTask(context: Context, currentTid: Long,schedulerCallback: (task: Task?) -> Any?){
 
-            if (currentTid == 0) {
+            if (currentTid == 0L) {
                 getNextUncompletedTask(context, schedulerCallback)
                 return
             }
@@ -327,9 +327,9 @@ class TaskScheduler{
          * Return the next task in our scheduled set. If the task is last it will return the first
          * task of the day
          */
-        fun getNextOrderedTask(context: Context,currentTid:Int, schedulerCallback:(task:Task?) ->Any?){
+        fun getNextOrderedTask(context: Context,currentTid:Long, schedulerCallback:(task:Task?) ->Any?){
 
-            if (currentTid == 0) {
+            if (currentTid == 0L) {
                 getNextUncompletedTask(context, schedulerCallback)
                 return
             }
@@ -364,7 +364,7 @@ class TaskScheduler{
          */
         fun getNextUncompletedTask(context:Context, scheduleCallback: (task:Task?) -> Any?){
 
-            var nextTid:Int =-1
+            var nextTid:Long =-1
             val taskList = context.getDayTaskList()
 
             //always fetch from the end of the list
@@ -372,7 +372,7 @@ class TaskScheduler{
                 nextTid = taskList.last
             }
 
-            if (nextTid != -1) {
+            if (nextTid != -1L) {
 
                 val repository = context.getDataRepository()
                 Log.d("getNextUncompletedTask","Will show Task:$nextTid")
@@ -431,7 +431,7 @@ class TaskScheduler{
             }
         }
 
-        fun skipAndShowNext(context: Context, currentTid: Int) {
+        fun skipAndShowNext(context: Context, currentTid: Long) {
             if (scheduleNTasksForward(context, currentTid, 2)) {
                 showNext(context)
             }

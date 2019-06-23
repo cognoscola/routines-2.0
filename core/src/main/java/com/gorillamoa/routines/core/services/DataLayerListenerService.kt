@@ -2,7 +2,7 @@ package com.gorillamoa.routines.core.services
 
 import android.annotation.TargetApi
 import android.content.Context
-import android.os.Build
+
 import android.util.Log
 import com.google.android.gms.wearable.*
 import com.gorillamoa.routines.core.constants.DataLayerConstant
@@ -11,7 +11,6 @@ import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
 
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
-import com.google.gson.reflect.TypeToken
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.DATA_TASK_MOBILE_DELETE_PATH
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.DATA_TASK_MOBILE_INSERT_PATH
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.DATA_TASK_MOBILE_UPDATE_PATH
@@ -21,7 +20,6 @@ import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.DATA_T
 import com.gorillamoa.routines.core.coroutines.Coroutines
 import java.lang.Exception
 import java.util.*
-
 
 /**
  * Listens for data changes (in case we are synchronized with the mobile)
@@ -120,7 +118,6 @@ class DataLayerListenerService:WearableListenerService(){
             executeGenericDataTransfer(context,task,if (context.isWatch()) DATA_TASK_MOBILE_UPDATE_PATH else DATA_TASK_WEAR_UPDATE_PATH)
         }
 
-
         fun executeGenericDataTransfer(context: Context,task: Task,path:String){
             val putDataReq: PutDataRequest = PutDataMapRequest.create(path)
                     .run {
@@ -207,6 +204,38 @@ class DataLayerListenerService:WearableListenerService(){
                         }
                     }
 
+                    else if(DataLayerConstant.DATA_TASK_WEAR_DELETE_PATH.equals(it.dataItem.uri.path)){
+                        try {
+                            processDeleteData(getGson().fromJson(taskData,Task::class.java))
+
+                        }catch (e:Exception){
+                            Log.e(tag,"There was a problem deleting",e)
+                        }
+                    }
+                    else if(DataLayerConstant.DATA_TASK_MOBILE_DELETE_PATH.equals(it.dataItem.uri.path)){
+                        try {
+                            processDeleteData(getGson().fromJson(taskData,Task::class.java))
+
+                        }catch (e:Exception){
+                            Log.e(tag,"There was a problem deleting",e)
+                        }
+                    }
+                    else if(DataLayerConstant.DATA_TASK_WEAR_UPDATE_PATH.equals(it.dataItem.uri.path)){
+                        try {
+                            processUpdateData(getGson().fromJson(taskData,Task::class.java))
+
+                        }catch (e:Exception){
+                            Log.e(tag,"There was a problem updating",e)
+                        }
+                    }
+                    else if(DataLayerConstant.DATA_TASK_MOBILE_UPDATE_PATH.equals(it.dataItem.uri.path)){
+                        try {
+                            processUpdateData(getGson().fromJson(taskData,Task::class.java))
+                        }catch (e:Exception){
+                            Log.e(tag,"There was a problem updating",e)
+                        }
+                    }
+
                 }
                 DataEvent.TYPE_DELETED -> {
 
@@ -220,11 +249,11 @@ class DataLayerListenerService:WearableListenerService(){
                     }else if (DataLayerConstant.TASK_PATH.equals(it.dataItem.uri.path)){
 
                         Log.d("notificationRoutine","TASK")
-                        getAllTaskShowing().forEach {
+                        getAllTaskShowing().forEach {notification ->
 
                             //we only show 1 task, so we'll take this opportunity to dismiss ALL
                             //task notifications
-                            notificationDismissTask(it.id)
+                            notificationDismissTask(notification.id)
                         }
                     }
                 }
@@ -236,21 +265,41 @@ class DataLayerListenerService:WearableListenerService(){
     }
 
     fun processInsertData(task: Task){
+        Log.d("$tag onDataChanged Data","got Insert Command")
         Coroutines.ioThenMain({ getDataRepository().insertAndReturnList(task)}){
-            Log.d("$tag onDataChanged","New List:")
-            it?.forEach {task ->
-                Log.d("$tag onDataChanged",task.toPrettyString())
-            }
+            printList(it)
+        }
+    }
+
+    fun processDeleteData(task: Task){
+        Log.d("$tag onDataChanged Data","got Delete Command")
+        Coroutines.ioThenMain({ getDataRepository().deleteAndReturnList(task)}){
+            printList(it)
+        }
+    }
+
+    fun processUpdateData(task: Task){
+        Log.d("$tag onDataChanged Data","got Update Command")
+        Coroutines.ioThenMain({ getDataRepository().updateAndReturnList(task)}){
+           printList(it)
+        }
+    }
+
+    fun printList(list:List<Task>?){
+        Log.d("$tag onDataChanged Data","New List:")
+        list?.forEach {task ->
+            Log.d("$tag onDataChanged Data",task.toPrettyString())
         }
     }
 
 
+
     @TargetApi(23)
-    private fun isAlreadyShowing(id:Int):Boolean {
+    private fun isAlreadyShowing(id:Long):Boolean {
         return if (getNotificationManager().activeNotifications.find {
                     //Check if we aren't already displaying a notification
                     Log.d("notificationRoutine", "onDataChanged check: ${it.id}")
-                    it.id == id
+                    it.id == id.toInt()
                 } == null) {
             false
         } else {

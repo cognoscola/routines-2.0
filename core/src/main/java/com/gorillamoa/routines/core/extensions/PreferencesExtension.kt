@@ -170,7 +170,7 @@ fun Context.saveAlarmRestTriggerStatus(isAlarmSet: Boolean) {
  * save task list
  * @param queue is the task list
  */
-fun Context.saveTaskList(queue:ArrayDeque<Int>) {
+fun Context.saveTaskList(queue:ArrayDeque<Long>) {
 
     try {
         val prefs = getLocalSettings()
@@ -190,7 +190,7 @@ fun Context.saveTaskList(queue:ArrayDeque<Int>) {
  * save completed task list
  * @param queue is the completed task list
  */
-fun Context.saveCompletedTaskList(queue:ArrayDeque<Int>) {
+fun Context.saveCompletedTaskList(queue:ArrayDeque<Long>) {
 
     try {
         val prefs = getLocalSettings()
@@ -205,7 +205,7 @@ fun Context.saveCompletedTaskList(queue:ArrayDeque<Int>) {
 }
 
 
-fun Context.saveTaskLists(queue:ArrayDeque<Int>,completed:ArrayDeque<Int>){
+fun Context.saveTaskLists(queue:ArrayDeque<Long>,completed:ArrayDeque<Long>){
     val prefs = getLocalSettings()
     prefs.edit().apply{
 
@@ -221,7 +221,7 @@ fun Context.saveTaskLists(queue:ArrayDeque<Int>,completed:ArrayDeque<Int>){
     }
 }
 
-fun Context.saveOrder(list:ArrayList<Int>){
+fun Context.saveOrder(list:ArrayList<Long>){
      getLocalSettings().edit().apply{
          putString(TASK_ORDER,list.joinToString(","))
     }.apply()
@@ -232,7 +232,7 @@ fun Context.getTaskFinishedKey() = TASK_COMPLETE
 fun Context.getOrderKey() = TASK_ORDER
 
 
-fun Context.getCompletedTaskList():ArrayDeque<Int>{
+fun Context.getCompletedTaskList():ArrayDeque<Long>{
     return fetchArrayFromPreference(TASK_COMPLETE)
 }
 
@@ -240,22 +240,22 @@ fun Context.getCompletedTaskList():ArrayDeque<Int>{
 /**
  * We get the task list, if there is any.
  */
-fun Context.getDayTaskList():ArrayDeque<Int>{
+fun Context.getDayTaskList():ArrayDeque<Long>{
     return fetchArrayFromPreference(TASK_INCOMPLETE)
 }
 
-fun Context.getSavedOrder():ArrayList<Int>{
+fun Context.getSavedOrder():ArrayList<Long>{
     val prefs = getLocalSettings()
     val taskString = prefs.getString(TASK_ORDER,"-1")
     if (taskString != "-1") {
-        val deque = ArrayList<Int>()
+        val deque = ArrayList<Long>()
         if (taskString!!.contains(",")) {
 
             try {
                 val sequence = taskString.split(",")
                 sequence.forEach {
                     try {
-                        deque.add(it.toInt())
+                        deque.add(it.toLong())
                     } catch (e: IllegalArgumentException) {
                         Log.d("getDayTaskList", "Tried to convert numbers", e)
                     }
@@ -268,7 +268,7 @@ fun Context.getSavedOrder():ArrayList<Int>{
             //only one task today?
 
             if (taskString.isNotEmpty()) {
-                deque.add(taskString.toInt())
+                deque.add(taskString.toLong())
             }
         }
         return deque
@@ -278,18 +278,18 @@ fun Context.getSavedOrder():ArrayList<Int>{
 }
 
 
-fun Context.fetchArrayFromPreference(listName:String):ArrayDeque<Int>{
+fun Context.fetchArrayFromPreference(listName:String):ArrayDeque<Long>{
     val prefs = getLocalSettings()
     val taskString = prefs.getString(listName,"-1")
     if (taskString != "-1") {
-        val deque = ArrayDeque<Int>()
+        val deque = ArrayDeque<Long>()
         if (taskString!!.contains(",")) {
 
             try {
                 val sequence = taskString.split(",")
                 sequence.forEach {
                     try {
-                        deque.add(it.toInt())
+                        deque.add(it.toLong())
                     } catch (e: IllegalArgumentException) {
                         Log.d("getDayTaskList", "Tried to convert numbers", e)
                     }
@@ -302,7 +302,7 @@ fun Context.fetchArrayFromPreference(listName:String):ArrayDeque<Int>{
             //only one task today?
 
             if (taskString.isNotEmpty()) {
-                deque.add(taskString.toInt())
+                deque.add(taskString.toLong())
             }
         }
         return deque

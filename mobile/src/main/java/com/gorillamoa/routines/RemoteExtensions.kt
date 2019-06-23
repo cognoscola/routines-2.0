@@ -39,7 +39,7 @@ fun Context.setStartFunction(remoteViews: RemoteViews) {
 }
 
 //TODO CONFIGURE appearance for empty tasks
-fun RemoteViews.createFunction(context:Context, tasks:String?, action:String,tid:Int = -1):RemoteViews{
+fun RemoteViews.createFunction(context:Context, tasks:String?, action:String,tid:Long = -1):RemoteViews{
 
      try {
         tasks?.let {
@@ -48,7 +48,7 @@ fun RemoteViews.createFunction(context:Context, tasks:String?, action:String,tid
             intent.putExtra(TASK_DATA, it)
             val pIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-            if (tid != -1) {
+            if (tid != -1L) {
                 intent.putExtra(TASK_ID, tid)
                 setOnClickPendingIntent(R.id.contentGroup, pIntent)
             }else{
