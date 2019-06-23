@@ -145,7 +145,8 @@ class NotificationActionReceiver:BroadcastReceiver(){
                     TaskScheduler.getNextOrderedTask(context, currentTid) { task ->
 
                         task?.let {
-                            //First dismiss both locally and remotely
+                            //First dismiss both locally and remotely,
+                            //Don't need this anymore, we
                             context.notificationDismissTaskMirror(currentTid)
 
                             //now lets show a new task on both screens

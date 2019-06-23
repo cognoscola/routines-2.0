@@ -29,7 +29,7 @@ import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companio
 
 import java.util.*
 
-const val WAKE_UP_NOTIFICATION_ID =1L
+const val WAKE_UP_NOTIFICATION_ID =1
 
 const val SLEEP_NOTIFICATION_ID =65535
 const val REST_NOTIFICATION_ID =65534
@@ -95,7 +95,7 @@ fun Context.notificationShowWakeUp(tasks:List<Task>,
 
         manager.notify(
                 NOTIFICATION_TAG,
-                WAKE_UP_NOTIFICATION_ID.toInt(),
+                WAKE_UP_NOTIFICATION_ID,
                 build())
     }
 }
@@ -130,6 +130,9 @@ fun Context.notificationShowWakeUpMirror(tasks:List<Task>){
  */
 fun Context.notificationShowWakeUpLocal(tasks:List<Task>){
     Log.d("notificationRoutine","notificationShowWakeUpLocal")
+
+    removeAllNotificationsExceptSpecified(WAKE_UP_NOTIFICATION_ID)
+
     notificationShowWakeUp(
             tasks,
             mainPendingIntent = null,
@@ -159,7 +162,7 @@ fun Context.notificationDismissWakeUpRemote(){
  */
 fun Context.notificationDismissWakeUp(){
 
-    getNotificationManager().cancel(NOTIFICATION_TAG, WAKE_UP_NOTIFICATION_ID.toInt())
+    getNotificationManager().cancel(NOTIFICATION_TAG, WAKE_UP_NOTIFICATION_ID)
 }
 
 /**
@@ -253,7 +256,7 @@ fun Context.notificationShowTaskMirror(task:Task){
 fun Context.notificationShowTaskLocal(task:Task){
     Log.d("notificationRoutine"," notificationShowTaskLocal Task:${task.id}")
 
-
+    removeAllNotificationsExceptSpecified(task.id!!.toInt())
 
     notificationShowTask(
             task,
@@ -265,6 +268,17 @@ fun Context.notificationShowTaskLocal(task:Task){
             //TODO make a big remote view for tasks
             bigRemoteView= null
             )
+}
+
+fun Context.removeAllNotificationsExceptSpecified(tid:Int){
+
+    //we need to make sure to only show this one TASK
+    val manager = getNotificationManager()
+    getAllTaskShowing().forEach {notification ->
+        if (notification.id != tid) {
+            manager.cancel(NOTIFICATION_TAG,notification.id)
+        }
+    }
 }
 
 /**

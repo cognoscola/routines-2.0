@@ -159,25 +159,24 @@ class DataLayerListenerService:WearableListenerService(){
 
                         //We'll use the scheduler to get the task list,
                         //TODO but we must synchronize task completion data somewhere else
-                        TaskScheduler.schedule(this){ tasks ->
-                            tasks?.let{
-                                Log.d("notificationRoutine","onDataChanged")
+                        TaskScheduler.schedule(this) { tasks ->
+                            tasks?.let {
+                                Log.d("notificationRoutine", "onDataChanged")
 
                                 if (!isAlreadyShowing(WAKE_UP_NOTIFICATION_ID)) {
                                     notificationShowWakeUpLocal(it)
                                 }
                             }
                         }
-                    }
-
-                    else if(DataLayerConstant.TASK_PATH.equals(it.dataItem.uri.path)){
+                    } else if (DataLayerConstant.TASK_PATH.equals(it.dataItem.uri.path)) {
 
                         //Here task data is of type task
                         val task = getGson().fromJson(taskData, Task::class.java)
-                        if (!isAlreadyShowing(task.id!!)) {
+                        if (!isAlreadyShowing(task.id!!.toInt())) {
                             notificationShowTaskLocal(task)
                         }
                     }
+
 
                     /**
                      * This is a special case which we'll use to synchronize data between
@@ -186,70 +185,62 @@ class DataLayerListenerService:WearableListenerService(){
                      * phones, so the devices are treated as equal in terms of data, so they need
                      * to contain exactly the same data all the time .
                      */
-                    else if(DataLayerConstant.DATA_TASK_WEAR_INSERT_PATH.equals(it.dataItem.uri.path)){
+                    else if (DataLayerConstant.DATA_TASK_WEAR_INSERT_PATH.equals(it.dataItem.uri.path)) {
 
                         try {
-                            processInsertData(getGson().fromJson(taskData,Task::class.java))
-                        }catch (e:Exception){
-                            Log.e(tag,"There was a problem inserting",e)
+                            processInsertData(getGson().fromJson(taskData, Task::class.java))
+                        } catch (e: Exception) {
+                            Log.e(tag, "There was a problem inserting", e)
                         }
-                    }
-
-                    else if(DataLayerConstant.DATA_TASK_MOBILE_INSERT_PATH.equals(it.dataItem.uri.path)){
+                    } else if (DataLayerConstant.DATA_TASK_MOBILE_INSERT_PATH.equals(it.dataItem.uri.path)) {
                         try {
-                            processInsertData(getGson().fromJson(taskData,Task::class.java))
+                            processInsertData(getGson().fromJson(taskData, Task::class.java))
 
-                        }catch (e:Exception){
-                            Log.e(tag,"There was a problem inserting",e)
+                        } catch (e: Exception) {
+                            Log.e(tag, "There was a problem inserting", e)
                         }
-                    }
-
-                    else if(DataLayerConstant.DATA_TASK_WEAR_DELETE_PATH.equals(it.dataItem.uri.path)){
+                    } else if (DataLayerConstant.DATA_TASK_WEAR_DELETE_PATH.equals(it.dataItem.uri.path)) {
                         try {
-                            processDeleteData(getGson().fromJson(taskData,Task::class.java))
+                            processDeleteData(getGson().fromJson(taskData, Task::class.java))
 
-                        }catch (e:Exception){
-                            Log.e(tag,"There was a problem deleting",e)
+                        } catch (e: Exception) {
+                            Log.e(tag, "There was a problem deleting", e)
                         }
-                    }
-                    else if(DataLayerConstant.DATA_TASK_MOBILE_DELETE_PATH.equals(it.dataItem.uri.path)){
+                    } else if (DataLayerConstant.DATA_TASK_MOBILE_DELETE_PATH.equals(it.dataItem.uri.path)) {
                         try {
-                            processDeleteData(getGson().fromJson(taskData,Task::class.java))
+                            processDeleteData(getGson().fromJson(taskData, Task::class.java))
 
-                        }catch (e:Exception){
-                            Log.e(tag,"There was a problem deleting",e)
+                        } catch (e: Exception) {
+                            Log.e(tag, "There was a problem deleting", e)
                         }
-                    }
-                    else if(DataLayerConstant.DATA_TASK_WEAR_UPDATE_PATH.equals(it.dataItem.uri.path)){
+                    } else if (DataLayerConstant.DATA_TASK_WEAR_UPDATE_PATH.equals(it.dataItem.uri.path)) {
                         try {
-                            processUpdateData(getGson().fromJson(taskData,Task::class.java))
+                            processUpdateData(getGson().fromJson(taskData, Task::class.java))
 
-                        }catch (e:Exception){
-                            Log.e(tag,"There was a problem updating",e)
+                        } catch (e: Exception) {
+                            Log.e(tag, "There was a problem updating", e)
                         }
-                    }
-                    else if(DataLayerConstant.DATA_TASK_MOBILE_UPDATE_PATH.equals(it.dataItem.uri.path)){
+                    } else if (DataLayerConstant.DATA_TASK_MOBILE_UPDATE_PATH.equals(it.dataItem.uri.path)) {
                         try {
-                            processUpdateData(getGson().fromJson(taskData,Task::class.java))
-                        }catch (e:Exception){
-                            Log.e(tag,"There was a problem updating",e)
+                            processUpdateData(getGson().fromJson(taskData, Task::class.java))
+                        } catch (e: Exception) {
+                            Log.e(tag, "There was a problem updating", e)
                         }
                     }
-
                 }
                 DataEvent.TYPE_DELETED -> {
 
                     //TODO test situation where we may get a delete issue after a
                     //new notification issue b/c of network lag
-                    Log.d("notificationRoutine","onDataChanged Delete issued")
+                    Log.d("notificationRoutine", "onDataChanged Delete issued")
 
                     if (DataLayerConstant.WAKE_UP_PATH.equals(it.dataItem.uri.path)) {
-                        Log.d("notificationRoutine","WAKE")
+                        Log.d("notificationRoutine", "WAKE")
                         notificationDismissWakeUp()
-                    }else if (DataLayerConstant.TASK_PATH.equals(it.dataItem.uri.path)){
+                    } else if (DataLayerConstant.TASK_PATH.equals(it.dataItem.uri.path)) {
 
-                        Log.d("notificationRoutine","TASK")
-                        getAllTaskShowing().forEach {notification ->
+                        Log.d("notificationRoutine", "TASK")
+                        getAllTaskShowing().forEach { notification ->
 
                             //we only show 1 task, so we'll take this opportunity to dismiss ALL
                             //task notifications
@@ -292,23 +283,17 @@ class DataLayerListenerService:WearableListenerService(){
         }
     }
 
-
-
     @TargetApi(23)
-    private fun isAlreadyShowing(id:Long):Boolean {
+    private fun isAlreadyShowing(id:Int):Boolean {
         return if (getNotificationManager().activeNotifications.find {
                     //Check if we aren't already displaying a notification
                     Log.d("notificationRoutine", "onDataChanged check: ${it.id}")
-                    it.id == id.toInt()
+                    it.id == id
                 } == null) {
             false
         } else {
             Log.d("notificationRoutine", "onDataChanged We're already showing $id")
             true
         }
-
-
     }
-
-
 }
