@@ -74,7 +74,10 @@
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/wakeup"/>
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/task"/>
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/sleep"/>
-                <data android:scheme="wear" android:host="*" android:pathPrefix="/data"/>
+
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/data/task/wear/insert"/>
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/data/task/wear/update"/>
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/data/task/wear/delete"/>
 
                 <!--Watch only paths, I have yet to find a situation for this.. but maybe later-->
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/watch-only"/>

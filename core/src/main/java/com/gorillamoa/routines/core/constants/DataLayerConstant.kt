@@ -10,6 +10,23 @@ package com.gorillamoa.routines.core.constants
          const val TASK_PATH = "/task"
          const val SLEEP_PATH  = "/sleep"
 
+
+         //This is for synchronizing databases from PHONE -> WEAR
+         //We'll pass ALL DB items in one call for now to keep it simple
+         const val DATA_TASK_WEAR_UPDATE_PATH = "/data/task/wear/update"
+         const val DATA_TASK_WEAR_INSERT_PATH = "/data/task/wear/insert"
+         const val DATA_TASK_WEAR_DELETE_PATH = "/data/task/wear/delete"
+
+         //WEAR -> PHONE
+         //When the user makes a change in the wear, it should reflect on phone
+         const val DATA_TASK_MOBILE_INSERT_PATH = "/data/task/mobile/insert"
+         const val DATA_TASK_MOBILE_DELETE_PATH = "/data/task/mobile/delete"
+         const val DATA_TASK_MOBILE_UPDATE_PATH = "/data/task/mobile/update"
+
+         //This is for synchronizing user settings (stubborn notifications)
+         //We'll pass ALL settings on every call
+         const val DATA_SETTINGS = "/data/settings"
+
          /**
           * Field to contain information about tasks
           * Used by, Wake, Task and Sleep notifications

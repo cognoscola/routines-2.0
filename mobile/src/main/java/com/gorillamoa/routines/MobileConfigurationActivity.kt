@@ -14,6 +14,7 @@ import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_routine_runner.*
+import java.util.*
 
 const val EVENT_WAKEUP = "event.wakeup.visibility"
 
@@ -85,6 +86,15 @@ class MobileConfigurationActivity : FragmentActivity(),
         sendDataButton?.setOnClickListener { view ->
 
             //TODO Check if task completed etc...
+        }
+
+        createTask.setOnClickListener {
+
+            val cal = Calendar.getInstance()
+            cal.timeInMillis = System.currentTimeMillis()
+            getDataRepository().insertMirror(this, com.gorillamoa.routines.core.data.Task(name = "Mobile Task:${cal.get(Calendar.HOUR)}:${cal.get(Calendar.MINUTE)}:${cal.get(Calendar.SECOND)}"))
+
+
         }
     }
 

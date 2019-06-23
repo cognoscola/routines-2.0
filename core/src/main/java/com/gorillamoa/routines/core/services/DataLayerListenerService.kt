@@ -11,6 +11,17 @@ import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
 
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
+import com.google.gson.reflect.TypeToken
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.DATA_TASK_MOBILE_DELETE_PATH
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.DATA_TASK_MOBILE_INSERT_PATH
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.DATA_TASK_MOBILE_UPDATE_PATH
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.DATA_TASK_WEAR_DELETE_PATH
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.DATA_TASK_WEAR_INSERT_PATH
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.DATA_TASK_WEAR_UPDATE_PATH
+import com.gorillamoa.routines.core.coroutines.Coroutines
+import java.lang.Exception
+import java.util.*
+
 
 /**
  * Listens for data changes (in case we are synchronized with the mobile)
@@ -59,7 +70,7 @@ class DataLayerListenerService:WearableListenerService(){
         /**A task has its info changed, requires synchronization
          * One of: frequency, name, type has changed so update the local database
          */
-        const val EVENT_TASK_INFO_CHANGED ="event.task_settings_change"
+        const val EVENT_TASK_INFO_CHANGED = "event.task_settings_change"
 
         /**
          * The user's history info has updated
@@ -96,8 +107,38 @@ class DataLayerListenerService:WearableListenerService(){
          * Sync the "current" viewing task
          */
         const val ACTION_VIEW_TASK = "action.viewchange"
-    }
 
+        fun insertRemotely(context: Context, task: Task) {
+            executeGenericDataTransfer(context,task,if (context.isWatch()) DATA_TASK_MOBILE_INSERT_PATH else DATA_TASK_WEAR_INSERT_PATH)
+        }
+
+        fun deleteRemotely(context: Context,task: Task){
+            executeGenericDataTransfer(context,task,if (context.isWatch()) DATA_TASK_MOBILE_DELETE_PATH else DATA_TASK_WEAR_DELETE_PATH)
+        }
+
+        fun updateRemotely(context: Context,task: Task){
+            executeGenericDataTransfer(context,task,if (context.isWatch()) DATA_TASK_MOBILE_UPDATE_PATH else DATA_TASK_WEAR_UPDATE_PATH)
+        }
+
+
+        fun executeGenericDataTransfer(context: Context,task: Task,path:String){
+            val putDataReq: PutDataRequest = PutDataMapRequest.create(path)
+                    .run {
+                        dataMap.putString(KEY_TASK_DATA, context.getGson().toJson(task)) //save the time
+                        dataMap.putString(DataLayerConstant.KEY_TIME, getTimeInstant())
+                        asPutDataRequest()
+                    }
+            putDataReq.setUrgent()
+            Wearable.getDataClient(context).putDataItem(putDataReq)
+        }
+
+        fun getTimeInstant(): String {
+            val cal = Calendar.getInstance()
+            cal.timeInMillis = System.currentTimeMillis()
+            return "${cal.get(Calendar.HOUR)}:${cal.get(Calendar.MINUTE)}:${cal.get(Calendar.SECOND)}"
+        }
+
+    }
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
         Log.d("$tag onDataChanged ", "$dataEvents")
@@ -115,7 +156,6 @@ class DataLayerListenerService:WearableListenerService(){
                     val taskData = dataMap.getString(KEY_TASK_DATA)
 
                     //In Any case we'll check the time it was issued
-
                     Log.d("$tag onDataChanged", " Changed Time Issued: ${dataMap.getString(DataLayerConstant.KEY_TIME)}")
 
                     if (DataLayerConstant.WAKE_UP_PATH.equals(it.dataItem.uri.path)) {
@@ -141,6 +181,32 @@ class DataLayerListenerService:WearableListenerService(){
                             notificationShowTaskLocal(task)
                         }
                     }
+
+                    /**
+                     * This is a special case which we'll use to synchronize data between
+                     * mobile and Wear.
+                     * Since Wear is a Standalone, Wear needs to have full capibilities of the
+                     * phones, so the devices are treated as equal in terms of data, so they need
+                     * to contain exactly the same data all the time .
+                     */
+                    else if(DataLayerConstant.DATA_TASK_WEAR_INSERT_PATH.equals(it.dataItem.uri.path)){
+
+                        try {
+                            processInsertData(getGson().fromJson(taskData,Task::class.java))
+                        }catch (e:Exception){
+                            Log.e(tag,"There was a problem inserting",e)
+                        }
+                    }
+
+                    else if(DataLayerConstant.DATA_TASK_MOBILE_INSERT_PATH.equals(it.dataItem.uri.path)){
+                        try {
+                            processInsertData(getGson().fromJson(taskData,Task::class.java))
+
+                        }catch (e:Exception){
+                            Log.e(tag,"There was a problem inserting",e)
+                        }
+                    }
+
                 }
                 DataEvent.TYPE_DELETED -> {
 
@@ -168,6 +234,16 @@ class DataLayerListenerService:WearableListenerService(){
             }
         }
     }
+
+    fun processInsertData(task: Task){
+        Coroutines.ioThenMain({ getDataRepository().insertAndReturnList(task)}){
+            Log.d("$tag onDataChanged","New List:")
+            it?.forEach {task ->
+                Log.d("$tag onDataChanged",task.toPrettyString())
+            }
+        }
+    }
+
 
     @TargetApi(23)
     private fun isAlreadyShowing(id:Int):Boolean {

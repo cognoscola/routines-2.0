@@ -70,7 +70,6 @@ class TaskViewModel(application: Application): AndroidViewModel(application){
 
     fun insert(task:Task){
         //Update the change in memory. The LiveData structure will report a change
-
         com.gorillamoa.routines.core.coroutines.Coroutines.io{
             repository.insert(task)
         }

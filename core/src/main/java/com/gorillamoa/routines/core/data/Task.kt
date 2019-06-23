@@ -20,4 +20,8 @@ data class Task(
         //TODO add history
 
 
-)
+) {
+        fun toPrettyString(): String {
+                return "Task: ID${id}, Name:${name}, description:${description}, type:${type}"
+        }
+}

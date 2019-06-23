@@ -23,8 +23,6 @@ import com.gorillamoa.routines.core.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_service_controller.*
 import java.util.*
 
-
-
 /**
  * A few notes on this class.
  * We use support FragmentActivity instead of WearableActivity() because the
@@ -133,9 +131,9 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
          */
         sleepNotificationButton?.setOnClickListener { notificationShowSleep() }
 
-        //clean truncate notificationShowTask function
+
         taskNotificationButton?.setOnClickListener {
-            com.gorillamoa.routines.core.scheduler.TaskScheduler.getNextUncompletedTask(this) { task ->
+            TaskScheduler.getNextUncompletedTask(this) { task ->
                 task?.let {
                     notificationShowTask(it)
                 }
@@ -153,9 +151,8 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
         sleepButton?.setOnClickListener {
             notificationShowSleep()
-            com.gorillamoa.routines.core.scheduler.TaskScheduler.endDay(this)
+            TaskScheduler.endDay(this)
         }
-
 
 
         createTask?.setOnClickListener {
@@ -163,8 +160,10 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
             //TODO show on notification updated tasks
             val cal =Calendar.getInstance()
             cal.timeInMillis = System.currentTimeMillis()
-            taskViewModel.insertAndReturnList(Task(name = "Task:${cal.get(Calendar.HOUR)}:${cal.get(Calendar.MINUTE)}:${cal.get(Calendar.SECOND)}"))
+//            taskViewModel.insertAndReturnList(Task(name = "Task:${cal.get(Calendar.HOUR)}:${cal.get(Calendar.MINUTE)}:${cal.get(Calendar.SECOND)}"))
 //            taskViewModel.insert()
+            getDataRepository().insertMirror(this, Task(name = "WEAR Task:${cal.get(Calendar.HOUR)}:${cal.get(Calendar.MINUTE)}:${cal.get(Calendar.SECOND)}"))
+
         }
 
 
