@@ -46,6 +46,7 @@
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/data/task/mobile/insert"/>
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/data/task/mobile/delete"/>
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/data/task/mobile/update"/>
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/progress/update"/>
 
             </intent-filter>
         </service>

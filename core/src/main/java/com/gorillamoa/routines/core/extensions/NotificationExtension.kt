@@ -23,9 +23,10 @@ import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TA
 
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_DONE
-import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_SKIP_SHORT
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_SKIP_TODAY
+import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_NEXT
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_WAKE_START_DAY
+import com.gorillamoa.routines.core.scheduler.TaskScheduler
 
 import java.util.*
 
@@ -36,8 +37,8 @@ const val REST_NOTIFICATION_ID =65534
 const val ACTIVITY_NOTIFICATION_ID = 65533
 const val TIMER_NOTIFICATION_ID = 65532
 
-public const val NOTIFICATION_CHANNEL_ONE  = "channel"
-public const val NOTIFICATION_CHANNEL_TWO  = "channel_MAX"
+const val NOTIFICATION_CHANNEL_ONE  = "channel"
+const val NOTIFICATION_CHANNEL_TWO  = "channel_MAX"
 const val NOTIFICATION_TAG = "routines"
 
 
@@ -83,7 +84,6 @@ fun Context.notificationShowWakeUp(tasks:List<Task>,
             bigRemoteView?.let {
                 setCustomBigContentView(bigRemoteView)
             }
-
         }
 
         determineOnGoingAbility(this@apply,dismissable)
@@ -211,9 +211,20 @@ fun Context.notificationShowTask(task: Task,
             setAutoCancel(true)
             setCategory(Notification.CATEGORY_REMINDER)
 
-            addTaskAction(this@notificationShowTask,"Done      ", ACTION_DONE,task)
-            addTaskAction(this@notificationShowTask,"Delay     ", ACTION_SKIP_SHORT,task)
-            addTaskAction(this@notificationShowTask,"Skip Today", ACTION_SKIP_TODAY,task)
+            if(TaskScheduler.isComplete(this@notificationShowTask, task.id!!)){
+
+                addTaskAction(this@notificationShowTask,"Uncheck", ACTION_DONE,task)
+
+            }else{
+
+                //Mark as done
+                addTaskAction(this@notificationShowTask,"Done      ", ACTION_DONE,task)
+                //Equivalent to NEXT
+                addTaskAction(this@notificationShowTask,"Delay     ", ACTION_TASK_NEXT,task)
+                //Removes from the Queue
+                addTaskAction(this@notificationShowTask,"Skip Today", ACTION_SKIP_TODAY,task)
+            }
+
         }else{
 
             setCategory(Notification.CATEGORY_SERVICE)

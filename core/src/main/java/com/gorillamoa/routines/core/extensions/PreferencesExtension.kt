@@ -36,11 +36,9 @@ private const val SLEEP_PHASE = "sleep_phase"
 private const val TASK_INCOMPLETE = "INCOMPLETE" // tasks not yet completed
 private const val TASK_COMPLETE = "COMPLETE" //which tasks completed
 private const val TASK_ORDER = "order" //task order
+private const val IS_ACTIVE = "isActive" //wether the app is currently working on not
 
 private const val KEY_TASK_VISIBLE ="taskShowing"
-
-
-private const val IS_ACTIVE = "ready" //wether the app is currently working on not
 
 
 fun Context.getLocalSettings():SharedPreferences{
@@ -205,6 +203,7 @@ fun Context.saveCompletedTaskList(queue:ArrayDeque<Long>) {
 }
 
 
+
 fun Context.saveTaskLists(queue:ArrayDeque<Long>,completed:ArrayDeque<Long>){
     val prefs = getLocalSettings()
     prefs.edit().apply{
@@ -225,6 +224,22 @@ fun Context.saveOrder(list:ArrayList<Long>){
      getLocalSettings().edit().apply{
          putString(TASK_ORDER,list.joinToString(","))
     }.apply()
+}
+
+fun Context.getOrderedListAsString():String{
+    return getListAsString(TASK_ORDER)
+}
+
+fun Context.getCompletedListAsString():String{
+    return getListAsString(TASK_COMPLETE)
+}
+
+fun Context.getUnCompletedListAsString():String{
+    return getListAsString(TASK_INCOMPLETE)
+}
+
+fun Context.getListAsString(listString:String):String{
+    return getLocalSettings().getString(listString,"-1")?:"-1"
 }
 
 public fun Context.getTaskListKey() = TASK_INCOMPLETE
@@ -281,6 +296,10 @@ fun Context.getSavedOrder():ArrayList<Long>{
 fun Context.fetchArrayFromPreference(listName:String):ArrayDeque<Long>{
     val prefs = getLocalSettings()
     val taskString = prefs.getString(listName,"-1")
+    return stringToArray(taskString)
+}
+
+fun stringToArray(taskString:String?):ArrayDeque<Long>{
     if (taskString != "-1") {
         val deque = ArrayDeque<Long>()
         if (taskString!!.contains(",")) {
@@ -306,6 +325,8 @@ fun Context.fetchArrayFromPreference(listName:String):ArrayDeque<Long>{
             }
         }
         return deque
+    }else if(taskString.isNullOrBlank()){
+        return ArrayDeque()
     }else{
         return ArrayDeque()
     }
@@ -321,8 +342,12 @@ fun Context.clearSavedArrays(){
 }
 
 
-fun Context.isEnabled(){
-    getLocalSettings().getBoolean(IS_ACTIVE,false)
+/**
+ * If the user has approved the list and is progressing through their tasks
+ * then we know the day is active
+ */
+fun Context.isDayActive():Boolean{
+    return getLocalSettings().getBoolean(IS_ACTIVE,false)
 }
 
 fun Context.EnableScheduler(){
@@ -331,6 +356,14 @@ fun Context.EnableScheduler(){
 
 fun Context.DisableScheduler(){
     getLocalSettings().edit().putBoolean(IS_ACTIVE,false).apply()
+}
+
+fun Context.saveAllLists(order:String, uncompleted:String, completed:String){
+    getLocalSettings().edit()
+            .putString(TASK_ORDER,order)
+            .putString(TASK_INCOMPLETE,uncompleted)
+            .putString(TASK_COMPLETE,completed)
+            .apply()
 }
 
 

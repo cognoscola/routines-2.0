@@ -2,19 +2,11 @@ package com.gorillamoa.routines.core.scheduler
 
 import android.content.Context
 import android.util.Log
-import com.gorillamoa.routines.core.extensions.DisableScheduler
-import com.gorillamoa.routines.core.extensions.EnableScheduler
-import com.gorillamoa.routines.core.extensions.getCompletedTaskList
-import com.gorillamoa.routines.core.extensions.getDataRepository
-import com.gorillamoa.routines.core.extensions.getDayTaskList
-import com.gorillamoa.routines.core.extensions.getSavedOrder
-import com.gorillamoa.routines.core.extensions.saveCompletedTaskList
-import com.gorillamoa.routines.core.extensions.saveOrder
-import com.gorillamoa.routines.core.extensions.saveTaskList
-import com.gorillamoa.routines.core.extensions.saveTaskLists
+import com.gorillamoa.routines.core.constants.DataLayerConstant
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.data.TaskType
 import com.gorillamoa.routines.core.extensions.*
+import com.gorillamoa.routines.core.services.DataLayerListenerService
 
 import java.util.*
 
@@ -35,12 +27,37 @@ import java.util.*
  */
 class TaskScheduler{
 
-
     //TODO account for day's progress. For now we'll just try to see # of tasks completed
     //TODO reset at the wake up alarm
     companion object {
         @Suppress("unused")
         private val tag:String = TaskScheduler::class.java.name
+
+        /**
+         * Schedule some tasks locally and then send that schedule over to remote
+         */
+        fun scheduleMirror(context:Context, scheduleCallback: (tasks: List<Task>?)->Unit?){
+
+            context.apply {
+
+                schedule(context,scheduleCallback)
+                sendProgressData(context)
+            }
+        }
+
+        fun sendProgressData(context: Context){
+            context.apply {
+                DataLayerListenerService.updateDayMirror(
+                        context,
+                        isWatch(),
+                        isDayActive(),
+                        getOrderedListAsString(),
+                        getUnCompletedListAsString(),
+                        getCompletedListAsString()
+                )
+            }
+        }
+
 
         /**
          * Using the context, we'll fetch task data
@@ -117,9 +134,9 @@ class TaskScheduler{
                 order.remove(tid)
                 context.saveOrder(order)
             }
-
-
         }
+
+
 
         /**
          * Schedule a specific task indicated by the user
@@ -442,6 +459,32 @@ class TaskScheduler{
             val list = context.getDayTaskList()
             val finishedList = context.getCompletedTaskList()
             return ((list.size == 0).and(finishedList.size > 0))
+        }
+
+        /**
+         * We received some information from the network, now we'll process it
+         * @param isDayActive is wether the day is currently active
+         * @param uncompleted is the list of uncompleted tasks
+         * @param completed is the list of completed tasks
+         * @param order is the day's task order
+         */
+        fun processDayInformation(
+                context:Context,
+                isDayActive:Boolean,
+                uncompleted:String,
+                completed:String,
+                order:String) {
+            /*
+          val uncompleted = stringToArray(uncompleted)
+          val completed = stringToArray(completed)
+          val order = stringToArray(order)
+           */
+
+            //perhaps we'll store both on the receipt of the network message
+            context.apply {
+                if (isDayActive) EnableScheduler() else DisableScheduler()
+                saveAllLists(order, uncompleted, completed)
+            }
         }
 
         fun generateEmptyTaskObject():Task{

@@ -3,7 +3,6 @@ package com.gorillamoa.routines.core.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Handler
 import android.util.Log
 import android.widget.Toast
 
@@ -45,13 +44,14 @@ class NotificationActionReceiver:BroadcastReceiver(){
                 ACTION_DONE -> {
                     //mark the task as done.
                     //TODO DONE FUNCTION
-/*
                     if (TaskScheduler.completeTask(context, currentTid)) {
 
                         val task = context.getTaskFromString(intent.getStringExtra(TASK_DATA))
 
-                        context.showMobileNotificationTask(task)
+                        context.notificationShowTaskMirror(task)
                         //Check if we finish the day
+                        //TODO SHOW Sleep once we complete the last task
+/*
                         if (TaskScheduler.isDayComplete(context)) {
 
                             //This will either show a next task or a the sleep Notification
@@ -59,35 +59,32 @@ class NotificationActionReceiver:BroadcastReceiver(){
                             TaskScheduler.endDay(context)
 
                             Handler().postDelayed({
-                                context.getNotificationManager().cancel(NOTIFICATION_TAG,currentTid)
+                                context.getNotificationManager().cancel(NOTIFICATION_TAG,currentTid.toInt())
 
                             },2000)
 
                         }else{
                             //we'll just show the same TASK
                         }
+*/
 
                         //TODO MAKE THIS OPTIONAL
 //                        TaskScheduler.showNext(context)
                     }else{
                         Log.e("onReceive","Something wont wrong Completeing task! UH OH")
                     }
-*/
                 }
 
                 ACTION_TASK_UNCOMPLETE ->{
 
-                    //TODO DO THIS
-/*
                     if (TaskScheduler.uncompleteTask(context, currentTid)) {
 
                         val task = context.getTaskFromString(intent.getStringExtra(TASK_DATA))
-                        context.showMobileNotificationTask(task)
+                        context.notificationShowTaskMirror(task)
 
                     }else{
 
                     }
-*/
                 }
 
                 ACTION_SKIP_SHORT ->{

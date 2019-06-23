@@ -90,8 +90,7 @@ class AlarmReceiver:BroadcastReceiver(){
                     // we don't want to receive two wake up events from both the Alarm and the
                     //event from the network..in which case we should just use the data layer
                     //to manage the synchronization task...
-                    TaskScheduler.schedule(context){ tasks ->
-
+                    TaskScheduler.scheduleMirror(context){ tasks ->
                         tasks?.let{context.notificationShowWakeUpMirror(tasks!!)}
                     }
                 }
