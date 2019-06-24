@@ -7,6 +7,7 @@ import android.util.Log
 import com.gorillamoa.routines.core.extensions.notificationDismissSleepRemote
 import com.gorillamoa.routines.core.extensions.notificationDismissWakeUpRemote
 import com.gorillamoa.routines.core.extensions.notificationDismissTaskRemote
+import com.gorillamoa.routines.core.services.DataLayerListenerService
 
 
 /**
@@ -53,6 +54,7 @@ class NotificationDismissReceiver:BroadcastReceiver() {
             when (intent.action) {
                 TYPE_SLEEP -> {
                     context.notificationDismissSleepRemote()
+                    DataLayerListenerService.endDayMirror(context)
                 }
                 TYPE_TASK -> {
                     //TODO this behaviour is determined by notification behaviour settings

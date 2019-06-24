@@ -78,6 +78,7 @@
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/data/task/wear/insert"/>
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/data/task/wear/update"/>
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/data/task/wear/delete"/>
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/data/progress/"/>
 
                 <!--Watch only paths, I have yet to find a situation for this.. but maybe later-->
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/watch-only"/>

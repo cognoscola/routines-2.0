@@ -55,10 +55,16 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
         taskViewModel = connectAndLoadViewModel()
         taskViewModel.tasks.observe(this, Observer {
-            if (it.isNotEmpty()) {
+            /*if (it.isNotEmpty()) {
                 notificationShowWakeUpMirror(it)
             }else{
                 notificationShowWakeUpMirror(TaskScheduler.generateEmptyVisibleList())
+            }*/
+
+            TaskScheduler.schedule(this){ list->
+                list?.let {
+                    notificationShowWakeUpMirror(list)
+                }
             }
         })
 
@@ -282,10 +288,8 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
                         append("Task")
                     } else if (DataLayerConstant.SLEEP_PATH.equals(event.dataItem.uri.path)) {
                         append("Sleep")
-                    } else if (DataLayerConstant.PROGRESS_MOBILE_PATH.equals(event.dataItem.uri.path)) {
-                        append("Progress Mobile")
-                    } else if (DataLayerConstant.PROGRESS_WEAR_PATH.equals(event.dataItem.uri.path)) {
-                        append("Progress Wear")
+                    } else if (DataLayerConstant.PROGRESS_PATH.equals(event.dataItem.uri.path)) {
+                        append("Progress")
                     } else if (DataLayerConstant.DATA_TASK_WEAR_INSERT_PATH.equals(event.dataItem.uri.path)) {
                         append("Wear Insert")
                     } else if (DataLayerConstant.DATA_TASK_MOBILE_INSERT_PATH.equals(event.dataItem.uri.path)) {

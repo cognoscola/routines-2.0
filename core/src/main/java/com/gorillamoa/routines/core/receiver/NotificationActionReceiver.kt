@@ -8,6 +8,7 @@ import android.widget.Toast
 
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
+import com.gorillamoa.routines.core.services.DataLayerListenerService
 
 class NotificationActionReceiver:BroadcastReceiver(){
     @Suppress("unused")
@@ -51,13 +52,11 @@ class NotificationActionReceiver:BroadcastReceiver(){
                         if (TaskScheduler.isDayComplete(context)) {
 
                             context.notificationShowSleepMirror()
-                            TaskScheduler.endDay(context)
 
                         }else{
                             //we'll just show the same TASK if we're not done the day
                             context.notificationShowTaskMirror(task)
                         }
-
                         //TODO MAKE THIS OPTIONAL
 //                        TaskScheduler.showNext(context)
                     }else{
@@ -102,18 +101,10 @@ class NotificationActionReceiver:BroadcastReceiver(){
                         Log.d("onReceive","ACTION_SKIP_TODAY")
                     }
                 }
-
                 ACTION_WAKE_START_DAY-> {
 
                     context.apply {
-
-                        //Always attempt to cancel the wake up notification on all ends
-                        if(!context.isWatch()){
-                            context.notificationDismissWakeUpRemote()
-                        }
-
-                        Toast.makeText(this@apply, "Start day", Toast.LENGTH_SHORT).show()
-                        TaskScheduler.approve(this@apply)
+                        TaskScheduler.approveMirror(context)
                         TaskScheduler.getNextUncompletedTask(this@apply) { task ->
                             task?.let {
                                 notificationShowTaskMirror(task)

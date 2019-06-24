@@ -33,25 +33,11 @@ class TaskScheduler{
         @Suppress("unused")
         private val tag:String = TaskScheduler::class.java.name
 
-        /**
-         * Schedule some tasks locally and then send that schedule over to remote
-         * @param context is the application context
-         * @param scheduleCallback is the call back that returns the list of scheduled task
-         */
-        fun scheduleMirror(context:Context, scheduleCallback: (tasks: List<Task>?)->Unit?){
-
-            context.apply {
-
-                schedule(context,scheduleCallback)
-                sendProgressData(context)
-            }
-        }
 
         fun sendProgressData(context: Context){
             context.apply {
                 DataLayerListenerService.updateDayMirror(
                         context,
-                        isWatch(),
                         isDayActive(),
                         getOrderedListAsString(),
                         getUnCompletedListAsString(),
@@ -71,7 +57,7 @@ class TaskScheduler{
          * TaskString - is the list of tasks for the day as a string
          * tid - is the first task to start
          */
-        fun schedule(context: Context, scheduleCallback: (tasks: List<Task>?)->Unit?){
+        fun schedule(context: Context, scheduleCallback: (tasks: ArrayDeque<Long>?)->Unit?){
 
             val repository = context.getDataRepository()
 
@@ -99,9 +85,11 @@ class TaskScheduler{
                 context.EnableScheduler()
 
                 if (taskList?.isEmpty()?:true) {
-                    scheduleCallback.invoke(generateEmptyVisibleList())
+                    scheduleCallback.invoke(ArrayDeque<Long>().apply {
+                        add(-1L)
+                    })
                 }else{
-                    scheduleCallback.invoke(taskList)
+                    scheduleCallback.invoke(queue)
                 }
             }
         }
@@ -162,9 +150,8 @@ class TaskScheduler{
         /**
          * The user has approved the schedule and so now we can begin assigning tasks
          */
-        fun approve(context:Context){
-//            val taskList = context.getDayTaskList()
-
+        fun approveMirror(context:Context){
+            sendProgressData(context)
         }
 
         //TODO come up with a scheme to schedule into the future
@@ -429,20 +416,20 @@ class TaskScheduler{
         //TODO give user one more chance to finish a task
 
         fun endDay(context: Context){
-            Log.d("endDay","The day is over")
-            context.DisableScheduler()
+
+            //TODO Before you clean shit, record it!
 
 
-            val taskList = context.getDayTaskList()
-            while (taskList.size > 0) {
-                taskList.remove()
-                //TODO DON"T CLEAR THIS LIST, instead use another flag to tell when we're scheduled or not
-                //call it a isScheduled Flag
-                context.saveTaskList(taskList)
-            }
+            val uncompleted = context.getDayTaskList()
+            val completed = context.getCompletedTaskList()
+            val order = context.getSavedOrder()
 
-            //TODO save statistics
-            //TODO dismiss notifications
+            uncompleted.clear()
+            completed.clear()
+            order.clear()
+
+            context.saveTaskLists(uncompleted,completed)
+            context.saveOrder(order)
         }
 
         fun showNext(context:Context){

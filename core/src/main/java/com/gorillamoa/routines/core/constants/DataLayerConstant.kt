@@ -23,8 +23,8 @@ package com.gorillamoa.routines.core.constants
          const val DATA_TASK_MOBILE_UPDATE_PATH = "/data/task/mobile/update"
 
          //synchronize the day's progress! from Phone -> Wear
-         const val PROGRESS_MOBILE_PATH = "/progress/mobile/update"
-         const val PROGRESS_WEAR_PATH = "/progress/wear/update"
+         const val PROGRESS_PATH = "/data/progress/"
+
 
          //This is for synchronizing user settings (stubborn notifications)
          //We'll pass ALL settings on every call

@@ -45,7 +45,6 @@ const val NOTIFICATION_TAG = "routines"
 /** Prepare the intent for when user dismisses the notification **/
 //TODO obfuscate strings later using obfuscation library
 
-
 /********************************************************************************
  * WAKE UP NOTIFICATION FUNCTIONS
  *********************************************************************************/
@@ -103,9 +102,9 @@ fun Context.notificationShowWakeUp(tasks:List<Task>,
 /**
  * Notify other devices that they should build a notification of type WAKE UP
  */
-fun Context.notificationShowWakeUpRemote(tasks:List<Task>){
+fun Context.notificationShowWakeUpRemote(tasks:ArrayDeque<Long>){
 
-    notificationShowRemote(StringBuilder().stringifyTasks(tasks),WAKE_UP_PATH)
+    notificationShowRemote(tasks.joinToString(","),WAKE_UP_PATH)
 }
 
 /**
@@ -113,7 +112,7 @@ fun Context.notificationShowWakeUpRemote(tasks:List<Task>){
  * other connected nodes. When either is ACTIONED, the same action occurs on both devices.
  * @param tasks is the task list to show
  */
-fun Context.notificationShowWakeUpMirror(tasks:List<Task>){
+fun Context.notificationShowWakeUpMirror(tasks:ArrayDeque<Long>){
     Log.d("notificationRoutine","notificationShowWakeUpMirror")
 
     //Next lets build a remote notification
@@ -226,7 +225,6 @@ fun Context.notificationShowTask(task: Task,
 
             smallRemoteView?.let { setCustomContentView(smallRemoteView) }
             bigRemoteView?.let { setCustomBigContentView(bigRemoteView) }
-
 
         }
 

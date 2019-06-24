@@ -129,7 +129,6 @@ fun Context.createNotificationDeleteIntentForWakeUp():PendingIntent{
     dismissIntent.action = NotificationDismissReceiver.TYPE_WAKE_UP
     //we're passing in the tid
     return PendingIntent.getBroadcast(this,0, dismissIntent,PendingIntent.FLAG_UPDATE_CURRENT)
-
 }
 
 /****************************************************************

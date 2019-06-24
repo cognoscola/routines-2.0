@@ -2,9 +2,9 @@ package com.gorillamoa.routines.core.services
 
 import android.annotation.TargetApi
 import android.content.Context
+import android.net.Uri
 
 import android.util.Log
-import android.widget.Toast
 import com.google.android.gms.wearable.*
 import com.gorillamoa.routines.core.constants.DataLayerConstant
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
@@ -22,6 +22,7 @@ import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_PR
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_PROGRESS_COMPLETED
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_PROGRESS_ORDER
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_PROGRESS_UNCOMPLETED
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.PROGRESS_PATH
 
 import com.gorillamoa.routines.core.coroutines.Coroutines
 import java.lang.Exception
@@ -80,13 +81,13 @@ class DataLayerListenerService:WearableListenerService(){
 
         fun updateDayMirror(
                 context: Context,
-                isWatch:Boolean,
                 isDayActive:Boolean,
                 orderList:String,
                 unCompletedList:String,
                 completedList:String){
             val putDataReq: PutDataRequest = PutDataMapRequest.create(
-                    if(isWatch)DataLayerConstant.PROGRESS_MOBILE_PATH else DataLayerConstant.PROGRESS_WEAR_PATH
+                    PROGRESS_PATH
+//                    if(isWatch)DataLayerConstant.2PROGRESS_MOBILE_PATH else DataLayerConstant.PROGRESS_WEAR_PATH
             )
                     .run {
                         dataMap.putBoolean(KEY_PROGRESS_ACTIVE, isDayActive) //save the time
@@ -98,6 +99,13 @@ class DataLayerListenerService:WearableListenerService(){
             putDataReq.setUrgent()
             Wearable.getDataClient(context).putDataItem(putDataReq)
         }
+
+        fun endDayMirror(context:Context){
+
+            val dataItemUri = Uri.Builder().scheme(PutDataRequest.WEAR_URI_SCHEME).path(PROGRESS_PATH).build()
+            Wearable.getDataClient(context).deleteDataItems(dataItemUri)
+        }
+
     }
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
@@ -115,18 +123,19 @@ class DataLayerListenerService:WearableListenerService(){
                     //In Any case we'll check the time it was issued
                     Log.d("$tag onDataChanged", " Changed Time Issued: ${dataMap.getString(DataLayerConstant.KEY_TIME)}")
 
+                    /**
+                     * Here we always received a list of IDS of scheduled tasks, we'll assume we already
+                     * have the information for these tasks, so we'll just fetch
+                     * them from our local database and display them
+                     */
+                    //TODO should we check for missing tasks in the database? We could use this as an opportunity to sync dbs
                     if (DataLayerConstant.WAKE_UP_PATH.equals(it.dataItem.uri.path)) {
 
-                        //We'll use the scheduler to get the task list,
-                        //TODO but we must synchronize task completion data somewhere else
-                        TaskScheduler.schedule(this) { tasks ->
-                            tasks?.let {
-                                Log.d("notificationRoutine", "onDataChanged")
+                        val unCompletedList = stringToArray(dataMap.getString(KEY_TASK_DATA))
+                        saveTaskList(unCompletedList)
 
-                                if (!isAlreadyShowing(WAKE_UP_NOTIFICATION_ID)) {
-                                    notificationShowWakeUpLocal(it)
-                                }
-                            }
+                        Coroutines.ioThenMain({getDataRepository().getTaskByIds(unCompletedList)}){tasks->
+                            tasks?.let { notificationShowWakeUpLocal(tasks) }
                         }
 
                     } else if (DataLayerConstant.TASK_PATH.equals(it.dataItem.uri.path)) {
@@ -150,7 +159,7 @@ class DataLayerListenerService:WearableListenerService(){
 
                         notificationShowSleepLocal()
 
-                    } else if (DataLayerConstant.PROGRESS_MOBILE_PATH.equals(it.dataItem.uri.path)) {
+                    } else if (DataLayerConstant.PROGRESS_PATH.equals(it.dataItem.uri.path)) {
 
                         TaskScheduler.processDayInformation(
                                 applicationContext,
@@ -159,7 +168,7 @@ class DataLayerListenerService:WearableListenerService(){
                                 dataMap.getString(KEY_PROGRESS_COMPLETED),
                                 dataMap.getString(KEY_PROGRESS_ORDER)
                         )
-                    } else if (DataLayerConstant.PROGRESS_WEAR_PATH.equals(it.dataItem.uri.path)){
+                    }/* else if (DataLayerConstant.PROGRESS_WEAR_PATH.equals(it.dataItem.uri.path)){
                         TaskScheduler.processDayInformation(
                                 applicationContext,
                                 dataMap.getBoolean(KEY_PROGRESS_ACTIVE),
@@ -167,7 +176,7 @@ class DataLayerListenerService:WearableListenerService(){
                                 dataMap.getString(KEY_PROGRESS_COMPLETED),
                                 dataMap.getString(KEY_PROGRESS_ORDER)
                         )
-                    }
+                    }*/
 
                     /**
                      * This is a special case which we'll use to synchronize data between
@@ -247,6 +256,9 @@ class DataLayerListenerService:WearableListenerService(){
                     } else if (DataLayerConstant.SLEEP_PATH.equals(it.dataItem.uri.path)) {
 
                         notificationDismissSleepLocally()
+
+                    } else if (DataLayerConstant.PROGRESS_PATH.equals(it.dataItem.uri.path)){
+                        TaskScheduler.endDay(this@DataLayerListenerService)
                     }
                 }
                 else -> {

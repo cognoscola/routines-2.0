@@ -299,6 +299,8 @@ fun Context.fetchArrayFromPreference(listName:String):ArrayDeque<Long>{
     return stringToArray(taskString)
 }
 
+
+
 fun stringToArray(taskString:String?):ArrayDeque<Long>{
     if (taskString != "-1") {
         val deque = ArrayDeque<Long>()
