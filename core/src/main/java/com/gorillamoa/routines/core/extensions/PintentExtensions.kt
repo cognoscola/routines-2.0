@@ -128,7 +128,7 @@ fun Context.createNotificationDeleteIntentForWakeUp():PendingIntent{
     //signal the receiver that it came from a wake up notification
     dismissIntent.action = NotificationDismissReceiver.TYPE_WAKE_UP
     //we're passing in the tid
-    return PendingIntent.getBroadcast(this,0, dismissIntent,PendingIntent.FLAG_ONE_SHOT)
+    return PendingIntent.getBroadcast(this,0, dismissIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
 }
 
@@ -163,6 +163,19 @@ fun Context.createNotificationDeleteIntentForTask(task:Task):PendingIntent{
     val dismissIntent = Intent(this.applicationContext, NotificationDismissReceiver::class.java)
     dismissIntent.action = NotificationDismissReceiver.TYPE_TASK
     dismissIntent.putExtra(TASK_ID,task.id)
-    return PendingIntent.getBroadcast(this.applicationContext,task.id?.toInt()?:0, dismissIntent,PendingIntent.FLAG_ONE_SHOT)
+    return PendingIntent.getBroadcast(this.applicationContext,task.id?.toInt()?:0, dismissIntent,PendingIntent.FLAG_UPDATE_CURRENT)
+
+}
+
+
+/****************************************************************
+ * Functions for Sleep  notifications
+ ************************************************************/
+fun Context.createNotificationDeleteIntentForSleep():PendingIntent{
+    Log.d("notificationRoutine","createNotificationDeleteIntentForSleep")
+
+    val dismissIntent = Intent(this, NotificationDismissReceiver::class.java)
+    dismissIntent.action = NotificationDismissReceiver.TYPE_SLEEP
+    return PendingIntent.getBroadcast(this, SLEEP_NOTIFICATION_ID, dismissIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
 }

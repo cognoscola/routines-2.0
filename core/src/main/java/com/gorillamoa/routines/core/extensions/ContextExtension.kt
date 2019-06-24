@@ -49,4 +49,14 @@ fun Context.remoteGetLargeWakeUpView(tasks:String):RemoteViews{
     return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetLargeWakeUpView(tasks)
 }
 
+fun Context.remoteGetSmallSleepView():RemoteViews{
+    return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetSmallSleepView()
+}
+
+fun Context.remoteGetLargeSleepView():RemoteViews{
+    return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetLargeSleepView()
+}
+
+
+
 

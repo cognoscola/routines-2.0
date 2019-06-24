@@ -8,14 +8,13 @@ import android.graphics.Color
 import android.os.Build
 import android.widget.RemoteViews
 import com.google.gson.Gson
+import com.gorillamoa.routines.*
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.NOTIFICATION_CHANNEL_ONE
 import com.gorillamoa.routines.core.extensions.NOTIFICATION_CHANNEL_TWO
+import com.gorillamoa.routines.core.extensions.remoteGetLargeSleepView
 import com.gorillamoa.routines.core.views.RemoteViewGraph
 import com.gorillamoa.routines.core.views.RemoteInjectorHelper
-import com.gorillamoa.routines.getLargeWakeUpRemoteView
-import com.gorillamoa.routines.getTaskRemoteView
-import com.gorillamoa.routines.getWakeupRemoteView
 
 
 /**
@@ -60,9 +59,14 @@ class App:Application(),RemoteInjectorHelper.RemoteGraphProvider, RemoteInjector
                 return this@App.getWakeupRemoteView(taskLength)
             }
 
+            override fun remoteGetLargeSleepView(): RemoteViews {
+                return this@App.getLargeSleepView()
+            }
 
+            override fun remoteGetSmallSleepView(): RemoteViews {
+                return this@App.getSmallSleepView()
+            }
         }
-
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 

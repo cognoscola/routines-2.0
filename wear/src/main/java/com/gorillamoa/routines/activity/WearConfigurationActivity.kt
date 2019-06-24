@@ -8,8 +8,10 @@ import androidx.fragment.app.FragmentActivity
 import androidx.wear.ambient.AmbientModeSupport
 import android.util.Log
 import androidx.lifecycle.Observer
+import com.google.android.gms.wearable.*
 
 import com.gorillamoa.routines.R
+import com.gorillamoa.routines.core.constants.DataLayerConstant
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
@@ -24,12 +26,13 @@ import java.util.*
  * ViewModelProvider only supports these types of activities.
  * Note also that we must use  LiveData from android.arch.livecycle and NOT androidx
  */
-class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider {
+class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider,  DataClient.OnDataChangedListener {
 
     @Suppress("unused")
     private val tag = WearConfigurationActivity::class.java.name
 
     private lateinit var taskViewModel: TaskViewModel
+    val calendar = Calendar.getInstance()
 
     companion object {
 
@@ -255,4 +258,67 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        Wearable.getDataClient(this).addListener(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Wearable.getDataClient(this).removeListener(this)
+    }
+
+
+    override fun onDataChanged(dataEventBuffer: DataEventBuffer) {
+        for (event in dataEventBuffer) {
+
+            val dataMap = DataMapItem.fromDataItem(event.dataItem).dataMap
+            when (event.type) {
+                DataEvent.TYPE_CHANGED -> {
+
+                    if (DataLayerConstant.WAKE_UP_PATH.equals(event.dataItem.uri.path)) {
+                        append("Wakeup")
+                    } else if (DataLayerConstant.TASK_PATH.equals(event.dataItem.uri.path)) {
+                        append("Task")
+                    } else if (DataLayerConstant.SLEEP_PATH.equals(event.dataItem.uri.path)) {
+                        append("Sleep")
+                    } else if (DataLayerConstant.PROGRESS_MOBILE_PATH.equals(event.dataItem.uri.path)) {
+                        append("Progress Mobile")
+                    } else if (DataLayerConstant.PROGRESS_WEAR_PATH.equals(event.dataItem.uri.path)) {
+                        append("Progress Wear")
+                    } else if (DataLayerConstant.DATA_TASK_WEAR_INSERT_PATH.equals(event.dataItem.uri.path)) {
+                        append("Wear Insert")
+                    } else if (DataLayerConstant.DATA_TASK_MOBILE_INSERT_PATH.equals(event.dataItem.uri.path)) {
+                        append("Mobile Insert")
+                    } else if (DataLayerConstant.DATA_TASK_WEAR_DELETE_PATH.equals(event.dataItem.uri.path)) {
+                        append("Wear Delete")
+                    } else if (DataLayerConstant.DATA_TASK_MOBILE_DELETE_PATH.equals(event.dataItem.uri.path)) {
+                        append("Mobile Delete")
+                    } else if (DataLayerConstant.DATA_TASK_WEAR_UPDATE_PATH.equals(event.dataItem.uri.path)) {
+                        append("Wear Update")
+                    } else if (DataLayerConstant.DATA_TASK_MOBILE_UPDATE_PATH.equals(event.dataItem.uri.path)) {
+                        append("Mobile Update")
+                    }
+                }
+                DataEvent.TYPE_DELETED -> {
+
+                    if (DataLayerConstant.WAKE_UP_PATH.equals(event.dataItem.uri.path)) {
+                        append("Delete Wake up")
+                    } else if (DataLayerConstant.TASK_PATH.equals(event.dataItem.uri.path)) {
+                        append("Delete Task")
+                    } else if (DataLayerConstant.SLEEP_PATH.equals(event.dataItem.uri.path)){
+                        append("Delete Sleep")
+                    }
+                }
+                else -> {
+
+                }
+            }
+        }
+
+    }
+    fun append(string:String){
+        Log.d("$tag Data Layer Network","DataNetwork: ${calendar.get(Calendar.HOUR)}:${calendar.get(Calendar.MINUTE)}:${calendar.get(Calendar.MILLISECOND)} $string")
+
+    }
 }

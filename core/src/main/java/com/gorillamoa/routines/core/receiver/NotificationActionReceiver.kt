@@ -46,25 +46,17 @@ class NotificationActionReceiver:BroadcastReceiver(){
                     //TODO DONE FUNCTION
                     if (TaskScheduler.completeTaskMirror(context, currentTid)) {
                         val task = context.getTaskFromString(intent.getStringExtra(TASK_DATA))
-                        context.notificationShowTaskMirror(task)
-                        //Check if we finish the day
+
                         //TODO SHOW Sleep once we complete the last task
-/*
                         if (TaskScheduler.isDayComplete(context)) {
 
-                            //This will either show a next task or a the sleep Notification
-                            context.notificationShowSleep(dismissable = false)
+                            context.notificationShowSleepMirror()
                             TaskScheduler.endDay(context)
 
-                            Handler().postDelayed({
-                                context.getNotificationManager().cancel(NOTIFICATION_TAG,currentTid.toInt())
-
-                            },2000)
-
                         }else{
-                            //we'll just show the same TASK
+                            //we'll just show the same TASK if we're not done the day
+                            context.notificationShowTaskMirror(task)
                         }
-*/
 
                         //TODO MAKE THIS OPTIONAL
 //                        TaskScheduler.showNext(context)

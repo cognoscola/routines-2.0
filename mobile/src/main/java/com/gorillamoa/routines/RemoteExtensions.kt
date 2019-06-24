@@ -129,6 +129,18 @@ fun Context.setDirectionFunctions(task:Task,remoteView:RemoteViews){
 
     remoteView.setOnClickPendingIntent(R.id.nextGroup,createNotificationActionPendingIntentForTask(task, ACTION_TASK_NEXT))
     remoteView.setOnClickPendingIntent(R.id.previousGroup,createNotificationActionPendingIntentForTask(task, ACTION_TASK_PREVIOUS))
+}
 
+fun Context.getSmallSleepView():RemoteViews{
+    val remoteViews = RemoteViews(packageName,R.layout.remote_sleep)
+    remoteViews.setTextViewText(R.id.title, getHtml(getString(R.string.sleep_title)))
+    remoteViews.setTextViewText(R.id.percentScore, TaskScheduler.getScoreString(this@getSmallSleepView))
+    remoteViews.setTextViewText(R.id.points, TaskScheduler.getPoints(this@getSmallSleepView).toString())
+    remoteViews.setTextViewText(R.id.description, getString(R.string.details))
 
+    return remoteViews
+}
+
+fun Context.getLargeSleepView():RemoteViews{
+    return RemoteViews(packageName,0)
 }

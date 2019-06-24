@@ -5,6 +5,11 @@
     <string name="wake_up_description">"Expand to see today's schedule (%1$d items)"</string>
 
     <string name="wake_up_large_title">"Today's tasks &amp;#128170"</string>
+    <string name="sleep_title">"All done! &amp;#127881"</string>
+
+    <string name="score">"Score"</string>
+    <string name="points">"Points"</string>
+    <string name="details">Expand for details</string>
 
     <!-- Notification Texts -->
     <string name="notification_start">Start</string>
@@ -15,6 +20,5 @@
     <string name="previous">Previous</string>
     <string name="status">Finish</string>
     <string name="next">Next</string>
-
 
 </resources>

@@ -6,6 +6,7 @@ import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.data.TaskType
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.services.DataLayerListenerService
+import java.lang.StringBuilder
 
 import java.util.*
 
@@ -500,6 +501,22 @@ class TaskScheduler{
                 if (isDayActive) EnableScheduler() else DisableScheduler()
                 saveAllLists(order, uncompleted, completed)
             }
+        }
+
+        fun getScoreString(context: Context):String{
+            val denominator = context.getSavedOrder().size
+            val numerator = context.getCompletedTaskList().size
+
+            //TODO get Builder from Dagger
+            return StringBuilder().append(numerator).append("/").append(denominator).toString()
+        }
+
+        fun getPoints(context: Context):Int{
+            val denominator = context.getSavedOrder().size
+            val numerator = context.getCompletedTaskList().size
+
+            //TODO get Builder from Dagger
+            return numerator - (denominator - numerator)
         }
 
         fun generateEmptyTaskObject():Task{

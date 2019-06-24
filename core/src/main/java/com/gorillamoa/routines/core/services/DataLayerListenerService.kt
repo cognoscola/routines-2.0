@@ -112,9 +112,6 @@ class DataLayerListenerService:WearableListenerService(){
             when (it.type) {
                 DataEvent.TYPE_CHANGED -> {
 
-                    //first lets get the data if any
-
-
                     //In Any case we'll check the time it was issued
                     Log.d("$tag onDataChanged", " Changed Time Issued: ${dataMap.getString(DataLayerConstant.KEY_TIME)}")
 
@@ -131,6 +128,7 @@ class DataLayerListenerService:WearableListenerService(){
                                 }
                             }
                         }
+
                     } else if (DataLayerConstant.TASK_PATH.equals(it.dataItem.uri.path)) {
 
                         //Here task data is of type task
@@ -147,6 +145,11 @@ class DataLayerListenerService:WearableListenerService(){
                             notificationShowTaskLocal(task)
                         }
 */
+
+                    } else if (DataLayerConstant.SLEEP_PATH.equals(it.dataItem.uri.path)){
+
+                        notificationShowSleepLocal()
+
                     } else if (DataLayerConstant.PROGRESS_MOBILE_PATH.equals(it.dataItem.uri.path)) {
 
                         TaskScheduler.processDayInformation(
@@ -180,7 +183,6 @@ class DataLayerListenerService:WearableListenerService(){
                     else if (DataLayerConstant.DATA_TASK_WEAR_INSERT_PATH.equals(it.dataItem.uri.path)) {
 
                         try {
-                            Toast.makeText(applicationContext,"WEAR INSERT",Toast.LENGTH_SHORT).show()
                             val taskData = dataMap.getString(KEY_TASK_DATA)
                             processInsertData(getGson().fromJson(taskData, Task::class.java))
                         } catch (e: Exception) {
@@ -188,7 +190,6 @@ class DataLayerListenerService:WearableListenerService(){
                         }
                     } else if (DataLayerConstant.DATA_TASK_MOBILE_INSERT_PATH.equals(it.dataItem.uri.path)) {
                         try {
-                            Toast.makeText(applicationContext,"MOBILE INSERT",Toast.LENGTH_SHORT).show()
                             val taskData = dataMap.getString(KEY_TASK_DATA)
                             processInsertData(getGson().fromJson(taskData, Task::class.java))
 
@@ -235,17 +236,17 @@ class DataLayerListenerService:WearableListenerService(){
                     Log.d("notificationRoutine", "onDataChanged Delete issued")
 
                     if (DataLayerConstant.WAKE_UP_PATH.equals(it.dataItem.uri.path)) {
-                        Log.d("notificationRoutine", "WAKE")
                         notificationDismissWakeUp()
                     } else if (DataLayerConstant.TASK_PATH.equals(it.dataItem.uri.path)) {
 
-                        Log.d("notificationRoutine", "TASK")
                         getAllTaskShowing().forEach { notification ->
-
                             //we only show 1 task, so we'll take this opportunity to dismiss ALL
                             //task notifications
                             notificationDismissTask(notification.id)
                         }
+                    } else if (DataLayerConstant.SLEEP_PATH.equals(it.dataItem.uri.path)) {
+
+                        notificationDismissSleepLocally()
                     }
                 }
                 else -> {

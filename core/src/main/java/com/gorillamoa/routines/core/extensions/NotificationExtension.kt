@@ -20,6 +20,7 @@ import com.gorillamoa.routines.core.constants.DataLayerConstant
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.WAKE_UP_PATH
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.TASK_PATH
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.SLEEP_PATH
 
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_DONE
@@ -73,7 +74,6 @@ fun Context.notificationShowWakeUp(tasks:List<Task>,
             addWakeUpAction(this@notificationShowWakeUp,"Start Day", ACTION_WAKE_START_DAY)
             //addWakeUpAction(this@notificationShowWakeUp,"Edit", ACTION_START_MODIFY, WAKE_UP_NOTIFICATION_ID!!)
         }else{
-            setCategory(Notification.CATEGORY_SERVICE)
 
             //lets add RemoteView
             smallRemoteView?.let {
@@ -104,9 +104,9 @@ fun Context.notificationShowWakeUp(tasks:List<Task>,
  * Notify other devices that they should build a notification of type WAKE UP
  */
 fun Context.notificationShowWakeUpRemote(tasks:List<Task>){
+
     notificationShowRemote(StringBuilder().stringifyTasks(tasks),WAKE_UP_PATH)
 }
-
 
 /**
  * Builds a mirrored notification both on the Local device and on
@@ -115,9 +115,6 @@ fun Context.notificationShowWakeUpRemote(tasks:List<Task>){
  */
 fun Context.notificationShowWakeUpMirror(tasks:List<Task>){
     Log.d("notificationRoutine","notificationShowWakeUpMirror")
-
-    //First lets build a local notification
-    notificationShowWakeUpLocal(tasks)
 
     //Next lets build a remote notification
     notificationShowWakeUpRemote(tasks)
@@ -207,14 +204,15 @@ fun Context.notificationShowTask(task: Task,
     getBuilder().apply {
 
         if (isWatch()) {
-            setAutoCancel(true)
-            setCategory(Notification.CATEGORY_REMINDER)
 
             if(TaskScheduler.isComplete(this@notificationShowTask, task.id!!)){
+                Log.d("notificationRoutine","notificationShowTask Task is Completed!")
 
                 addTaskAction(this@notificationShowTask,"Uncheck", ACTION_DONE,task)
                 setContentTitle(getHtml("<strike>${task.name}</strike>"))
             }else{
+                Log.d("notificationRoutine","notificationShowTask Task is InComplete")
+
                 setContentTitle(task.name)
                 //Mark as done
                 addTaskAction(this@notificationShowTask,"Done      ", ACTION_DONE,task)
@@ -226,9 +224,9 @@ fun Context.notificationShowTask(task: Task,
 
         }else{
 
-            setCategory(Notification.CATEGORY_SERVICE)
             smallRemoteView?.let { setCustomContentView(smallRemoteView) }
             bigRemoteView?.let { setCustomBigContentView(bigRemoteView) }
+
 
         }
 
@@ -254,9 +252,6 @@ fun Context.notificationShowTask(task: Task,
  */
 fun Context.notificationShowTaskMirror(task:Task){
     Log.d("notificationRoutine","notificationShowTaskMirror")
-
-    //lets show a local notification first
-    notificationShowTaskLocal(task)
 
     //lets show a remote notification now
     notificationShowTaskRemote(task)
@@ -346,6 +341,88 @@ fun NotificationCompat.Builder.addTaskAction(context: Context,actionText:String,
 }
 
 /********************************************************************************
+ * SLEEP NOTIFICATION FUNCTIONS
+ *********************************************************************************/
+
+fun Context.notificationShowSleepMirror(){
+    notificationShowRemote("",SLEEP_PATH)
+}
+
+fun Context.notificationShowSleepLocal(){
+
+    removeAllNotificationsExceptSpecified(SLEEP_NOTIFICATION_ID)
+
+    notificationShowSleep(
+            mainPendingIntent = null,
+            dismissPendingIntent = createNotificationDeleteIntentForSleep(),
+            dismissable = true,
+            smallRemoteView = if(!isWatch())remoteGetSmallSleepView() else null,
+            bigRemoteView = null
+//            bigRemoteView = remoteGetLargeSleepView()
+    )
+}
+
+fun Context.notificationShowSleep(
+        mainPendingIntent: PendingIntent? = null,
+        dismissPendingIntent: PendingIntent? = null,
+        dismissable: Boolean = true,
+        smallRemoteView: RemoteViews? = null,
+        bigRemoteView: RemoteViews? = null
+){
+
+    val manager = getNotificationManager()
+    getBuilder().apply {
+
+        //TODO launch with alarm OR with task completion
+        val completed = getCompletedTaskList()
+        val uncompleted = getDayTaskList()
+        val total = completed.size + uncompleted.size
+
+        (true)
+        if (isWatch()) {
+
+            //TODO change text depending on wether we came from an alarm or from a task completision
+            setContentTitle(getHtml("All done! &#127881"))
+            setContentText("See Today's Accomplishments ")
+
+//            addTaskAction(this@notificationShowTask,"Uncheck", ACTION_DONE,task)
+
+            setStyle(prepareBigTextStyle("$completed/$total Tasks Completed!","Results:"))
+        }else{
+
+            smallRemoteView?.let { setCustomContentView(smallRemoteView) }
+            bigRemoteView?.let { setCustomBigContentView(bigRemoteView) }
+        }
+
+        setDeleteIntent(dismissPendingIntent)
+
+        determineOnGoingAbility(this@apply,dismissable)
+
+        manager.notify(
+                NOTIFICATION_TAG,
+                SLEEP_NOTIFICATION_ID,
+                build()
+        )
+    }
+
+
+}
+
+fun Context.notificationDismissSleepRemote(){
+
+    val dataItemUri = Uri.Builder().scheme(WEAR_URI_SCHEME).path(SLEEP_PATH).build()
+    Wearable.getDataClient(this).deleteDataItems(dataItemUri)
+
+}
+
+fun Context.notificationDismissSleepLocally(){
+
+    getNotificationManager().cancel(NOTIFICATION_TAG, SLEEP_NOTIFICATION_ID)
+}
+
+
+
+/********************************************************************************
  * GENERIC NOTIFICATION FUNCTIONS
  *********************************************************************************/
 
@@ -388,6 +465,8 @@ fun determineOnGoingAbility(builder:NotificationCompat.Builder, dismissable:Bool
                 priority = Notification.PRIORITY_MAX
             }
         }
+    }else{
+        builder.setCategory(Notification.CATEGORY_REMINDER)
     }
 }
 
@@ -467,44 +546,6 @@ fun Context.notificationShowActivity(activity:String, int:Int){
 }
 
 
-
-
-fun Context.notificationShowSleep(dismissable: Boolean = true){
-
-        val manager = getNotificationManager()
-        getBuilder().apply {
-
-                //TODO launch with alarm OR with task completion
-
-                //TODO change text depending on above condition
-                setContentTitle(getHtml("All done! &#127881"))
-//                setContentTitle(Html.fromHtml("All done! &#127769", Html.FROM_HTML_MODE_COMPACT))
-                //TODO change text depending on above conditions
-                setContentText("See Today's Accomplishments ")
-
-                //TODO MOVE THIS ELSEWHERE
-                val completed = getCompletedTaskList()
-                val uncompleted = getDayTaskList()
-                val total = completed.size + uncompleted.size
-
-                setStyle(prepareBigTextStyle("$completed/$total Tasks Completed!","Results:"))
-                setAutoCancel(true)
-                setCategory(Notification.CATEGORY_SOCIAL)
-//                setDeleteIntent(dimissPendingIntent)
-
-                determineOnGoingAbility(this@apply,dismissable)
-
-                manager.notify(
-                        NOTIFICATION_TAG,
-                        SLEEP_NOTIFICATION_ID,
-                        build()
-                )
-        }
-
-
-}
-
-
 fun prepareBigTextStyle(tasks:String,title:String):NotificationCompat.BigTextStyle{
         return NotificationCompat.BigTextStyle()
          .setBigContentTitle(getHtml(title))
@@ -521,8 +562,7 @@ fun Context.getBuilder():NotificationCompat.Builder{
                 .setContentTitle(getHtml("Good morning! &#127780"))
                 .setSmallIcon(com.gorillamoa.routines.core.R.mipmap.ic_launcher)
                 .setContentText("See today's schedule")
-                .setAutoCancel(true)
-                .setCategory(Notification.CATEGORY_REMINDER)
+
 //                                .setDeleteIntent(dismissPendingIntent)
 }
 

@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.gorillamoa.routines.core.extensions.notificationDismissSleepRemote
 import com.gorillamoa.routines.core.extensions.notificationDismissWakeUpRemote
 import com.gorillamoa.routines.core.extensions.notificationDismissTaskRemote
 
@@ -47,19 +48,17 @@ class NotificationDismissReceiver:BroadcastReceiver() {
         intent?.let {
             Log.d("$tag onReceive",intent.action)
 
-            val tid = it.getIntExtra(com.gorillamoa.routines.core.extensions.TASK_ID,-1)
+            val tid = it.getLongExtra(com.gorillamoa.routines.core.extensions.TASK_ID,-1)
 
             when (intent.action) {
                 TYPE_SLEEP -> {
-
+                    context.notificationDismissSleepRemote()
                 }
                 TYPE_TASK -> {
                     //TODO this behaviour is determined by notification behaviour settings
 //                    TaskScheduler.skipAndShowNext(context,tid)
 
                         context.notificationDismissTaskRemote()
-
-
                 }
 
                 TYPE_WAKE_UP -> {
