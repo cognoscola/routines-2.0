@@ -44,10 +44,8 @@ class NotificationActionReceiver:BroadcastReceiver(){
                 ACTION_DONE -> {
                     //mark the task as done.
                     //TODO DONE FUNCTION
-                    if (TaskScheduler.completeTask(context, currentTid)) {
-
+                    if (TaskScheduler.completeTaskMirror(context, currentTid)) {
                         val task = context.getTaskFromString(intent.getStringExtra(TASK_DATA))
-
                         context.notificationShowTaskMirror(task)
                         //Check if we finish the day
                         //TODO SHOW Sleep once we complete the last task
@@ -77,8 +75,7 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
                 ACTION_TASK_UNCOMPLETE ->{
 
-                    if (TaskScheduler.uncompleteTask(context, currentTid)) {
-
+                    if (TaskScheduler.uncompleteTaskMirror(context, currentTid)) {
                         val task = context.getTaskFromString(intent.getStringExtra(TASK_DATA))
                         context.notificationShowTaskMirror(task)
 

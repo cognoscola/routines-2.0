@@ -2,7 +2,6 @@ package com.gorillamoa.routines.core.scheduler
 
 import android.content.Context
 import android.util.Log
-import com.gorillamoa.routines.core.constants.DataLayerConstant
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.data.TaskType
 import com.gorillamoa.routines.core.extensions.*
@@ -35,6 +34,8 @@ class TaskScheduler{
 
         /**
          * Schedule some tasks locally and then send that schedule over to remote
+         * @param context is the application context
+         * @param scheduleCallback is the call back that returns the list of scheduled task
          */
         fun scheduleMirror(context:Context, scheduleCallback: (tasks: List<Task>?)->Unit?){
 
@@ -251,6 +252,12 @@ class TaskScheduler{
             return false
         }
 
+        fun uncompleteTaskMirror(context: Context,tid:Long):Boolean{
+            val success = uncompleteTask(context,tid)
+            sendProgressData(context)
+            return success
+        }
+
         /**
          * User may wish to mark a task as uncompleted for whatever reasons
          * @param context is the application context
@@ -283,6 +290,14 @@ class TaskScheduler{
             }else {return false}
             return false
         }
+
+        fun completeTaskMirror(context: Context, tid:Long):Boolean{
+
+            val success = completeTask(context,tid)
+            sendProgressData(context)
+            return success
+        }
+
 
         /**
          * We finished the task

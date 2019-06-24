@@ -41,7 +41,6 @@ const val NOTIFICATION_CHANNEL_ONE  = "channel"
 const val NOTIFICATION_CHANNEL_TWO  = "channel_MAX"
 const val NOTIFICATION_TAG = "routines"
 
-
 /** Prepare the intent for when user dismisses the notification **/
 //TODO obfuscate strings later using obfuscation library
 
@@ -214,9 +213,9 @@ fun Context.notificationShowTask(task: Task,
             if(TaskScheduler.isComplete(this@notificationShowTask, task.id!!)){
 
                 addTaskAction(this@notificationShowTask,"Uncheck", ACTION_DONE,task)
-
+                setContentTitle(getHtml("<strike>${task.name}</strike>"))
             }else{
-
+                setContentTitle(task.name)
                 //Mark as done
                 addTaskAction(this@notificationShowTask,"Done      ", ACTION_DONE,task)
                 //Equivalent to NEXT
@@ -233,7 +232,6 @@ fun Context.notificationShowTask(task: Task,
 
         }
 
-        setContentTitle(task.name)
         setContentText(task.description)
         setDeleteIntent(dismissPendingIntent)
 

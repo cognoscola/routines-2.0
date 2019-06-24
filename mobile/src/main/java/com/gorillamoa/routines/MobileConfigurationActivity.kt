@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import com.google.android.gms.wearable.*
 import com.gorillamoa.routines.MobileNotificationBehaviourReceiver.Companion.ACTION_WAKEUP_EXPAND
+import com.gorillamoa.routines.core.constants.DataLayerConstant
 import com.gorillamoa.routines.core.coroutines.Coroutines
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
@@ -15,6 +16,7 @@ import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_routine_runner.*
+import java.lang.Exception
 import java.util.*
 
 const val EVENT_WAKEUP = "event.wakeup.visibility"
@@ -32,6 +34,8 @@ class MobileConfigurationActivity : FragmentActivity(),
 
     lateinit var  dataClient:DataClient
     lateinit var dataMap: DataMapItem
+
+    val calendar = Calendar.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +77,6 @@ class MobileConfigurationActivity : FragmentActivity(),
         }
 
         extra.setOnClickListener { notificationShowSleep() }
-
 
         configureDataLayer()
         sendDataButton?.setOnClickListener { view ->
@@ -128,14 +131,14 @@ class MobileConfigurationActivity : FragmentActivity(),
 
     override fun onResume() {
         super.onResume()
-//        dataClient = Wearable.getDataClient(this)
-//        dataClient.addListener(this)
+        dataClient = Wearable.getDataClient(this)
+        dataClient.addListener(this)
     }
 
 
     override fun onPause() {
         super.onPause()
-//        Wearable.getDataClient(this).removeListener(this)
+        Wearable.getDataClient(this).removeListener(this)
     }
 
     override fun onDataChanged(dataEventBuffer: DataEventBuffer){
@@ -143,14 +146,59 @@ class MobileConfigurationActivity : FragmentActivity(),
         Log.d("$tag onDataChanged","$dataEventBuffer")
 
         for (event in dataEventBuffer) {
-            if (event.type == DataEvent.TYPE_CHANGED) {
-                Log.d("$tag onDataChanged","Changed")
-            } else if (event.type == DataEvent.TYPE_DELETED) {
-                Log.d("$tag onDataChanged","Deleted")
-                
+
+                Log.d("$tag onDataChanged", "Host: ${event.dataItem.uri.host}")
+
+                val dataMap = DataMapItem.fromDataItem(event.dataItem).dataMap
+                when (event.type) {
+                    DataEvent.TYPE_CHANGED -> {
+
+                        if (DataLayerConstant.WAKE_UP_PATH.equals(event.dataItem.uri.path)) {
+                            append("Wakeup")
+
+                        } else if (DataLayerConstant.TASK_PATH.equals(event.dataItem.uri.path)) {
+
+                            append("Task")
+                        } else if (DataLayerConstant.PROGRESS_MOBILE_PATH.equals(event.dataItem.uri.path)) {
+
+                            append("Progress Mobile")
+                        } else if (DataLayerConstant.PROGRESS_WEAR_PATH.equals(event.dataItem.uri.path)){
+                            append("Progress Wear")
+                        }
+
+                        else if (DataLayerConstant.DATA_TASK_WEAR_INSERT_PATH.equals(event.dataItem.uri.path)) {
+                            append("Wear Insert")
+                        } else if (DataLayerConstant.DATA_TASK_MOBILE_INSERT_PATH.equals(event.dataItem.uri.path)) {
+                            append("Mobile Insert")
+                        } else if (DataLayerConstant.DATA_TASK_WEAR_DELETE_PATH.equals(event.dataItem.uri.path)) {
+                            append("Wear Delete")
+                        } else if (DataLayerConstant.DATA_TASK_MOBILE_DELETE_PATH.equals(event.dataItem.uri.path)) {
+                            append("Mobile Delete")
+                        } else if (DataLayerConstant.DATA_TASK_WEAR_UPDATE_PATH.equals(event.dataItem.uri.path)) {
+                            append("Wear Update")
+                        } else if (DataLayerConstant.DATA_TASK_MOBILE_UPDATE_PATH.equals(event.dataItem.uri.path)) {
+                            append("Mobile Update")
+                        }
+                    }
+                    DataEvent.TYPE_DELETED -> {
+
+
+                        if (DataLayerConstant.WAKE_UP_PATH.equals(event.dataItem.uri.path)) {
+
+                            append("Delete Wake up")
+                        } else if (DataLayerConstant.TASK_PATH.equals(event.dataItem.uri.path)) {
+                            append("Delete Task")
+                        }
+                    }
+                    else -> {
+
+                    }
+                }
             }
-        }
     }
 
+    fun append(string:String){
 
+        inDataTextview.text = "${inDataTextview.text} \n ${calendar.get(Calendar.HOUR)}:${calendar.get(Calendar.MINUTE)}:${calendar.get(Calendar.MILLISECOND)} $string"
+    }
 }

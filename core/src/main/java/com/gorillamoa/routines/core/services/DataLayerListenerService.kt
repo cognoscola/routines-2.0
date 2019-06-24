@@ -4,6 +4,7 @@ import android.annotation.TargetApi
 import android.content.Context
 
 import android.util.Log
+import android.widget.Toast
 import com.google.android.gms.wearable.*
 import com.gorillamoa.routines.core.constants.DataLayerConstant
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
@@ -135,12 +136,21 @@ class DataLayerListenerService:WearableListenerService(){
                         //Here task data is of type task
                         val taskData = dataMap.getString(KEY_TASK_DATA)
                         val task = getGson().fromJson(taskData, Task::class.java)
+
+                        //We'll show the task again, because it may be that
+                        //the task was marked as complete from another device and we
+                        //we may need to uodate it here.
+                        notificationShowTaskLocal(task)
+
+/*
                         if (!isAlreadyShowing(task.id!!.toInt())) {
                             notificationShowTaskLocal(task)
                         }
+*/
                     } else if (DataLayerConstant.PROGRESS_MOBILE_PATH.equals(it.dataItem.uri.path)) {
 
                         TaskScheduler.processDayInformation(
+                                applicationContext,
                                 dataMap.getBoolean(KEY_PROGRESS_ACTIVE),
                                 dataMap.getString(KEY_PROGRESS_UNCOMPLETED),
                                 dataMap.getString(KEY_PROGRESS_COMPLETED),
@@ -148,6 +158,7 @@ class DataLayerListenerService:WearableListenerService(){
                         )
                     } else if (DataLayerConstant.PROGRESS_WEAR_PATH.equals(it.dataItem.uri.path)){
                         TaskScheduler.processDayInformation(
+                                applicationContext,
                                 dataMap.getBoolean(KEY_PROGRESS_ACTIVE),
                                 dataMap.getString(KEY_PROGRESS_UNCOMPLETED),
                                 dataMap.getString(KEY_PROGRESS_COMPLETED),
@@ -283,4 +294,21 @@ class DataLayerListenerService:WearableListenerService(){
             true
         }
     }
+
+    override fun onCapabilityChanged(capibility: CapabilityInfo?) {
+        super.onCapabilityChanged(capibility)
+
+    }
+
+    override fun onPeerConnected(node: Node?) {
+        super.onPeerConnected(node)
+    }
+
+
+    override fun onConnectedNodes(nodes: MutableList<Node>?) {
+        super.onConnectedNodes(nodes)
+
+
+    }
+
 }
