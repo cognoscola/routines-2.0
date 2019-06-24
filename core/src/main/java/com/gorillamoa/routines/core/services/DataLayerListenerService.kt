@@ -180,6 +180,7 @@ class DataLayerListenerService:WearableListenerService(){
                     else if (DataLayerConstant.DATA_TASK_WEAR_INSERT_PATH.equals(it.dataItem.uri.path)) {
 
                         try {
+                            Toast.makeText(applicationContext,"WEAR INSERT",Toast.LENGTH_SHORT).show()
                             val taskData = dataMap.getString(KEY_TASK_DATA)
                             processInsertData(getGson().fromJson(taskData, Task::class.java))
                         } catch (e: Exception) {
@@ -187,6 +188,7 @@ class DataLayerListenerService:WearableListenerService(){
                         }
                     } else if (DataLayerConstant.DATA_TASK_MOBILE_INSERT_PATH.equals(it.dataItem.uri.path)) {
                         try {
+                            Toast.makeText(applicationContext,"MOBILE INSERT",Toast.LENGTH_SHORT).show()
                             val taskData = dataMap.getString(KEY_TASK_DATA)
                             processInsertData(getGson().fromJson(taskData, Task::class.java))
 
