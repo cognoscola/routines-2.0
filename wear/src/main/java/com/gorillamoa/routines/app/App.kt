@@ -6,16 +6,29 @@ import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
+import androidx.fragment.app.Fragment
 import com.google.gson.Gson
 import com.gorillamoa.routines.core.extensions.NOTIFICATION_CHANNEL_ONE
 import com.gorillamoa.routines.core.extensions.NOTIFICATION_CHANNEL_TWO
+import com.gorillamoa.routines.core.views.FragmentGraph
+import com.gorillamoa.routines.core.views.FragmentInjectorHelper
 import com.gorillamoa.routines.core.views.RemoteInjectorHelper
 
 
 /**
  * We'll configure notification channels every time the app starts
  */
-class App:Application(), RemoteInjectorHelper.RemoteGsonProvider{
+class App:Application(),
+        RemoteInjectorHelper.RemoteGsonProvider,
+        FragmentInjectorHelper.FragmentGraphProvider{
+
+    override val fragmentGraph: FragmentGraph
+        get() = object:FragmentGraph{
+            override fun getTaskListActivityFragment(): Fragment {
+              return Fragment()
+            }
+        }
+
 
     //TODO provide this VIA DAGGER!
     override fun getGson():Gson {
@@ -117,6 +130,14 @@ class App:Application(), RemoteInjectorHelper.RemoteGsonProvider{
 
     //BUG LIST
     //TODO clicking on the alarm, the background also captures the event. Dont' do this!
+
+    //LOGGING
+    //Did the user skip the task?
+    //Did they skip the entire day?
+    //Are their habits changing?
+    //How frequently are they adding a new habiat?
+    //How frequently are they removing a task?
+    // Frequency of each type of task included
 
 
     //DEBUG - ADD DEBUG CLOCKING, so we can TEST

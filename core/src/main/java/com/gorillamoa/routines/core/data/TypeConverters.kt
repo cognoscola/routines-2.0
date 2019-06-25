@@ -1,6 +1,7 @@
 package com.gorillamoa.routines.core.data
 
 import androidx.room.TypeConverter
+import java.util.*
 
 class TypeConverters {
 
@@ -30,4 +31,15 @@ class TypeConverters {
             TaskType.TYPE_SPECIAL -> 3
         }
     }
+
+    @TypeConverter
+    fun toDate(value: Long?): Date? {
+        return if (value == null) null else Date(value)
+    }
+
+    @TypeConverter
+    fun toLong(value: Date?): Long? {
+        return (if (value == null) 0L else value!!.getTime()).toLong()
+    }
+
 }

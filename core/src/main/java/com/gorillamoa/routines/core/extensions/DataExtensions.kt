@@ -2,11 +2,12 @@ package com.gorillamoa.routines.core.extensions
 
 import android.content.Context
 import com.gorillamoa.routines.core.data.TaskDatabase
-import com.gorillamoa.routines.core.data.TaskRepository
+import com.gorillamoa.routines.core.data.DataRepository
 
-fun Context.getDataRepository(): TaskRepository {
+fun Context.getDataRepository(): DataRepository {
 
-    return TaskRepository(TaskDatabase.getDatabase(this).taskDao())
+    val db= TaskDatabase.getDatabase(this)
+    return DataRepository(db.taskDao(), db.taskHistoryDao(),db.dayHistoryDao())
 }
 
 //        val taskList = getGson().fromJson(dataString, object : TypeToken<List<Task>>() {}.type)

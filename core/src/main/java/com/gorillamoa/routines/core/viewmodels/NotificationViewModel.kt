@@ -5,11 +5,10 @@ import androidx.annotation.UiThread
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.gorillamoa.routines.core.coroutines.Coroutines
 
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.data.TaskDatabase
-import com.gorillamoa.routines.core.data.TaskRepository
+import com.gorillamoa.routines.core.data.DataRepository
 import java.util.*
 
 /**
@@ -22,7 +21,7 @@ class TaskViewModel(application: Application): AndroidViewModel(application){
         get() = parentJob + Dispatchers.Main
     private val scope = CoroutineScope(coroutineContext)*/
 
-    private val repository:TaskRepository
+    private val repository:DataRepository
     private val _tasks = MutableLiveData<List<Task>>()
 
     //the object on which we can observe changes
@@ -30,8 +29,9 @@ class TaskViewModel(application: Application): AndroidViewModel(application){
 
     init{
 
-        val taskDao = TaskDatabase.getDatabase(application).taskDao()
-        repository = TaskRepository(taskDao)
+        val db = TaskDatabase.getDatabase(application)
+        val taskDao = db.taskDao()
+        repository = DataRepository(taskDao, db.taskHistoryDao(),db.dayHistoryDao())
 //        scope.launch(Dispatchers.IO){
 //            allTasks = repository.getTasks()
     }

@@ -16,8 +16,14 @@ import java.util.*
  * data between our local data and network data.
  * For now its just a layer that does nothing.
  */
-class TaskRepository(private val taskdao:TaskDao){
+class DataRepository(
+        private val taskdao:TaskDao,
+        private val taskHistoryDao: TaskHistoryDao,
+        private val dayHistoryDao: DayHistoryDao){
 
+    /****************************************
+     * TASK
+     *****************************************/
     fun insertMirror(context: Context, task: Task){
         Coroutines.ioThenMain({insert(task)}){ tid ->
             DataLayerListenerService.insertRemotely(context,task.apply { id = tid  })
@@ -104,21 +110,33 @@ class TaskRepository(private val taskdao:TaskDao){
 
     @WorkerThread
     fun dummy(){
-        taskdao.insertTasks(
+        val a= Task(name = "Early Mobilization",description = "Postural Exercises and Spine Stretch", type = TaskType.TYPE_HABIT)
+        val b= Task(name = "Morning Meditation",description = "1 Hour, Remain Equanimous", type = TaskType.TYPE_HABIT)
+        val c= Task(name = "WHM Breathing",description = "Take a cold shower", type = TaskType.TYPE_HABIT)
 
-                Task(name = "Early Mobilization",description = "Postural Exercises and Spine Stretch", type = TaskType.TYPE_HABIT),
-                Task(name = "Morning Meditation",description = "1 Hour, Remain Equanimous", type = TaskType.TYPE_HABIT),
-                Task(name = "WHM Breathing",description = "Take a cold shower", type = TaskType.TYPE_HABIT)
-
-                /*Task(name = "Exercises",description = "See exercise", type = TaskType.TYPE_HABIT),
-                Task(name = "French Practice",description = "For 1 hour. Verbs. Nouns", type = TaskType.TYPE_GOAL),
-                Task(name = "Food Log",description = "Log your food", type = TaskType.TYPE_HABIT),
-                Task(name = "Love Project",description = "Find someone cool", type = TaskType.TYPE_HABIT),
-                Task(name = "Sankara",description = "Work on Project Sankara", type = TaskType.TYPE_GOAL),
-                Task(name = "Food Log",description = "Log information about food", type = TaskType.TYPE_HABIT),
-                Task(name = "Friend Log",description = "Log information about friends", type = TaskType.TYPE_HABIT),
-                Task(name = "Late Mobilization",description = "1 Hour, Remain Equanimous", type = TaskType.TYPE_HABIT),
-                Task(name = "Late Meditation",description = "Postural Exercises and Spine Stretch", type = TaskType.TYPE_HABIT)*/
-        )
+        taskdao.insertTasks( a,b,c)
+        taskdao.getTasks().forEach {
+            taskHistoryDao.insertTaskHistory(TaskHistory(tid = it.id!!, timeCompleted = Date(),info = "LaLa",completed = true,skippedCount = 2 ))
+        }
     }
+
+    /****************************************
+     * TASK HISTORY 
+     *****************************************/
+    @WorkerThread
+    fun appendTaskEntry(taskHistory: TaskHistory){
+        taskHistoryDao.insertTaskHistory(taskHistory)
+    }
+
+    @WorkerThread
+    fun getHistoryForTask(task: Task):List<TaskHistory>{
+        return taskHistoryDao.getAllHistoryForTask(task.id!!)
+    }
+
+    @WorkerThread
+    fun clearAllTaskHistory(){
+        taskHistoryDao.clearAll()
+    }
+
+
 }

@@ -4,15 +4,16 @@ package com.gorillamoa.routines.core.extensions
 import android.app.UiModeManager
 import android.content.Context
 import android.content.res.Configuration
-import android.util.Log
+
 import android.widget.RemoteViews
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProviders
 import com.google.gson.Gson
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
+import com.gorillamoa.routines.core.views.FragmentInjectorHelper
 import com.gorillamoa.routines.core.views.RemoteInjectorHelper
-import java.util.*
 
 fun FragmentActivity.connectAndLoadViewModel():TaskViewModel{
 
@@ -57,6 +58,8 @@ fun Context.remoteGetLargeSleepView():RemoteViews{
     return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetLargeSleepView()
 }
 
-
+fun Context.getTaskListFragment():Fragment{
+    return (applicationContext as FragmentInjectorHelper.FragmentGraphProvider).fragmentGraph.getTaskListActivityFragment()
+}
 
 

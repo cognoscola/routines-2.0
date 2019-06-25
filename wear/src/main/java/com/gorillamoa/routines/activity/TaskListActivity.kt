@@ -19,7 +19,7 @@ import com.gorillamoa.routines.core.data.TypeConverters
 import com.gorillamoa.routines.core.extensions.*
 
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
-import kotlinx.android.synthetic.main.activity_task_list.*
+import kotlinx.android.synthetic.main.fragment_task_list_wear.*
 import java.lang.Exception
 
 //TODO the listview doesn't stretch out to the end and start edges of the activity. Make it so.
@@ -33,7 +33,6 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
 
     private lateinit var taskViewModel: TaskViewModel
     private var isCreating = false
-
 
 
     private val preferenceListener= SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
@@ -51,7 +50,7 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_task_list)
+        setContentView(R.layout.fragment_task_list_wear)
 
         mAmbientController = AmbientModeSupport.attach(this@TaskListActivity)
         taskViewModel = ViewModelProviders.of(this@TaskListActivity).get(TaskViewModel::class.java)
