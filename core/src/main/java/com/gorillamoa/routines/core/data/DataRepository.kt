@@ -43,9 +43,10 @@ class DataRepository(
     }
 
     @WorkerThread
-    fun getTaskById(tid:Long):Task{
+    fun getTaskById(tid:Long):Task?{
         return taskdao.getTask(tid)
     }
+
 
     @WorkerThread
     fun getTaskByIds(ids:ArrayDeque<Long>):List<Task>{
@@ -106,23 +107,97 @@ class DataRepository(
     @WorkerThread
     fun clearAll(){
         taskdao.clearAll()
+        taskHistoryDao.clearAll()
+        dayHistoryDao.clearAll()
     }
 
     @WorkerThread
     fun dummy(){
-        val a= Task(name = "Early Mobilization",description = "Postural Exercises and Spine Stretch", type = TaskType.TYPE_HABIT)
-        val b= Task(name = "Morning Meditation",description = "1 Hour, Remain Equanimous", type = TaskType.TYPE_HABIT)
-        val c= Task(name = "WHM Breathing",description = "Take a cold shower", type = TaskType.TYPE_HABIT)
 
-        taskdao.insertTasks( a,b,c)
+        taskdao.insertTasks(
+        Task(name = "Morning Meditation",description = "1 Hour, Remain Equanimous", type = TaskType.TYPE_HABIT, frequency = 1f),
+        Task(name = "Morning Meal Prep",description = "Seg Meal Log", type = TaskType.TYPE_HABIT, frequency = 1f),
+        Task(name = "Morning Exercise and Log",description = "Postural Exercises and Spine Stretch", type = TaskType.TYPE_HABIT, frequency = 1f),
+        Task(name = "WHM Breathing",description = "Take a cold shower", type = TaskType.TYPE_HABIT, frequency = 1f),
+        Task(name = "Sankara",description = "See Sankara Log", type = TaskType.TYPE_HABIT,frequency = 1f),
+        Task(name = "French", description = "Just 1 hour", type = TaskType.TYPE_HABIT,frequency = 0.5f),
+        Task(name = "Paint", description = "Ego and creativity cannot go together", type = TaskType.TYPE_HABIT,frequency = 1f),
+        Task(name = "Breakfast Log", description = "Using cronometer", type = TaskType.TYPE_HABIT,frequency = 1f),
+        Task(name = "Lunch Log", description = "Using cronometer", type = TaskType.TYPE_HABIT,frequency = 1f),
+        Task(name = "Dinner Log", description = "Using cronometer", type = TaskType.TYPE_HABIT,frequency = 1f),
+        Task(name = "Gratitude Log", description = "Using cronometer", type = TaskType.TYPE_HABIT,frequency = 1f),
+        Task(name = "Journal", description = "Using cronometer", type = TaskType.TYPE_HABIT,frequency = 1f),
+        Task(name = "Wood Working", description = "Using cronometer", type = TaskType.TYPE_HABIT,frequency = 0.2f),
+        Task(name = "Evening Exercise", description = "Using cronometer", type = TaskType.TYPE_HABIT,frequency = 1f),
+        Task(name = "Evening Log", description = "Using cronometer", type = TaskType.TYPE_HABIT,frequency = 1f),
+        Task(name = "Evening Meditation", description = "1hr Equanimity", type = TaskType.TYPE_HABIT,frequency = 1f)
+        )
         taskdao.getTasks().forEach {
-            taskHistoryDao.insertTaskHistory(TaskHistory(tid = it.id!!, timeCompleted = Date(),info = "LaLa",completed = true,skippedCount = 2 ))
+            //TODO At the start of the day, we could create task history for each task, then we don't worry about wether they exist in our db
+            taskHistoryDao.insertTaskHistory(TaskHistory(tid = it.id!!, timeCompleted = Date(),info = "LaLa",completed = false,skippedCount = 2 ))
         }
     }
 
     /****************************************
      * TASK HISTORY 
      *****************************************/
+    @WorkerThread
+    fun completeTask(tid:Long){
+
+        val startDay  = getDayStartTimeMillis()
+        val endDay = startDay + (24 * 60 * 60 *1000)
+
+        val taskHistory = taskHistoryDao.getHistoryForTaskToday(tid,startDay,endDay)
+        taskHistory?.let {
+
+//            it.completed = true
+            taskHistoryDao.setCompletionStatus(true,it.thid!!)
+//            taskHistoryDao.updateTaskHistory(it)
+
+            //If not found, we simply insert.
+        }?:run {
+            appendTaskEntry(TaskHistory(
+                    tid = tid,
+                    timeCompleted = Date(),
+                    info = "",
+                    completed = true,
+                    skippedCount = 0
+            ))
+        }
+    }
+
+    fun getDayStartTimeMillis():Long{
+        return Calendar.getInstance().run {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+            timeInMillis
+        }
+    }
+
+    @WorkerThread
+    fun unCompleteTask(tid:Long){
+
+        val startDay  = getDayStartTimeMillis()
+        val endDay = startDay + (24 * 60 * 60 *1000)
+
+        taskHistoryDao.getHistoryForTaskToday(tid,startDay,endDay)?.let {
+
+            taskHistoryDao.setCompletionStatus(false,it.thid!!)
+
+        }?:run{
+            appendTaskEntry(TaskHistory(
+                    tid = tid,
+                    timeCompleted = Date(),
+                    info = "",
+                    completed = false,
+                    skippedCount = 0
+            ))
+        }
+    }
+
+
     @WorkerThread
     fun appendTaskEntry(taskHistory: TaskHistory){
         taskHistoryDao.insertTaskHistory(taskHistory)

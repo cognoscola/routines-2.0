@@ -2,7 +2,9 @@ package com.gorillamoa.routines.core.scheduler
 
 import android.content.Context
 import android.util.Log
+import com.gorillamoa.routines.core.coroutines.Coroutines
 import com.gorillamoa.routines.core.data.Task
+import com.gorillamoa.routines.core.data.TaskHistory
 import com.gorillamoa.routines.core.data.TaskType
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.services.DataLayerListenerService
@@ -274,6 +276,7 @@ class TaskScheduler{
                     context.saveTaskLists(taskList,doneList)
                     return true
                 }
+                context.getDataRepository().unCompleteTask(tid)
                 //TODO update the task history in the DB
             }else {return false}
             return false
@@ -306,6 +309,11 @@ class TaskScheduler{
                     return true
                 }
                 //TODO update the task history in the DB
+
+                //First see if we already have an existing entry in the history db,
+                context.getDataRepository().completeTask(tid)
+
+
             }else {return false}
             return false
         }
@@ -314,7 +322,7 @@ class TaskScheduler{
          * Returns the previous task in the scheduled day. If the current Task is the first of the day
          * the call will return the last scheduled task
          */
-        fun getPreviousOrderedTask(context: Context, currentTid: Long,schedulerCallback: (task: Task?) -> Any?){
+        fun getPreviousOrderedTask(context: Context, currentTid: Long,schedulerCallback: (task: Task?, history:TaskHistory?) -> Any?){
 
             if (currentTid == 0L) {
                 getNextUncompletedTask(context, schedulerCallback)
@@ -332,14 +340,21 @@ class TaskScheduler{
                     position -1
                 }
 
-                com.gorillamoa.routines.core.coroutines.Coroutines.ioThenMain({context.getDataRepository().getTaskById(order[nextPosition])}){
-                    schedulerCallback.invoke(it)
-                }
+                returnTaskAndHistory(context,order[nextPosition], schedulerCallback)
+                /*Coroutines.ioThenMain({repository.getTaskById(order[nextPosition])}){task ->
+                    task?.apply {
+                        Coroutines.ioThenMain({repository.getHistoryForTask(task)}){ history->
+                            scheduleCallback.invoke(task, history?.lastOrNull())
+                        }
+                    }?:run{
+                        scheduleCallback.invoke(generateEmptyTaskObject(),null)
+                    }
+                }*/
 
             }else{
                 //we don't have a schedule yet so just pass back nothing
                 //TODO prevent user from calling this function when there isn't anny task scheduled
-                schedulerCallback.invoke(null)
+                schedulerCallback.invoke(null, null)
             }
         }
 
@@ -347,7 +362,7 @@ class TaskScheduler{
          * Return the next task in our scheduled set. If the task is last it will return the first
          * task of the day
          */
-        fun getNextOrderedTask(context: Context,currentTid:Long, schedulerCallback:(task:Task?) ->Any?){
+        fun getNextOrderedTask(context: Context,currentTid:Long, schedulerCallback:(task:Task?, history:TaskHistory?) ->Any?){
 
             if (currentTid == 0L) {
                 getNextUncompletedTask(context, schedulerCallback)
@@ -362,15 +377,24 @@ class TaskScheduler{
                     position + 1
                 }
 
-                com.gorillamoa.routines.core.coroutines.Coroutines.ioThenMain({context.getDataRepository().getTaskById(order[nextPosition])}){
 
-                    schedulerCallback.invoke(it)
-                }
+                returnTaskAndHistory(context,order[nextPosition], schedulerCallback)
+
+              /*  Coroutines.ioThenMain({context.getDataRepository().getTaskById(order[nextPosition])}){ task ->
+
+                    task?.apply {
+                        Coroutines.ioThenMain({repository.getHistoryForTask(task)}){ history->
+                            scheduleCallback.invoke(task, history?.lastOrNull())
+                        }
+                    }?:run{
+                        scheduleCallback.invoke(generateEmptyTaskObject(),null)
+                    }
+                }*/
 
             }else{
                 //we don't have a schedule yet so just pass back nothing
                 //TODO prevent user from calling this function when there isn't anny task scheduled
-                schedulerCallback.invoke(null)
+                schedulerCallback.invoke(null,null)
             }
 
         }
@@ -382,7 +406,7 @@ class TaskScheduler{
          * @param currentTid is the current task id (which the user is currently doing
          * @param scheduleCallback is the call back function to fetch the next task
          */
-        fun getNextUncompletedTask(context:Context, scheduleCallback: (task:Task?) -> Any?){
+        fun getNextUncompletedTask(context:Context, scheduleCallback: (task:Task?, history:TaskHistory?) -> Any?){
 
             var nextTid:Long =-1
             val taskList = context.getDayTaskList()
@@ -394,20 +418,31 @@ class TaskScheduler{
 
             if (nextTid != -1L) {
 
-                val repository = context.getDataRepository()
                 Log.d("getNextUncompletedTask","Will show Task:$nextTid")
-                com.gorillamoa.routines.core.coroutines.Coroutines.ioThenMain({repository.getTaskById(nextTid)}){
-                    scheduleCallback.invoke(it)
-                }
-
+                returnTaskAndHistory(context,nextTid, scheduleCallback)
             }else{
 
                 Log.d("getNextUncompletedTask","Out of tasks!")
                 //TODO check if any tasks were completed, if not don't show sleep notification
-                    scheduleCallback.invoke(generateEmptyTaskObject())
+                    scheduleCallback.invoke(generateEmptyTaskObject(),null)
                 //TODO schedule alarm at some point S
             }
         }
+
+        fun returnTaskAndHistory(context:Context,tid:Long, scheduleCallback: (task:Task?, history:TaskHistory?) -> Any?){
+
+            val repository = context.getDataRepository()
+            Coroutines.ioThenMain({repository.getTaskById(tid)}){task ->
+                task?.apply {
+                    Coroutines.ioThenMain({repository.getHistoryForTask(task)}){ history->
+                        scheduleCallback.invoke(task, history?.lastOrNull())
+                    }
+                }?:run{
+                    scheduleCallback.invoke(generateEmptyTaskObject(),null)
+                }
+            }
+        }
+
 
         /**
          * The user may finish all his tasks, or they finish the day despite completing
@@ -433,10 +468,12 @@ class TaskScheduler{
         }
 
         fun showNext(context:Context){
+/*
             getNextUncompletedTask(context) { task ->
 
                 //TODO May delete this or move it somewhere else because the scheduler
                 //should not have to handle showing anything
+*/
 /*
                 task?.let {
                     context.showMobileNotificationTask(task)
@@ -447,8 +484,10 @@ class TaskScheduler{
                     context.notificationShowSleep()
                     endDay(context)
                 }
-*/
+*//*
+
             }
+*/
         }
 
         fun skipAndShowNext(context: Context, currentTid: Long) {

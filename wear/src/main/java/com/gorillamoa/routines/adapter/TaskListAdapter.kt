@@ -34,11 +34,7 @@ const val MODE_PICKER = 2 //pick an existing unscheduled task
  * @param scheduledCallback is to notify the parent that the user requested to schedule or unschedule a task
  * @param addButtonCallback is when the user presses the + button on the item header
  */
-class TaskListAdapter(
-        private val itemClickedCallback:((Long)->Unit)? = null,
-        private val completionCallback:((Long, Boolean)->Any?)? =null,
-        private val scheduledCallback:((Long,Boolean)->Any?)? = null,
-        private val addButtonCallback:((Boolean)->Any?)? = null): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class TaskListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     @Suppress("unused")
     private val tag:String = TaskListAdapter::class.java.name
@@ -51,6 +47,24 @@ class TaskListAdapter(
     private var mode = MODE_DAILY
     private var lastTimeTouch = 0L
     private var lastInteractedItemPosition = -1
+
+     var itemClickedCallback:((Long)->Unit)? = null
+    var  completionCallback:((Long, Boolean)->Any?)? =null
+    var  scheduledCallback:((Long,Boolean)->Any?)? = null
+    var  addButtonCallback:((Boolean)->Any?)? = null
+
+    public fun attachCallbackFunctions(
+            itemClickedCallback:((Long)->Unit)? = null,
+            completionCallback:((Long, Boolean)->Any?)? =null,
+            scheduledCallback:((Long,Boolean)->Any?)? = null,
+            addButtonCallback:((Boolean)->Any?)? = null
+    ){
+        this@TaskListAdapter.itemClickedCallback = itemClickedCallback
+        this@TaskListAdapter.completionCallback = completionCallback
+        this@TaskListAdapter.scheduledCallback = scheduledCallback
+        this@TaskListAdapter.addButtonCallback = addButtonCallback
+    }
+
 
     /**
      * Have we recently interacted with an item on this list?
@@ -280,6 +294,7 @@ class TaskListAdapter(
 
     private fun addSchedulingAction(view:View){
         view.setOnClickListener {
+            setPickerMode()
             addButtonCallback?.invoke(true)
         }
     }
@@ -406,10 +421,7 @@ class TaskListAdapter(
             0 -> VIEW_TYPE_TITLE
             (order.size + 1 ) -> VIEW_TYPE_ADD
             else -> VIEW_TYPE_TASK
-
         }
-
-
     }
 
     inner class TaskItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

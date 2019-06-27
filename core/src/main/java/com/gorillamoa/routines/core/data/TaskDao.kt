@@ -9,7 +9,7 @@ interface TaskDao{
     fun getTasks(): List<Task>
 
     @Query("SELECT * FROM TASK WHERE id = :tid")
-    fun getTask(tid:Long):Task
+    fun getTask(tid:Long):Task?
 
     @Query("SELECT * FROM TASK WHERE id IN (:ids)")
     fun getTaskByIds(ids: List<Long>): List<Task>

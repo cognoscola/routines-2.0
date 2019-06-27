@@ -6,6 +6,7 @@ import android.net.Uri
 
 import android.util.Log
 import com.google.android.gms.wearable.*
+import com.google.gson.reflect.TypeToken
 import com.gorillamoa.routines.core.constants.DataLayerConstant
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
 import com.gorillamoa.routines.core.data.Task
@@ -22,9 +23,12 @@ import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_PR
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_PROGRESS_COMPLETED
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_PROGRESS_ORDER
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_PROGRESS_UNCOMPLETED
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_HISTORY_DATA
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.PROGRESS_PATH
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.TASK_PATH
 
 import com.gorillamoa.routines.core.coroutines.Coroutines
+import com.gorillamoa.routines.core.data.TaskHistory
 import java.lang.Exception
 import java.util.*
 
@@ -77,6 +81,23 @@ class DataLayerListenerService:WearableListenerService(){
             val cal = Calendar.getInstance()
             cal.timeInMillis = System.currentTimeMillis()
             return "${cal.get(Calendar.HOUR)}:${cal.get(Calendar.MINUTE)}:${cal.get(Calendar.SECOND)}"
+        }
+
+        fun sendTaskData(context:Context, taskData:String, historyData:String){
+
+            val putDataReq: PutDataRequest = PutDataMapRequest.create(TASK_PATH).run {
+                dataMap.putString(KEY_TASK_DATA, taskData )
+                dataMap.putString(KEY_TASK_HISTORY_DATA, historyData)
+
+                //save the time
+                val cal = Calendar.getInstance()
+                cal.timeInMillis = System.currentTimeMillis()
+                dataMap.putString(DataLayerConstant.KEY_TIME, "${cal.get(Calendar.HOUR)}:${cal.get(Calendar.MINUTE)}:${cal.get(Calendar.SECOND)}")
+
+                asPutDataRequest()
+            }
+            putDataReq.setUrgent()
+            Wearable.getDataClient(context).putDataItem(putDataReq)
         }
 
         fun updateDayMirror(
@@ -142,13 +163,16 @@ class DataLayerListenerService:WearableListenerService(){
 
                         //Here task data is of type task
                         val taskData = dataMap.getString(KEY_TASK_DATA)
-                        val task = getGson().fromJson(taskData, Task::class.java)
+                        val historyData = dataMap.getString(KEY_TASK_HISTORY_DATA)
+
+                        val gson = getGson()
+                        val task = gson.fromJson(taskData, Task::class.java)
+                        val history = gson.fromJson(historyData, TaskHistory::class.java)
 
                         //We'll show the task again, because it may be that
                         //the task was marked as complete from another device and we
                         //we may need to uodate it here.
-                        notificationShowTaskLocal(task)
-
+                        notificationShowTaskLocal(task,history)
 /*
                         if (!isAlreadyShowing(task.id!!.toInt())) {
                             notificationShowTaskLocal(task)

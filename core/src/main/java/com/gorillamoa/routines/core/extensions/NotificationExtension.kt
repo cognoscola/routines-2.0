@@ -23,11 +23,13 @@ import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TA
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.SLEEP_PATH
 
 import com.gorillamoa.routines.core.data.Task
+import com.gorillamoa.routines.core.data.TaskHistory
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_DONE
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_SKIP_TODAY
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_NEXT
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_WAKE_START_DAY
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
+import com.gorillamoa.routines.core.services.DataLayerListenerService
 
 import java.util.*
 
@@ -133,7 +135,7 @@ fun Context.notificationShowWakeUpLocal(tasks:List<Task>){
             mainPendingIntent = null,
             dismissPendingIntent = createNotificationDeleteIntentForWakeUp(),
             //TODO CHECK IF WE SHOULD ALLOW DISMISSAL with stubborn settings
-            dismissable = true,
+            dismissable = false,
             //TODO get the actual task length
             smallRemoteView = if(!isWatch())remoteGetSmallWakeUpView(tasks.size)else null,
             //TODO Get stringbuilder from dagger singleton
@@ -192,6 +194,7 @@ fun NotificationCompat.Builder.addWakeUpAction(context: Context,actionText:Strin
  *********************************************************************************/
 
 fun Context.notificationShowTask(task: Task,
+                                 history:TaskHistory? = null,
                                  mainPendingIntent: PendingIntent? = null,
                                  dismissPendingIntent: PendingIntent? = null,
                                  dismissable: Boolean = true,
@@ -204,9 +207,10 @@ fun Context.notificationShowTask(task: Task,
 
         if (isWatch()) {
 
+            setStyle(prepareBigTextStyle(StringBuilder().stringifyHistory(history), "Task History"))
+
             if(TaskScheduler.isComplete(this@notificationShowTask, task.id!!)){
                 Log.d("notificationRoutine","notificationShowTask Task is Completed!")
-
                 addTaskAction(this@notificationShowTask,"Uncheck", ACTION_DONE,task)
                 setContentTitle(getHtml("<strike>${task.name}</strike>"))
             }else{
@@ -248,24 +252,25 @@ fun Context.notificationShowTask(task: Task,
  * other connected nodes. When either is ACTIONED, the same action occurs on both devices.
  * @param task is the task to show
  */
-fun Context.notificationShowTaskMirror(task:Task){
+fun Context.notificationShowTaskMirror(task:Task,history:TaskHistory?= null){
     Log.d("notificationRoutine","notificationShowTaskMirror")
 
     //lets show a remote notification now
-    notificationShowTaskRemote(task)
+    notificationShowTaskRemote(task,history)
 }
 
-fun Context.notificationShowTaskLocal(task:Task){
+fun Context.notificationShowTaskLocal(task:Task, history:TaskHistory? = null){
     Log.d("notificationRoutine"," notificationShowTaskLocal Task:${task.id}")
 
     removeAllNotificationsExceptSpecified(task.id!!.toInt())
 
     notificationShowTask(
             task,
+            history,
             mainPendingIntent = null,
             dismissPendingIntent = createNotificationDeleteIntentForTask(task),
             //TODO check stubborn to see if we should dismiss
-            dismissable = true,
+            dismissable = false,
             smallRemoteView = if(!isWatch())remoteGetSmallTaskView(task)else null,
             //TODO make a big remote view for tasks
             bigRemoteView= null
@@ -286,10 +291,11 @@ fun Context.removeAllNotificationsExceptSpecified(tid:Int){
 /**
  * Show a task remotely
  */
-fun Context.notificationShowTaskRemote(task:Task){
+fun Context.notificationShowTaskRemote(task:Task, history:TaskHistory?=null){
     Log.d("notificationRoutine","notificationShowTaskRemote")
 
-    notificationShowRemote(getGson().toJson(task), TASK_PATH)
+    DataLayerListenerService.sendTaskData(this,getGson().toJson(task),getGson().toJson(history))
+//    notificationShowRemote(getGson().toJson(task), TASK_PATH)
 }
 
 fun Context.notificationDismissTaskMirror(tid:Long){

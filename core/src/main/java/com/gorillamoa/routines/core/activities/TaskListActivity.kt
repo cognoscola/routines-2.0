@@ -1,6 +1,5 @@
-package com.gorillamoa.routines.activity
+package com.gorillamoa.routines.core.activities
 
-import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -8,14 +7,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.wear.ambient.AmbientModeSupport
-import com.gorillamoa.routines.R
-import com.gorillamoa.routines.core.activities.TaskViewActivity
+import com.gorillamoa.routines.core.R
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.data.TaskType
 import com.gorillamoa.routines.core.data.TypeConverters
 import com.gorillamoa.routines.core.extensions.*
-
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
 import com.gorillamoa.routines.core.views.TaskListDisplayer
 
@@ -27,7 +23,7 @@ import com.gorillamoa.routines.core.views.TaskListDisplayer
  * This a generic activity for displaying the Tasks to the user. The actually layout is handled by
  * either the mobile or wear side independently.
  */
-class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider {
+class TaskListActivity : FragmentActivity() {
     @Suppress("unused")
     private val tag:String = TaskListActivity::class.java.name
 
@@ -61,9 +57,10 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
         //pick a task from existing tasks
         //add button call back
         if (!isExisting) {
-            startActivityForResult(
-                    Intent(this@TaskListActivity, TaskAddActivity::class.java),
-                    TaskAddActivity.REQUEST_CODE)
+            //TODO clicking on task add button shows the task add activity
+//            startActivityForResult(
+//                    Intent(this@TaskListActivity, TaskAddActivity::class.java),
+//                    TaskAddActivity.REQUEST_CODE)
 
         }
     }
@@ -86,9 +83,9 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
                           .add(R.id.fragmentContainerFrameLayout,taskListFragment as Fragment )
                           .commit()
 
-        if (isWatch()) {
+        /*if (isWatch()) {
             mAmbientController = AmbientModeSupport.attach(this@TaskListActivity)
-        }
+        }*/
 
         taskViewModel = ViewModelProviders.of(this@TaskListActivity).get(TaskViewModel::class.java)
         taskViewModel.loadTasks()
@@ -116,6 +113,8 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        //TODO return result of of task add Activity
+/*
         if (requestCode == TaskAddActivity.REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
 
@@ -137,14 +136,14 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
                 }
             }
         }
+*/
     }
 
 
-    private var mAmbientController: AmbientModeSupport.AmbientController? = null
+    /*private var mAmbientController: AmbientModeSupport.AmbientController? = null
 
     override fun getAmbientCallback(): AmbientModeSupport.AmbientCallback {
         return TaskListAmbient()
-    }
-
+    }*/
 
 }

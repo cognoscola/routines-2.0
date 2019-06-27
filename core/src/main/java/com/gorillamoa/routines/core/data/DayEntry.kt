@@ -8,13 +8,13 @@ import java.util.*
 @Entity(tableName = "DayHistory")
 class DayHistory(
         @PrimaryKey(autoGenerate = true)
-        val dhid:Long? = null,
-        val date:Long, //is the date
-        val timeStarted:Long,
-        val timeFinished:Long,
-        val totalTasksScheduled:Int,
-        val totalCompleted:Int,
-        val totalUnCompleted:Int
+        var dhid:Long? = null,
+        var date:Long, //is the date
+        var timeStarted:Long,
+        var timeFinished:Long,
+        var totalTasksScheduled:Int,
+        var totalCompleted:Int,
+        var totalUnCompleted:Int
 )
 
 //Some ideas
@@ -29,12 +29,12 @@ class DayHistory(
 data class TaskHistory(
 
         @PrimaryKey(autoGenerate = true)
-        val thid:Long?=null,
-        val tid:Long, //This is the matching Task ID
-        val timeCompleted: Date, //including the date
-        val info:String? = null, //not sure yet
-        val completed:Boolean, //did the user skip this today
-        val skippedCount:Int //This is how many times the user has been shown the task, but they choose
+        var thid:Long?=null,
+        var tid:Long, //This is the matching Task ID
+        var timeCompleted: Date, //including the date
+        var info:String? = null, //not sure yet
+        var completed:Boolean, //did the user skip this today
+        var skippedCount:Int //This is how many times the user has been shown the task, but they choose
 //to do at some other time. The scheduler will try to find an appropriate time to schedule this
 //in the future using the timeCompleted and skip Count
 )

@@ -105,9 +105,9 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
                     context.apply {
                         TaskScheduler.approveMirror(context)
-                        TaskScheduler.getNextUncompletedTask(this@apply) { task ->
+                        TaskScheduler.getNextUncompletedTask(this@apply) { task,history ->
                             task?.let {
-                                notificationShowTaskMirror(task)
+                                notificationShowTaskMirror(task,history)
                             }
                         }
                     }
@@ -119,8 +119,9 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
                 ACTION_TASK_NEXT -> {
 
-                    TaskScheduler.getNextOrderedTask(context, currentTid) { task ->
+                    TaskScheduler.getNextOrderedTask(context, currentTid) { task, history ->
 
+/*
                         task?.let {
                             //First dismiss both locally and remotely,
                             //Don't need this anymore, we
@@ -129,13 +130,15 @@ class NotificationActionReceiver:BroadcastReceiver(){
                             //now lets show a new task on both screens
                             context.notificationShowTaskMirror(task)
                         }
+*/
                     }
                 }
 
                 ACTION_TASK_PREVIOUS ->{
 
-                    TaskScheduler.getPreviousOrderedTask(context, currentTid) { task ->
+                    TaskScheduler.getPreviousOrderedTask(context, currentTid) { task, history->
 
+/*
                         task?.let {
                             //First dismiss both locally and remotely
                             context.notificationDismissTaskMirror(currentTid)
@@ -144,6 +147,7 @@ class NotificationActionReceiver:BroadcastReceiver(){
                             context.notificationShowTaskMirror(task)
 
                         }
+*/
                     }
                 }
 

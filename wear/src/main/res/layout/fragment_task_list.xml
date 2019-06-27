@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <androidx.wear.widget.drawer.WearableDrawerLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/ic_gradient_bg"
+        android:padding="@dimen/box_inset_layout_padding"
+        tools:context=".activity.TaskListActivity"
+        tools:deviceIds="wear">
+
+        <androidx.wear.widget.WearableRecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="30dp"
+            android:paddingEnd="30dp"
+            android:id="@+id/taskListWearableRecyclerView"
+            android:nestedScrollingEnabled="true">
+        </androidx.wear.widget.WearableRecyclerView>
+
+        <androidx.wear.widget.drawer.WearableNavigationDrawerView
+            android:id="@+id/top_navigation_drawer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:navigationStyle="singlePage"
+
+            />
+        <!--        ap  p:peekView="@layout/drawer_peek_content"
+                app:peek_view="@layout/drawer_peek_content"-->
+        <!--/>-->
+
+        <!-- <androidx.wear.widget.drawer.WearableActionDrawerView
+             android:id="@+id/bottom_action_drawer"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"/>-->
+        <!-- app:actionMenu="@menu/action_drawer_menu"/> -->
+    </androidx.wear.widget.drawer.WearableDrawerLayout>
+

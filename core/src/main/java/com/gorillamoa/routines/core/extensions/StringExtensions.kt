@@ -2,6 +2,8 @@
 package com.gorillamoa.routines.core.extensions
 
 import com.gorillamoa.routines.core.data.Task
+import com.gorillamoa.routines.core.data.TaskHistory
+import java.util.*
 
 
 const val MAX_NOTIFICATION_LINE_LENGTH = 23
@@ -19,6 +21,49 @@ fun StringBuilder.stringifyTasks(tasks:List<Task>?):String{
     }
 
     addTaskLine("There are no tasks","yea")
+    return toString()
+}
+
+fun StringBuilder.stringifyHistory(tasks:TaskHistory?):String{
+//fun StringBuilder.stringifyHistory(tasks:List<TaskHistory>?):String{
+
+
+    tasks?.let{
+        val completionTime = Calendar.getInstance()
+        completionTime.timeInMillis = it.timeCompleted.time
+        addTaskLine("Date: ${completionTime.get(Calendar.DAY_OF_MONTH)}/" +
+                "${completionTime.get(Calendar.MONTH)}/" +
+                "${completionTime.get(Calendar.YEAR)} - " +
+                "${completionTime.get(Calendar.HOUR)}:" +
+                "${completionTime.get(Calendar.MINUTE)}:"+
+                "${completionTime.get(Calendar.SECOND)}" +
+                "Done: ${it.completed}",
+                "")
+    }
+
+/*
+    tasks?.let {
+        if(tasks.isEmpty()){
+            addTaskLine("There are no task history for this task!","yea")
+        } else{
+            tasks.forEach {
+                val completionTime = Calendar.getInstance()
+                completionTime.timeInMillis = it.timeCompleted.time
+                addTaskLine("Date: ${completionTime.get(Calendar.DAY_OF_MONTH)}/" +
+                        "${completionTime.get(Calendar.MONTH)}/" +
+                        "${completionTime.get(Calendar.YEAR)} - " +
+                        "${completionTime.get(Calendar.HOUR)}:" +
+                        "${completionTime.get(Calendar.MINUTE)}:"+
+                        "${completionTime.get(Calendar.SECOND)}" +
+                        "Done: ${it.completed}",
+                        "")
+            }
+        }
+        return toString()
+    }
+*/
+
+    addTaskLine("There are no task histories","yea")
     return toString()
 }
 

@@ -292,7 +292,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                 saveAlarmTimerTriggerStatus(false)
             }
 
-            com.gorillamoa.routines.core.scheduler.TaskScheduler.getNextUncompletedTask(this@TaskWatchService) { task ->
+            com.gorillamoa.routines.core.scheduler.TaskScheduler.getNextUncompletedTask(this@TaskWatchService) { task, history ->
                 foreground.configureTaskUI(task, this@TaskWatchService)
                 invalidate()
             }
@@ -621,17 +621,17 @@ class TaskWatchService : CanvasWatchFaceService() {
                     stateButtonCallback = { invalidate() },
                     leftButtonCallback = {
                         com.gorillamoa.routines.core.scheduler.TaskScheduler.getPreviousOrderedTask(this@TaskWatchService, currentTask?.id
-                                ?: 0) {
-                            foreground.configureTaskUI(it,this@TaskWatchService)
-                            currentTask = it
+                                ?: 0) { task, history ->
+                            foreground.configureTaskUI(task,this@TaskWatchService)
+                            currentTask = task
                             invalidate()
                         }
                     },
                     rightButtonCallback = {
                         com.gorillamoa.routines.core.scheduler.TaskScheduler.getNextOrderedTask(this@TaskWatchService, currentTask?.id
-                                ?: 0) {
-                            foreground.configureTaskUI(it, this@TaskWatchService)
-                            currentTask = it
+                                ?: 0) { task , history->
+                            foreground.configureTaskUI(task, this@TaskWatchService)
+                            currentTask = task
                             invalidate()
                         }
                     },

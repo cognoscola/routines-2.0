@@ -62,4 +62,8 @@ fun Context.getTaskListFragment():Fragment{
     return (applicationContext as FragmentInjectorHelper.FragmentGraphProvider).fragmentGraph.getTaskListActivityFragment()
 }
 
+fun Context.getTaskViewFragment():Fragment{
+    return (applicationContext as FragmentInjectorHelper.FragmentGraphProvider).fragmentGraph.getTaskViewFragment()
+}
+
 

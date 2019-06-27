@@ -5,4 +5,5 @@ import androidx.fragment.app.Fragment
 interface FragmentGraph{
 
     fun getTaskListActivityFragment(): Fragment
+    fun getTaskViewFragment():Fragment
 }

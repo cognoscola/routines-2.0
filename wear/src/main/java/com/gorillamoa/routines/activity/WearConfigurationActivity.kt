@@ -133,9 +133,11 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
 
         taskNotificationButton?.setOnClickListener {
-            TaskScheduler.getNextUncompletedTask(this) { task ->
+            TaskScheduler.getNextUncompletedTask(this) { task, history ->
                 task?.let {
-                    notificationShowTask(it)
+
+
+                    notificationShowTask(it,history)
                 }
             }
         }

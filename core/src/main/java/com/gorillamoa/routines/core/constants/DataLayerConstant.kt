@@ -1,6 +1,9 @@
 package com.gorillamoa.routines.core.constants
 
- class DataLayerConstant{
+import com.google.gson.reflect.TypeToken
+import com.gorillamoa.routines.core.data.TaskHistory
+
+class DataLayerConstant{
 
      companion object {
          /**
@@ -35,6 +38,7 @@ package com.gorillamoa.routines.core.constants
           * Used by, Wake, Task and Sleep notifications
           */
          const val KEY_TASK_DATA = "task_data"
+         const val KEY_TASK_HISTORY_DATA = "task_history_data"
          const val KEY_TIME = "data.time"
 
          /**
@@ -44,6 +48,8 @@ package com.gorillamoa.routines.core.constants
          const val KEY_PROGRESS_UNCOMPLETED = "progress.uncompleted"
          const val KEY_PROGRESS_COMPLETED = "progress.completed"
          const val KEY_PROGRESS_ACTIVE = "progress.isActive"
+
+
 
      }
 
