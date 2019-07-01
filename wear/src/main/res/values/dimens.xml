@@ -15,7 +15,6 @@
 
     <dimen name="picker_button_stroke_radius">10dp</dimen>
 
-
     <!-- add task dimens -->
     <dimen name="add_buttons_width">58dp</dimen>
     <dimen name="add_buttons_height">58dp</dimen>

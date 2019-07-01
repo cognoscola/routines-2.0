@@ -8,9 +8,11 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/configuration" />
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/delauney-triangulator" />
             <option value="$PROJECT_DIR$/mobile" />
+            <option value="$PROJECT_DIR$/onboard" />
             <option value="$PROJECT_DIR$/wear" />
           </set>
         </option>

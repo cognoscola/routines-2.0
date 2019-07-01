@@ -1,4 +1,4 @@
-package com.gorillamoa.routines.fragment
+package com.gorillamoa.routines.onboard.fragments
 
 import android.os.Bundle
 import android.util.Log
@@ -8,8 +8,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
-import com.gorillamoa.routines.R
-import com.gorillamoa.routines.adapter.TimePickerAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.gorillamoa.routines.onboard.R
+import com.gorillamoa.routines.onboard.adapters.TimePickerAdapter
 import kotlinx.android.synthetic.main.fragment_timepicker.*
 
 class TimePickerFragment: Fragment(){
@@ -41,44 +42,46 @@ class TimePickerFragment: Fragment(){
         Log.d("onViewCreated","Found Display Text ${arguments?.getString(DISPLAY_TEXT)}")
 
         /** populate the recycler view*/
-        buttonRecyclerView.adapter = TimePickerAdapter(12)
-        val gridLayoutManager = GridLayoutManager(context, 2)
-        gridLayoutManager.orientation = GridLayoutManager.HORIZONTAL
-        gridLayoutManager.scrollToPosition(4)
-        buttonRecyclerView.layoutManager =  gridLayoutManager
-        buttonRecyclerView.scrollToPosition(4)
-        val snapHelper = LinearSnapHelper()
-        snapHelper.attachToRecyclerView(buttonRecyclerView)
+        (buttonRecyclerView as RecyclerView).apply {
+            adapter = TimePickerAdapter(12)
+            val gridLayoutManager = GridLayoutManager(context, 2)
+            gridLayoutManager.orientation = GridLayoutManager.HORIZONTAL
+            gridLayoutManager.scrollToPosition(4)
+            layoutManager =  gridLayoutManager
+            scrollToPosition(4)
+            val snapHelper = LinearSnapHelper()
+            snapHelper.attachToRecyclerView(this@apply)
 
 
-        (buttonRecyclerView.adapter as TimePickerAdapter).apply {
-            setHourClickedCallback {
+            (adapter as TimePickerAdapter).apply {
+                setHourClickedCallback {
 
-                /**
-                 * if hour is -1 it means the user has not picked an hour,
-                 * we'll have to force minutes to be -1 and change UI
-                 * to show minutes
-                 */
-                if (hour == -1) {
-                    hour = it
-                    minute = 0
-                    setMinuteState()
+                    /**
+                     * if hour is -1 it means the user has not picked an hour,
+                     * we'll have to force minutes to be -1 and change UI
+                     * to show minutes
+                     */
+                    if (hour == -1) {
+                        hour = it
+                        minute = 0
+                        setMinuteState()
+                    }
+
+                    updatePickedText()
                 }
 
-                updatePickedText()
-            }
+                setMinuteClickedCallback {
 
-            setMinuteClickedCallback {
+                    minute = it
+                    setPhaseState(phase)
 
-                minute = it
-                setPhaseState(phase)
+                    updatePickedText()
+                }
 
-                updatePickedText()
-            }
-
-            setPhaseClickedCallback {
-                phase = it
-                updatePickedText()
+                setPhaseClickedCallback {
+                    phase = it
+                    updatePickedText()
+                }
             }
         }
 
@@ -89,7 +92,7 @@ class TimePickerFragment: Fragment(){
                 minute = 0
                 timeTextView.visibility = View.INVISIBLE
                 backwardButton.visibility = View.INVISIBLE
-                (buttonRecyclerView.adapter as TimePickerAdapter).setHourState()
+                ((buttonRecyclerView as RecyclerView).adapter as TimePickerAdapter).setHourState()
             }
         }
     }

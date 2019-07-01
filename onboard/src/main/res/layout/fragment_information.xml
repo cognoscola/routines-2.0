@@ -10,9 +10,6 @@
     android:id="@+id/infoTextView"
     tools:text="some super long text which needs to be padded etc.. This
 is an enginious layout tool"
-
-    app:boxedEdges="all"
-
     >
 
 </TextView>

@@ -1,7 +1,6 @@
 package com.gorillamoa.routines.activity
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
@@ -15,7 +14,6 @@ import com.gorillamoa.routines.core.constants.DataLayerConstant
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
-import com.gorillamoa.routines.fragment.TimePickerFragment
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_service_controller.*
 import java.util.*

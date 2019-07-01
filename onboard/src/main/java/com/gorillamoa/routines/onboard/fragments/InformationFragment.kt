@@ -1,11 +1,11 @@
-package com.gorillamoa.routines.fragment
+package com.gorillamoa.routines.onboard.fragments
 
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.gorillamoa.routines.R
+import com.gorillamoa.routines.onboard.R
 import kotlinx.android.synthetic.main.fragment_information.*
 
 class InformationFragment: OnboardFragment(){

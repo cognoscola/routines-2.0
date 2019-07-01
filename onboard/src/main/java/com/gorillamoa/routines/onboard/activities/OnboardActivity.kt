@@ -1,24 +1,20 @@
-package com.gorillamoa.routines.activity
+package com.gorillamoa.routines.onboard.activities
 
 import android.os.Bundle
 
 import android.util.Log
+import android.view.View
 import androidx.fragment.app.FragmentActivity
-import com.gorillamoa.routines.R
-import com.gorillamoa.routines.core.extensions.ACTION_TEST_WAKE_UP
-import com.gorillamoa.routines.core.extensions.alarmSetRepeatWithCal
-import com.gorillamoa.routines.core.extensions.broadcastShowWakeUpTest
-import com.gorillamoa.routines.core.extensions.setWakeTimeToCalendarAndStore
-import com.gorillamoa.routines.fragment.InformationFragment
-import com.gorillamoa.routines.fragment.SplashFragment
-import com.gorillamoa.routines.fragment.TimePickerFragment
-import kotlinx.android.synthetic.main.activity_onboard.*
+import com.gorillamoa.routines.core.extensions.*
+import com.gorillamoa.routines.onboard.R
+import com.gorillamoa.routines.onboard.fragments.InformationFragment
+import com.gorillamoa.routines.onboard.fragments.SplashFragment
+import com.gorillamoa.routines.onboard.fragments.TimePickerFragment
+import kotlinx.android.synthetic.main.activity_onboard.fragmentContainer
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
-
-
 
 /**
  * Created by Guillermo Alvarez Colman 15/02/2019
@@ -60,13 +56,11 @@ class OnboardActivity:FragmentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+        setContentView(if(isWatch())R.layout.activity_onboard_wear else R.layout.activity_onboard)
 
-        setContentView(R.layout.activity_onboard)
-
-        fragmentManager.beginTransaction()
-                .add(R.id.fragmentContainerInsetLayout, SplashFragment())
+        supportFragmentManager.beginTransaction()
+                .add(R.id.fragmentContainer, SplashFragment())
                 .commit()
-
 
         GlobalScope.launch {
 
@@ -101,9 +95,9 @@ class OnboardActivity:FragmentActivity(){
             }
             OnboardState.TEXT3 -> {
 
-                fragmentContainerInsetLayout.setOnClickListener(null)
+                (fragmentContainer as View).setOnClickListener(null)
                 supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragmentContainerInsetLayout, TimePickerFragment().apply {
+                        .replace(R.id.fragmentContainer, TimePickerFragment().apply {
 
                             arguments?.putString(TimePickerFragment.DISPLAY_TEXT,getString(R.string.onboard_wake_up_text))
                             setCallbackFunction { hour, minute,phase ->
@@ -157,7 +151,7 @@ class OnboardActivity:FragmentActivity(){
 
             Log.d("setTextFragment","making new fragment")
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragmentContainerInsetLayout,InformationFragment.newInstance(textAddress,this) ,TEXT_FRAGMENT_TAG)
+                    .replace(R.id.fragmentContainer,InformationFragment.newInstance(textAddress,this) ,TEXT_FRAGMENT_TAG)
                     .commit()
         }
     }

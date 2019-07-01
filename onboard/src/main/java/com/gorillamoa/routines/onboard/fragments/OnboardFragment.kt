@@ -1,10 +1,10 @@
-package com.gorillamoa.routines.fragment
+package com.gorillamoa.routines.onboard.fragments
 
 
 import android.content.Context
 import android.util.Log
 import androidx.fragment.app.Fragment
-import com.gorillamoa.routines.activity.OnboardActivity
+import com.gorillamoa.routines.onboard.activities.OnboardActivity
 
 open class OnboardFragment: Fragment(){
     open var forwardFunction:(()->Unit)?=null

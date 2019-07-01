@@ -1,4 +1,4 @@
-package com.gorillamoa.routines.adapter
+package com.gorillamoa.routines.onboard.adapters
 
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import android.widget.Button
-import com.gorillamoa.routines.R
+import com.gorillamoa.routines.onboard.R
 
 /**
  * An adapter which will hold maxNumber of items
