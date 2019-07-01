@@ -7,6 +7,7 @@ import java.util.*
 
 
 const val MAX_NOTIFICATION_LINE_LENGTH = 23
+const val MAX_NOTIFICATION_HISTORY_LINE_LENGTH = 26
 fun StringBuilder.stringifyTasks(tasks:List<Task>?):String{
 
     tasks?.let {
@@ -29,44 +30,51 @@ fun StringBuilder.stringifyHistory(tasks:TaskHistory?):String{
 
 
     tasks?.let{
+
+        //TODO limit the amount of lines
         val completionTime = Calendar.getInstance()
         completionTime.timeInMillis = it.timeCompleted.time
-        addTaskLine("Date: ${completionTime.get(Calendar.DAY_OF_MONTH)}/" +
+        addHistoryLine("${completionTime.get(Calendar.DAY_OF_MONTH)}/" +
                 "${completionTime.get(Calendar.MONTH)}/" +
-                "${completionTime.get(Calendar.YEAR)} - " +
-                "${completionTime.get(Calendar.HOUR)}:" +
+                "${completionTime.get(Calendar.YEAR)}",
+                "${completionTime.get(Calendar.HOUR)}:"+
                 "${completionTime.get(Calendar.MINUTE)}:"+
-                "${completionTime.get(Calendar.SECOND)}" +
-                "Done: ${it.completed}",
-                "")
+                "${completionTime.get(Calendar.SECOND)}",
+                it.completed)
+
+        addTotalLine(1,1 )
+
+    }?:run{
+        addTaskLine("There are no task histories","yea")
     }
 
-/*
-    tasks?.let {
-        if(tasks.isEmpty()){
-            addTaskLine("There are no task history for this task!","yea")
-        } else{
-            tasks.forEach {
-                val completionTime = Calendar.getInstance()
-                completionTime.timeInMillis = it.timeCompleted.time
-                addTaskLine("Date: ${completionTime.get(Calendar.DAY_OF_MONTH)}/" +
-                        "${completionTime.get(Calendar.MONTH)}/" +
-                        "${completionTime.get(Calendar.YEAR)} - " +
-                        "${completionTime.get(Calendar.HOUR)}:" +
-                        "${completionTime.get(Calendar.MINUTE)}:"+
-                        "${completionTime.get(Calendar.SECOND)}" +
-                        "Done: ${it.completed}",
-                        "")
-            }
-        }
-        return toString()
-    }
-*/
-
-    addTaskLine("There are no task histories","yea")
     return toString()
 }
 
+fun StringBuilder.addTotalLine(completed:Int, total:Int){
+
+    append("Total Points Accumulated: 1")
+
+}
+
+fun StringBuilder.addHistoryLine(historyDate:String, historyTime:String, completed:Boolean){
+
+    if(historyDate.isEmpty() or historyDate.isBlank()){
+        return
+    }
+
+    append(historyDate)
+
+    if(completed){
+        append(" At ${historyTime}")
+    }
+    else{
+        append(" Skipped")
+    }
+
+    append("<br>")
+
+}
 
 
 /**

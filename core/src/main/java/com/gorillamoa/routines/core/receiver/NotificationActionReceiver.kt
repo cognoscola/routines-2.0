@@ -5,6 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_HISTORY_DATA
+import com.gorillamoa.routines.core.coroutines.Coroutines
 
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
@@ -46,7 +49,8 @@ class NotificationActionReceiver:BroadcastReceiver(){
                     //mark the task as done.
                     //TODO DONE FUNCTION
                     if (TaskScheduler.completeTaskMirror(context, currentTid)) {
-                        val task = context.getTaskFromString(intent.getStringExtra(TASK_DATA))
+                        val task = context.getTaskFromString(intent.getStringExtra(KEY_TASK_DATA))
+                        val lastHistory = context.getHistoryFromString(intent.getStringExtra(KEY_TASK_HISTORY_DATA))
 
                         //TODO SHOW Sleep once we complete the last task
                         if (TaskScheduler.isDayComplete(context)) {
@@ -54,11 +58,16 @@ class NotificationActionReceiver:BroadcastReceiver(){
                             context.notificationShowSleepMirror()
 
                         }else{
-                            //we'll just show the same TASK if we're not done the day
-                            context.notificationShowTaskMirror(task)
+                            //we'll just show the same TASK if we're not done the day, but make
+                            //make sure to get update history information!
+                            Coroutines.ioThenMain({context.getDataRepository().getHistoryForTask(task)}){
+                                it?.let{
+                                    context.notificationShowTaskMirror(task,it.lastOrNull())
+                                }?:run{
+                                    context.notificationShowTaskMirror(task,lastHistory)
+                                }
+                            }
                         }
-                        //TODO MAKE THIS OPTIONAL
-//                        TaskScheduler.showNext(context)
                     }else{
                         Log.e("onReceive","Something wont wrong Completeing task! UH OH")
                     }
@@ -67,8 +76,9 @@ class NotificationActionReceiver:BroadcastReceiver(){
                 ACTION_TASK_UNCOMPLETE ->{
 
                     if (TaskScheduler.uncompleteTaskMirror(context, currentTid)) {
-                        val task = context.getTaskFromString(intent.getStringExtra(TASK_DATA))
-                        context.notificationShowTaskMirror(task)
+                        val task = context.getTaskFromString(intent.getStringExtra(KEY_TASK_DATA))
+                        val history = context.getHistoryFromString(intent.getStringExtra(KEY_TASK_HISTORY_DATA))
+                        context.notificationShowTaskMirror(task,history)
 
                     }else{
 

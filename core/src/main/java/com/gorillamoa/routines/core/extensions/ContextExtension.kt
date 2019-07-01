@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProviders
 import com.google.gson.Gson
 import com.gorillamoa.routines.core.data.Task
+import com.gorillamoa.routines.core.data.TaskHistory
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
 import com.gorillamoa.routines.core.views.FragmentInjectorHelper
 import com.gorillamoa.routines.core.views.RemoteInjectorHelper
@@ -38,8 +39,17 @@ fun Context.getTaskFromString(taskString:String):Task{
     return getGson().fromJson(taskString, Task::class.java)
 }
 
+//TODO fetch list instead of just one
+fun Context.getHistoryFromString(historyString:String): TaskHistory {
+    return getGson().fromJson(historyString, TaskHistory::class.java)
+}
+
 fun Context.remoteGetSmallTaskView(task: Task):RemoteViews{
     return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetSmallTaskView(task)
+}
+
+fun Context.remoteGetLargeTaskView(history:String):RemoteViews{
+    return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetLargeTaskView(history)
 }
 
 fun Context.remoteGetSmallWakeUpView(taskLength:Int):RemoteViews{

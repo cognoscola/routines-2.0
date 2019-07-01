@@ -4,7 +4,10 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_HISTORY_DATA
 import com.gorillamoa.routines.core.data.Task
+import com.gorillamoa.routines.core.data.TaskHistory
 
 import com.gorillamoa.routines.core.receiver.AlarmReceiver
 import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.EVENT_WAKEUP
@@ -20,7 +23,7 @@ import com.gorillamoa.routines.core.receiver.NotificationActionReceiver
  */
 
 public const val TASK_ID ="TaskId"
-public const val TASK_DATA = "taskDataString"
+
 
 /**
  * The user is coming from a notification. This notification is a wake-up attempt from
@@ -140,14 +143,15 @@ fun Context.createNotificationDeleteIntentForWakeUp():PendingIntent{
  * create a notification action which will mark the displayed task as done
  * @param tid is the task id of the task currently being displayed
  */
-fun Context.createNotificationActionPendingIntentForTask(task: Task?, action:String):PendingIntent{
+fun Context.createNotificationActionPendingIntentForTask(task: Task?, history: TaskHistory?, action:String):PendingIntent{
     Log.d("notificationRoutine","createNotificationActionPendingIntentForTask")
 
     val intent = Intent(this,NotificationActionReceiver::class.java)
     intent.action = action
     if (task != null) {
         intent.putExtra(TASK_ID,task.id?:-1)
-        intent.putExtra(TASK_DATA, getGson().toJson(task))
+        intent.putExtra(KEY_TASK_DATA, getGson().toJson(task))
+        intent.putExtra(KEY_TASK_HISTORY_DATA, getGson().toJson(history))
     }
 
     return PendingIntent.getBroadcast(this, task?.id?.toInt()?:-1,intent,PendingIntent.FLAG_ONE_SHOT)

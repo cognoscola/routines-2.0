@@ -6,6 +6,7 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import com.gorillamoa.routines.app.App
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.views.RemoteInjectorHelper
@@ -110,12 +111,12 @@ class MobileNotificationBehaviourReceiver: BroadcastReceiver(){
 */
                 }
                 ACTION_TASK_EXPAND->{
-                    if (intent.hasExtra(TASK_DATA)) {
+                    if (intent.hasExtra(KEY_TASK_DATA)) {
                         context.apply {
 
                             getNotificationManager().cancel(NOTIFICATION_TAG,tid)
 
-                            val task = context.getGson().fromJson(intent.getStringExtra(TASK_DATA), Task::class.java)
+                            val task = context.getGson().fromJson(intent.getStringExtra(KEY_TASK_DATA), Task::class.java)
 
                             notificationShowTask(
                                     task,

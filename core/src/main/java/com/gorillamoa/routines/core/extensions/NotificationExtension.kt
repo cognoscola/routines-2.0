@@ -27,6 +27,7 @@ import com.gorillamoa.routines.core.data.TaskHistory
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_DONE
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_SKIP_TODAY
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_NEXT
+import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_UNCOMPLETE
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_WAKE_START_DAY
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
 import com.gorillamoa.routines.core.services.DataLayerListenerService
@@ -69,7 +70,7 @@ fun Context.notificationShowWakeUp(tasks:List<Task>,
 
         if (isWatch()) {
             //TODO bring Stringbuilder from dagger()
-            setStyle(prepareBigTextStyle(StringBuilder().stringifyTasks(tasks), "Today's tasks &#128170;"))
+            setStyle(prepareBigTextStyle(StringBuilder().stringifyTasks(tasks), getHtml("Today's tasks &#128170;")))
 
             //TODO UNCOMMENT FOR WATCH
             addWakeUpAction(this@notificationShowWakeUp,"Start Day", ACTION_WAKE_START_DAY)
@@ -207,23 +208,28 @@ fun Context.notificationShowTask(task: Task,
 
         if (isWatch()) {
 
-            setStyle(prepareBigTextStyle(StringBuilder().stringifyHistory(history), "Task History"))
+            val title:Spanned
 
             if(TaskScheduler.isComplete(this@notificationShowTask, task.id!!)){
                 Log.d("notificationRoutine","notificationShowTask Task is Completed!")
-                addTaskAction(this@notificationShowTask,"Uncheck", ACTION_DONE,task)
-                setContentTitle(getHtml("<strike>${task.name}</strike>"))
+                addTaskAction(this@notificationShowTask,"Uncheck", ACTION_TASK_UNCOMPLETE,task,history)
+
+                title= getHtml("<strike>${task.name}</strike>")
             }else{
                 Log.d("notificationRoutine","notificationShowTask Task is InComplete")
 
-                setContentTitle(task.name)
+                title = getHtml(task.name)
+
                 //Mark as done
-                addTaskAction(this@notificationShowTask,"Done      ", ACTION_DONE,task)
+                addTaskAction(this@notificationShowTask,"Done      ", ACTION_DONE,task,history)
                 //Equivalent to NEXT
-                addTaskAction(this@notificationShowTask,"Delay     ", ACTION_TASK_NEXT,task)
+                addTaskAction(this@notificationShowTask,"Delay     ", ACTION_TASK_NEXT,task,history)
                 //Removes from the Queue
-                addTaskAction(this@notificationShowTask,"Skip Today", ACTION_SKIP_TODAY,task)
+                addTaskAction(this@notificationShowTask,"Skip Today", ACTION_SKIP_TODAY,task,history)
             }
+
+            setContentTitle(title)
+            setStyle(prepareBigTextStyle(StringBuilder().stringifyHistory(history), title))
 
         }else{
 
@@ -273,7 +279,9 @@ fun Context.notificationShowTaskLocal(task:Task, history:TaskHistory? = null){
             dismissable = false,
             smallRemoteView = if(!isWatch())remoteGetSmallTaskView(task)else null,
             //TODO make a big remote view for tasks
-            bigRemoteView= null
+
+            //TODO fetch builder from Dagger
+            bigRemoteView= if(!isWatch())remoteGetLargeTaskView(StringBuilder().stringifyHistory(history)) else null
             )
 }
 
@@ -334,13 +342,13 @@ fun Context.notificationDismissTaskRemote(){
  * @param actionText is the text to display on the button
  * @param action is the Intent action that will redirect to the proper functoin
  */
-fun NotificationCompat.Builder.addTaskAction(context: Context,actionText:String, action:String, task:Task){
+fun NotificationCompat.Builder.addTaskAction(context: Context,actionText:String, action:String, task:Task,history:TaskHistory?){
     Log.d("notificationRoutine","addTaskAction")
 
     addAction(NotificationCompat.Action.Builder(
             R.mipmap.ic_launcher,
             actionText,
-            context.createNotificationActionPendingIntentForTask(task, action)
+            context.createNotificationActionPendingIntentForTask(task,history, action)
     ).build())
 }
 
@@ -391,7 +399,7 @@ fun Context.notificationShowSleep(
 
 //            addTaskAction(this@notificationShowTask,"Uncheck", ACTION_DONE,task)
 
-            setStyle(prepareBigTextStyle("$completed/$total Tasks Completed!","Results:"))
+            setStyle(prepareBigTextStyle("$completed/$total Tasks Completed!",getHtml("Results:")))
         }else{
 
             smallRemoteView?.let { setCustomContentView(smallRemoteView) }
@@ -550,9 +558,9 @@ fun Context.notificationShowActivity(activity:String, int:Int){
 }
 
 
-fun prepareBigTextStyle(tasks:String,title:String):NotificationCompat.BigTextStyle{
+fun prepareBigTextStyle(tasks:String,title:Spanned):NotificationCompat.BigTextStyle{
         return NotificationCompat.BigTextStyle()
-         .setBigContentTitle(getHtml(title))
+         .setBigContentTitle(title)
          .bigText(getHtml(tasks))
 }
 
@@ -582,7 +590,7 @@ fun getHtml(htmlString:String): Spanned {
 }
 
 /**
- * retrieve the notifcation manager.
+ * retrieve the notification manager.
  */
 fun Context.getNotificationManager():NotificationManager{
     return getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

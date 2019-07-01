@@ -46,8 +46,8 @@ class App:Application(),RemoteInjectorHelper.RemoteGraphProvider, RemoteInjector
                 return this@App.getTaskRemoteView(task)
             }
 
-            override fun remoteGetLargeTaskView(taskList:String): RemoteViews {
-                return this@App.getLargeWakeUpRemoteView(taskList)
+            override fun remoteGetLargeTaskView(history:String): RemoteViews {
+                return this@App.getLargeTaskRemoteView(history)
             }
 
 

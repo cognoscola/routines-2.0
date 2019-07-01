@@ -23,7 +23,7 @@
         android:id="@+id/bigContent"
         android:layout_below="@id/title"/>
 
-<!--    <include layout="@layout/remote_group_expand_collapse"
+    <include layout="@layout/remote_group_expand_collapse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toStartOf="@+id/startGroup"/>
@@ -33,7 +33,39 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:id="@+id/startGroup"/>-->
+        android:id="@+id/startGroup"/>
+    <!--<LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        >
+
+        <Button
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="#FF333333"
+
+            android:id="@+id/start"
+            android:paddingEnd="10dp"
+            android:paddingStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="0dp"
+            />
+
+
+
+        <Button
+            android:id="@+id/edit"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingStart="10dp"
+            android:background="#FF333333" />
+    </LinearLayout>-->
 
 
 </RelativeLayout>

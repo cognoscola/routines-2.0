@@ -14,6 +14,7 @@ import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companio
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
 
 import android.graphics.Paint
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_DONE
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_UNCOMPLETE
@@ -33,6 +34,14 @@ fun Context.getLargeWakeUpRemoteView(bigStringContent: String): RemoteViews {
     return remoteViews
 }
 
+fun Context.getLargeTaskRemoteView(bigTaskContent:String):RemoteViews{
+
+    val remoteViews = RemoteViews(packageName, R.layout.remote_task_large)
+    remoteViews.setTextViewText(R.id.bigContent, getHtml(bigTaskContent))
+    return remoteViews
+
+}
+
 fun Context.setStartFunction(remoteViews: RemoteViews) {
 
         remoteViews.setOnClickPendingIntent(R.id.start, createNotificationActionPendingIntentForWakeUp(ACTION_WAKE_START_DAY))
@@ -45,7 +54,7 @@ fun RemoteViews.createFunction(context:Context, tasks:String?, action:String,tid
         tasks?.let {
             val intent = Intent(context, MobileNotificationBehaviourReceiver::class.java)
             intent.action = action
-            intent.putExtra(TASK_DATA, it)
+            intent.putExtra(KEY_TASK_DATA, it)
             val pIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
             if (tid != -1L) {
@@ -54,8 +63,6 @@ fun RemoteViews.createFunction(context:Context, tasks:String?, action:String,tid
             }else{
                 setOnClickPendingIntent(R.id.notificationContainer, pIntent)
             }
-
-
         }
 
     } catch (ignored: ClassNotFoundException) {
@@ -70,7 +77,7 @@ fun RemoteViews.createCollapseFunction(context: Context,tasks: String?):RemoteVi
         tasks?.let {
             val intent = Intent(context, MobileNotificationBehaviourReceiver::class.java)
             intent.action = ACTION_WAKEUP_COLLAPSE
-            intent.putExtra(TASK_DATA, it)
+            intent.putExtra(KEY_TASK_DATA, it)
 
             val pIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
             setOnClickPendingIntent(R.id.behaviourButton, pIntent)
@@ -107,6 +114,7 @@ fun Context.getTaskRemoteView(task:Task):RemoteViews{
     return remoteViews
 }
 
+
 fun Context.setTaskCompletionStatus(task:Task, remoteView: RemoteViews){
 
     if(TaskScheduler.isComplete(this, task.id!!)){
@@ -114,21 +122,21 @@ fun Context.setTaskCompletionStatus(task:Task, remoteView: RemoteViews){
         remoteView.setImageViewResource(R.id.statusImage,R.drawable.ic_check_box_black_24dp)
         remoteView.setInt(R.id.title, "setPaintFlags", Paint.STRIKE_THRU_TEXT_FLAG or Paint.ANTI_ALIAS_FLAG)
         //we're completed so the next Intent should "Uncomplete" the task
-        remoteView.setOnClickPendingIntent(R.id.statusButton,createNotificationActionPendingIntentForTask(task,ACTION_TASK_UNCOMPLETE))
+        remoteView.setOnClickPendingIntent(R.id.statusButton,createNotificationActionPendingIntentForTask(task,null,ACTION_TASK_UNCOMPLETE))
 
     }else{
 
         //we aren't complete so next intent should complete the task
         remoteView.setImageViewResource(R.id.statusImage,R.drawable.ic_crop_square_black_24dp)
         remoteView.setInt(R.id.title, "setPaintFlags", Paint.ANTI_ALIAS_FLAG)
-        remoteView.setOnClickPendingIntent(R.id.statusButton,createNotificationActionPendingIntentForTask(task,ACTION_DONE))
+        remoteView.setOnClickPendingIntent(R.id.statusButton,createNotificationActionPendingIntentForTask(task,null,ACTION_DONE))
     }
 }
 
 fun Context.setDirectionFunctions(task:Task,remoteView:RemoteViews){
 
-    remoteView.setOnClickPendingIntent(R.id.nextGroup,createNotificationActionPendingIntentForTask(task, ACTION_TASK_NEXT))
-    remoteView.setOnClickPendingIntent(R.id.previousGroup,createNotificationActionPendingIntentForTask(task, ACTION_TASK_PREVIOUS))
+    remoteView.setOnClickPendingIntent(R.id.nextGroup,createNotificationActionPendingIntentForTask(task, null,ACTION_TASK_NEXT))
+    remoteView.setOnClickPendingIntent(R.id.previousGroup,createNotificationActionPendingIntentForTask(task,null, ACTION_TASK_PREVIOUS))
 }
 
 fun Context.getSmallSleepView():RemoteViews{

@@ -134,7 +134,11 @@ class DataRepository(
         )
         taskdao.getTasks().forEach {
             //TODO At the start of the day, we could create task history for each task, then we don't worry about wether they exist in our db
-            taskHistoryDao.insertTaskHistory(TaskHistory(tid = it.id!!, timeCompleted = Date(),info = "LaLa",completed = false,skippedCount = 2 ))
+            taskHistoryDao.insertTaskHistory(TaskHistory(tid = it.id!!, timeCompleted = Date(),info = "LaLa1",completed = false,skippedCount = 2 ))
+            taskHistoryDao.insertTaskHistory(TaskHistory(tid = it.id!!, timeCompleted = Calendar.getInstance().run {
+                add(Calendar.HOUR,25)
+                time
+            },info = "LaLa2",completed = false,skippedCount = 1 ))
         }
     }
 
