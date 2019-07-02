@@ -7,7 +7,6 @@ import android.util.Log
 import com.gorillamoa.routines.onboard.activities.OnboardActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
-
 class MainActivity : AppCompatActivity() {
     @Suppress("unused")
     private val tag:String = MainActivity::class.java.name

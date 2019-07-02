@@ -2,6 +2,43 @@
     <string name="app_name">Routines</string>
 
     <!-- onboarding -->
+    <string name="onboard_welcome_title_00">Welcome!</string>
+    <string name="onboard_welcome_01">\nYou installed Routines because:\n
+     You want to set new or change habits for yourself\n
+        You want to change the pace of your life.\n
+        You want to drive a change within yourself.\n
+        Or perhaps you are just curious about yourself.\n
+        Is this you?\n</string>
+    <string name="onboard_welcome_02"></string>
+    <string name="onboard_welcome_03"></string>
+    <string name="onboard_welcome_04"></string>
+    <string name="onboard_welcome_05"></string>
+    <string name="onboard_welcome_06"></string>
+
+    <string name="onboard_continue">Yes</string>
+
+    <string name="onboard_welcome_10">Great! Lets get started by establishing the most important
+    task of the day: The Morning Prep.  </string>
+
+    <string name="onboard_welcome_11">Are you ready? </string>
+    <string name="onboard_ready">I\'m ready</string>
+
+
+    <string name="onboard_welcome_12">Think of Routines as a tool to help you manage your habits.
+        It is not just a habit tracker but a tool that can help you change if you
+    really want it. Remember this tip well: \n <b>Do not rely on this app, or any other app for that manner, to change
+        things for you. You must drive your own change.</b> \n
+
+    </string>
+
+    <string name="onboard_welcome_13">
+        To use this app effectively, it is important
+
+
+    </string>
+
+
+
     <string name="onboard_welcome_text_01">All majestic trees are born from tiny little seeds.</string>
     <string name="onboard_welcome_text_02">By getting started, you have picked up your seed and shovel. </string>
     <string name="onboard_welcome_text_03">Now lets plant that seed.</string>

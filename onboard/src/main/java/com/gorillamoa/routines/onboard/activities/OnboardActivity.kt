@@ -32,12 +32,10 @@ import java.util.*
 class OnboardActivity:FragmentActivity(){
 
     //TODO change the activity launcher name (what the user sees)
-
-
     private val TEXT_FRAGMENT_TAG = "textfrag"
 
     enum class OnboardState{
-        Other,
+        Splash,
         TEXT1,
         TEXT2,
         TEXT3,
@@ -47,11 +45,8 @@ class OnboardActivity:FragmentActivity(){
         Text6
     }
 
-    private var state:OnboardState = OnboardState.Other
+    private var state:OnboardState = OnboardState.Splash
 
-    companion object {
-
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -64,7 +59,7 @@ class OnboardActivity:FragmentActivity(){
 
         GlobalScope.launch {
 
-            delay(2000)
+            delay(3000)
 
             //TODO check if intent is null
             if (intent?.action == ACTION_TEST_WAKE_UP) {
@@ -81,16 +76,20 @@ class OnboardActivity:FragmentActivity(){
      */
     private fun setNextFragment(currentState:OnboardState){
         when (currentState) {
-            OnboardState.Other ->{
-                setTextFragment(R.string.onboard_welcome_text_01)
+            OnboardState.Splash ->{
+                setTextFragment(
+                        getString(R.string.onboard_welcome_title_00),
+                        getString(R.string.onboard_welcome_01),
+                        getString(R.string.onboard_continue)
+                        )
                 state = OnboardState.TEXT1
             }
             OnboardState.TEXT1 -> {
-                setTextFragment(R.string.onboard_welcome_text_02)
+//                setTextFragment(R.string.onboard_welcome_text_02)
                 state = OnboardState.TEXT2
             }
             OnboardState.TEXT2 -> {
-                setTextFragment(R.string.onboard_welcome_text_03)
+//                setTextFragment(R.string.onboard_welcome_text_03)
                 state = OnboardState.TEXT3
             }
             OnboardState.TEXT3 -> {
@@ -119,13 +118,13 @@ class OnboardActivity:FragmentActivity(){
                     delay(1000)
                     broadcastShowWakeUpTest()
                 }
-                setTextFragment(R.string.onboard_welcome_text_04)
+//                setTextFragment(R.string.onboard_welcome_text_04)
                 state = OnboardState.TEXT5
             }
 
             OnboardState.TEXT5 -> {
 
-                setTextFragment(R.string.onboard_welcome_text_05)
+//                setTextFragment(R.string.onboard_welcome_text_05)
                 state = OnboardState.Text6
                 //TODO save state
             }
@@ -136,22 +135,24 @@ class OnboardActivity:FragmentActivity(){
      * Show a fragment that contains a single text
      * @param textAddress is the ID of the string of text to display
      */
-    private fun setTextFragment(textAddress:Int){
+    private fun setTextFragment(title:String, description:String, action:String){
 
         /** check if we're not already displaying the fragment, if yes just update the text,
          * otherwise pass the address to its arguments**/
-        val textFrag = fragmentManager.findFragmentByTag(TEXT_FRAGMENT_TAG)
+        val textFrag = supportFragmentManager.findFragmentByTag(TEXT_FRAGMENT_TAG)
         Log.d("setTextFragment","checking existence")
         if ((textFrag != null)) {
             if (textFrag.isVisible) {
                 Log.d("setTextFragment","Fragment was found")
-                (textFrag as InformationFragment).updateText(textAddress)
+                (textFrag as InformationFragment).updateText(title,description,action)
             }
         }else{
 
             Log.d("setTextFragment","making new fragment")
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragmentContainer,InformationFragment.newInstance(textAddress,this) ,TEXT_FRAGMENT_TAG)
+                    .replace(R.id.fragmentContainer,InformationFragment.newInstance(
+                            title,description,action
+                    ) ,TEXT_FRAGMENT_TAG)
                     .commit()
         }
     }

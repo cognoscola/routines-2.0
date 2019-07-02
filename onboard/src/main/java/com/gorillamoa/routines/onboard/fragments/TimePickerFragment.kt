@@ -17,7 +17,7 @@ class TimePickerFragment: Fragment(){
 
     /**
      * If the value is -1 it means the user hasn't chosen yet or undid his choice
-     * all Other values means that the user has picked a time
+     * all Splash values means that the user has picked a time
      */
     private var hour = -1
     private var minute = 0

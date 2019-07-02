@@ -2,13 +2,15 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center">
+    android:layout_gravity="center"
+    android:background="@color/onboard_background_color">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="Splash"
         android:gravity="center"
+        android:textColor="@color/onboard_text_color"
         />
 
 </FrameLayout>

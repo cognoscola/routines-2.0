@@ -1,6 +1,6 @@
 package com.gorillamoa.routines.onboard.fragments
 
-import android.content.Context
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,15 +22,21 @@ class InformationFragment: OnboardFragment(){
         view?.setOnClickListener {
             forwardFunction?.invoke()
         }
+
+        welcomeTitleTextView?.text = resources.getString(R.string.onboard_welcome_title_00)
     }
 
-    fun updateText(IDofValue: Int){
-        infoTextView.text = resources.getString(IDofValue)?:
-                resources.getString(R.string.info_oops_string)
+    fun updateText(title:String, content:String, action:String){
+        infoTextView.text = content
+        welcomeTitleTextView.text = title
+        actionButton.text = action
     }
 
     companion object {
 
+        const val KEY_TITLE = "key_title"
+        const val KEY_CONTENT = "key_content"
+        const val KEY_ACTION = "key_action"
         private val instance by lazy { InformationFragment() }
 
         /**
@@ -38,11 +44,12 @@ class InformationFragment: OnboardFragment(){
          * the text we'd like to show.
          * @param IDofValue of the text to show
          */
-        fun newInstance(IDofValue:Int, context: Context) = instance.apply {
+        fun newInstance(title:String,content:String, action:String) = instance.apply {
 
             this.arguments = Bundle(1).apply {
-                putString(context.resources.getString(R.string.info_argument_key),
-                        context.resources.getString(IDofValue))
+                putString(KEY_TITLE, title)
+                putString(KEY_CONTENT, content)
+                putString(KEY_ACTION, action)
             }
         }
     }
