@@ -4,11 +4,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
 
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
-
-
 
 /**
  * What to do when our app sounds the "wake up" alarm.
@@ -72,16 +71,7 @@ class AlarmReceiver:BroadcastReceiver(){
 
                 ACTION_ONBOARD ->{
 
-                    //TODO FIX THIS
-                    //TODO bring th string builder from dagger
-/*
-                    context.notificationShowWakeUp(StringBuilder().apply {
-                        addTaskLine("Plant Seed", "0/1") }.toString()
-                    ,context.createNotificationMainIntentForOnboarding(
-                            //TODO LAUNCH VIA INTENT FILTER NAME instead of class name
-                            "com.gorillamoa.routines.activity.OnboardActivity"
-                    ))
-*/
+
                 }
 
                 EVENT_WAKEUP -> {

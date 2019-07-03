@@ -7,4 +7,6 @@
 
     <dimen name="picker_button_stroke_radius">10dp</dimen>
     <dimen name="picker_button_stroke_radius_addtask">40dp</dimen>
+
+    <dimen name="picker_title_text_size">20sp</dimen>
 </resources>

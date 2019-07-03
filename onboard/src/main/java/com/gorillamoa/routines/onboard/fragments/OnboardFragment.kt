@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import com.gorillamoa.routines.onboard.activities.OnboardActivity
 
 open class OnboardFragment: Fragment(){
-    open var forwardFunction:(()->Unit)?=null
+    open var forwardFunction:((argument:Int)->Unit)?=null
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)

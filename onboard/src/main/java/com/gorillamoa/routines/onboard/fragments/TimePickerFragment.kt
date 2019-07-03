@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.gorillamoa.routines.core.extensions.isWatch
 import com.gorillamoa.routines.onboard.R
 import com.gorillamoa.routines.onboard.adapters.TimePickerAdapter
 import kotlinx.android.synthetic.main.fragment_timepicker.*
@@ -29,7 +30,24 @@ class TimePickerFragment: Fragment(){
         const val MIN = "MIN"
         const val PHASE =  "PHS"
 
+        private val instance by lazy { TimePickerFragment() }
+
+        /**
+         * Get a new instance of this fragment, passing the address of
+         * the text we'd like to show.
+         * @param IDofValue of the text to show
+         */
+        fun newInstance(title:String) = instance.apply {
+
+            this.arguments = Bundle(1).apply {
+                putString(DISPLAY_TEXT, title)
+
+            }
+        }
+
     }
+
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_timepicker,container,false)
@@ -101,7 +119,7 @@ class TimePickerFragment: Fragment(){
         val phase = if (phase == 0) "am" else "pm"
 
         val textToShow = if (minute == 0) {
-            "$hour$phase"
+            if(context?.isWatch()==true)"$hour$phase" else "$hour $phase"
         }else{
             "$hour:${String.format("%02d", minute)}$phase"
         }

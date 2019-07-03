@@ -113,12 +113,25 @@ class NotificationActionReceiver:BroadcastReceiver(){
                 }
                 ACTION_WAKE_START_DAY-> {
 
+
+
                     context.apply {
-                        TaskScheduler.approveMirror(context)
-                        TaskScheduler.getNextUncompletedTask(this@apply) { task,history ->
-                            task?.let {
-                                notificationShowTaskMirror(task,history)
+
+                        if (!getOnboardStatus()) {
+                            TaskScheduler.approveMirror(context)
+                            TaskScheduler.getNextUncompletedTask(this@apply) { task,history ->
+                                task?.let {
+                                    notificationShowTaskMirror(task,history)
+                                }
                             }
+                        }else{
+
+                            //we go back to the Onboard Page
+
+                            val c = Class.forName("com.gorillamoa.routines.onboard.activities.OnboardActivity")
+                            val intent = Intent(this, c)
+                            intent.action = ACTION_TEST_WAKE_UP
+                            context.startActivity(intent)
                         }
                     }
                 }

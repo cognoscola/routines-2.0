@@ -8,7 +8,6 @@
     android:textAlignment="center"
     android:id="@+id/timeButton"
 
-    android:textColor="@color/onboard_text_color"
     tools:text="3"
     tools:gravity="center"
     tools:layout_gravity="center">

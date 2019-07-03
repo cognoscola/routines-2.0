@@ -38,7 +38,7 @@
         app:layout_constraintStart_toStartOf="@id/background"
         app:layout_constraintTop_toBottomOf="@id/welcomeTitleTextView"
         tools:context=".activities.OnboardActivity"
-        tools:text="@string/onboard_welcome_01"/>
+        tools:text="@string/onboard_welcome_04"/>
 
     <Button
         android:layout_width="200dp"
@@ -46,9 +46,21 @@
         app:layout_constraintTop_toBottomOf="@id/infoTextView"
         app:layout_constraintEnd_toEndOf="@id/background"
         app:layout_constraintStart_toStartOf="@id/background"
-        app:layout_constraintBottom_toBottomOf="@id/background"
-        android:id="@+id/actionButton"
+        app:layout_constraintBottom_toTopOf="@id/actionButtonTwo"
+        android:id="@+id/actionButtonOne"
         tools:text="I'm ready!"
+        android:textColor="@color/onboard_text_button_color"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        app:layout_constraintTop_toBottomOf="@id/actionButtonOne"
+        app:layout_constraintEnd_toEndOf="@id/background"
+        app:layout_constraintStart_toStartOf="@id/background"
+        app:layout_constraintBottom_toBottomOf="@id/background"
+        android:id="@+id/actionButtonTwo"
+        tools:text="@string/onboard_choice_02_04"
         android:textColor="@color/onboard_text_button_color"
         />
 

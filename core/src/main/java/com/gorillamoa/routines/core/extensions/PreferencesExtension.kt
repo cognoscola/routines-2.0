@@ -40,6 +40,8 @@ private const val IS_ACTIVE = "isActive" //wether the app is currently working o
 
 private const val KEY_TASK_VISIBLE ="taskShowing"
 
+private const val ONBOARDING = "isOnboarding"
+
 
 fun Context.getLocalSettings():SharedPreferences{
     //later investigate cost of retrieving shared preferences
@@ -358,6 +360,14 @@ fun Context.EnableScheduler(){
 
 fun Context.DisableScheduler(){
     getLocalSettings().edit().putBoolean(IS_ACTIVE,false).apply()
+}
+
+fun Context.saveOnboardStatus(onboarding:Boolean){
+    getLocalSettings().edit().putBoolean(ONBOARDING,onboarding).apply()
+}
+
+fun Context.getOnboardStatus():Boolean{
+    return getLocalSettings().getBoolean(ONBOARDING, false)
 }
 
 fun Context.saveAllLists(order:String, uncompleted:String, completed:String){

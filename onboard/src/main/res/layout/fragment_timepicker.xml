@@ -12,7 +12,13 @@
             android:id="@+id/displayText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/onboard_default_text" />
+            android:textColor="@color/onboard_text_color"
+            android:text="@string/onboard_default_text"
+            android:textSize="@dimen/picker_title_text_size"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="40dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
@@ -26,6 +32,9 @@
 
         </androidx.recyclerview.widget.RecyclerView>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="40dp"/>
 
         <LinearLayout
             android:layout_marginTop="5dp"
@@ -42,7 +51,7 @@
                     android:visibility="invisible"/>
 
                 <View
-                    android:layout_width="5dp"
+                    android:layout_width="20dp"
                     android:layout_height="match_parent"/>
 
                 <TextView
@@ -55,8 +64,9 @@
                     android:gravity="center"
                     android:visibility="invisible"
                     tools:visibility="visible"
-                    tools:text="12:54pm"
+                    tools:text="12:54 pm"
                     android:lines="1"
+                    android:textColor="@color/onboard_text_color"
                     android:background="@drawable/picker_button_selector"
                     android:drawableEnd="@drawable/ic_done_black_24dp"/>
 

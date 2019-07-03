@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.FragmentActivity
+import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.onboard.R
 import com.gorillamoa.routines.onboard.fragments.InformationFragment
@@ -39,8 +40,8 @@ class OnboardActivity:FragmentActivity(){
         TEXT1,
         TEXT2,
         PickTime,
+        TEXT3,
         TEXT4,
-        TEXT5,
         Text6
     }
 
@@ -56,17 +57,19 @@ class OnboardActivity:FragmentActivity(){
                 .add(R.id.fragmentContainer, SplashFragment())
                 .commit()
 
+
         GlobalScope.launch {
 
             delay(3000)
 
             //TODO check if intent is null
             if (intent?.action == ACTION_TEST_WAKE_UP) {
-                state = OnboardState.TEXT5
+                state = OnboardState.TEXT3
             }
             setNextFragment(state)
         }
     }
+
 
 
     /**
@@ -75,19 +78,19 @@ class OnboardActivity:FragmentActivity(){
      */
     private fun setNextFragment(currentState:OnboardState){
         when (currentState) {
-            OnboardState.Splash ->{
+            OnboardState.Splash -> {
                 setTextFragment(
                         getString(R.string.onboard_welcome_title_00),
                         getString(R.string.onboard_welcome_01),
-                        getString(R.string.onboard_continue)
-                        )
+                        getString(R.string.onboard_continue), null
+                )
                 state = OnboardState.TEXT1
             }
             OnboardState.TEXT1 -> {
                 setTextFragment(
                         getString(R.string.onboard_welcome_title_00),
                         getString(R.string.onboard_welcome_02),
-                        getString(R.string.onboard_ready)
+                        getString(R.string.onboard_ready), null
                 )
                 state = OnboardState.TEXT2
             }
@@ -95,15 +98,15 @@ class OnboardActivity:FragmentActivity(){
 
                 (fragmentContainer as View).setOnClickListener(null)
                 supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragmentContainer, TimePickerFragment().apply {
+                        .replace(R.id.fragmentContainer, TimePickerFragment.newInstance(getString(R.string.onboard_wake_up_text)).apply {
 
-                            arguments?.putString(TimePickerFragment.DISPLAY_TEXT,getString(R.string.onboard_wake_up_text))
-                            setCallbackFunction { hour, minute,phase ->
-
-                                getForwardFunction().invoke()
+                            setCallbackFunction { hour, minute, phase ->
+                                getForwardFunction().invoke(0)
                                 val cal = Calendar.getInstance()
-                                setWakeTimeToCalendarAndStore(cal, hour, minute,phase)
-                                alarmSetRepeatWithCal(cal,true)
+                                setWakeTimeToCalendarAndStore(cal, hour, minute, phase)
+                                alarmSetRepeatWithCal(cal, true)
+
+                                setNextFragment(state)
                             }
                         })
                         .commit()
@@ -112,18 +115,65 @@ class OnboardActivity:FragmentActivity(){
             }
             OnboardState.PickTime -> {
 
+                setTextFragment(
+                        getString(R.string.onboard_title_03),
+                        getString(R.string.onboard_welcome_03),
+                        null, null
+                )
+
                 GlobalScope.launch {
                     delay(1000)
-                    broadcastShowWakeUpTest()
+
+
+                    //TODO FIX THIS
+                    //TODO bring th string builder from dagger
+
+                    //create an onboard task
+                    val dummyArrray = ArrayList<Task>()
+                    dummyArrray.add(Task(
+                            name = "This is my first task in the future!"
+                    ))
+                    dummyArrray.add(Task(
+                            name = "2nd task in the future!"
+                    ))
+                    dummyArrray.add(Task(
+                            name = "And so on..."
+                    ))
+                    dummyArrray.add(Task(
+                            name = "<b>Click Start to Finish!</b>"
+                    ))
+
+
+                    notificationShowWakeUp(
+                            dummyArrray,
+                            mainPendingIntent = null,
+                            dismissPendingIntent = null,
+                            //TODO dismissing the onboard should go back to the information fragment to displau to user to try again
+//                            dismissPendingIntent = createNotificationDeleteIntentForWakeUp(),
+                            //TODO CHECK IF WE SHOULD ALLOW DISMISSAL with stubborn settings
+                            dismissable = false,
+                            //TODO get the actual task length
+                            smallRemoteView = if (!isWatch()) remoteGetSmallWakeUpView(dummyArrray.size) else null,
+                            //TODO Get stringbuilder from dagger singleton
+                            bigRemoteView = if (!isWatch()) remoteGetLargeWakeUpView(StringBuilder().stringifyTasks(dummyArrray)) else null
+                    )
+
+                    saveOnboardStatus(true)
                 }
+
 //                setTextFragment(R.string.onboard_welcome_text_04)
-                state = OnboardState.TEXT5
+                state = OnboardState.TEXT3
             }
 
-            OnboardState.TEXT5 -> {
+            OnboardState.TEXT3 -> {
 
-//                setTextFragment(R.string.onboard_welcome_text_05)
-                state = OnboardState.Text6
+                setTextFragment(
+                        getString(R.string.onboard_title_03),
+                        getString(R.string.onboard_welcome_04),
+                        getString(R.string.onboard_choice_01_04),
+                        getString(R.string.onboard_choice_02_04)
+                )
+                state = OnboardState.TEXT4
                 //TODO save state
             }
         }
@@ -133,7 +183,7 @@ class OnboardActivity:FragmentActivity(){
      * Show a fragment that contains a single text
      * @param textAddress is the ID of the string of text to display
      */
-    private fun setTextFragment(title:String, description:String, action:String){
+    private fun setTextFragment(title:String, description:String, actionOne:String?, actionTwo:String?){
 
         /** check if we're not already displaying the fragment, if yes just update the text,
          * otherwise pass the address to its arguments**/
@@ -142,14 +192,14 @@ class OnboardActivity:FragmentActivity(){
         if ((textFrag != null)) {
             if (textFrag.isVisible) {
                 Log.d("setTextFragment","Fragment was found")
-                (textFrag as InformationFragment).updateText(title,description,action)
+                (textFrag as InformationFragment).updateText(title,description,actionOne,actionTwo)
             }
         }else{
 
             Log.d("setTextFragment","making new fragment")
             supportFragmentManager.beginTransaction()
                     .replace(R.id.fragmentContainer,InformationFragment.newInstance(
-                            title,description,action
+                            title,description,actionOne,actionTwo
                     ) ,TEXT_FRAGMENT_TAG)
                     .commit()
         }
@@ -159,5 +209,12 @@ class OnboardActivity:FragmentActivity(){
         setNextFragment(state)
     }
 
-    fun getForwardFunction() = { nextState() }
+    fun getForwardFunction() = { argument:Int ->
+
+        if (state == OnboardState.TEXT4) {
+            //capture the argument
+        }
+
+        nextState()
+    }
 }
