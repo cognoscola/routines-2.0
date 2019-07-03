@@ -112,7 +112,7 @@ class TimePickerFragment: Fragment(){
 
     private var callbackFunction:((Int,Int,Int)->Any?)? = null
 
-    fun setCallbackFunction(callback:(Int, Int,Int) ->Any?){
+    fun setCallbackFunction(callback:(hour:Int, minute:Int,phase:Int) ->Any?){
         callbackFunction = callback
 
     }

@@ -38,7 +38,6 @@ class OnboardActivity:FragmentActivity(){
         Splash,
         TEXT1,
         TEXT2,
-        TEXT3,
         PickTime,
         TEXT4,
         TEXT5,
@@ -85,14 +84,14 @@ class OnboardActivity:FragmentActivity(){
                 state = OnboardState.TEXT1
             }
             OnboardState.TEXT1 -> {
-//                setTextFragment(R.string.onboard_welcome_text_02)
+                setTextFragment(
+                        getString(R.string.onboard_welcome_title_00),
+                        getString(R.string.onboard_welcome_02),
+                        getString(R.string.onboard_ready)
+                )
                 state = OnboardState.TEXT2
             }
             OnboardState.TEXT2 -> {
-//                setTextFragment(R.string.onboard_welcome_text_03)
-                state = OnboardState.TEXT3
-            }
-            OnboardState.TEXT3 -> {
 
                 (fragmentContainer as View).setOnClickListener(null)
                 supportFragmentManager.beginTransaction()
@@ -111,7 +110,6 @@ class OnboardActivity:FragmentActivity(){
                 state = OnboardState.PickTime
 
             }
-
             OnboardState.PickTime -> {
 
                 GlobalScope.launch {

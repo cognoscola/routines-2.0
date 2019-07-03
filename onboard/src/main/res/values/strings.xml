@@ -3,13 +3,20 @@
 
     <!-- onboarding -->
     <string name="onboard_welcome_title_00">Welcome!</string>
-    <string name="onboard_welcome_01">\nYou installed Routines because:\n
-     You want to set new or change habits for yourself\n
-        You want to change the pace of your life.\n
-        You want to drive a change within yourself.\n
-        Or perhaps you are just curious about yourself.\n
+    <string name="onboard_welcome_01">\nYou installed Routines because:\n\n\n\n
+     &#9999; You want to set new or change your habits \n
+     &#9999; You want to change the pace of your life.\n
+     &#9999; You want to drive a change within yourself.\n
+        &#9999; Perhaps you are just curious about yourself.\n\n\n
         Is this you?\n</string>
-    <string name="onboard_welcome_02"></string>
+    <string name="onboard_welcome_02">
+        Great! Lets get started by establishing the most important
+    task of the day:\n\n The Morning Planner.\n\n
+
+         Are you ready?
+
+
+    </string>
     <string name="onboard_welcome_03"></string>
     <string name="onboard_welcome_04"></string>
     <string name="onboard_welcome_05"></string>
@@ -17,8 +24,7 @@
 
     <string name="onboard_continue">Yes</string>
 
-    <string name="onboard_welcome_10">Great! Lets get started by establishing the most important
-    task of the day: The Morning Prep.  </string>
+    <string name="onboard_welcome_10"></string>
 
     <string name="onboard_welcome_11">Are you ready? </string>
     <string name="onboard_ready">I\'m ready</string>

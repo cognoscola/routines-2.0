@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.gorillamoa.routines.core.extensions.getHtml
 import com.gorillamoa.routines.onboard.R
 import kotlinx.android.synthetic.main.fragment_information.*
 
@@ -17,13 +18,13 @@ class InformationFragment: OnboardFragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        infoTextView.text = arguments?.getString(resources.getString(R.string.info_argument_key))?:
+        infoTextView.text = arguments?.getString(KEY_CONTENT)?:
                 resources.getString(R.string.info_oops_string)
-        view?.setOnClickListener {
+        welcomeTitleTextView?.text = getHtml(arguments?.getString(KEY_TITLE)?:resources.getString(R.string.info_oops_string))
+        actionButton?.setText(arguments?.getString(KEY_ACTION))
+        actionButton?.setOnClickListener {
             forwardFunction?.invoke()
         }
-
-        welcomeTitleTextView?.text = resources.getString(R.string.onboard_welcome_title_00)
     }
 
     fun updateText(title:String, content:String, action:String){

@@ -6,6 +6,7 @@
     <color name="picker_stroke">#AAAAAA</color>
     <color name="picker_press_fill">#888888</color>
     <color name="onboard_text_color">#888888</color>
+    <color name="onboard_text_button_color">#1D1D1D</color>
 
 
 </resources>

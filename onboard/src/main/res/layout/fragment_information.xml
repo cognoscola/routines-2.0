@@ -7,7 +7,7 @@
     android:layout_gravity="center"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="30dp"
+    android:padding="10dp"
     android:id="@+id/background">
 
     <TextView
@@ -16,25 +16,23 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:textSize="30sp"
+        android:textColor="@color/onboard_text_color"
         app:layout_constraintEnd_toEndOf="@id/background"
         app:layout_constraintStart_toStartOf="@id/background"
-
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Welcome!" />
 
     <TextView
         android:id="@+id/infoTextView"
         android:layout_width="match_parent"
-
         android:layout_height="wrap_content"
-
         android:layout_gravity="center"
         android:layout_marginBottom="8dp"
-
         android:gravity="center"
         android:padding="10dp"
         android:textAlignment="center"
         android:textSize="15sp"
+        android:textColor="@color/onboard_text_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/background"
         app:layout_constraintStart_toStartOf="@id/background"
@@ -44,12 +42,14 @@
 
     <Button
         android:layout_width="200dp"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         app:layout_constraintTop_toBottomOf="@id/infoTextView"
         app:layout_constraintEnd_toEndOf="@id/background"
         app:layout_constraintStart_toStartOf="@id/background"
         app:layout_constraintBottom_toBottomOf="@id/background"
         android:id="@+id/actionButton"
+        tools:text="I'm ready!"
+        android:textColor="@color/onboard_text_button_color"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

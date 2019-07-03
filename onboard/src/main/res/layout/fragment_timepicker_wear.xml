@@ -14,7 +14,7 @@
             android:layout_height="wrap_content"
             android:text="@string/onboard_default_text" />
 
-        <androidx.recyclerview.widget.RecyclerView
+        <androidx.wear.widget.WearableRecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:layout_height="100dp"
@@ -24,7 +24,7 @@
             android:nestedScrollingEnabled="true"
             android:layout_gravity="center">
 
-        </androidx.recyclerview.widget.RecyclerView>
+        </androidx.wear.widget.WearableRecyclerView>
 
 
         <LinearLayout
