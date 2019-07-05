@@ -1,4 +1,4 @@
-package com.gorillamoa.routines.notifications
+package com.gorillamoa.routines.notifications.impl
 
 import android.app.Notification
 import android.app.NotificationManager

@@ -144,6 +144,7 @@ class OnboardActivity:FragmentActivity(){
                     ))
 
 
+
                     notificationShowWakeUp(
                             dummyArrray,
                             mainPendingIntent = null,

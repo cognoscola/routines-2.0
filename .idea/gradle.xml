@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/delauney-triangulator" />
             <option value="$PROJECT_DIR$/mobile" />
             <option value="$PROJECT_DIR$/notifications" />
+            <option value="$PROJECT_DIR$/notificationsimpl" />
             <option value="$PROJECT_DIR$/onboard" />
             <option value="$PROJECT_DIR$/tools" />
             <option value="$PROJECT_DIR$/wear" />
