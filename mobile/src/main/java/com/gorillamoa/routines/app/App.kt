@@ -9,29 +9,28 @@ import android.os.Build
 import android.widget.RemoteViews
 import com.google.gson.Gson
 import com.gorillamoa.routines.*
-import com.gorillamoa.routines.core.data.Task
+
 import com.gorillamoa.routines.core.extensions.NOTIFICATION_CHANNEL_ONE
 import com.gorillamoa.routines.core.extensions.NOTIFICATION_CHANNEL_TWO
-import com.gorillamoa.routines.core.extensions.remoteGetLargeSleepView
-import com.gorillamoa.routines.core.views.RemoteViewGraph
-import com.gorillamoa.routines.core.views.RemoteInjectorHelper
+import com.gorillamoa.routines.notifications.RemoteInjectorHelper
+import com.gorillamoa.routines.notifications.RemoteViewGraph
 
 
 /**
  * We'll configure notification channels every time the app starts
  */
-class App:Application(),RemoteInjectorHelper.RemoteGraphProvider, RemoteInjectorHelper.RemoteGsonProvider
+class App:Application(), RemoteInjectorHelper.RemoteGraphProvider, RemoteInjectorHelper.RemoteGsonProvider
 {
 
     lateinit var graph:AppComponent
 
-    override val remoteViewGraph:RemoteViewGraph
+    override val remoteViewGraph: RemoteViewGraph
         get() = graph
 
 
-    override fun getGson():Gson {
-        return gsonObject
-    }
+//    override fun getGson():Gson {
+//        return gsonObject
+//    }
 
     private val gsonObject by lazy {
         return@lazy Gson()
@@ -39,10 +38,9 @@ class App:Application(),RemoteInjectorHelper.RemoteGraphProvider, RemoteInjector
 
     override fun onCreate() {
         super.onCreate()
-
         graph = object:AppComponent{
 
-            override fun remoteGetSmallTaskView(task: Task): RemoteViews {
+            override fun remoteGetSmallTaskView(task: String): RemoteViews {
                 return this@App.getTaskRemoteView(task)
             }
 
@@ -67,6 +65,7 @@ class App:Application(),RemoteInjectorHelper.RemoteGraphProvider, RemoteInjector
                 return this@App.getSmallSleepView()
             }
         }
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 

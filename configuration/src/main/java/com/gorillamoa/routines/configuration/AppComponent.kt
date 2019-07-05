@@ -1,4 +1,4 @@
-package com.gorillamoa.routines.app
+package com.gorillamoa.routines.configuration
 
 import com.gorillamoa.routines.notifications.RemoteViewGraph
 

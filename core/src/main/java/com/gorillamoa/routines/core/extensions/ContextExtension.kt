@@ -14,7 +14,6 @@ import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.data.TaskHistory
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
 import com.gorillamoa.routines.core.views.FragmentInjectorHelper
-import com.gorillamoa.routines.core.views.RemoteInjectorHelper
 
 fun FragmentActivity.connectAndLoadViewModel():TaskViewModel{
 
@@ -31,8 +30,9 @@ fun Context.isWatch():Boolean{
 }
 
 fun Context.getGson(): Gson {
-
-    return (applicationContext as RemoteInjectorHelper.RemoteGsonProvider).getGson()
+//TODO provide GSON with dagger
+//    return (applicationContext as RemoteInjectorHelper.RemoteGsonProvider).getGson()
+    return Gson()
 }
 
 fun Context.getTaskFromString(taskString:String):Task{
@@ -44,29 +44,6 @@ fun Context.getHistoryFromString(historyString:String): TaskHistory {
     return getGson().fromJson(historyString, TaskHistory::class.java)
 }
 
-fun Context.remoteGetSmallTaskView(task: Task):RemoteViews{
-    return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetSmallTaskView(task)
-}
-
-fun Context.remoteGetLargeTaskView(history:String):RemoteViews{
-    return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetLargeTaskView(history)
-}
-
-fun Context.remoteGetSmallWakeUpView(taskLength:Int):RemoteViews{
-    return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetSmallWakeUpView(taskLength)
-}
-
-fun Context.remoteGetLargeWakeUpView(tasks:String):RemoteViews{
-    return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetLargeWakeUpView(tasks)
-}
-
-fun Context.remoteGetSmallSleepView():RemoteViews{
-    return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetSmallSleepView()
-}
-
-fun Context.remoteGetLargeSleepView():RemoteViews{
-    return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetLargeSleepView()
-}
 
 fun Context.getTaskListFragment():Fragment{
     return (applicationContext as FragmentInjectorHelper.FragmentGraphProvider).fragmentGraph.getTaskListActivityFragment()

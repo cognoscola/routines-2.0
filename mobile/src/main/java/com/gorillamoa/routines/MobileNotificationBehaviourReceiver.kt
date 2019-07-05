@@ -5,11 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import com.gorillamoa.routines.app.App
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
-import com.gorillamoa.routines.core.views.RemoteInjectorHelper
 
 /**
  * This class exists because we wish to modify how to the noficiation will behave on

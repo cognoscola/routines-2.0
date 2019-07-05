@@ -1,4 +1,4 @@
-package com.gorillamoa.routines
+package com.gorillamoa.routines.notifications
 
 import android.app.PendingIntent
 import android.content.Context
@@ -100,7 +100,9 @@ fun Context.getWakeupRemoteView(taskLength:Int): RemoteViews {
     return remoteViews
 }
 
-fun Context.getTaskRemoteView(task:Task):RemoteViews{
+fun Context.getTaskRemoteView(task:String):RemoteViews{
+
+
     val remoteViews = RemoteViews(packageName, R.layout.remote_task)
     remoteViews.setTextViewText(R.id.title, task.name)
     remoteViews.setTextViewText(R.id.description, task.description)

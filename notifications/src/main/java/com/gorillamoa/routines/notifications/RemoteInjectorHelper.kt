@@ -1,7 +1,7 @@
-package com.gorillamoa.routines.core.views
+package com.gorillamoa.routines.notifications
 
 import android.app.Application
-import com.google.gson.Gson
+//import com.google.gson.Gson
 
 class RemoteInjectorHelper{
 
@@ -21,6 +21,6 @@ class RemoteInjectorHelper{
     }
 
     interface RemoteGsonProvider{
-        fun getGson():Gson
+//        fun getGson():Gson
     }
 }

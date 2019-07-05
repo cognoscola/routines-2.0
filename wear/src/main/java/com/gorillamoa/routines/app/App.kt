@@ -12,7 +12,6 @@ import com.gorillamoa.routines.core.extensions.NOTIFICATION_CHANNEL_ONE
 import com.gorillamoa.routines.core.extensions.NOTIFICATION_CHANNEL_TWO
 import com.gorillamoa.routines.core.views.FragmentGraph
 import com.gorillamoa.routines.core.views.FragmentInjectorHelper
-import com.gorillamoa.routines.core.views.RemoteInjectorHelper
 import com.gorillamoa.routines.fragment.TaskListFragment
 import com.gorillamoa.routines.fragment.TaskViewFragment
 

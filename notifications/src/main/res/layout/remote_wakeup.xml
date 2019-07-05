@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:padding="9dp"
+    android:background="@color/notification_bg_color"
+    android:id="@+id/notificationContainer"
+    android:gravity="center_vertical"
+    >
+<LinearLayout
+
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="64dp"
+    android:layout_centerVertical="true"
+
+    >
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:id="@+id/title"
+        tools:text="Good morning!"
+        android:gravity="center_vertical"
+        android:textColor="@color/notification_title_text_color"
+        android:textSize="@dimen/notification_title_text_size"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/description"
+        android:textColor="@color/notification_description_text_color"
+        android:textSize="@dimen/notification_description_text_size"
+        tools:text="See Today's Schedule"/>
+
+</LinearLayout>
+
+  <!--  <include layout="@layout/remote_group_expand_collapse"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_toStartOf="@+id/startGroup"/>-->
+
+
+    <include layout="@layout/remote_group_start_edit"
+        android:layout_height="64dp"
+        android:layout_width="wrap_content"
+        android:layout_alignParentEnd="true"
+
+        android:id="@+id/startGroup"
+        android:layout_centerVertical="true"
+        />
+</RelativeLayout>

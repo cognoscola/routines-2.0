@@ -1,4 +1,4 @@
-package com.gorillamoa.routines.core.extensions
+package com.gorillamoa.routines.notifications
 
 import android.app.PendingIntent
 import android.content.Context

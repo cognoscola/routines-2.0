@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:id="@+id/start">
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:id="@+id/startImage"
+            android:src="@mipmap/ic_launcher"
+            android:layout_gravity="center_horizontal"
+            />
+
+        <TextView
+            android:gravity="center_horizontal"
+            android:layout_width="@dimen/button_text_width"
+            android:layout_height="wrap_content"
+            tools:text="start"
+            android:id="@+id/startText"
+            android:text="@string/notification_start"
+            android:textSize="@dimen/notification_button_text_size"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@color/notification_button_text_color"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:id="@+id/edit">
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:id="@+id/editImage"
+            android:src="@mipmap/ic_launcher"
+            android:layout_gravity="center_horizontal"
+            />
+
+        <TextView
+            android:gravity="center_horizontal"
+            android:layout_width="@dimen/button_text_width"
+            android:layout_height="wrap_content"
+            tools:text="edit"
+            android:id="@+id/editText"
+            android:textColor="@color/notification_button_text_color"
+            android:layout_gravity="center_horizontal"
+
+            android:textSize="@dimen/notification_button_text_size"
+            android:text="@string/notification_edit"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>
