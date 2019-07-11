@@ -163,16 +163,6 @@ class OnboardActivity:FragmentActivity(){
                     saveOnboardStatus(true)
                 }
 
-                GlobalScope.launch {
-                    delay(1000)
-
-
-                    //TODO FIX THIS
-                    //TODO bring th string builder from dagger
-
-                    //create an onboard task
-
-                }
 
 //                setTextFragment(R.string.onboard_welcome_text_04)
                 state = OnboardState.TEXT3

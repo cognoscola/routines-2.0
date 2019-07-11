@@ -80,15 +80,5 @@ class InformationFragment: OnboardFragment(){
         }
     }
 
-    fun getHtml(htmlString:String): Spanned {
-        //24 and above
-        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.N){
-            return Html.fromHtml(htmlString,Html.FROM_HTML_MODE_COMPACT)
-        }
-        //below
-        else{
-            return Html.fromHtml(htmlString)
-        }
-    }
 
 }

@@ -53,8 +53,14 @@ fun Context.notificationShowWakeUp(tasks:List<Any>? = null,
                                    smallRemoteView: RemoteViews? = null,
                                    bigRemoteView:RemoteViews?= null) {
 
-    Toast.makeText(this, "Wake up", Toast.LENGTH_SHORT).show()
-//    _notificationShowWakeUp(tasks,mainPendingIntent,dismissPendingIntent,dismissable,smallRemoteView,bigRemoteView)
+    _notificationShowWakeUp(
+            tasks,
+            mainPendingIntent,
+            dismissPendingIntent,
+            dismissable,
+            smallRemoteView,
+            bigRemoteView,
+            NOTIFICATION_CHANNEL_ONE)
 }
 
 

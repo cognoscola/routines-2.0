@@ -40,16 +40,6 @@ import com.gorillamoa.routines.core.services.DataLayerListenerService
 
 import java.util.*
 
-const val WAKE_UP_NOTIFICATION_ID =1
-
-const val SLEEP_NOTIFICATION_ID =65535
-const val REST_NOTIFICATION_ID =65534
-const val ACTIVITY_NOTIFICATION_ID = 65533
-const val TIMER_NOTIFICATION_ID = 65532
-
-const val NOTIFICATION_CHANNEL_ONE  = "channel"
-const val NOTIFICATION_CHANNEL_TWO  = "channel_MAX"
-const val NOTIFICATION_TAG = "routines"
 
 */
 /** Prepare the intent for when user dismisses the notification **//*
@@ -60,7 +50,6 @@ const val NOTIFICATION_TAG = "routines"
 /********************************************************************************
  * WAKE UP NOTIFICATION FUNCTIONS
  *********************************************************************************//*
-
 
 */
 /**
@@ -75,11 +64,12 @@ fun Context._notificationShowWakeUp(tasks:List<Any>? = null,
                                     dismissPendingIntent:PendingIntent? = null,
                                     dismissable:Boolean = true,
                                     smallRemoteView: RemoteViews? = null,
-                                    bigRemoteView:RemoteViews?= null) {
+                                    bigRemoteView:RemoteViews?= null,
+                                    channel:String) {
 
-    Toast.makeText(this, "Wake up",Toast.LENGTH_SHORT).show()
-   /* val manager = getNotificationManager()
-    getBuilder().apply {
+    val manager = getNotificationManager()
+
+ /*   getBuilder(channel).apply {
 
         if (isWatch()) {
             //TODO bring Stringbuilder from dagger()
@@ -600,36 +590,5 @@ fun Context.notificationShowActivity(activity:String, int:Int){
 
 }
 
-
-fun prepareBigTextStyle(tasks:String,title:Spanned):NotificationCompat.BigTextStyle{
-        return NotificationCompat.BigTextStyle()
-         .setBigContentTitle(title)
-         .bigText(getHtml(tasks))
-}
-
-fun Context.getBuilder():NotificationCompat.Builder{
-
-
-    //TODO UNCOMMENTAND DELETE ABOVE
-        return NotificationCompat.Builder(this,NOTIFICATION_CHANNEL_ONE)
-
-                //TODO show weather in one icon in the notification title
-                .setContentTitle(getHtml("Good morning! &#127780"))
-                .setSmallIcon(com.gorillamoa.routines.core.R.mipmap.ic_launcher)
-                .setContentText("See today's schedule")
-
-//                                .setDeleteIntent(dismissPendingIntent)
-}
-
-
-
 */
-/**
- * retrieve the notification manager.
- *//*
 
-fun Context.getNotificationManager():NotificationManager{
-    return getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-}
-
-*/
