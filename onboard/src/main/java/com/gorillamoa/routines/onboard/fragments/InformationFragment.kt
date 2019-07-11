@@ -1,17 +1,17 @@
 package com.gorillamoa.routines.onboard.fragments
 
 
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
+import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.gorillamoa.routines.core.extensions.getHtml
 import com.gorillamoa.routines.onboard.R
 import kotlinx.android.synthetic.main.fragment_information.*
 
 class InformationFragment: OnboardFragment(){
-
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_information,container,false)
@@ -77,6 +77,17 @@ class InformationFragment: OnboardFragment(){
                 putString(KEY_ACTION_ONE, actionOne)
                 putString(KEY_ACTION_TWO, actionTwo)
             }
+        }
+    }
+
+    fun getHtml(htmlString:String): Spanned {
+        //24 and above
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.N){
+            return Html.fromHtml(htmlString,Html.FROM_HTML_MODE_COMPACT)
+        }
+        //below
+        else{
+            return Html.fromHtml(htmlString)
         }
     }
 

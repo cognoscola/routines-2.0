@@ -54,10 +54,11 @@ fun Context.alarmEnableWakeUp(){
 /**
  * Convenience disable the Wake up Alarm.
  */
+//TODO split
 fun Context.alarmDisableWakeUp(){
     val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    alarmManager.cancel(createWakeUpAlarmPendingIntent())
-    saveAlarmWakeStatus(false)
+//    alarmManager.cancel(createWakeUpAlarmPendingIntent())
+//    saveAlarmWakeStatus(false)
 }
 
 fun Context.alarmEnableSleep(){
@@ -69,9 +70,10 @@ fun Context.alarmEnableSleep(){
 
 fun Context.alarmDisableSleep(){
 
+    //TODO split
     val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    alarmManager.cancel(createWakeUpAlarmPendingIntent())
-    saveAlarmSleepStatus(false)
+//    alarmManager.cancel(createWakeUpAlarmPendingIntent())
+//    saveAlarmSleepStatus(false)
 
 
 }
@@ -85,15 +87,17 @@ fun Context.alarmDisableSleep(){
 fun Context.alarmSetRepeatWithCal(cal:Calendar, isWake:Boolean){
     val alarmManager = getAlarmService()
 
-    alarmManager.setInexactRepeating(
+    //TODO SPLIT
+    /*alarmManager.setInexactRepeating(
             AlarmManager.RTC_WAKEUP,
             cal.timeInMillis,
             AlarmManager.INTERVAL_DAY,
             if(isWake){createWakeUpAlarmPendingIntent()} else{ createSleepAlarmPendingIntent()}
-    )
+    )*/
 
     //clean
-    if(isWake)saveAlarmWakeStatus(true)else saveAlarmSleepStatus(true)
+    //TODO SPLIT
+//    if(isWake)saveAlarmWakeStatus(true)else saveAlarmSleepStatus(true)
 }
 
 fun Context.getAlarmService():AlarmManager{

@@ -7,7 +7,9 @@ import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.ActivityTransitionResult
 import com.google.android.gms.location.DetectedActivity
 
-import com.gorillamoa.routines.core.extensions.notificationShowActivity
+
+//TODO SPLIT
+//import com.gorillamoa.routines.core.extensions.notificationShowActivity
 import com.gorillamoa.routines.core.extensions.saveAlarmRestStatus
 
 class ActivityReceiver:BroadcastReceiver(){
@@ -24,7 +26,8 @@ class ActivityReceiver:BroadcastReceiver(){
                 }
 
                 //TODO add option to disable the recognition activity temporarily
-                context?.notificationShowActivity(getActivityName(event.activityType), event.transitionType)
+                //TODO SPLIT
+//                context?.notificationShowActivity(getActivityName(event.activityType), event.transitionType)
 
 //                Log.d("onReceive","ActivityRecog: ${getActivityName(event.activityType)} ${getEventName(event.transitionType)}")
                 // chronological sequence of events....

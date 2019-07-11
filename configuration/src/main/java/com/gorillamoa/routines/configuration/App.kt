@@ -7,16 +7,18 @@ import com.gorillamoa.routines.notifications.*
 
 class App :Application(), RemoteInjectorHelper.RemoteGraphProvider
 {
-    lateinit var graph:AppComponent
+    var graph:AppComponent ? = null
+//    lateinit var graph:AppComponent
 
+    //TODO SPLIT
     override val remoteViewGraph: RemoteViewGraph
-        get() = graph
+        get() = graph as RemoteViewGraph
 
     override fun onCreate() {
         super.onCreate()
 
 
-        graph = object : AppComponent {
+       /* graph = object : AppComponent {
             override fun remoteGetSmallTaskView(task: String): RemoteViews {
                 return this@App.getTaskRemoteView(task)
             }
@@ -40,8 +42,8 @@ class App :Application(), RemoteInjectorHelper.RemoteGraphProvider
 
             override fun remoteGetSmallSleepView(): RemoteViews {
                 return this@App.getSmallSleepView()
-            }
-        }
+            }*/
+       // }
     }
 
 }

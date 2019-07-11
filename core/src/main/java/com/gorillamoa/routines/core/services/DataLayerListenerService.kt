@@ -156,7 +156,10 @@ class DataLayerListenerService:WearableListenerService(){
                         saveTaskList(unCompletedList)
 
                         Coroutines.ioThenMain({getDataRepository().getTaskByIds(unCompletedList)}){tasks->
-                            tasks?.let { notificationShowWakeUpLocal(tasks) }
+                            tasks?.let {
+                                //TODO SPLIT
+//                                notificationShowWakeUpLocal(tasks)
+                            }
                         }
 
                     } else if (DataLayerConstant.TASK_PATH.equals(it.dataItem.uri.path)) {
@@ -172,7 +175,8 @@ class DataLayerListenerService:WearableListenerService(){
                         //We'll show the task again, because it may be that
                         //the task was marked as complete from another device and we
                         //we may need to uodate it here.
-                        notificationShowTaskLocal(task,history)
+                        //TODO SPLIT
+//                        notificationShowTaskLocal(task,history)
 /*
                         if (!isAlreadyShowing(task.id!!.toInt())) {
                             notificationShowTaskLocal(task)
@@ -181,8 +185,8 @@ class DataLayerListenerService:WearableListenerService(){
 
                     } else if (DataLayerConstant.SLEEP_PATH.equals(it.dataItem.uri.path)){
 
-                        notificationShowSleepLocal()
-
+//                        notificationShowSleepLocal()
+//TODO SPLIT
                     } else if (DataLayerConstant.PROGRESS_PATH.equals(it.dataItem.uri.path)) {
 
                         TaskScheduler.processDayInformation(
@@ -269,17 +273,20 @@ class DataLayerListenerService:WearableListenerService(){
                     Log.d("notificationRoutine", "onDataChanged Delete issued")
 
                     if (DataLayerConstant.WAKE_UP_PATH.equals(it.dataItem.uri.path)) {
-                        notificationDismissWakeUp()
+                    //TODO SPLIT
+//                        notificationDismissWakeUp()
                     } else if (DataLayerConstant.TASK_PATH.equals(it.dataItem.uri.path)) {
 
                         getAllTaskShowing().forEach { notification ->
                             //we only show 1 task, so we'll take this opportunity to dismiss ALL
                             //task notifications
-                            notificationDismissTask(notification.id)
+                            //TODO SPLIT
+//                            notificationDismissTask(notification.id)
                         }
                     } else if (DataLayerConstant.SLEEP_PATH.equals(it.dataItem.uri.path)) {
 
-                        notificationDismissSleepLocally()
+                        //TODO SPLIT
+//                        notificationDismissSleepLocally()
 
                     } else if (DataLayerConstant.PROGRESS_PATH.equals(it.dataItem.uri.path)){
                         TaskScheduler.endDay(this@DataLayerListenerService)
@@ -322,7 +329,10 @@ class DataLayerListenerService:WearableListenerService(){
 
     @TargetApi(23)
     private fun isAlreadyShowing(id:Int):Boolean {
-        return if (getNotificationManager().activeNotifications.find {
+
+        //TODO SPLIT
+        return false
+        /*return if (getNotificationManager().activeNotifications.find {
                     //Check if we aren't already displaying a notification
                     Log.d("notificationRoutine", "onDataChanged check: ${it.id}")
                     it.id == id
@@ -332,7 +342,7 @@ class DataLayerListenerService:WearableListenerService(){
             Log.d("notificationRoutine", "onDataChanged We're already showing $id")
             true
         }
-    }
+*/    }
 
     override fun onCapabilityChanged(capibility: CapabilityInfo?) {
         super.onCapabilityChanged(capibility)

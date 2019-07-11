@@ -5,16 +5,17 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.FragmentActivity
+import com.gorillamoa.routines.core.coroutines.Coroutines
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
+import com.gorillamoa.routines.notifications.notificationShowWakeUp
+import com.gorillamoa.routines.notifications.remoteGetSmallWakeUpView
 import com.gorillamoa.routines.onboard.R
 import com.gorillamoa.routines.onboard.fragments.InformationFragment
 import com.gorillamoa.routines.onboard.fragments.SplashFragment
 import com.gorillamoa.routines.onboard.fragments.TimePickerFragment
 import kotlinx.android.synthetic.main.activity_onboard.fragmentContainer
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.util.*
 
 /**
@@ -63,9 +64,10 @@ class OnboardActivity:FragmentActivity(){
             delay(3000)
 
             //TODO check if intent is null
-            if (intent?.action == ACTION_TEST_WAKE_UP) {
+            /*if (intent?.action == ACTION_TEST_WAKE_UP) {
                 state = OnboardState.TEXT3
-            }
+            }*/
+            state = OnboardState.PickTime
             setNextFragment(state)
         }
     }
@@ -121,14 +123,12 @@ class OnboardActivity:FragmentActivity(){
                         null, null
                 )
 
-                GlobalScope.launch {
+                CoroutineScope(Dispatchers.Main).launch {
+
+                }
+                Coroutines.ioThenMain({
                     delay(1000)
-
-
-                    //TODO FIX THIS
-                    //TODO bring th string builder from dagger
-
-                    //create an onboard task
+                }){
                     val dummyArrray = ArrayList<Task>()
                     dummyArrray.add(Task(
                             name = "This is my first task in the future!"
@@ -144,7 +144,6 @@ class OnboardActivity:FragmentActivity(){
                     ))
 
 
-
                     notificationShowWakeUp(
                             dummyArrray,
                             mainPendingIntent = null,
@@ -154,12 +153,25 @@ class OnboardActivity:FragmentActivity(){
                             //TODO CHECK IF WE SHOULD ALLOW DISMISSAL with stubborn settings
                             dismissable = false,
                             //TODO get the actual task length
-                            smallRemoteView = if (!isWatch()) remoteGetSmallWakeUpView(dummyArrray.size) else null,
+                            smallRemoteView = null,
+//                            smallRemoteView = if (!isWatch()) remoteGetSmallWakeUpView(dummyArrray.size) else null,
                             //TODO Get stringbuilder from dagger singleton
-                            bigRemoteView = if (!isWatch()) remoteGetLargeWakeUpView(StringBuilder().stringifyTasks(dummyArrray)) else null
+                            bigRemoteView =  null
+//                            bigRemoteView = if (!isWatch()) remoteGetLargeWakeUpView(StringBuilder().stringifyTasks(dummyArrray)) else null
                     )
 
                     saveOnboardStatus(true)
+                }
+
+                GlobalScope.launch {
+                    delay(1000)
+
+
+                    //TODO FIX THIS
+                    //TODO bring th string builder from dagger
+
+                    //create an onboard task
+
                 }
 
 //                setTextFragment(R.string.onboard_welcome_text_04)

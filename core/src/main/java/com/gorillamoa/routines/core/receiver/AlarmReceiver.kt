@@ -85,7 +85,10 @@ class AlarmReceiver:BroadcastReceiver(){
                      * WAKE UP FROM ALARM -> SCHEDULE TASKS -> SEND TASKS OVER
                      */
                     TaskScheduler.schedule(context){ tasks ->
-                        tasks?.let{context.notificationShowWakeUpMirror(tasks!!)}
+                        tasks?.let{
+                            //TODO SPLIT
+//                            context.notificationShowWakeUpMirror(tasks!!)
+                        }
                     }
                 }
 
@@ -94,7 +97,8 @@ class AlarmReceiver:BroadcastReceiver(){
                     Log.d("onReceive","Sleep Alarm went off!")
                     //TODO dismiss other task notifications
 
-                    context.notificationShowSleep()
+                    //TODO SPLIT
+//                    context.notificationShowSleep()
                     TaskScheduler.endDay(context)
 
                 }

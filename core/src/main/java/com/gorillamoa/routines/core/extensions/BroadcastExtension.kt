@@ -14,7 +14,8 @@ fun Context.broadcastShowWakeUp(){
     /** We indicate that the receiver should treat the intent as
      * part of a normal Wake up
      */
-    sendBroadcast(createWakeUpRecieverIntent().setAction(AlarmReceiver.EVENT_WAKEUP))
+    //TODO split
+//    sendBroadcast(createWakeUpRecieverIntent().setAction(AlarmReceiver.EVENT_WAKEUP))
 }
 
 /**
@@ -26,7 +27,8 @@ fun Context.broadcastShowWakeUpTest(){
      * part of the on-board process
      */
 
-    sendBroadcast(Intent(createWakeUpRecieverIntent()).setAction(AlarmReceiver.ACTION_ONBOARD))
+    //TODO SPLIT
+//    sendBroadcast(Intent(createWakeUpRecieverIntent()).setAction(AlarmReceiver.ACTION_ONBOARD))
 
 }
 //TODO Launch task notification from UI

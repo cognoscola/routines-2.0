@@ -40,7 +40,9 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
         intent?.let {
 
-            val currentTid = intent.getLongExtra(TASK_ID,-1)
+            //TODO SPLIT
+            val currentTid = intent.getLongExtra("",-1)
+//            val currentTid = intent.getLongExtra(TASK_ID,-1)
 
             Log.d("$tag onReceive","${intent.action}")
 
@@ -55,16 +57,19 @@ class NotificationActionReceiver:BroadcastReceiver(){
                         //TODO SHOW Sleep once we complete the last task
                         if (TaskScheduler.isDayComplete(context)) {
 
-                            context.notificationShowSleepMirror()
+                            //TODO SPLIT
+//                            context.notificationShowSleepMirror()
 
                         }else{
                             //we'll just show the same TASK if we're not done the day, but make
                             //make sure to get update history information!
                             Coroutines.ioThenMain({context.getDataRepository().getHistoryForTask(task)}){
                                 it?.let{
-                                    context.notificationShowTaskMirror(task,it.lastOrNull())
+                                    //TODO SPLIT
+//                                    context.notificationShowTaskMirror(task,it.lastOrNull())
                                 }?:run{
-                                    context.notificationShowTaskMirror(task,lastHistory)
+                                    //TODO SPLIT
+//                                    context.notificationShowTaskMirror(task,lastHistory)
                                 }
                             }
                         }
@@ -78,7 +83,9 @@ class NotificationActionReceiver:BroadcastReceiver(){
                     if (TaskScheduler.uncompleteTaskMirror(context, currentTid)) {
                         val task = context.getTaskFromString(intent.getStringExtra(KEY_TASK_DATA))
                         val history = context.getHistoryFromString(intent.getStringExtra(KEY_TASK_HISTORY_DATA))
-                        context.notificationShowTaskMirror(task,history)
+
+                        //TODO SPLIT
+//                        context.notificationShowTaskMirror(task,history)
 
                     }else{
 
@@ -121,7 +128,8 @@ class NotificationActionReceiver:BroadcastReceiver(){
                             TaskScheduler.approveMirror(context)
                             TaskScheduler.getNextUncompletedTask(this@apply) { task,history ->
                                 task?.let {
-                                    notificationShowTaskMirror(task,history)
+                                    //TODO SPLIT
+//                                    notificationShowTaskMirror(task,history)
                                 }
                             }
                         }else{
@@ -130,7 +138,8 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
                             val c = Class.forName("com.gorillamoa.routines.onboard.activities.OnboardActivity")
                             val intent = Intent(this, c)
-                            intent.action = ACTION_TEST_WAKE_UP
+                            //TODO SPLIT
+//                            intent.action = ACTION_TEST_WAKE_UP
                             context.startActivity(intent)
                         }
                     }
@@ -178,7 +187,8 @@ class NotificationActionReceiver:BroadcastReceiver(){
                  * Expand the currently showing notification
                  */
                 else -> {
-                    Log.d("onReceive","Unknown Action on Task ${intent.getIntExtra(com.gorillamoa.routines.core.extensions.TASK_ID,-1)}")
+                    //TODO SPLIT
+//                    Log.d("onReceive","Unknown Action on Task ${intent.getIntExtra(com.gorillamoa.routines.core.extensions.TASK_ID,-1)}")
                 }
             }
         }

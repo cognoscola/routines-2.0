@@ -2,7 +2,9 @@ package com.gorillamoa.routines.core.extensions
 
 import android.annotation.TargetApi
 import android.app.Activity
+import android.app.NotificationManager
 import android.content.Context
+import android.content.Context.NOTIFICATION_SERVICE
 import android.content.SharedPreferences
 import android.service.notification.StatusBarNotification
 import android.util.Log
@@ -387,7 +389,10 @@ fun Context.isNotificationStubborn():Boolean{
 
 @TargetApi(23)
 fun Context.getAllTaskShowing():Array<StatusBarNotification>{
-    return getNotificationManager().activeNotifications
+
+    //TODO SPLIT
+   return(getSystemService(NOTIFICATION_SERVICE) as NotificationManager).activeNotifications
+//    return getNotificationManager().activeNotifications
 }
 
 

@@ -4,9 +4,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.gorillamoa.routines.core.extensions.notificationDismissSleepRemote
-import com.gorillamoa.routines.core.extensions.notificationDismissWakeUpRemote
-import com.gorillamoa.routines.core.extensions.notificationDismissTaskRemote
+//TODO SPIT
+//import com.gorillamoa.routines.core.extensions.notificationDismissSleepRemote
+//import com.gorillamoa.routines.core.extensions.notificationDismissWakeUpRemote
+//import com.gorillamoa.routines.core.extensions.notificationDismissTaskRemote
 import com.gorillamoa.routines.core.services.DataLayerListenerService
 
 
@@ -49,24 +50,31 @@ class NotificationDismissReceiver:BroadcastReceiver() {
         intent?.let {
             Log.d("$tag onReceive",intent.action)
 
-            val tid = it.getLongExtra(com.gorillamoa.routines.core.extensions.TASK_ID,-1)
+            //TODO SPLIT
+            val tid = it.getLongExtra("",-1)
+//            val tid = it.getLongExtra(com.gorillamoa.routines.core.extensions.TASK_ID,-1)
 
             when (intent.action) {
                 TYPE_SLEEP -> {
-                    context.notificationDismissSleepRemote()
+
+                    //TODO SPLIT
+//                    context.notificationDismissSleepRemote()
                     DataLayerListenerService.endDayMirror(context)
                 }
                 TYPE_TASK -> {
                     //TODO this behaviour is determined by notification behaviour settings
 //                    TaskScheduler.skipAndShowNext(context,tid)
 
-                        context.notificationDismissTaskRemote()
+                    //TODO SPLIT
+//                        context.notificationDismissTaskRemote()
                 }
 
                 TYPE_WAKE_UP -> {
 
                     //Dismiss Remotely if we're not a watch Remote Notifications
-                        context.notificationDismissWakeUpRemote()
+                    //TODO SPLIT
+//                        context.notificationDismissWakeUpRemote()
+
 
                     //TODO we automatically approve the schedule on dismissal of notification, make this optional
 //                    if (context.EnableScheduler()) {
