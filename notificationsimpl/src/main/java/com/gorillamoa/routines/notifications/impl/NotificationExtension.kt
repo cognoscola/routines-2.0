@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.widget.RemoteViews
 import android.widget.Toast
+import com.example.notificationsimpl.R
 
 /*
 import android.app.Notification
@@ -52,31 +53,42 @@ import java.util.*
  *********************************************************************************//*
 
 */
+
 /**
- * Show a local notification to the user which displays ""WAKEUP" information
- * @param tasks is the task list as a strin
- * @param mainPendingIntent is the Main notification intent
- * @param dismissPendingIntent is what happens when the user dismisses
+ * Show the wake up notification
+ * @receiver Context
+ * @param taskData String? contains the string information to show to show as part of the
+ * notification's content
+ * @param mainPendingIntent PendingIntent?
+ * @param dismissPendingIntent PendingIntent?
+ * @param dismissable Boolean
+ * @param smallRemoteView RemoteViews?
+ * @param bigRemoteView RemoteViews?
+ * @param channel String
  */
 
-fun Context._notificationShowWakeUp(tasks:List<Any>? = null,
+fun Context._notificationShowWakeUp(taskData:String? = null,
                                     mainPendingIntent: PendingIntent?,
                                     dismissPendingIntent:PendingIntent? = null,
                                     dismissable:Boolean = true,
                                     smallRemoteView: RemoteViews? = null,
                                     bigRemoteView:RemoteViews?= null,
-                                    channel:String) {
+                                    channel:String,
+                                    tag:String,
+                                    notificatonId:Int) {
 
     val manager = getNotificationManager()
 
- /*   getBuilder(channel).apply {
+    getBuilder(channel).apply {
 
         if (isWatch()) {
-            //TODO bring Stringbuilder from dagger()
-            setStyle(prepareBigTextStyle(StringBuilder().stringifyTasks(tasks), getHtml("Today's tasks &#128170;")))
+
+            setStyle(prepareBigTextStyle(
+                    tasks = taskData?:getString(R.string.notification_missing_data),
+                    title = getHtml("Today's tasks &#128170;")))
 
             //TODO UNCOMMENT FOR WATCH
-            addWakeUpAction(this@notificationShowWakeUp,"Start Day", ACTION_WAKE_START_DAY)
+//            addWakeUpAction(this@notificationShowWakeUp,"Start Day", ACTION_WAKE_START_DAY)
             //addWakeUpAction(this@notificationShowWakeUp,"Edit", ACTION_START_MODIFY, WAKE_UP_NOTIFICATION_ID!!)
         }else{
 
@@ -90,7 +102,8 @@ fun Context._notificationShowWakeUp(tasks:List<Any>? = null,
             }
         }
 
-        determineOnGoingAbility(this@apply,dismissable)
+        //TODO MODULE SPLIT
+//        determineOnGoingAbility(this@apply,dismissable)
 
         mainPendingIntent?.let { setContentIntent(mainPendingIntent) }
         //TODO make the dismiss action optional, as in let user decide how a dismiss behaviour works!
@@ -98,10 +111,10 @@ fun Context._notificationShowWakeUp(tasks:List<Any>? = null,
         dismissPendingIntent?.let { setDeleteIntent(it) }
 
         manager.notify(
-                NOTIFICATION_TAG,
-                WAKE_UP_NOTIFICATION_ID,
+                tag,
+                notificatonId,
                 build())
-    }*/
+    }
 }
 
 /**

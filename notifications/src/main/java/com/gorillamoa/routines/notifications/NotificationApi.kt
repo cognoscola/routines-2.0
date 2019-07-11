@@ -54,13 +54,15 @@ fun Context.notificationShowWakeUp(tasks:List<Any>? = null,
                                    bigRemoteView:RemoteViews?= null) {
 
     _notificationShowWakeUp(
-            tasks,
+            null,
             mainPendingIntent,
             dismissPendingIntent,
             dismissable,
             smallRemoteView,
             bigRemoteView,
-            NOTIFICATION_CHANNEL_ONE)
+            NOTIFICATION_CHANNEL_ONE,
+            NOTIFICATION_TAG,
+            WAKE_UP_NOTIFICATION_ID)
 }
 
 

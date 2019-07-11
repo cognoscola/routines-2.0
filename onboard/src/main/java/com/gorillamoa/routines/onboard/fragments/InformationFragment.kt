@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.gorillamoa.routines.onboard.R
+import com.gorillamoa.routines.tools.getHtml
 import kotlinx.android.synthetic.main.fragment_information.*
 
 class InformationFragment: OnboardFragment(){
@@ -22,6 +23,7 @@ class InformationFragment: OnboardFragment(){
 
         infoTextView.text = arguments?.getString(KEY_CONTENT)?:
                 resources.getString(R.string.info_oops_string)
+
         welcomeTitleTextView?.text = getHtml(arguments?.getString(KEY_TITLE)?:resources.getString(R.string.info_oops_string))
 
         val actionOneString = arguments?.getString(KEY_ACTION_ONE)
