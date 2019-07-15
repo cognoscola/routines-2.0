@@ -56,6 +56,7 @@ class MobileConfigurationActivity : FragmentActivity(),
 
             TaskScheduler.schedule(this){ list->
                 list?.let {
+
                     notificationShowWakeUpMirror(list)
                 }
             }

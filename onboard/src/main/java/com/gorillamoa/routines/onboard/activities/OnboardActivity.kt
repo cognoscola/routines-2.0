@@ -120,7 +120,7 @@ class OnboardActivity:FragmentActivity(){
                 setTextFragment(
                         getString(R.string.onboard_title_03),
                         getString(R.string.onboard_welcome_03),
-                        null, null
+                        "Send me a notification", null
                 )
 
                 CoroutineScope(Dispatchers.Main).launch {
@@ -129,61 +129,7 @@ class OnboardActivity:FragmentActivity(){
                 Coroutines.ioThenMain({
                     delay(1000)
                 }){
-                    val dummyArrray = ArrayList<Task>()
-                    dummyArrray.add(Task(
-                            name = "This is my first task in the future!"
-                    ))
-                    dummyArrray.add(Task(
-                            name = "2nd task in the future!"
-                    ))
-                    dummyArrray.add(Task(
-                            name = "And so on..."
-                    ))
-                    dummyArrray.add(Task(
-                            name = "<b>Click Start to Finish!</b>"
-                    ))
 
-                    /**
-                     * We are going to create a new notification building method, one that will
-                     * allow more flexibility when creating a new notification. Instead of creating
-                     * the notification from a single method, we'll split the methods into many
-                     * little methods in order to accept for inputs.
-                     * E.g. the remote view isn't always accepted, so we don't need to worry about it.
-                     */
-
-                    //E.g.
-                    //our title
-
-/*                    getNotificationBuilder(NOTIFICATION_CHANNEL_ONE,isWatch()).apply {
-                       // setContent()//TODO pass content title and info
-                        //setCustomContentView()
-                    }*/
-
-                    val smallWakeupView = remoteGetSmallWakeUpView(dummyArrray.size)
-                    smallWakeupView.setStartFunction(createNotificationActionPendingIntentForWakeUp(ACTION_WAKE_START_DAY))
-
-                    val largeWakeupView = remoteGetLargeWakeUpView(StringBuilder().stringifyTasks(dummyArrray))
-                    largeWakeupView.setStartFunction(createNotificationActionPendingIntentForWakeUp(ACTION_WAKE_START_DAY))
-
-                    notificationShowWakeUp(
-                            StringBuilder().stringifyTasks(dummyArrray),
-                            mainPendingIntent = null,
-                            dismissPendingIntent = null,
-                            //TODO dismissing the onboard should go back to the information fragment to displau to user to try again
-//                            dismissPendingIntent = createNotificationDeleteIntentForWakeUp(),
-                            //TODO CHECK IF WE SHOULD ALLOW DISMISSAL with stubborn settings
-                            dismissable = false,
-                            //TODO get the actual task length
-//                            smallRemoteView = null,
-//                            smallRemoteView = if (!isWatch()) remoteGetSmallWakeUpView(dummyArrray.size) else null,
-                            smallRemoteView = smallWakeupView,
-//                            TODO Get stringbuilder from dagger singleton
-//                            bigRemoteView =  null
-//                            bigRemoteView = if (!isWatch()) remoteGetLargeWakeUpView(StringBuilder().stringifyTasks(dummyArrray)) else null
-                            bigRemoteView = largeWakeupView
-                    )
-
-                    saveOnboardStatus(true)
                 }
 
 
@@ -239,6 +185,67 @@ class OnboardActivity:FragmentActivity(){
 
         if (state == OnboardState.TEXT4) {
             //capture the argument
+        }
+
+        if(state == OnboardState.TEXT3){
+
+            val dummyArrray = ArrayList<Task>()
+            dummyArrray.add(Task(
+                    name = "This is my first task in the future!"
+            ))
+            dummyArrray.add(Task(
+                    name = "2nd task in the future!"
+            ))
+            dummyArrray.add(Task(
+                    name = "And so on..."
+            ))
+            dummyArrray.add(Task(
+                    name = "<b>Click Start to Finish!</b>"
+            ))
+
+            /**
+             * We are going to create a new notification building method, one that will
+             * allow more flexibility when creating a new notification. Instead of creating
+             * the notification from a single method, we'll split the methods into many
+             * little methods in order to accept for inputs.
+             * E.g. the remote view isn't always accepted, so we don't need to worry about it.
+             */
+
+            //E.g.
+            //our title
+
+/*                    getNotificationBuilder(NOTIFICATION_CHANNEL_ONE,isWatch()).apply {
+                       // setContent()//TODO pass content title and info
+                        //setCustomContentView()
+                    }*/
+
+            val smallWakeupView = remoteGetSmallWakeUpView(dummyArrray.size)
+            smallWakeupView.setStartFunction(createNotificationActionPendingIntentForWakeUp(ACTION_WAKE_START_DAY))
+
+            val largeWakeupView = remoteGetLargeWakeUpView(StringBuilder().stringifyTasks(dummyArrray))
+            largeWakeupView.setStartFunction(createNotificationActionPendingIntentForWakeUp(ACTION_WAKE_START_DAY))
+
+            notificationShowWakeUp(
+                    StringBuilder().stringifyTasks(dummyArrray),
+                    mainPendingIntent = null,
+                    dismissPendingIntent = null,
+                    //TODO dismissing the onboard should go back to the information fragment to displau to user to try again
+//                            dismissPendingIntent = createNotificationDeleteIntentForWakeUp(),
+                    //TODO CHECK IF WE SHOULD ALLOW DISMISSAL with stubborn settings
+                    dismissable = false,
+                    //TODO get the actual task length
+//                            smallRemoteView = null,
+//                            smallRemoteView = if (!isWatch()) remoteGetSmallWakeUpView(dummyArrray.size) else null,
+                    smallRemoteView = smallWakeupView,
+//                            TODO Get stringbuilder from dagger singleton
+//                            bigRemoteView =  null
+//                            bigRemoteView = if (!isWatch()) remoteGetLargeWakeUpView(StringBuilder().stringifyTasks(dummyArrray)) else null
+                    bigRemoteView = largeWakeupView
+            )
+
+            saveOnboardStatus(true)
+            this@OnboardActivity.finish()
+
         }
 
         nextState()

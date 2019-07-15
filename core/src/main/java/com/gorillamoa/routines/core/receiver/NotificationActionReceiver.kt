@@ -1,5 +1,6 @@
 package com.gorillamoa.routines.core.receiver
 
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -33,7 +34,6 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
         const val ACTION_EDIT_ORDER = "edit.sort"
         const val ACTION_EDIT_SCHEDULE = "edit.schedule"
-
     }
 
     override fun onReceive(context: Context, intent: Intent?) {
@@ -120,8 +120,6 @@ class NotificationActionReceiver:BroadcastReceiver(){
                 }
                 ACTION_WAKE_START_DAY-> {
 
-
-
                     context.apply {
 
                         if (!getOnboardStatus()) {
@@ -138,6 +136,7 @@ class NotificationActionReceiver:BroadcastReceiver(){
 
                             val c = Class.forName("com.gorillamoa.routines.onboard.activities.OnboardActivity")
                             val intent = Intent(this, c)
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             //TODO SPLIT
 //                            intent.action = ACTION_TEST_WAKE_UP
                             context.startActivity(intent)
