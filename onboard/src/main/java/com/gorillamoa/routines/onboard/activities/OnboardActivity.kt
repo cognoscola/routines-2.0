@@ -8,8 +8,7 @@ import androidx.fragment.app.FragmentActivity
 import com.gorillamoa.routines.core.coroutines.Coroutines
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
-import com.gorillamoa.routines.notifications.notificationShowWakeUp
-import com.gorillamoa.routines.notifications.remoteGetSmallWakeUpView
+import com.gorillamoa.routines.notifications.*
 import com.gorillamoa.routines.onboard.R
 import com.gorillamoa.routines.onboard.fragments.InformationFragment
 import com.gorillamoa.routines.onboard.fragments.SplashFragment
@@ -143,9 +142,28 @@ class OnboardActivity:FragmentActivity(){
                             name = "<b>Click Start to Finish!</b>"
                     ))
 
+                    /**
+                     * We are going to create a new notification building method, one that will
+                     * allow more flexibility when creating a new notification. Instead of creating
+                     * the notification from a single method, we'll split the methods into many
+                     * little methods in order to accept for inputs.
+                     * E.g. the remote view isn't always accepted, so we don't need to worry about it.
+                     */
+
+                    //E.g.
+                    //our title
+
+
+                    getNotificationBuilder(NOTIFICATION_CHANNEL_ONE,isWatch()).apply {
+                       // setContent()//TODO pass content title and info
+                        //setCustomContentView()
+                    }
+
+
+
 
                     notificationShowWakeUp(
-                            dummyArrray,
+                            StringBuilder().stringifyTasks(dummyArrray),
                             mainPendingIntent = null,
                             dismissPendingIntent = null,
                             //TODO dismissing the onboard should go back to the information fragment to displau to user to try again
@@ -155,7 +173,7 @@ class OnboardActivity:FragmentActivity(){
                             //TODO get the actual task length
                             smallRemoteView = null,
 //                            smallRemoteView = if (!isWatch()) remoteGetSmallWakeUpView(dummyArrray.size) else null,
-                            //TODO Get stringbuilder from dagger singleton
+//                            TODO Get stringbuilder from dagger singleton
                             bigRemoteView =  null
 //                            bigRemoteView = if (!isWatch()) remoteGetLargeWakeUpView(StringBuilder().stringifyTasks(dummyArrray)) else null
                     )

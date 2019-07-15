@@ -4,6 +4,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.widget.RemoteViews
 import android.widget.Toast
+import androidx.core.app.NotificationCompat
+import com.gorillamoa.routines.notifications.impl.RoutinesNotificationBuilder
+import com.gorillamoa.routines.notifications.impl._getBuilder
 import com.gorillamoa.routines.notifications.impl._notificationShowWakeUp
 
 /*
@@ -46,7 +49,7 @@ const val NOTIFICATION_TAG = "routines"
  * @param dismissPendingIntent is what happens when the user dismisses
  */
 
-fun Context.notificationShowWakeUp(tasks:List<Any>? = null,
+fun Context.notificationShowWakeUp(tasks:String? = null,
                                    mainPendingIntent: PendingIntent?,
                                    dismissPendingIntent: PendingIntent? = null,
                                    dismissable:Boolean = true,
@@ -54,7 +57,7 @@ fun Context.notificationShowWakeUp(tasks:List<Any>? = null,
                                    bigRemoteView:RemoteViews?= null) {
 
     _notificationShowWakeUp(
-            null,
+            tasks,
             mainPendingIntent,
             dismissPendingIntent,
             dismissable,
@@ -304,11 +307,15 @@ fun prepareBigTextStyle(tasks:String,title:Spanned):NotificationCompat.BigTextSt
             .setBigContentTitle(title)
             .bigText(getHtml(tasks))
 }
+*/
 
-fun Context.getBuilder(): NotificationCompat.Builder{
-
-
+//create an abstract class RoutinesNotificationBuilder
+fun Context.getNotificationBuilder(channel:String,isWatch:Boolean): NotificationCompat.Builder{
+    return _getBuilder(channel,isWatch) as NotificationCompat.Builder
 }
+
+
+/*
 
 fun getHtml(htmlString:String): Spanned {
 

@@ -18,16 +18,16 @@ import com.example.notificationsimpl.R
  * @param channel String
  * @return NotificationCompat.Builder
  */
-fun Context.getBuilder(channel:String): NotificationCompat.Builder{
+fun Context._getBuilder(channel:String,isWatch:Boolean): RoutinesNotificationBuilder{
 
     //TODO UNCOMMENTAND DELETE ABOVE
-    //TODO move channel to API
-    return NotificationCompat.Builder(this,channel)
+    //provide builder via dagger
+    return RoutinesNotificationBuilder(this,channel,isWatch)
 
             //TODO show weather in one icon in the notification title
             .setContentTitle(getHtml("Good morning! &#127780"))
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentText("See today's schedule")
+            .setContentText("See today's schedule") as RoutinesNotificationBuilder
 
 //                                .setDeleteIntent(dismissPendingIntent)
 }

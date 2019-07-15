@@ -1,9 +1,11 @@
 package com.gorillamoa.routines.notifications.impl
 
+import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
+import android.os.Build
 import android.widget.RemoteViews
-import android.widget.Toast
+import androidx.core.app.NotificationCompat
 import com.example.notificationsimpl.R
 
 /*
@@ -79,7 +81,7 @@ fun Context._notificationShowWakeUp(taskData:String? = null,
 
     val manager = getNotificationManager()
 
-    getBuilder(channel).apply {
+    _getBuilder(channel,false).apply {
 
         if (isWatch()) {
 
@@ -103,7 +105,7 @@ fun Context._notificationShowWakeUp(taskData:String? = null,
         }
 
         //TODO MODULE SPLIT
-//        determineOnGoingAbility(this@apply,dismissable)
+        determineOnGoingAbility(this@apply,dismissable)
 
         mainPendingIntent?.let { setContentIntent(mainPendingIntent) }
         //TODO make the dismiss action optional, as in let user decide how a dismiss behaviour works!
@@ -116,6 +118,16 @@ fun Context._notificationShowWakeUp(taskData:String? = null,
                 build())
     }
 }
+
+fun NotificationCompat.Builder.setWatchContent(content:String,title:String){
+
+}
+
+fun NotificationCompat.Builder.setMobileContent(smallRemoteView: RemoteViews,bigRemoteView: RemoteViews){
+
+}
+
+
 
 /**
  * Notify other devices that they should build a notification of type WAKE UP
@@ -234,7 +246,7 @@ fun Context.notificationShowTask(task: Task,
 
     val manager = getNotificationManager()
 
-    getBuilder().apply {
+    _getBuilder().apply {
 
         if (isWatch()) {
 
@@ -425,7 +437,7 @@ fun Context.notificationShowSleep(
 ){
 
     val manager = getNotificationManager()
-    getBuilder().apply {
+    _getBuilder().apply {
 
         //TODO launch with alarm OR with task completion
         val completed = getCompletedTaskList()
@@ -505,8 +517,8 @@ fun Context.notificationShowRemote(taskData:String, path:String){
     putDataReq.setUrgent()
     val putDataTask = Wearable.getDataClient(this).putDataItem(putDataReq)
 }
-
-fun determineOnGoingAbility(builder:NotificationCompat.Builder, dismissable:Boolean){
+*/
+fun determineOnGoingAbility(builder: NotificationCompat.Builder, dismissable:Boolean){
 
     if (!dismissable) {
 
@@ -517,7 +529,8 @@ fun determineOnGoingAbility(builder:NotificationCompat.Builder, dismissable:Bool
             setOngoing(true)
 
             //set priority Level to stay on TOP of other notifications
-            setChannelId(NOTIFICATION_CHANNEL_TWO)
+            setChannelId("")
+//            setChannelId(NOTIFICATION_CHANNEL_TWO)
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                 priority = Notification.PRIORITY_MAX
@@ -527,7 +540,7 @@ fun determineOnGoingAbility(builder:NotificationCompat.Builder, dismissable:Bool
         builder.setCategory(Notification.CATEGORY_REMINDER)
     }
 }
-
+/*
 
 //TODO ADD common functionality to remove notifications!
 //TODO when switching between tasks, make notification priority low so it doesn't show up all the time
@@ -536,7 +549,7 @@ fun determineOnGoingAbility(builder:NotificationCompat.Builder, dismissable:Bool
 fun Context.notificationShowTimer(){
     val manager = getNotificationManager()
 
-    getBuilder().apply {
+    _getBuilder().apply {
 
         setContentTitle(getHtml("Times up!"))
         setAutoCancel(true)
@@ -556,7 +569,7 @@ fun Context.notificationShowTimer(){
 fun Context.notificationShowRest(){
     val manager = getNotificationManager()
 
-    getBuilder().apply {
+    _getBuilder().apply {
 
         setContentTitle(getHtml("Rest!"))
 //                setContentTitle(Html.fromHtml("All done! &#127769", Html.FROM_HTML_MODE_COMPACT))
@@ -581,7 +594,7 @@ fun Context.notificationShowRest(){
 fun Context.notificationShowActivity(activity:String, int:Int){
     val manager = getNotificationManager()
 
-    getBuilder().apply {
+    _getBuilder().apply {
 
         setContentTitle(getHtml("$activity! $int"))
 //                setContentTitle(Html.fromHtml("All done! &#127769", Html.FROM_HTML_MODE_COMPACT))
