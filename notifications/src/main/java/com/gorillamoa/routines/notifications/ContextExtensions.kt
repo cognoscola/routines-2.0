@@ -3,7 +3,6 @@ package com.gorillamoa.routines.notifications
 import android.content.Context
 import android.widget.RemoteViews
 
-
 fun Context.remoteGetSmallTaskView(task: String): RemoteViews {
     return (applicationContext as RemoteInjectorHelper.RemoteGraphProvider).remoteViewGraph.remoteGetSmallTaskView(task)
 }

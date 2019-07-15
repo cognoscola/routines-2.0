@@ -1,4 +1,4 @@
-/*
+
 package com.gorillamoa.routines.notifications
 
 import android.app.PendingIntent
@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.RemoteViews
+/*
 import com.gorillamoa.routines.MobileNotificationBehaviourReceiver.Companion.ACTION_TASK_EXPAND
 import com.gorillamoa.routines.MobileNotificationBehaviourReceiver.Companion.ACTION_WAKEUP_COLLAPSE
 import com.gorillamoa.routines.core.data.Task
@@ -14,11 +15,13 @@ import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companio
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_PREVIOUS
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
 
+*/
 import android.graphics.Paint
-import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
+/*import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_DONE
-import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_UNCOMPLETE
+import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_UNCOMPLETE*/
+import com.gorillamoa.routines.notifications.impl.getHtml
 
 
 //TODO Set Height of remote view  to MIN of (WRAP_CONTENT, 256dp )
@@ -31,7 +34,6 @@ fun Context.getLargeWakeUpRemoteView(bigStringContent: String): RemoteViews {
     remoteViews.setImageViewResource(R.id.behaviourImage, R.drawable.ic_expand_less_black_24dp)
     remoteViews.setTextViewText(R.id.behaviourText, getString(R.string.collapse))
 
-    setStartFunction(remoteViews)
     return remoteViews
 }
 
@@ -43,13 +45,13 @@ fun Context.getLargeTaskRemoteView(bigTaskContent:String):RemoteViews{
 
 }
 
-fun Context.setStartFunction(remoteViews: RemoteViews) {
+fun RemoteViews.setStartFunction( startPendingIntent:PendingIntent) {
 
-        remoteViews.setOnClickPendingIntent(R.id.start, createNotificationActionPendingIntentForWakeUp(ACTION_WAKE_START_DAY))
+        setOnClickPendingIntent(R.id.start, startPendingIntent)
 }
 
 //TODO CONFIGURE appearance for empty tasks
-fun RemoteViews.createFunction(context:Context, tasks:String?, action:String,tid:Long = -1):RemoteViews{
+/*fun RemoteViews.createFunction(context:Context, tasks:String?, action:String,tid:Long = -1):RemoteViews{
 
      try {
         tasks?.let {
@@ -70,9 +72,9 @@ fun RemoteViews.createFunction(context:Context, tasks:String?, action:String,tid
         Log.e("Unknown Activity Name",ignored.message)
     }
     return this
-}
+}*/
 
-fun RemoteViews.createCollapseFunction(context: Context,tasks: String?):RemoteViews{
+/*fun RemoteViews.createCollapseFunction(context: Context,tasks: String?):RemoteViews{
 
     try {
         tasks?.let {
@@ -88,7 +90,8 @@ fun RemoteViews.createCollapseFunction(context: Context,tasks: String?):RemoteVi
         Log.e("Unknown Activity Name",ignored.message)
     }
     return this
-}
+}*/
+
 
 fun Context.getWakeupRemoteView(taskLength:Int): RemoteViews {
 
@@ -97,7 +100,6 @@ fun Context.getWakeupRemoteView(taskLength:Int): RemoteViews {
     remoteViews.setTextViewText(R.id.description, getHtml(getString(R.string.wake_up_description, taskLength )))
     remoteViews.setImageViewResource(R.id.behaviourImage, R.drawable.ic_expand_more_black_24dp)
 
-    setStartFunction(remoteViews)
     return remoteViews
 }
 
@@ -105,19 +107,19 @@ fun Context.getTaskRemoteView(task:String):RemoteViews{
 
 
     val remoteViews = RemoteViews(packageName, R.layout.remote_task)
-    remoteViews.setTextViewText(R.id.title, task.name)
+/*    remoteViews.setTextViewText(R.id.title, task.name)
     remoteViews.setTextViewText(R.id.description, task.description)
 
     setTaskCompletionStatus(task,remoteViews)
 
     setDirectionFunctions(task,remoteViews)
     //TODO MOVE THIS OUT OF HERE, we may want to create a notification without having this function
-    remoteViews.createFunction(this, getGson().toJson(task),ACTION_TASK_EXPAND,task.id!!)
+    remoteViews.createFunction(this, getGson().toJson(task),ACTION_TASK_EXPAND,task.id!!)*/
 
     return remoteViews
 }
 
-
+/*
 fun Context.setTaskCompletionStatus(task:Task, remoteView: RemoteViews){
 
     if(TaskScheduler.isComplete(this, task.id!!)){
@@ -134,20 +136,23 @@ fun Context.setTaskCompletionStatus(task:Task, remoteView: RemoteViews){
         remoteView.setInt(R.id.title, "setPaintFlags", Paint.ANTI_ALIAS_FLAG)
         remoteView.setOnClickPendingIntent(R.id.statusButton,createNotificationActionPendingIntentForTask(task,null,ACTION_DONE))
     }
-}
+}*/
 
+/*
 fun Context.setDirectionFunctions(task:Task,remoteView:RemoteViews){
+
 
     remoteView.setOnClickPendingIntent(R.id.nextGroup,createNotificationActionPendingIntentForTask(task, null,ACTION_TASK_NEXT))
     remoteView.setOnClickPendingIntent(R.id.previousGroup,createNotificationActionPendingIntentForTask(task,null, ACTION_TASK_PREVIOUS))
 }
+*/
 
 fun Context.getSmallSleepView():RemoteViews{
     val remoteViews = RemoteViews(packageName,R.layout.remote_sleep)
-    remoteViews.setTextViewText(R.id.title, getHtml(getString(R.string.sleep_title)))
-    remoteViews.setTextViewText(R.id.percentScore, TaskScheduler.getScoreString(this@getSmallSleepView))
-    remoteViews.setTextViewText(R.id.points, TaskScheduler.getPoints(this@getSmallSleepView).toString())
-    remoteViews.setTextViewText(R.id.description, getString(R.string.details))
+//    remoteViews.setTextViewText(R.id.title, getHtml(getString(R.string.sleep_title)))
+//    remoteViews.setTextViewText(R.id.percentScore, TaskScheduler.getScoreString(this@getSmallSleepView))
+//    remoteViews.setTextViewText(R.id.points, TaskScheduler.getPoints(this@getSmallSleepView).toString())
+//    remoteViews.setTextViewText(R.id.description, getString(R.string.details))
 
     return remoteViews
 }
@@ -155,4 +160,4 @@ fun Context.getSmallSleepView():RemoteViews{
 fun Context.getLargeSleepView():RemoteViews{
     return RemoteViews(packageName,0)
 }
-*/
+

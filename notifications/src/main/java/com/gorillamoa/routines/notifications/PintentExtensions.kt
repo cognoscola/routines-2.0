@@ -1,3 +1,8 @@
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.util.Log
+
 /*
 package com.gorillamoa.routines.notifications
 
@@ -123,17 +128,9 @@ fun Context.createNotificationMainIntentForWakeup(startingActivityName:String):P
 */
 /****************************************************************
  * Functions for WAKE UP Notifications
- *****************************************************************//*
+ *****************************************************************/
 
-fun Context.createNotificationActionPendingIntentForWakeUp(action:String):PendingIntent{
-    Log.d("notificationRoutine","createNotificationActionPendingIntentForWakeUp ACTION:$action")
 
-    val intent = Intent(this,NotificationActionReceiver::class.java)
-    intent.action = action
-    return PendingIntent.getBroadcast(this, 0,intent,PendingIntent.FLAG_ONE_SHOT)
-}
-
-*/
 /**
  * The user dismisses a Wake Up Intent. System needs to take an action
  * For now We'll just launch the first task.

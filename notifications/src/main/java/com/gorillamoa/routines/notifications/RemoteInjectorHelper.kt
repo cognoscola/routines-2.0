@@ -1,6 +1,8 @@
 package com.gorillamoa.routines.notifications
 
 import android.app.Application
+import android.content.Context
+
 //import com.google.gson.Gson
 
 
@@ -15,6 +17,7 @@ class RemoteInjectorHelper{
                 throw IllegalStateException("The Application is not implementing RemoteGraphProvider")
             }
         }
+
     }
 
     interface RemoteGraphProvider{
@@ -24,4 +27,7 @@ class RemoteInjectorHelper{
     interface RemoteGsonProvider{
 //        fun getGson():Gson
     }
+
+
+
 }

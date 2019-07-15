@@ -8,12 +8,7 @@ import android.graphics.Color
 import android.os.Build
 import android.widget.RemoteViews
 import com.google.gson.Gson
-import com.gorillamoa.routines.*
-
-import com.gorillamoa.routines.core.extensions.NOTIFICATION_CHANNEL_ONE
-import com.gorillamoa.routines.core.extensions.NOTIFICATION_CHANNEL_TWO
-import com.gorillamoa.routines.notifications.RemoteInjectorHelper
-import com.gorillamoa.routines.notifications.RemoteViewGraph
+import com.gorillamoa.routines.notifications.*
 
 
 /**

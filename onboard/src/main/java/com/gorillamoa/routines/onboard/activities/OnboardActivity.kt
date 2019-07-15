@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentActivity
 import com.gorillamoa.routines.core.coroutines.Coroutines
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
+import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_WAKE_START_DAY
 import com.gorillamoa.routines.notifications.*
 import com.gorillamoa.routines.onboard.R
 import com.gorillamoa.routines.onboard.fragments.InformationFragment
@@ -153,14 +154,16 @@ class OnboardActivity:FragmentActivity(){
                     //E.g.
                     //our title
 
-
-                    getNotificationBuilder(NOTIFICATION_CHANNEL_ONE,isWatch()).apply {
+/*                    getNotificationBuilder(NOTIFICATION_CHANNEL_ONE,isWatch()).apply {
                        // setContent()//TODO pass content title and info
                         //setCustomContentView()
-                    }
+                    }*/
 
+                    val smallWakeupView = remoteGetSmallWakeUpView(dummyArrray.size)
+                    smallWakeupView.setStartFunction(createNotificationActionPendingIntentForWakeUp(ACTION_WAKE_START_DAY))
 
-
+                    val largeWakeupView = remoteGetLargeWakeUpView(StringBuilder().stringifyTasks(dummyArrray))
+                    largeWakeupView.setStartFunction(createNotificationActionPendingIntentForWakeUp(ACTION_WAKE_START_DAY))
 
                     notificationShowWakeUp(
                             StringBuilder().stringifyTasks(dummyArrray),
@@ -171,11 +174,13 @@ class OnboardActivity:FragmentActivity(){
                             //TODO CHECK IF WE SHOULD ALLOW DISMISSAL with stubborn settings
                             dismissable = false,
                             //TODO get the actual task length
-                            smallRemoteView = null,
+//                            smallRemoteView = null,
 //                            smallRemoteView = if (!isWatch()) remoteGetSmallWakeUpView(dummyArrray.size) else null,
+                            smallRemoteView = smallWakeupView,
 //                            TODO Get stringbuilder from dagger singleton
-                            bigRemoteView =  null
+//                            bigRemoteView =  null
 //                            bigRemoteView = if (!isWatch()) remoteGetLargeWakeUpView(StringBuilder().stringifyTasks(dummyArrray)) else null
+                            bigRemoteView = largeWakeupView
                     )
 
                     saveOnboardStatus(true)
