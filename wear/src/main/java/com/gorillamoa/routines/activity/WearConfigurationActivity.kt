@@ -15,6 +15,8 @@ import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
+import com.gorillamoa.routines.notifications.notificationShowSleep
+import com.gorillamoa.routines.notifications.notificationShowTask
 import kotlinx.android.synthetic.main.activity_service_controller.*
 import java.util.*
 
@@ -52,7 +54,8 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
         mAmbientController = AmbientModeSupport.attach(this@WearConfigurationActivity)
 
         taskViewModel = connectAndLoadViewModel()
-        taskViewModel.tasks.observe(this, Observer {
+        //todo fix the lifecycleowner problem
+        /*taskViewModel.tasks.observe(this, Observer {
             /*if (it.isNotEmpty()) {
                 notificationShowWakeUpMirror(it)
             }else{
@@ -64,7 +67,7 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
                     notificationShowWakeUpMirror(list)
                 }
             }
-        })
+        })*/
 
         /**get the view model object */
 
@@ -72,10 +75,11 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
 
         wakePickerButton.setOnClickListener {
 
-            startActivityForResult(
+            //FIXME
+           /* startActivityForResult(
                     Intent(this,SettingsActivity::class.java).apply {
                         putExtra(TimePickerFragment.DISPLAY_TEXT,getString(R.string.onboard_wake_up_text))
-            }, PICKER_CODE_WAKE)
+            }, PICKER_CODE_WAKE)*/
         }
 
         /** get our local settings*/
@@ -95,10 +99,11 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
         }
 
         sleepPickerButton.setOnClickListener {
-            startActivityForResult(
+            //FIXME spli
+            /*startActivityForResult(
                     Intent(this,SettingsActivity::class.java).apply {
                         putExtra(TimePickerFragment.DISPLAY_TEXT,getString(R.string.onboard_sleep_text))
-                    }, PICKER_CODE_SLEEP)
+                    }, PICKER_CODE_SLEEP)*/
         }
 
         sleepAlarmToggle.apply {
@@ -135,7 +140,8 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
                 task?.let {
 
 
-                    notificationShowTask(it,history)
+                    //TODO pass info as strings
+//                    notificationShowTask(it,history)
                 }
             }
         }
@@ -217,11 +223,11 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
                     //TODO truncate these codes
                     val cal = Calendar.getInstance()
 
-
-                    setWakeTimeToCalendarAndStore(cal,
+                    //TODO fix code split issues
+                    /*setWakeTimeToCalendarAndStore(cal,
                             data?.getIntExtra(TimePickerFragment.HOUR,-1)?:-1,
                             data?.getIntExtra(TimePickerFragment.MIN,-1)?:-1,
-                            data?.getIntExtra(TimePickerFragment.PHASE,-1)?:-1)
+                            data?.getIntExtra(TimePickerFragment.PHASE,-1)?:-1)*/
 
                     alarmSetRepeatWithCal(cal,true)
                     wakeUpAlarmToggle?.isChecked = true
@@ -229,11 +235,12 @@ class WearConfigurationActivity : FragmentActivity(), AmbientModeSupport.Ambient
                 PICKER_CODE_SLEEP -> {
                     val cal = Calendar.getInstance()
 
-                    setSleepTimeToCalendarAndStore(cal,
+                    //TODO fix code split issues
+                    /*setSleepTimeToCalendarAndStore(cal,
 
                             data?.getIntExtra(TimePickerFragment.HOUR,-1)?:-1,
                             data?.getIntExtra(TimePickerFragment.MIN,-1)?:-1,
-                            data?.getIntExtra(TimePickerFragment.PHASE,-1)?:-1)
+                            data?.getIntExtra(TimePickerFragment.PHASE,-1)?:-1)*/
                     sleepAlarmToggle?.isChecked = true
                     alarmSetRepeatWithCal(cal,false)
                 }

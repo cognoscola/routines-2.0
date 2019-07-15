@@ -23,7 +23,55 @@ import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companio
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_UNCOMPLETE*/
 import com.gorillamoa.routines.notifications.impl.getHtml
 
+/**
+ * Creates a remote view specifically designed (dimension wise) for a large sized notification.
+ * @receiver Context
+ * @param bigStringContent String
+ * @return RemoteViews
+ */
+fun Context.createLargeWakeUpRemoteView(bigStringContent: String): RemoteViews {
+    val remoteViews = RemoteViews(packageName, R.layout.remote_wakeup_large)
+    remoteViews.setTextViewText(R.id.title, getHtml(getString(R.string.wake_up_large_title)))
+    remoteViews.setTextViewText(R.id.bigContent, getHtml(bigStringContent))
 
+    //Give option to collapse
+    remoteViews.setImageViewResource(R.id.behaviourImage, R.drawable.ic_expand_less_black_24dp)
+    remoteViews.setTextViewText(R.id.behaviourText, getString(R.string.collapse))
+
+    return remoteViews
+}
+
+/**
+ * Creates a Remote View. This View is intented for a regular-sized notification. So don't assign it
+ * to a large content view
+ * @receiver Context
+ * @param taskLength Int
+ * @return RemoteViews
+ */
+fun Context.createWakeUpRemoteView(taskLength:Int): RemoteViews {
+
+    val remoteViews = RemoteViews(packageName, R.layout.remote_wakeup)
+    remoteViews.setTextViewText(R.id.title, getHtml(getString(R.string.wake_up_title)))
+    remoteViews.setTextViewText(R.id.description, getHtml(getString(R.string.wake_up_description, taskLength )))
+    remoteViews.setImageViewResource(R.id.behaviourImage, R.drawable.ic_expand_more_black_24dp)
+
+    return remoteViews
+}
+
+
+/**
+ * Assigns the specified pending intent to the start function
+ * @receiver RemoteViews
+ * @param startPendingIntent PendingIntent
+ */
+fun RemoteViews.setIntentToStartButton(startPendingIntent:PendingIntent) {
+    setOnClickPendingIntent(R.id.start, startPendingIntent)
+}
+
+/************************************************************************************
+ * OLD FUNCTIONS
+ *********************************************************************************/
+//TODO deprecate this
 //TODO Set Height of remote view  to MIN of (WRAP_CONTENT, 256dp )
 fun Context.getLargeWakeUpRemoteView(bigStringContent: String): RemoteViews {
     val remoteViews = RemoteViews(packageName, R.layout.remote_wakeup_large)
@@ -45,10 +93,6 @@ fun Context.getLargeTaskRemoteView(bigTaskContent:String):RemoteViews{
 
 }
 
-fun RemoteViews.setStartFunction( startPendingIntent:PendingIntent) {
-
-        setOnClickPendingIntent(R.id.start, startPendingIntent)
-}
 
 //TODO CONFIGURE appearance for empty tasks
 /*fun RemoteViews.createFunction(context:Context, tasks:String?, action:String,tid:Long = -1):RemoteViews{
@@ -93,18 +137,9 @@ fun RemoteViews.setStartFunction( startPendingIntent:PendingIntent) {
 }*/
 
 
-fun Context.getWakeupRemoteView(taskLength:Int): RemoteViews {
 
-    val remoteViews = RemoteViews(packageName, R.layout.remote_wakeup)
-    remoteViews.setTextViewText(R.id.title, getHtml(getString(R.string.wake_up_title)))
-    remoteViews.setTextViewText(R.id.description, getHtml(getString(R.string.wake_up_description, taskLength )))
-    remoteViews.setImageViewResource(R.id.behaviourImage, R.drawable.ic_expand_more_black_24dp)
-
-    return remoteViews
-}
 
 fun Context.getTaskRemoteView(task:String):RemoteViews{
-
 
     val remoteViews = RemoteViews(packageName, R.layout.remote_task)
 /*    remoteViews.setTextViewText(R.id.title, task.name)

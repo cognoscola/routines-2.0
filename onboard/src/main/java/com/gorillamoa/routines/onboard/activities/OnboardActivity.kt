@@ -1,5 +1,7 @@
 package com.gorillamoa.routines.onboard.activities
 
+import android.app.NotificationManager
+import android.content.Context
 import android.os.Bundle
 
 import android.util.Log
@@ -31,6 +33,8 @@ import java.util.*
  * "Wake up from sleep" alarm.
  *
  */
+const val ACTION_WAKE_UP_PRACTISE = "action.wakeup.practise"
+
 class OnboardActivity:FragmentActivity(){
 
     //TODO change the activity launcher name (what the user sees)
@@ -58,21 +62,28 @@ class OnboardActivity:FragmentActivity(){
                 .add(R.id.fragmentContainer, SplashFragment())
                 .commit()
 
+        //Supposedly the wake up notification should not be on right now, so we'll
+        //just dismiss incase it is!
+        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
+            Log.d("NotificationActionRecei","Dismissing Wake up ${intent.getIntExtra(TASK_ID,-1)}")
+            cancel(NOTIFICATION_TAG,intent.getIntExtra(TASK_ID,1))
+        }
 
         GlobalScope.launch {
 
             delay(3000)
 
             //TODO check if intent is null
-            /*if (intent?.action == ACTION_TEST_WAKE_UP) {
+            if (intent?.action == ACTION_WAKE_UP_PRACTISE) {
+
+                //dismiss the notification
+                //dismiss the wake up notification
                 state = OnboardState.TEXT3
-            }*/
-            state = OnboardState.PickTime
+            }
+
             setNextFragment(state)
         }
     }
-
-
 
     /**
      * Determine which fragment to show next depending on the view state.
@@ -108,7 +119,7 @@ class OnboardActivity:FragmentActivity(){
                                 setWakeTimeToCalendarAndStore(cal, hour, minute, phase)
                                 alarmSetRepeatWithCal(cal, true)
 
-                                setNextFragment(state)
+                                setNextFragment(OnboardState.PickTime)
                             }
                         })
                         .commit()
@@ -123,17 +134,6 @@ class OnboardActivity:FragmentActivity(){
                         "Send me a notification", null
                 )
 
-                CoroutineScope(Dispatchers.Main).launch {
-
-                }
-                Coroutines.ioThenMain({
-                    delay(1000)
-                }){
-
-                }
-
-
-//                setTextFragment(R.string.onboard_welcome_text_04)
                 state = OnboardState.TEXT3
             }
 
@@ -146,6 +146,8 @@ class OnboardActivity:FragmentActivity(){
                         getString(R.string.onboard_choice_02_04)
                 )
                 state = OnboardState.TEXT4
+
+
                 //TODO save state
             }
         }
@@ -211,35 +213,22 @@ class OnboardActivity:FragmentActivity(){
              * E.g. the remote view isn't always accepted, so we don't need to worry about it.
              */
 
-            //E.g.
-            //our title
+            val smallWakeupView = createWakeUpRemoteView(dummyArrray.size)
+            smallWakeupView.setIntentToStartButton(createNotificationActionPendingIntentForWakeUp(ACTION_WAKE_START_DAY, WAKE_UP_NOTIFICATION_ID))
 
-/*                    getNotificationBuilder(NOTIFICATION_CHANNEL_ONE,isWatch()).apply {
-                       // setContent()//TODO pass content title and info
-                        //setCustomContentView()
-                    }*/
-
-            val smallWakeupView = remoteGetSmallWakeUpView(dummyArrray.size)
-            smallWakeupView.setStartFunction(createNotificationActionPendingIntentForWakeUp(ACTION_WAKE_START_DAY))
-
-            val largeWakeupView = remoteGetLargeWakeUpView(StringBuilder().stringifyTasks(dummyArrray))
-            largeWakeupView.setStartFunction(createNotificationActionPendingIntentForWakeUp(ACTION_WAKE_START_DAY))
+            val largeWakeupView = createLargeWakeUpRemoteView(StringBuilder().stringifyTasks(dummyArrray, if(isWatch())25 else 40))
+            largeWakeupView.setIntentToStartButton(createNotificationActionPendingIntentForWakeUp(ACTION_WAKE_START_DAY, WAKE_UP_NOTIFICATION_ID))
 
             notificationShowWakeUp(
-                    StringBuilder().stringifyTasks(dummyArrray),
+                    StringBuilder().stringifyTasks(dummyArrray,if(isWatch())25 else 40),
                     mainPendingIntent = null,
                     dismissPendingIntent = null,
-                    //TODO dismissing the onboard should go back to the information fragment to displau to user to try again
 //                            dismissPendingIntent = createNotificationDeleteIntentForWakeUp(),
                     //TODO CHECK IF WE SHOULD ALLOW DISMISSAL with stubborn settings
                     dismissable = false,
                     //TODO get the actual task length
-//                            smallRemoteView = null,
-//                            smallRemoteView = if (!isWatch()) remoteGetSmallWakeUpView(dummyArrray.size) else null,
                     smallRemoteView = smallWakeupView,
 //                            TODO Get stringbuilder from dagger singleton
-//                            bigRemoteView =  null
-//                            bigRemoteView = if (!isWatch()) remoteGetLargeWakeUpView(StringBuilder().stringifyTasks(dummyArrray)) else null
                     bigRemoteView = largeWakeupView
             )
 

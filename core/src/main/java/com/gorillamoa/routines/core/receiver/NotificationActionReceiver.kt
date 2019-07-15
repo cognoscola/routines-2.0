@@ -1,18 +1,16 @@
 package com.gorillamoa.routines.core.receiver
 
-import android.app.Activity
+import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import android.widget.Toast
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_HISTORY_DATA
 import com.gorillamoa.routines.core.coroutines.Coroutines
 
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
-import com.gorillamoa.routines.core.services.DataLayerListenerService
 
 class NotificationActionReceiver:BroadcastReceiver(){
     @Suppress("unused")
@@ -133,13 +131,14 @@ class NotificationActionReceiver:BroadcastReceiver(){
                         }else{
 
                             //we go back to the Onboard Page
-
                             val c = Class.forName("com.gorillamoa.routines.onboard.activities.OnboardActivity")
-                            val intent = Intent(this, c)
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            //TODO SPLIT
-//                            intent.action = ACTION_TEST_WAKE_UP
-                            context.startActivity(intent)
+                            val newIntent = Intent(this, c)
+                            newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            newIntent.action = "action.wakeup.practise"
+                            context.startActivity(newIntent)
+
+                            //we'll close the notification tray
+                            context.sendBroadcast(Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
                         }
                     }
                 }

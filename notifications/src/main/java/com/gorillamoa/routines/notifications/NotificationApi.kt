@@ -1,5 +1,6 @@
 package com.gorillamoa.routines.notifications
 
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.widget.RemoteViews
@@ -8,6 +9,7 @@ import androidx.core.app.NotificationCompat
 import com.gorillamoa.routines.notifications.impl.RoutinesNotificationBuilder
 import com.gorillamoa.routines.notifications.impl._getBuilder
 import com.gorillamoa.routines.notifications.impl._notificationShowWakeUp
+import java.util.*
 
 /*
 
@@ -19,16 +21,6 @@ import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import java.util.*
 
-const val WAKE_UP_NOTIFICATION_ID =1
-
-const val SLEEP_NOTIFICATION_ID =65535
-const val REST_NOTIFICATION_ID =65534
-const val ACTIVITY_NOTIFICATION_ID = 65533
-const val TIMER_NOTIFICATION_ID = 65532
-
-const val NOTIFICATION_CHANNEL_ONE  = "channel"
-const val NOTIFICATION_CHANNEL_TWO  = "channel_MAX"
-const val NOTIFICATION_TAG = "routines"
 
 */
 /** Prepare the intent for when user dismisses the notification **//*
@@ -39,7 +31,6 @@ const val NOTIFICATION_TAG = "routines"
 /********************************************************************************
  * WAKE UP NOTIFICATION FUNCTIONS
  *********************************************************************************//*
-
 
 */
 /**
@@ -72,30 +63,28 @@ fun Context.notificationShowWakeUp(tasks:String? = null,
 
 /**
  * Notify other devices that they should build a notification of type WAKE UP
- *//*
+ */
 
 fun Context.notificationShowWakeUpRemote(tasks: ArrayDeque<Long>){
-
+//TODO complete function
 }
 
-*/
 /**
  * Builds a mirrored notification both on the Local device and on
  * other connected nodes. When either is ACTIONED, the same action occurs on both devices.
  * @param tasks is the task list to show
- *//*
-
+ */
 fun Context.notificationShowWakeUpMirror(tasks:ArrayDeque<Long>){
-
+//TODO complete function
 }
 
-*/
 /**
  * Builds a local notification
  * @param tasks is the string of tasks to display
  *//*
 
 fun Context.notificationShowWakeUpLocal(tasks:List<Task>){
+//TODO complete function
 }
 
 */
@@ -105,7 +94,7 @@ fun Context.notificationShowWakeUpLocal(tasks:List<Task>){
  *//*
 
 fun Context.notificationDismissWakeUpRemote(){
-
+//TODO complete function
 }
 
 */
@@ -115,7 +104,7 @@ fun Context.notificationDismissWakeUpRemote(){
  *//*
 
 fun Context.notificationDismissWakeUp(){
-
+//TODO complete function
 }
 
 */
@@ -125,7 +114,7 @@ fun Context.notificationDismissWakeUp(){
 
 fun Context.notificationDismissWakeUpMirror(){
 
-
+//TODO complete function
 }
 
 */
@@ -139,27 +128,26 @@ fun Context.notificationDismissWakeUpMirror(){
  *//*
 
 fun NotificationCompat.Builder.addWakeUpAction(context: Context,actionText:String, action:String){
-
+//TODO complete function
 }
 
 
 */
 /********************************************************************************
  * TASK NOTIFICATION FUNCTIONS
- *********************************************************************************//*
+ *********************************************************************************/
 
-
-fun Context.notificationShowTask(task: Task,
-                                 history:TaskHistory? = null,
+fun Context.notificationShowTask(task: String?= null,
+                                 history:String? = null,
                                  mainPendingIntent: PendingIntent? = null,
                                  dismissPendingIntent: PendingIntent? = null,
                                  dismissable: Boolean = true,
                                  smallRemoteView: RemoteViews? = null,
                                  bigRemoteView: RemoteViews? = null) {
-
+//TODO complete function
 }
 
-*/
+
 /**
  * Builds a mirrored notification both on the Local device and on
  * other connected nodes. When either is ACTIONED, the same action occurs on both devices.
@@ -167,14 +155,15 @@ fun Context.notificationShowTask(task: Task,
  *//*
 
 fun Context.notificationShowTaskMirror(task:Task,history:TaskHistory?= null){
+//TODO complete function
 }
 
 fun Context.notificationShowTaskLocal(task:Task, history:TaskHistory? = null){
-
+//TODO complete function
 }
 
 fun Context.removeAllNotificationsExceptSpecified(tid:Int){
-
+//TODO complete function
 }
 
 */
@@ -183,11 +172,11 @@ fun Context.removeAllNotificationsExceptSpecified(tid:Int){
  *//*
 
 fun Context.notificationShowTaskRemote(task:Task, history:TaskHistory?=null){
-
+//TODO complete function
 }
 
 fun Context.notificationDismissTaskMirror(tid:Long){
-
+//TODO complete function
 }
 
 */
@@ -198,7 +187,7 @@ fun Context.notificationDismissTaskMirror(tid:Long){
  *//*
 
 fun Context.notificationDismissTask(tid:Int) {
-
+//TODO complete function
 }
 
 */
@@ -208,7 +197,7 @@ fun Context.notificationDismissTask(tid:Int) {
  *//*
 
 fun Context.notificationDismissTaskRemote(){
-
+//TODO complete function
 }
 
 */
@@ -222,21 +211,23 @@ fun Context.notificationDismissTaskRemote(){
  *//*
 
 fun NotificationCompat.Builder.addTaskAction(context: Context,actionText:String, action:String, task:Task,history:TaskHistory?){
-
+//TODO complete function
 }
 
 */
 /********************************************************************************
  * SLEEP NOTIFICATION FUNCTIONS
- *********************************************************************************//*
+ *********************************************************************************/
 
 
 fun Context.notificationShowSleepMirror(){
+//TODO complete function
 }
 
-fun Context.notificationShowSleepLocal(){
+fun Context.notificationShowSleepLocal() {
+//TODO complete function
 
-
+}
 fun Context.notificationShowSleep(
         mainPendingIntent: PendingIntent? = null,
         dismissPendingIntent: PendingIntent? = null,
@@ -245,20 +236,20 @@ fun Context.notificationShowSleep(
         bigRemoteView: RemoteViews? = null
 ){
 
+    //TODO complete function
+
 }
 
 fun Context.notificationDismissSleepRemote(){
 
-
+//TODO complete function
 }
 
 fun Context.notificationDismissSleepLocally(){
-
+//TODO complete function
 }
 
 
-
-*/
 /********************************************************************************
  * GENERIC NOTIFICATION FUNCTIONS
  *********************************************************************************//*
@@ -273,11 +264,11 @@ fun Context.notificationDismissSleepLocally(){
  *//*
 
 fun Context.notificationShowRemote(taskData:String, path:String){
-
+//TODO complete function
 }
 
 fun determineOnGoingAbility(builder:NotificationCompat.Builder, dismissable:Boolean){
-
+//TODO complete function
 }
 
 
@@ -287,19 +278,19 @@ fun determineOnGoingAbility(builder:NotificationCompat.Builder, dismissable:Bool
 //clean
 fun Context.notificationShowTimer(){
 
-
+//TODO complete function
 }
 
 
 //clean
 fun Context.notificationShowRest(){
-
+//TODO complete function
 
 }
 
 fun Context.notificationShowActivity(activity:String, int:Int){
 
-
+//TODO complete function
 }
 
 
@@ -312,23 +303,25 @@ fun prepareBigTextStyle(tasks:String,title:Spanned):NotificationCompat.BigTextSt
 
 //create an abstract class RoutinesNotificationBuilder
 fun Context.getNotificationBuilder(channel:String,isWatch:Boolean): NotificationCompat.Builder{
-    return _getBuilder(channel,isWatch) as NotificationCompat.Builder
+    return _getBuilder(channel,isWatch)
 }
 
 
 /*
 
 fun getHtml(htmlString:String): Spanned {
-
+//TODO complete function
 }
 
 */
+
 /**
- * retrieve the notification manager.
- *//*
-
+ * Get the notification manager
+ * @receiver Context
+ * @return NotificationManager
+ */
 fun Context.getNotificationManager(): NotificationManager {
-    `
+
+    return getSystemService(NotificationManager::class.java) as NotificationManager
 }
 
-*/

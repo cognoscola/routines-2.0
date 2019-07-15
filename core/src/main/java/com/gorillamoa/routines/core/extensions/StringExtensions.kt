@@ -8,20 +8,20 @@ import java.util.*
 
 const val MAX_NOTIFICATION_LINE_LENGTH = 23
 const val MAX_NOTIFICATION_HISTORY_LINE_LENGTH = 26
-fun StringBuilder.stringifyTasks(tasks:List<Task>?):String{
+fun StringBuilder.stringifyTasks(tasks:List<Task>?, lineLength: Int):String{
 
     tasks?.let {
         if(tasks.isEmpty()){
-            addTaskLine("There are no tasks","yea")
+            addTaskLine("There are no tasks","yea", MAX_NOTIFICATION_LINE_LENGTH)
         } else{
             tasks.forEach {
-                addTaskLine(it.name,"${it.id}")
+                addTaskLine(it.name,"${it.id}",lineLength)
             }
         }
         return toString()
     }
 
-    addTaskLine("There are no tasks","yea")
+    addTaskLine("There are no tasks","yea", MAX_NOTIFICATION_LINE_LENGTH)
     return toString()
 }
 
@@ -45,7 +45,7 @@ fun StringBuilder.stringifyHistory(tasks:TaskHistory?):String{
         addTotalLine(1,1 )
 
     }?:run{
-        addTaskLine("There are no task histories","yea")
+        addTaskLine("There are no task histories","yea", MAX_NOTIFICATION_HISTORY_LINE_LENGTH)
     }
 
     return toString()
@@ -83,7 +83,7 @@ fun StringBuilder.addHistoryLine(historyDate:String, historyTime:String, complet
  * @param task the showing detail, it can a time length or time specfied or task detail
  * @param extra is additional details to show to the user
  */
-fun StringBuilder.addTaskLine(task:String,extra:String){
+fun StringBuilder.addTaskLine(task:String,extra:String, lineLength:Int){
     //detail should only be 5 chars max
 
     //eg. Meditate
@@ -93,14 +93,14 @@ fun StringBuilder.addTaskLine(task:String,extra:String){
 
     //TODO predict relevant emoji for each task
     append("&#9999;&nbsp;")
-    if (task.length > MAX_NOTIFICATION_LINE_LENGTH) {
+    if (task.length > lineLength) {
 
-        append(task,0,(MAX_NOTIFICATION_LINE_LENGTH - 3 - Math.min(extra.length,5)))
+        append(task,0,(lineLength - 3 - Math.min(extra.length,5)))
         append("...")
 
     }else{
         append(task)
-        for (i in 0..(MAX_NOTIFICATION_LINE_LENGTH - task.length - Math.min(extra.length,5))) {
+        for (i in 0..(lineLength - task.length - Math.min(extra.length,5))) {
             append("&nbsp")
         }
     }

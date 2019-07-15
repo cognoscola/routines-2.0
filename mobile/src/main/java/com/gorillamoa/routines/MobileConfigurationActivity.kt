@@ -13,6 +13,8 @@ import com.gorillamoa.routines.core.extensions.*
 
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
 import com.gorillamoa.routines.core.viewmodels.TaskViewModel
+import com.gorillamoa.routines.notifications.notificationShowSleep
+import com.gorillamoa.routines.notifications.notificationShowWakeUpMirror
 import kotlinx.android.synthetic.main.activity_routine_runner.*
 import java.util.*
 
@@ -44,15 +46,10 @@ class MobileConfigurationActivity : FragmentActivity(),
             broadcastShowWakeUp()
         }
 
+
+
         taskViewModel = connectAndLoadViewModel()
-        taskViewModel.tasks.observe(this, Observer {
-
-            /*if (it.isNotEmpty()) {
-                Log.d("notificationRoutine","onCreate Observer")
-
-            }else{
-                notificationShowWakeUpMirror(TaskScheduler.generateEmptyVisibleList())
-            }*/
+        /*taskViewModel.tasks.observe(this, Observer {
 
             TaskScheduler.schedule(this){ list->
                 list?.let {
@@ -60,7 +57,7 @@ class MobileConfigurationActivity : FragmentActivity(),
                     notificationShowWakeUpMirror(list)
                 }
             }
-        })
+        })*/
 
         notification_show.setOnClickListener {
 

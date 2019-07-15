@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import android.widget.Button
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.gorillamoa.routines.R
 
@@ -30,7 +31,10 @@ class DoubleRowSelectAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DoubleRowItem {
         val inflater = LayoutInflater.from(parent.context)
         //TODO change the layout to be more generic
-        return DoubleRowItem(inflater.inflate(R.layout.item_timepicker, parent, false))
+
+        //TODO undo this and fix the time picker issue
+        return DoubleRowItem(TextView(parent.context))
+//        return DoubleRowItem(inflater.inflate(R.layout.item_timepicker, parent, false))
     }
 
     override fun onBindViewHolder(holder: DoubleRowItem, position: Int) {

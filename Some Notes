@@ -1,0 +1,6 @@
+Some Constants:
+
+Intent Actions:
+
+//When we generate a notification for the user to practise "waking up"
+action.wakeup.practise

@@ -8,6 +8,9 @@ import android.widget.Toast
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
+import com.gorillamoa.routines.notifications.NOTIFICATION_TAG
+import com.gorillamoa.routines.notifications.getNotificationManager
+import com.gorillamoa.routines.notifications.notificationShowTask
 
 /**
  * This class exists because we wish to modify how to the noficiation will behave on
@@ -49,7 +52,7 @@ class MobileNotificationBehaviourReceiver: BroadcastReceiver(){
 
         intent?.let {
 
-            val tid = intent.getIntExtra(com.gorillamoa.routines.core.extensions.TASK_ID,-1)
+            val tid = intent.getIntExtra(TASK_ID,-1)
 
             Log.d("$tag Mobile onReceive","We received.. at least")
 
@@ -74,7 +77,7 @@ class MobileNotificationBehaviourReceiver: BroadcastReceiver(){
                                     //TODO record the dismissal
                                     null,
                                     false,
-//                                    getWakeupRemoteView().createFunction(this,intent.getStringExtra(TASK_DATA)),
+//                                    createWakeUpRemoteView().createFunction(this,intent.getStringExtra(TASK_DATA)),
                                     bigRemoteView = getLargeWakeUpRemoteView(intent.getStringExtra(TASK_DATA))
                                             .createCollapseFunction(this,intent.getStringExtra(TASK_DATA))
                             )
@@ -100,7 +103,7 @@ class MobileNotificationBehaviourReceiver: BroadcastReceiver(){
                                     //TODO record the dismissal
                                     null,
                                     false,
-                                    getWakeupRemoteView(0).createFunction(context,intent.getStringExtra(TASK_DATA), ACTION_WAKEUP_EXPAND),
+                                    createWakeUpRemoteView(0).createFunction(context,intent.getStringExtra(TASK_DATA), ACTION_WAKEUP_EXPAND),
                                     null)
                         }
                     } else {
@@ -114,29 +117,30 @@ class MobileNotificationBehaviourReceiver: BroadcastReceiver(){
 
                             getNotificationManager().cancel(NOTIFICATION_TAG,tid)
 
+
                             val task = context.getGson().fromJson(intent.getStringExtra(KEY_TASK_DATA), Task::class.java)
 
                             notificationShowTask(
-                                    task,
+                                    null,
                                     mainPendingIntent = null,
                                     dismissPendingIntent = null,
                                     dismissable = false,
                                     //TODO just delete this and return null
-                                    smallRemoteView = getTaskRemoteView(task),
+                                    //TODO replace the task with a stringified version it it
+                                    smallRemoteView = null,
                                     bigRemoteView = null
                             )
                         }
                     }else{
                         //TODO OPEN UP TASK VIEW ACTIVITY
                     }
-
                 }
                 ACTION_TASK_COLLAPSE ->{
 
                 }
 
                 else -> {
-                    Log.d("onReceive","Unknown Action on Task ${intent.getIntExtra(com.gorillamoa.routines.core.extensions.TASK_ID,-1)}")
+                    Log.d("onReceive","Unknown Action on Task ${intent.getIntExtra(TASK_ID,-1)}")
                 }
             }
         }

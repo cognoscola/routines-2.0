@@ -45,11 +45,12 @@ class App:Application(), RemoteInjectorHelper.RemoteGraphProvider, RemoteInjecto
 
 
             override fun remoteGetLargeWakeUpView(tasks:String): RemoteViews {
+                //TODO potentially use the new function definition
                 return this@App.getLargeWakeUpRemoteView(tasks)
             }
 
             override fun remoteGetSmallWakeUpView(taskLength:Int): RemoteViews {
-                return this@App.getWakeupRemoteView(taskLength)
+                return this@App.createWakeUpRemoteView(taskLength)
             }
 
             override fun remoteGetLargeSleepView(): RemoteViews {

@@ -30,7 +30,7 @@ class App :Application(), RemoteInjectorHelper.RemoteGraphProvider
             }
 
             override fun remoteGetSmallWakeUpView(taskLength: Int): RemoteViews {
-                return this@App.getWakeupRemoteView(taskLength)
+                return this@App.createWakeUpRemoteView(taskLength)
             }
 
             override fun remoteGetLargeSleepView(): RemoteViews {
