@@ -6,16 +6,14 @@ import android.os.Bundle
 
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_WAKE_START_DAY
 import com.gorillamoa.routines.notifications.*
 import com.gorillamoa.routines.onboard.R
-import com.gorillamoa.routines.onboard.fragments.InformationFragment
-import com.gorillamoa.routines.onboard.fragments.PillarChoosingFragment
-import com.gorillamoa.routines.onboard.fragments.SplashFragment
-import com.gorillamoa.routines.onboard.fragments.TimePickerFragment
+import com.gorillamoa.routines.onboard.fragments.*
 import kotlinx.android.synthetic.main.activity_onboard.fragmentContainer
 import kotlinx.coroutines.*
 import java.util.*
@@ -255,11 +253,62 @@ class OnboardActivity:FragmentActivity(){
 
     fun getPillarChooseCallback() = { pillar:PillarChoosingFragment.Pillar ->
 
+        val fragment:TaskChooseFragment
+        when (pillar) {
+            PillarChoosingFragment.Pillar.Mental -> {
+
+                fragment = TaskChooseFragment.newInstance(
+                        "Meditate", "Wake up Early", "Relax"
+                )
+            }
+            PillarChoosingFragment.Pillar.Physical -> {
+                fragment = TaskChooseFragment.newInstance(
+                        "Lift Weights", "Cardio", "Stretch"
+                )
+            }
+
+            PillarChoosingFragment.Pillar.Relationships -> {
+                fragment = TaskChooseFragment.newInstance(
+                        "Call a friend", "Make a gift", "Hangout"
+                )
+
+            }
+            PillarChoosingFragment.Pillar.Play -> {
+                fragment = TaskChooseFragment.newInstance(
+                        "Video Game", "Soccer", "Read"
+                )
+
+            }
+
+            PillarChoosingFragment.Pillar.Work -> {
+                fragment = TaskChooseFragment.newInstance(
+                        "Check Email", "Cut Distractions", "Less Coffee"
+                )
+            }
+
+            PillarChoosingFragment.Pillar.Other -> {
+                fragment = TaskChooseFragment.newInstance(
+                        "Water Plants", "Wake up Early", "Comb Hair"
+                )
+
+            }
 
 
+        }
 
-
-
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer,fragment)
+                .addToBackStack(null)
+                .commit()
 
     }
+
+    fun getTaskChooseCallback() = {task: String ->
+
+
+        Toast.makeText(this,task,Toast.LENGTH_SHORT).show()
+
+    }
+
+
 }

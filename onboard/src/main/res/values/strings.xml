@@ -28,7 +28,7 @@
 
     </string>
     <string name="onboard_welcome_04">
-        Every morning Routines will remind you to plan your day. It will help you along by pre-scheduling tasks for you. However, it is not perfect. With your help Routines can learn to schedule tasks better for you over time.
+        Every morning Routines will remind you to plan your day. It will help you along by pre-scheduling tasks for you. With your help Routines can learn to schedule tasks better for you over time.
         You have the option to approve the task list, or modify it by changing the task order or by scheduling or removing tasks. These options are available to you anytime. Remember that planning your day is
         the most important task of the day so if you are a stubborn person when it comes to Notifications, it is a wise choice to make this notification persistent.\n\n
         Are you Stubborn?
@@ -78,6 +78,8 @@
 
     <string name="pillars_description"> As you progress through the app, you should ideally balance out the Pillars of your Life. For now, choose one area of your life on which to improve
      upon. </string>
+    <string name="pillar_suggestion_description">Here are some suggestions. You can always create your own as by clicking Add. Remember that
+    these are habits aimed at improving your life. Specific tasks are more actionable and are easier to turn into habits </string>
 
     <string name="pillar_mental">Mental</string>
     <string name="pillar_physical">Physical</string>
@@ -85,6 +87,7 @@
     <string name="pillar_recreational">Play</string>
     <string name="pillar_work">Work Life</string>
     <string name="pillar_other">Other</string>
+    <string name="task_add">Add + </string>
 
 </resources>
 

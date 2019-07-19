@@ -25,7 +25,7 @@
         android:textColor="@color/pillar_text_color"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/pillars_description"
+        android:text="@string/pillar_suggestion_description"
         android:textStyle="bold"
         />
 
@@ -46,7 +46,7 @@
         android:paddingBottom="@dimen/onboard_pillar_vertical_padding"
         android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
         android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
-        android:id="@+id/mentalButton"
+        android:id="@+id/choiceButtonOne"
         />
 
     <TextView
@@ -62,7 +62,8 @@
         android:paddingBottom="@dimen/onboard_pillar_vertical_padding"
         android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
         android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
-        android:id="@+id/physicalButton"/>
+        android:id="@+id/choiceButtonThree"
+        />
 
     <TextView
         android:textColor="@color/pillar_text_color"
@@ -77,36 +78,7 @@
         android:paddingBottom="@dimen/onboard_pillar_vertical_padding"
         android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
         android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
-        android:id="@+id/relationshipButton"/>
-
-    <TextView
-        android:textColor="@color/pillar_text_color"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@drawable/picker_button_selector"
-        android:text="@string/pillar_recreational"
-        android:gravity="center"
-        android:textStyle="bold"
-        android:textSize="@dimen/onboard_choice_text_size"
-        android:paddingTop="@dimen/onboard_pillar_vertical_padding"
-        android:paddingBottom="@dimen/onboard_pillar_vertical_padding"
-        android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
-        android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
-        android:id="@+id/playButton"/>
-    <TextView
-        android:textColor="@color/pillar_text_color"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@drawable/picker_button_selector"
-        android:text="@string/pillar_work"
-        android:gravity="center"
-        android:textStyle="bold"
-        android:textSize="@dimen/onboard_choice_text_size"
-        android:paddingTop="@dimen/onboard_pillar_vertical_padding"
-        android:paddingBottom="@dimen/onboard_pillar_vertical_padding"
-        android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
-        android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
-        android:id="@+id/worklifeButton"
+        android:id="@+id/choiceButtonTwo"
         />
 
     <TextView
@@ -114,14 +86,14 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@drawable/picker_button_selector"
-        android:text="@string/pillar_other"
+        android:text="@string/task_add"
         android:gravity="center"
         android:textStyle="bold"
         android:textSize="@dimen/onboard_choice_text_size"
-        android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
-        android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
         android:paddingTop="@dimen/onboard_pillar_vertical_padding"
         android:paddingBottom="@dimen/onboard_pillar_vertical_padding"
-        android:id="@+id/otherButton"/>
+        android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
+        android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
+        android:id="@+id/addButton"/>
 
 </LinearLayout>
