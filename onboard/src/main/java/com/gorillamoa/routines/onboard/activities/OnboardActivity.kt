@@ -2,6 +2,7 @@ package com.gorillamoa.routines.onboard.activities
 
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 
 import android.util.Log
@@ -307,7 +308,13 @@ class OnboardActivity:FragmentActivity(){
 
 
         Toast.makeText(this,task,Toast.LENGTH_SHORT).show()
+        //TODO create the specified task
+        //TODO start task view activity
 
+        val activity = Class.forName("com.gorillamoa.routines.details.DetailsActivity")
+        val newIntent  = Intent(this, activity)
+        newIntent.putExtra("task_name",task)
+        startActivityForResult(newIntent,1000)
     }
 
 

@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$/configuration" />
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/delauney-triangulator" />
+            <option value="$PROJECT_DIR$/details" />
             <option value="$PROJECT_DIR$/mobile" />
             <option value="$PROJECT_DIR$/notifications" />
             <option value="$PROJECT_DIR$/notificationsimpl" />

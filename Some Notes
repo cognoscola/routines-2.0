@@ -4,3 +4,8 @@ Intent Actions:
 
 //When we generate a notification for the user to practise "waking up"
 action.wakeup.practise
+
+
+//Items for the Details Activity
+
+task_name //task name
