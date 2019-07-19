@@ -73,6 +73,8 @@
     <string name="pref_help_category">Feedback</string>
     <string name="pref_show_notification_description">Show Notifications</string>
     <string name="pref_low_graphics_description">Use Low Graphics to Save Battery</string>
+    <string name="pref_stubborn_notification">pref_notification_stubborn</string>
+    <string name="pref_stubborn_notification_title">Stubborn Notifications</string>
     <string name="pref_background_color_description">Change Background Colors</string>
     <string name="pref_help_description">Got a feature request? Send some Feedback!</string>
 

@@ -1,6 +1,5 @@
 package com.gorillamoa.routines.core.receiver
 
-import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent

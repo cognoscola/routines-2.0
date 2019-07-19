@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="#EE2163"
+    android:paddingStart="@dimen/onboard_background_horizontal_padding"
+    android:paddingEnd="@dimen/onboard_background_horizontal_padding">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pillars_title"
+        android:layout_gravity="center_horizontal"
+        android:textStyle="bold"
+        android:textColor="@color/pillar_text_color"
+        android:textSize="@dimen/onboard_title_text_size"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="10dp"/>
+    <TextView
+        android:textColor="@color/pillar_text_color"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pillars_description"
+        android:textStyle="bold"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="10dp"/>
+
+    <TextView
+        android:textColor="@color/pillar_text_color"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/timepicker_button_background"
+        android:text="@string/pillar_mental"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textSize="@dimen/onboard_choice_text_size"
+        android:paddingTop="@dimen/onboard_pillar_vertical_padding"
+        android:paddingBottom="@dimen/onboard_pillar_vertical_padding"
+        android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
+        android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
+        android:id="@+id/mentalButton"
+        />
+
+    <TextView
+        android:textColor="@color/pillar_text_color"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/timepicker_button_background"
+        android:text="@string/pillar_physical"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textSize="@dimen/onboard_choice_text_size"
+        android:paddingTop="@dimen/onboard_pillar_vertical_padding"
+        android:paddingBottom="@dimen/onboard_pillar_vertical_padding"
+        android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
+        android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
+        android:id="@+id/physicalButton"/>
+
+    <TextView
+        android:textColor="@color/pillar_text_color"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/timepicker_button_background"
+        android:text="@string/pillar_relationships"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textSize="@dimen/onboard_choice_text_size"
+        android:paddingTop="@dimen/onboard_pillar_vertical_padding"
+        android:paddingBottom="@dimen/onboard_pillar_vertical_padding"
+        android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
+        android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
+        android:id="@+id/relationshipButton"/>
+
+    <TextView
+        android:textColor="@color/pillar_text_color"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/timepicker_button_background"
+        android:text="@string/pillar_recreational"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textSize="@dimen/onboard_choice_text_size"
+        android:paddingTop="@dimen/onboard_pillar_vertical_padding"
+        android:paddingBottom="@dimen/onboard_pillar_vertical_padding"
+        android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
+        android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
+        android:id="@+id/playButton"/>
+    <TextView
+        android:textColor="@color/pillar_text_color"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/timepicker_button_background"
+        android:text="@string/pillar_work"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textSize="@dimen/onboard_choice_text_size"
+        android:paddingTop="@dimen/onboard_pillar_vertical_padding"
+        android:paddingBottom="@dimen/onboard_pillar_vertical_padding"
+        android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
+        android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
+        android:id="@+id/worklifeButton"
+        />
+
+    <TextView
+        android:textColor="@color/pillar_text_color"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/timepicker_button_background"
+        android:text="@string/pillar_other"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textSize="@dimen/onboard_choice_text_size"
+        android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
+        android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
+        android:paddingTop="@dimen/onboard_pillar_vertical_padding"
+        android:paddingBottom="@dimen/onboard_pillar_vertical_padding"
+        android:id="@+id/otherButton"/>
+
+</LinearLayout>

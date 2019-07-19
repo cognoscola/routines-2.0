@@ -44,6 +44,8 @@ private const val KEY_TASK_VISIBLE ="taskShowing"
 
 private const val ONBOARDING = "isOnboarding"
 
+private const val PREF_STUBBORN = "pref_notification_stubborn"
+
 
 fun Context.getLocalSettings():SharedPreferences{
     //later investigate cost of retrieving shared preferences
@@ -384,8 +386,13 @@ fun Context.saveAllLists(order:String, uncompleted:String, completed:String){
 //SOME USER PREFERENCES
 //TODO find a way to share these values across xml and across modules
 fun Context.isNotificationStubborn():Boolean{
-    return getLocalSettings().getBoolean("pref_notifications_stubbon",false)
+    return getLocalSettings().getBoolean(PREF_STUBBORN,false)
 }
+
+fun Context.setNotificationStubborn(boolean: Boolean){
+    getLocalSettings().edit().putBoolean(PREF_STUBBORN,false).apply()
+}
+
 
 @TargetApi(23)
 fun Context.getAllTaskShowing():Array<StatusBarNotification>{

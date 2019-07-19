@@ -31,8 +31,8 @@
         android:paddingBottom="@dimen/pref_item_vertical_padding"
         android:layout_width="match_parent"
         android:layout_height="@dimen/pref_height"
-        android:text="@string/pref_show_notification_description"
-        app:key ="@string/pref_notification_category"
+        android:text="@string/pref_stubborn_notification_title"
+        app:key ="@string/pref_stubborn_notification"
         />
 
 

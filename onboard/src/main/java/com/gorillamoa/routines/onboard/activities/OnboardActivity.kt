@@ -7,13 +7,13 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.FragmentActivity
-import com.gorillamoa.routines.core.coroutines.Coroutines
 import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_WAKE_START_DAY
 import com.gorillamoa.routines.notifications.*
 import com.gorillamoa.routines.onboard.R
 import com.gorillamoa.routines.onboard.fragments.InformationFragment
+import com.gorillamoa.routines.onboard.fragments.PillarChoosingFragment
 import com.gorillamoa.routines.onboard.fragments.SplashFragment
 import com.gorillamoa.routines.onboard.fragments.TimePickerFragment
 import kotlinx.android.synthetic.main.activity_onboard.fragmentContainer
@@ -146,10 +146,16 @@ class OnboardActivity:FragmentActivity(){
                         getString(R.string.onboard_choice_02_04)
                 )
                 state = OnboardState.TEXT4
-
-
-                //TODO save state
             }
+
+            OnboardState.TEXT4 -> {
+
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragmentContainer,PillarChoosingFragment.newInstance())
+                        .commit()
+
+            }
+
         }
     }
 
@@ -187,6 +193,13 @@ class OnboardActivity:FragmentActivity(){
 
         if (state == OnboardState.TEXT4) {
             //capture the argument
+            if (argument == InformationFragment.KEY_STUBBORN) {
+
+                setNotificationStubborn(true)
+            }else{
+                setNotificationStubborn(false)
+            }
+
         }
 
         if(state == OnboardState.TEXT3){
@@ -238,5 +251,15 @@ class OnboardActivity:FragmentActivity(){
         }
 
         nextState()
+    }
+
+    fun getPillarChooseCallback() = { pillar:PillarChoosingFragment.Pillar ->
+
+
+
+
+
+
+
     }
 }
