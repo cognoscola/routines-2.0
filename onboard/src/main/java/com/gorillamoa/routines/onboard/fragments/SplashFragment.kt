@@ -12,6 +12,7 @@ class SplashFragment:androidx.fragment.app.Fragment(){
         return inflater.inflate(R.layout.fragment_splash,container,false)
     }
 
-    //TODO created fancy splash where the Words ROutines are drawn out like caligraphy
 
+
+    //TODO created fancy splash where the Words ROutines are drawn out like caligraphy
 }

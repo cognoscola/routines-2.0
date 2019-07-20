@@ -1,25 +1,22 @@
-package com.gorillamoa.routines.views
+package com.gorillamoa.routines.tools.delayneytriangle
 
 import android.graphics.*
 import android.os.SystemClock
 import android.util.Log
-import androidx.palette.graphics.Palette
 import java.util.*
 import kotlin.math.roundToInt
-import android.os.VibrationEffect
 import android.os.Vibrator
+import androidx.palette.graphics.Palette
 import com.badlogic.ashley.core.*
-import com.gorillamoa.routines.animation.*
-import com.gorillamoa.routines.utils.*
-import com.gorillamoa.routines.views.LivingBackground.TriangleEntity.Companion.getTriangleToLightUpGiven
+import com.gorillamoa.routines.tools.animation.*
+import com.gorillamoa.routines.tools.delayneytriangle.TriangleEntity.Companion.getTriangleToLightUpGiven
 import io.github.jdiemke.triangulation.*
 import kotlin.collections.ArrayList
 
 private const val WORKING_BITMAP_WIDTH = 200
-
-private const val widthD = WORKING_BITMAP_WIDTH.toDouble()
-private const val heightD = WORKING_BITMAP_WIDTH.toDouble()
-
+private const val WORKING_BITMAP_HEIGHT = 200
+private const val WORKING_BITMAP_WIDTH_MOBILE = 400
+private const val WORKING_BITMAP_HEIGHT_MOBILE = 800
 
 private const val NUM_TRIANGLES = 98
 private const val MIN_EDGES = 200
@@ -36,7 +33,7 @@ private const val MAX_COMPONENTS_PER_ENTITY = 6
 //TODO SEPERATE LOW POWER MODE FUNCTIONALITY WITH HIGH POWER MODE
 //CLEAN UP
 //them one by one
-class LivingBackground {
+class LivingBackground(val isWatch:Boolean) {
 
     @Suppress("unused")
     private val tag: String = LivingBackground::class.java.name
@@ -55,6 +52,7 @@ class LivingBackground {
 
     private lateinit var triangulator: DelaunayTriangulator
 
+
     private val baseDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC)
     private val morphDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
     private val bgDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_ATOP)
@@ -62,11 +60,11 @@ class LivingBackground {
     //FOR animation
     private var engine= PooledEngine(
             (NUM_TRIANGLES + MIN_EDGES),
-            (NUM_TRIANGLES+ MAX_EDGES),
-            (NUM_TRIANGLES+ MIN_EDGES)* MIN_COMPONENTS_PER_ENTITY,
-            (NUM_TRIANGLES+ MAX_EDGES)* MAX_COMPONENTS_PER_ENTITY )
-    private var fadeInSystem:FadeInSystem? = null
-    private var renderSystem:RenderSystem? = null
+            (NUM_TRIANGLES + MAX_EDGES),
+            (NUM_TRIANGLES + MIN_EDGES)* MIN_COMPONENTS_PER_ENTITY,
+            (NUM_TRIANGLES + MAX_EDGES)* MAX_COMPONENTS_PER_ENTITY)
+    private var fadeInSystem: FadeInSystem? = null
+    private var renderSystem: RenderSystem? = null
 
     val edges = ArrayList<EdgeEntity>()
     val triangleNodes = ArrayList<TriangleEntity>()
@@ -77,9 +75,8 @@ class LivingBackground {
 
 //    val lab = ColorSpace.get(ColorSpace.Named.CIE_LAB)
 
-    private lateinit var palette: Palette
-
-    var scale = 0.0f
+    var scaleX = 0.0f
+    var scaleY = 0.0f
     var triangleSoup: ArrayList<Triangle2D>? = null
 
     //COLORS
@@ -94,9 +91,6 @@ class LivingBackground {
     private var lastMeasuredTime = 0L
     private var dt = 0L
 
-    val vibrationEffect = VibrationEffect.createOneShot(1000, VibrationEffect.DEFAULT_AMPLITUDE)
-
-    lateinit var vibrator: Vibrator
 
     val fadeInFinishListener = object :EntityListener{
         override fun entityAdded(entity: Entity?) {}
@@ -109,7 +103,22 @@ class LivingBackground {
 
                     getTriangleToLightUpGiven(entity)?.let { triangleEntity ->
                         //light up the triangle
-                        triangleEntity.fadeColorFromAmbient(engine)
+
+                        triangleEntity.add(engine.createComponent(RenderComponent::class.java))
+
+                        //TODO get target color
+                        startColor.apply {
+                            r = 255.0f
+                            g = 255.0f
+                            b = 255.0f
+                            a = 255.0f
+                        }
+
+                        getColorCIEBasedOnPosition(getWorkingWidth().toFloat(), getWorkingHeight().toFloat(), triangleEntity)
+                        ColorChangerSystem.startChanging(
+                                startColor,
+                                final, 0.369, triangleEntity, engine)
+
                     }
                 }
 
@@ -135,28 +144,28 @@ class LivingBackground {
 
     init {
 
-        LivingBackground.topLeft.apply {
+        topLeft.apply {
             r = 255.0f
             g = 245.0f
             b = 230.0f
             a = backgroundAlpha
         }
 
-        LivingBackground.bottomRight.apply {
+        bottomRight.apply {
             r = 127f
             g = 39f
             b = 4f
             a = backgroundAlpha
         }
 
-        LivingBackground.bottomLeft.apply {
+        bottomLeft.apply {
             r = 175f
             g = 111f
             b = 84f
             a = backgroundAlpha
         }
 
-        LivingBackground.topRight.apply {
+        topRight.apply {
             r = 175f
             g = 111f
             b = 84f
@@ -202,9 +211,8 @@ class LivingBackground {
                 resetAnimationLatch()
                 add(engine.createComponent(RenderComponent::class.java))
                 add(engine.createComponent(FadeInEffectComponent::class.java).apply {
-                    startDelaySecond = ((Math.min(edgeEntity.itself.a.x, edgeEntity.itself.b.x) / widthD) * com.gorillamoa.routines.tools.animation.POINT_FOUR)
-//                    fadeRatePerFrame = FORTY_FIVE_INT
-                    fadeRatePerFrame = com.gorillamoa.routines.tools.animation.FIFTY_FIVE_INT
+                    startDelaySecond = ((Math.min(edgeEntity.itself.a.x, edgeEntity.itself.b.x) / getWorkingWidth()) * POINT_FOUR)
+                    fadeRatePerFrame = FIFTY_FIVE_INT
                 })
             }
         }
@@ -230,8 +238,8 @@ class LivingBackground {
             //we'll add the render component again because they should be all showing initially
             it.add(engine.createComponent(RenderComponent::class.java))
             it.add(engine.createComponent(FadeOutEffectComponent::class.java).apply {
-                startDelaySecond = (( it.getCenterX()/ widthD) * com.gorillamoa.routines.tools.animation.POINT_FIVE)
-                fadeRatePerFrame = com.gorillamoa.routines.tools.animation.FORTY_FIVE_INT
+                startDelaySecond = (( it.getCenterX()/ getWorkingWidth()) * POINT_FIVE)
+                fadeRatePerFrame = FORTY_FIVE_INT
             })
         }
     }
@@ -239,8 +247,8 @@ class LivingBackground {
     fun isAlarmEnabled() = isAlarmOn
 //TODO we'll show 1 generic alarm, but modify that alarm slightly (e.g. color) to indicate which type of alarm went off
 
-    fun initializeBackground(vibratorService: Vibrator, paletteCallback: ((Palette) -> Any?)? = null) {
-        vibrator = vibratorService
+    fun initializeBackground(vibratorService: Vibrator? = null, paletteCallback: ((Palette) -> Any?)? = null) {
+
 
         mBackgroundPaint = Paint().apply {
             color = Color.BLACK
@@ -294,7 +302,7 @@ class LivingBackground {
     fun drawAlarm(canvas: Canvas,deltaTimeMillis:Float){
 
         renderSystem?.canvas = canvas
-        engine.update(deltaTimeMillis/ com.gorillamoa.routines.tools.animation.ONE_THOUSAND_INT)
+        engine.update(deltaTimeMillis/ONE_THOUSAND_INT)
     }
 
 
@@ -305,10 +313,10 @@ class LivingBackground {
      * 3. Draw Features
      */
     fun drawBackground(canvas: Canvas,
-                       mAmbient: Boolean,
-                       mLowBitAmbient: Boolean,
-                       mBurnInProtection: Boolean,
-                       bounds: Rect, vararg timers:CircularTimer) {
+                       mAmbient: Boolean = false,
+                       mLowBitAmbient: Boolean = false,
+                       mBurnInProtection: Boolean = false,
+                       bounds: Rect? = null,  timers:CircularTimer?) {
 
         dt = (SystemClock.uptimeMillis() - lastMeasuredTime) //first dt will be 0
 
@@ -320,7 +328,7 @@ class LivingBackground {
         } else {
 
             //add a smooth transition
-            timers.forEach {
+            //timers.forEach {
 
                 //TODO UNCOMMENT
               /*  if (it.isRunning()) {
@@ -345,7 +353,7 @@ class LivingBackground {
                 }else{
                     mMorphPaint.xfermode = baseDrawingMode
                 }*/
-            }
+            //}
             //TODO delete this
           //  mMorphPaint.xfermode = baseDrawingMode
 
@@ -363,13 +371,13 @@ class LivingBackground {
 
 
         canvas.save()
-        canvas.scale(scale,scale)
+        canvas.scale(scaleX,scaleY)
         drawAlarm(canvas,dt.toFloat())
         canvas.restore()
 
         //TODO USE the Engine to show this alarm
         canvas.save()
-        canvas.scale(scale, scale)
+        canvas.scale(scaleX, scaleY)
 
         if (isAlarmOn) {
 
@@ -387,7 +395,7 @@ class LivingBackground {
                     isAlarmAlphaIncreasing = true
 
                     //sound a vibration
-                    vibrator.vibrate(vibrationEffect)
+                    //Not here
                 }
             }
             //Log.d("$tag drawBackground","Alpha $currentAlarmAlpha")
@@ -409,24 +417,34 @@ class LivingBackground {
         }
         canvas.restore()
 
-
         lastMeasuredTime = SystemClock.uptimeMillis()
+    }
+
+    fun getWorkingWidth():Double{
+        return if(isWatch) WORKING_BITMAP_WIDTH.toDouble() else WORKING_BITMAP_WIDTH_MOBILE.toDouble()
+    }
+
+    fun getWorkingHeight():Double{
+        return if(isWatch) WORKING_BITMAP_HEIGHT.toDouble() else WORKING_BITMAP_HEIGHT_MOBILE.toDouble()
     }
 
     fun scaleBackground(width: Int, height: Int) {
 
-        scale = width.toFloat() / widthD.toFloat()
-//        scale = width.toFloat() / mBackgroundBitmap.width.toFloat()
+        scaleX = width.toFloat() / getWorkingWidth().toFloat()
+        scaleY = height.toFloat()/getWorkingHeight().toFloat()
+//        scaleX = width.toFloat() / mBackgroundBitmap.width.toFloat()
+
+        Log.d("Living","Scale:$scaleX")
 
         //TODO enable this for low graphics or battery saver mode
      /*   mBackgroundBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap,
-                (mBackgroundBitmap.width * scale).toInt(),
-                (mBackgroundBitmap.height * scale).toInt(), true)
+                (mBackgroundBitmap.width * scaleX).toInt(),
+                (mBackgroundBitmap.height * scaleX).toInt(), true)
 */
         //TODO may delete this
 /*        morphedBitmap = Bitmap.createScaledBitmap(morphedBitmap,
-                (morphedBitmap.width * scale).toInt(),
-                (morphedBitmap.height * scale).toInt(), true)*/
+                (morphedBitmap.width * scaleX).toInt(),
+                (morphedBitmap.height * scaleX).toInt(), true)*/
 
 
 //        workingBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
@@ -535,13 +553,13 @@ class LivingBackground {
             //                    Log.d("$tag generateBackgroundBitmaps","Triangle: A(${it.a.x},${it.a.y}) B(${it.b.x},${it.b.y}) C(${it.c.x},${it.c.y})")
 
             //first find the Center Coordinates
-            centerX = (it.qA().x + it.qB().x + it.qC().x).div(com.gorillamoa.routines.tools.animation.THREE_FLOAT)
-            centerY = (it.qA().y + it.qB().y + it.qC().y).div(com.gorillamoa.routines.tools.animation.THREE_FLOAT)
+            centerX = (it.qA().x + it.qB().x + it.qC().x).div(THREE_FLOAT)
+            centerY = (it.qA().y + it.qB().y + it.qC().y).div(THREE_FLOAT)
 
 //                    Log.d("$tag generateBackgroundBitmaps","Centroid: $centerX, $centerY")
 
             //now use the coordinates to locate the correct color
-            painter.color = getColorBasedOnPosition(centerX.toFloat(),centerY.toFloat(),width.toFloat(),height.toFloat())
+            painter.color = getColorBasedOnPosition(centerX.toFloat(), centerY.toFloat(), width.toFloat(), height.toFloat())
 
             //draw the centroids
             //  canvas.drawPoint(centerX.toFloat(),centerY.toFloat(),painter)
@@ -576,7 +594,12 @@ class LivingBackground {
         triangleEntity.add(component)
     }
 
+
     private fun generateBackgroundBitmaps() {
+
+
+        val widthD = if(isWatch) WORKING_BITMAP_WIDTH.toDouble() else WORKING_BITMAP_WIDTH_MOBILE.toDouble()
+        val heightD = if(isWatch) WORKING_BITMAP_HEIGHT.toDouble() else WORKING_BITMAP_HEIGHT_MOBILE.toDouble()
 
         //we'll create delayney triangles
         val points = 61
@@ -865,7 +888,7 @@ class LivingBackground {
 
             edgeEntity.add(engine.createComponent(RenderComponent::class.java))
             edgeEntity.add(engine.createComponent(EdgeComponent::class.java))
-            edgeEntity.add(engine.createComponent(AlphaComponent::class.java).apply { alpha = com.gorillamoa.routines.tools.animation.ZERO_INT })
+            edgeEntity.add(engine.createComponent(AlphaComponent::class.java).apply { alpha = ZERO_INT })
 
             engine.addEntity(edgeEntity)
         }
@@ -961,138 +984,6 @@ class LivingBackground {
 
 
     //TODO make sure we remove the properties and make them into components later
-    class EdgeEntity(var itself: Edge2D):Entity(){
-
-        var parent:TriangleEntity? = null
-        var neighbour:TriangleEntity? = null
-        var animationLatch = false
-
-        companion object {
-
-            val paint =  Paint().apply {
-                strokeWidth = 1.0f
-                color = Color.WHITE
-                isAntiAlias = true
-            }
-            val renderFunction:(Canvas,EdgeEntity)->Any = { canvas, entity ->
-                entity.getComponent(AlphaComponent::class.java).apply {
-                    if (alpha > com.gorillamoa.routines.tools.animation.ZERO_INT) {
-                        val edge = entity.itself
-                        paint.alpha = alpha
-                        canvas.drawLine(
-                                edge.a.x.toFloat(),
-                                edge.a.y.toFloat(),
-                                edge.b.x.toFloat(),
-                                edge.b.y.toFloat(), paint)
-                    }
-                }
-            }
-
-        }
-        fun resetAnimationLatch(){
-            animationLatch = false
-        }
-
-    }
-
-    class TriangleEntity(val itself:Triangle2D):Entity() {
-
-        var edgeEntityAB: EdgeEntity? = null
-        var edgeEntityAC: EdgeEntity? = null
-        var edgeEntityBC: EdgeEntity? = null
-        var animationLatch = false
-
-        companion object {
-
-            val paint = Paint().apply {
-                color = Color.WHITE
-                style = Paint.Style.FILL
-            }
-            val path = Path()
-            val renderFunction: (Canvas, TriangleEntity) -> Any = { canvas, entity ->
-
-                path.reset()
-                path.moveTo(entity.itself.qA().x.toFloat(), entity.itself.qA().y.toFloat())
-                path.lineTo(entity.itself.qB().x.toFloat(), entity.itself.qB().y.toFloat())
-                path.lineTo(entity.itself.qC().x.toFloat(), entity.itself.qC().y.toFloat())
-                path.lineTo(entity.itself.qA().x.toFloat(), entity.itself.qA().y.toFloat())
-
-                paint.color = entity.getComponent(ColorComponent::class.java).color
-
-                canvas.drawPath(path, paint)
-            }
-
-            //clean move these functions else where
-            fun getTriangleToLightUpGiven(edgeEntity: LivingBackground.EdgeEntity): LivingBackground.TriangleEntity? {
-                //check the edge's neighbours
-                if (shouldLightUp(edgeEntity.neighbour)) {
-                    return edgeEntity.neighbour
-                }
-
-                if (shouldLightUp(edgeEntity.parent)) {
-                    return edgeEntity.parent
-                }
-
-                return null
-            }
-
-            fun isEdgeNodeLit(edgeEntity: LivingBackground.EdgeEntity?): Boolean {
-                return edgeEntity?.animationLatch ?: true
-            }
-
-            fun shouldLightUp(triangleNode: LivingBackground.TriangleEntity?): Boolean {
-
-                return triangleNode?.let {
-                    if (!it.animationLatch) {
-                        if (isEdgeNodeLit(it.edgeEntityAB) and isEdgeNodeLit(it.edgeEntityAC) and isEdgeNodeLit(it.edgeEntityBC)) {
-                            it.animationLatch = true
-                        }
-                    }
-                    it.animationLatch
-                } ?: false
-            }
-        }
-
-        fun setTriangleColor(color: Int, engine: Engine) {
-
-            val component = getComponent(ColorComponent::class.java)
-                    ?: engine.createComponent(ColorComponent::class.java).apply {
-                        add(this@apply)
-                    }
-            component.color = color
-        }
-
-        fun getCenterX(): Float {
-            return (itself.qA().x + itself.qB().x + itself.qC().x).div(com.gorillamoa.routines.tools.animation.THREE_FLOAT).toFloat()
-        }
-
-        fun getCenterY(): Float {
-            return (itself.qA().y + itself.qB().y + itself.qC().y).div(com.gorillamoa.routines.tools.animation.THREE_FLOAT).toFloat()
-        }
-
-        fun fadeColorFromAmbient(engine: Engine) {
-
-            add(engine.createComponent(RenderComponent::class.java))
-
-            //TODO get target color
-            startColor.apply {
-                r = 255.0f
-                g = 255.0f
-                b = 255.0f
-                a = 255.0f
-            }
-
-            getColorCIEBasedOnPosition(widthD.toFloat(), heightD.toFloat(), this)
-            ColorChangerSystem.startChanging(
-                    startColor,
-                    final, 0.369, this, engine)
-        }
-
-        fun resetAnimationLatch(){
-            animationLatch = false
-        }
-
-    }
 
 
 }

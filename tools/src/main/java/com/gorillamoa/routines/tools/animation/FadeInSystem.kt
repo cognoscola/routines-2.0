@@ -1,9 +1,10 @@
-package com.gorillamoa.routines.animation
+package com.gorillamoa.routines.tools.animation
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
+
 
 
 /**
@@ -32,16 +33,16 @@ class FadeInSystem:IteratingSystem(Family.all(AlphaComponent::class.java,FadeInE
             entity.getComponent(AlphaComponent::class.java).apply {
 
                 //theres a delay happening, so just countdown
-                if (fadeProperties.startDelaySecond > com.gorillamoa.routines.tools.animation.ZERO_FLOAT) {
+                if (fadeProperties.startDelaySecond > ZERO_FLOAT) {
                     fadeProperties.startDelaySecond -= deltaTime
                 }else{
                     //now start the fade in process
-                    if (alpha < com.gorillamoa.routines.tools.animation.TWOFIFTYFIVE) {
+                    if (alpha < TWOFIFTYFIVE) {
                         alpha += fadeProperties.fadeRatePerFrame
                     }
-                    alpha = Math.min(alpha, com.gorillamoa.routines.tools.animation.TWOFIFTYFIVE)
+                    alpha = Math.min(alpha, TWOFIFTYFIVE)
 
-                    if (alpha == com.gorillamoa.routines.tools.animation.TWOFIFTYFIVE) {
+                    if (alpha == TWOFIFTYFIVE) {
                         entity.remove(FadeInEffectComponent::class.java)
                     }
                 }

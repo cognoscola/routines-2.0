@@ -1,11 +1,10 @@
-package com.gorillamoa.routines.animation
+package com.gorillamoa.routines.tools.animation
 
 import android.graphics.Color
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
-import com.gorillamoa.routines.utils.*
 import kotlin.math.roundToInt
 
 class ColorChangerSystem: IteratingSystem(Family.all(ColorComponent::class.java, ColorChangerEffectComponent::class.java).get()){
@@ -24,11 +23,11 @@ class ColorChangerSystem: IteratingSystem(Family.all(ColorComponent::class.java,
                 this@apply.targetColor.b = targetColor.b
                 this@apply.targetColor.a = targetColor.a
                 timeToChangeSecond = rate
-                timeElapsed = com.gorillamoa.routines.tools.animation.ZERO_D
+                timeElapsed = ZERO_D
                 entity.add(this@apply)
             }
         }
-        private var percent = com.gorillamoa.routines.tools.animation.ZERO_FLOAT
+        private var percent = ZERO_FLOAT
     }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
@@ -41,7 +40,7 @@ class ColorChangerSystem: IteratingSystem(Family.all(ColorComponent::class.java,
 
                 //calculate the new color at this new time.
                 percent = (changeProperties.timeElapsed / changeProperties.timeToChangeSecond).toFloat()
-                percent =  com.gorillamoa.routines.tools.animation.ONE_FLOAT - Math.min( percent, com.gorillamoa.routines.tools.animation.ONE_FLOAT)
+                percent =  ONE_FLOAT - Math.min( percent, ONE_FLOAT)
                 changeProperties.targetColor.lerp(changeProperties.initialColor, percent,newColor)
 
                 color = Color.argb(

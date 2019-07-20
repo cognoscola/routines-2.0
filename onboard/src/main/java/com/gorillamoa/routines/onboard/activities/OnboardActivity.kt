@@ -293,10 +293,7 @@ class OnboardActivity:FragmentActivity(){
                 )
 
             }
-
-
         }
-
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer,fragment)
                 .addToBackStack(null)

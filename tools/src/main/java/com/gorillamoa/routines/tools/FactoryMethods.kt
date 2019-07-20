@@ -1,5 +1,8 @@
 package com.gorillamoa.routines.tools
 
+import android.app.UiModeManager
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Build
 import android.text.Html
 import android.text.Spanned
@@ -18,4 +21,10 @@ fun getHtml(htmlString:String): Spanned {
     else{
         return Html.fromHtml(htmlString)
     }
+}
+
+fun Context.isWatch():Boolean{
+
+    val uiServie = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+    return uiServie.currentModeType == Configuration.UI_MODE_TYPE_WATCH
 }

@@ -1,1 +1,1 @@
-include ':mobile', ':wear', ':delauney-triangulator', ':core', ':onboard', ':configuration', ':notifications', ':tools', ':notificationsimpl', ':details'
+include ':mobile', ':wear', ':delauney-triangulator', ':core', ':onboard', ':configuration', ':notifications', ':tools', ':notificationsimpl', ':details', ':splash'

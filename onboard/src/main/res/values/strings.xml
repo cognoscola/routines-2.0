@@ -46,8 +46,6 @@
     <string name="onboard_welcome_11">Are you ready? </string>
     <string name="onboard_ready">I\'m ready</string>
 
-
-
     <string name="onboard_wake_up_text">I wake up at:</string>
     <string name="onboard_sleep_text">I sleep at:</string>
     <string name="onboard_default_text">Pick:</string>

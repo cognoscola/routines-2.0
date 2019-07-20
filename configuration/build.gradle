@@ -42,4 +42,5 @@ dependencies {
     implementation project(path: ':tools')
     api project(path: ':notifications')
     api project(path: ':details')
+    api project(path: ':splash')
 }
