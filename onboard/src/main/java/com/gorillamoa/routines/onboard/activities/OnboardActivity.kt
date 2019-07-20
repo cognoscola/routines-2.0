@@ -68,19 +68,21 @@ class OnboardActivity:FragmentActivity(){
             cancel(NOTIFICATION_TAG,intent.getIntExtra(TASK_ID,1))
         }
 
-        GlobalScope.launch {
+        //TODO check if intent is null
+        if (intent?.action == ACTION_WAKE_UP_PRACTISE) {
 
-            delay(3000)
-
-            //TODO check if intent is null
-            if (intent?.action == ACTION_WAKE_UP_PRACTISE) {
-
-                //dismiss the notification
-                //dismiss the wake up notification
-                state = OnboardState.TEXT3
-            }
-
+            //dismiss the notification
+            //dismiss the wake up notification
+            state = OnboardState.TEXT3
             setNextFragment(state)
+        }else{
+
+            GlobalScope.launch {
+
+                delay(4000)
+
+                setNextFragment(state)
+            }
         }
     }
 
@@ -205,13 +207,13 @@ class OnboardActivity:FragmentActivity(){
 
             val dummyArrray = ArrayList<Task>()
             dummyArrray.add(Task(
-                    name = "This is my first task in the future!"
+                    name = "This is your morning reminder!"
             ))
             dummyArrray.add(Task(
-                    name = "2nd task in the future!"
+                    name = "This list of tasks for the day"
             ))
             dummyArrray.add(Task(
-                    name = "And so on..."
+                    name = "Be sure to review this everyday!"
             ))
             dummyArrray.add(Task(
                     name = "<b>Click Start to Finish!</b>"

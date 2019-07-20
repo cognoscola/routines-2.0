@@ -20,16 +20,14 @@
     <string name="onboard_welcome_03">
 
         “An intelligent plan is the first step to success. The man who plans knows where he is going, knows what progress he is making and has a pretty good idea when he will arrive.”
-– Basil S. Walsh\n\n\n
-
-        Planning your day is the most important habit to develop because it is a an opportunity for you to measure the effectiveness of all of your other habits as well as the
+– Basil S. Walsh\n\n\nPlanning your day is the most important habit to develop because it is a an opportunity for you to measure the effectiveness of all of your other habits as well as the
         ability to develop new habits. In other words, if you are having difficulty establishing this morning habit, there is a very high probability that you will have difficulty changing
         other habits as well. To be effective you must develop this habit first. Lets practise once by checking your Notifications.
 
     </string>
     <string name="onboard_welcome_04">
-        Every morning Routines will remind you to plan your day. It will help you along by pre-scheduling tasks for you. With your help Routines can learn to schedule tasks better for you over time.
-        You have the option to approve the task list, or modify it by changing the task order or by scheduling or removing tasks. These options are available to you anytime. Remember that planning your day is
+        Every morning Routines will remind you to plan your day. It will pre-schedule tasks as well as provide options for you to
+        approve, modify, edit, re-order and remove tasks. These options are available to you at anytime. Remember that planning your day is
         the most important task of the day so if you are a stubborn person when it comes to Notifications, it is a wise choice to make this notification persistent.\n\n
         Are you Stubborn?
 
@@ -59,8 +57,9 @@
 
     <string name="pillars_description"> As you progress through the app, you should ideally balance out the Pillars of your Life. For now, choose one area of your life on which to improve
      upon. </string>
-    <string name="pillar_suggestion_description">Here are some suggestions. You can always create your own as by clicking Add. Remember that
-    these are habits aimed at improving your life. Specific tasks are more actionable and are easier to turn into habits </string>
+
+    <string name="pillar_suggestion_description">Here are some suggestions. You can always create your own by pressing "Add my own". Remember that
+       these habits are aimed at improving your life. Specific tasks are more actionable and are easier to turn into habits </string>
 
     <string name="pillar_mental">Mental</string>
     <string name="pillar_physical">Physical</string>
@@ -68,7 +67,7 @@
     <string name="pillar_recreational">Play</string>
     <string name="pillar_work">Work Life</string>
     <string name="pillar_other">Other</string>
-    <string name="task_add">Add + </string>
+    <string name="task_add">Add My Own </string>
 
 </resources>
 

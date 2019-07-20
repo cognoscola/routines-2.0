@@ -15,8 +15,8 @@ import kotlin.collections.ArrayList
 
 private const val WORKING_BITMAP_WIDTH = 200
 private const val WORKING_BITMAP_HEIGHT = 200
-private const val WORKING_BITMAP_WIDTH_MOBILE = 400
-private const val WORKING_BITMAP_HEIGHT_MOBILE = 800
+private const val WORKING_BITMAP_WIDTH_MOBILE = 1080/2
+private const val WORKING_BITMAP_HEIGHT_MOBILE = 1920/2
 
 private const val NUM_TRIANGLES = 98
 private const val MIN_EDGES = 200
@@ -602,7 +602,7 @@ class LivingBackground(val isWatch:Boolean) {
         val heightD = if(isWatch) WORKING_BITMAP_HEIGHT.toDouble() else WORKING_BITMAP_HEIGHT_MOBILE.toDouble()
 
         //we'll create delayney triangles
-        val points = 61
+        val points = if(isWatch)61 else 122
 
         val random = Random()
 
