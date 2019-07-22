@@ -3,4 +3,6 @@
 
     <string name="description_frequency">I will perform this task:</string>
 
+    <string name="frequency_dividor">Times per</string>
+    <string name="description_type">This is a</string>
 </resources>

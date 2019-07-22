@@ -45,24 +45,72 @@
 to remember to be Equanimous as much as possible. It will be hard but it must be done twice
 a day if possible" />
 
+
+    <LinearLayout
+        android:id="@+id/typeLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/descriptionTextView"
+        android:gravity="center_vertical">
+
+
+        <TextView
+            android:paddingStart="@dimen/detail_background_padding"
+            android:paddingEnd="@dimen/detail_background_padding"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/description_type"
+            android:gravity="center_vertical"/>
+
+
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+
     <TextView
         android:paddingBottom="@dimen/detail_background_padding"
         android:paddingStart="@dimen/detail_background_padding"
         android:paddingEnd="10dp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/description_frequency"
-        app:layout_constraintTop_toBottomOf="@+id/descriptionTextView"/>
+        app:layout_constraintTop_toBottomOf="@+id/typeLinearLayout"
+        android:id="@+id/frequencyDescriptionTextView"
+        android:gravity="center_vertical"/>
+
+
 
     <LinearLayout
+        android:id="@+id/frequencyLinearLayout"
+        android:paddingStart="@dimen/detail_background_padding"
+        android:paddingEnd="@dimen/detail_background_padding"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/frequencyDescriptionTextView"
         >
 
         <EditText
             android:layout_width="40dp"
-            android:layout_height="40dp" />
+            android:layout_height="40dp"
+            android:id="@+id/amountEditText"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/frequency_dividor"
+            />
+
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1">
+
+        </Spinner>
 
     </LinearLayout>
 
