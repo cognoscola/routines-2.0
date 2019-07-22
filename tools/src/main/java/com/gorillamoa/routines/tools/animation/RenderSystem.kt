@@ -7,22 +7,22 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.gorillamoa.routines.tools.delayneytriangle.EdgeEntity
 import com.gorillamoa.routines.tools.delayneytriangle.TriangleEntity
 
-class RenderSystem:IteratingSystem(Family.all(RenderComponent::class.java).get()){
+class RenderSystem(val canvas: Canvas):IteratingSystem(Family.all(RenderComponent::class.java).get()){
 
     @Suppress("unused")
     private val tag:String = RenderSystem::class.java.name
-    var canvas: Canvas? = null
+
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
 
-        canvas?.let {
+        canvas.let {
 
             if (entity is EdgeEntity) {
-                EdgeEntity.renderFunction.invoke(canvas!!,entity)
+                EdgeEntity.renderFunction.invoke(canvas,entity)
             }
 
             if (entity is TriangleEntity) {
-                TriangleEntity.renderFunction.invoke(canvas!!,entity)
+                TriangleEntity.renderFunction.invoke(canvas,entity)
             }
         }
     }

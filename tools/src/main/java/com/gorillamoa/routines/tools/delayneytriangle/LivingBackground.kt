@@ -131,6 +131,9 @@ class LivingBackground(val isAnimated:Boolean = true,
     private var lastMeasuredTime = 0L
     private var dt = 0L
 
+    lateinit var  intermidiateBitmap:Bitmap
+    lateinit var intermediatecanvas:Canvas
+
 
     val fadeInFinishListener = object :EntityListener{
         override fun entityAdded(entity: Entity?) {}
@@ -308,10 +311,10 @@ class LivingBackground(val isAnimated:Boolean = true,
     /**
      * delta time is in seconds!
      */
-    fun drawAlarm(canvas: Canvas,deltaTimeMillis:Float){
+    fun draw(canvas: Canvas, deltaTimeMillis:Float){
 
-        renderSystem?.canvas = canvas
-        engine.update(deltaTimeMillis/ONE_THOUSAND_INT)
+        engine.update(deltaTimeMillis/ ONE_THOUSAND_FLOAT)
+        canvas.drawBitmap(intermidiateBitmap,0.0f,0.0f, mBackgroundPaint)
     }
 
 
@@ -381,7 +384,7 @@ class LivingBackground(val isAnimated:Boolean = true,
 
         canvas.save()
         canvas.scale(scaleX,scaleY)
-        drawAlarm(canvas,dt.toFloat())
+        draw(canvas,dt.toFloat())
         canvas.restore()
 
         //TODO USE the Engine to show this alarm
@@ -463,6 +466,8 @@ class LivingBackground(val isAnimated:Boolean = true,
 
     fun scaleBackground(width: Int, height: Int) {
 
+
+
         scaleX = width.toFloat() / getWorkingWidth().toFloat()
         scaleY = height.toFloat()/getWorkingHeight().toFloat()
 //        scaleX = width.toFloat() / mBackgroundBitmap.width.toFloat()
@@ -487,7 +492,7 @@ class LivingBackground(val isAnimated:Boolean = true,
         //prepare ashley
         engine.apply {
             fadeInSystem =FadeInSystem()
-            renderSystem = RenderSystem()
+            renderSystem = RenderSystem(intermediatecanvas)
             addSystem(fadeInSystem)
             addSystem(FadeOutSystem())
             addSystem(ColorChangerSystem())
@@ -499,6 +504,11 @@ class LivingBackground(val isAnimated:Boolean = true,
     }
 
     /* Check whether segment P0P1 intersects with triangle t0t1t2 */
+    init{
+        intermidiateBitmap = Bitmap.createBitmap(getWorkingWidth().toInt(), getWorkingHeight().toInt(), Bitmap.Config.ARGB_8888)
+        intermediatecanvas = Canvas(intermidiateBitmap)
+    }
+
 
     fun initGrayBackgroundBitmap() {
 /*
