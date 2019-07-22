@@ -38,7 +38,7 @@
         android:textColor="@color/pillar_text_color"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@drawable/picker_button_selector"
+
         android:text="@string/pillar_mental"
         android:gravity="center"
         android:textStyle="bold"
@@ -59,7 +59,7 @@
         android:textColor="@color/pillar_text_color"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@drawable/picker_button_selector"
+
         android:text="@string/pillar_physical"
         android:gravity="center"
         android:textStyle="bold"
@@ -75,11 +75,10 @@
         app:bottomLeft="#DADADA"
         />
 
-    <com.gorillamoa.routines.tools.DelauneyTextView
+    <TextView
         android:textColor="@color/pillar_text_color"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@drawable/picker_button_selector"
         android:text="@string/pillar_relationships"
         android:gravity="center"
         android:textStyle="bold"
@@ -89,17 +88,18 @@
         android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
         android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
         android:id="@+id/relationshipButton"
-        app:topLeft="#FFFFFF"
-        app:topRight="#144FF3"
-        app:bottomRight="#1645CC"
-        app:bottomLeft="#DADADA"
+
         />
 
-    <com.gorillamoa.routines.tools.DelauneyTextView
+    <!--app:topLeft="#FFFFFF"
+        app:topRight="#144FF3"
+        app:bottomRight="#1645CC"
+        app:bottomLeft="#DADADA"-->
+    <TextView
         android:textColor="@color/pillar_text_color"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@drawable/picker_button_selector"
+
         android:text="@string/pillar_recreational"
         android:gravity="center"
         android:textStyle="bold"
@@ -110,16 +110,16 @@
         android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
         android:id="@+id/playButton"
 
-        app:topLeft="#FFFFFF"
+
+        />
+    <!--        app:topLeft="#FFFFFF"
         app:topRight="#D914F3"
         app:bottomRight="#A20BB6"
-        app:bottomLeft="#DADADA"
-        />
-    <com.gorillamoa.routines.tools.DelauneyTextView
+        app:bottomLeft="#DADADA"-->
+    <TextView
         android:textColor="@color/pillar_text_color"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@drawable/picker_button_selector"
         android:text="@string/pillar_work"
         android:gravity="center"
         android:textStyle="bold"
@@ -130,11 +130,10 @@
         android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
         android:id="@+id/worklifeButton"
 
-        app:topLeft="#FFFFFF"
-        app:topRight="#F3D514"
-        app:bottomRight="#B39A0E"
-        app:bottomLeft="#DADADA"
         />
 
-
+    <!--     app:topLeft="#FFFFFF"
+         app:topRight="#F3D514"
+         app:bottomRight="#B39A0E"
+         app:bottomLeft="#DADADA"-->
 </LinearLayout>

@@ -79,8 +79,6 @@ class DelauneyBackground : View {
     }
 
 
-
-
     /**
      * Starts/stops the [.mUpdateTimeHandler] timer based on the state of the watch face.
      */
