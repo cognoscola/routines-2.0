@@ -274,7 +274,6 @@ class OnboardActivity:FragmentActivity(){
                 fragment = TaskChooseFragment.newInstance(
                         "Call a friend", "Make a gift", "Hangout"
                 )
-
             }
             PillarChoosingFragment.Pillar.Play -> {
                 fragment = TaskChooseFragment.newInstance(
@@ -289,12 +288,6 @@ class OnboardActivity:FragmentActivity(){
                 )
             }
 
-            PillarChoosingFragment.Pillar.Other -> {
-                fragment = TaskChooseFragment.newInstance(
-                        "Water Plants", "Wake up Early", "Comb Hair"
-                )
-
-            }
         }
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer,fragment)

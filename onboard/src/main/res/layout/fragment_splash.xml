@@ -4,17 +4,16 @@
     android:layout_height="match_parent"
     android:layout_gravity="center">
 
-    <com.gorillamoa.routines.tools.DelauneyBackground
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-        android:text="Splash"
+        android:layout_gravity="center"
+        android:text="@string/splash_text"
+        android:textStyle="bold"
         android:gravity="center"
-        android:textColor="@color/onboard_text_color"
+        android:textSize="@dimen/splash_text_size"
+        android:textColor="@color/splash_title_text_color"
         />
 
 </FrameLayout>

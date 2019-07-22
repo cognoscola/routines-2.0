@@ -14,4 +14,6 @@
     <dimen name="onboard_title_text_size">30sp</dimen>
     <dimen name="onboard_choice_text_size">25sp</dimen>
     <dimen name="onboard_pillar_vertical_padding">5dp</dimen>
+
+    <dimen name="splash_text_size">40sp</dimen>
 </resources>

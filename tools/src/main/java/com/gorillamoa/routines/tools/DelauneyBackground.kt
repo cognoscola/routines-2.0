@@ -11,6 +11,9 @@ import com.gorillamoa.routines.tools.delayneytriangle.LivingBackground
 import java.lang.ref.WeakReference
 
 
+//TODO add functions to accept new colors
+//TODO add functionality to morph to new colors
+
 class DelauneyBackground : View {
 
 
@@ -61,10 +64,8 @@ class DelauneyBackground : View {
 
     }
 
-
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        Log.d("Background","Draw")
         livingBackground.drawBackground(canvas, timers = null)
     }
 

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Routines</string>
 
+    <string name="splash_text">Routines</string>
     <!-- onboarding -->
     <string name="onboard_welcome_title_00">Welcome!</string>
     <string name="onboard_welcome_01">\nYou installed Routines because:\n\n\n\n
@@ -11,7 +12,7 @@
         Is this you?\n</string>
     <string name="onboard_welcome_02">
         Great! Lets get started by establishing the most important
-    task of the day:\n\n The Morning Planner.\n\n
+    task of the day:\n\n  &lt;b&gt;The Morning Planner.&lt;\/b&gt;\n\n
 
          Are you ready?
     </string>

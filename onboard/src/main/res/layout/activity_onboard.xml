@@ -5,10 +5,19 @@
     android:layout_height="match_parent"
     android:background="@color/onboard_background_color"
     android:padding="@dimen/onboard_background_padding"
-    android:id="@+id/fragmentContainer"
+
     tools:context=".activities.OnboardActivity"
     tools:deviceIds="wear"
     tools:background="#9A4AEB">
 
+    <com.gorillamoa.routines.tools.DelauneyBackground
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fragmentContainer"
+        />
 
 </FrameLayout>

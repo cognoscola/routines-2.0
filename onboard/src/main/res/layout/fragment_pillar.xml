@@ -109,19 +109,5 @@
         android:id="@+id/worklifeButton"
         />
 
-    <TextView
-        android:textColor="@color/pillar_text_color"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@drawable/picker_button_selector"
-        android:text="@string/pillar_other"
-        android:gravity="center"
-        android:textStyle="bold"
-        android:textSize="@dimen/onboard_choice_text_size"
-        android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
-        android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
-        android:paddingTop="@dimen/onboard_pillar_vertical_padding"
-        android:paddingBottom="@dimen/onboard_pillar_vertical_padding"
-        android:id="@+id/otherButton"/>
 
 </LinearLayout>

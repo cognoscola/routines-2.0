@@ -670,7 +670,6 @@ class LivingBackground(val isWatch:Boolean) {
 //        mBackgroundBitmap = generateBitmapFromTriangles(widthD, heightD, triangleSoup!!)
 
 
-
         var noABFound = false
         var noACFound = false
         var noBCFound = false

@@ -46,7 +46,7 @@ class InformationFragment: OnboardFragment(){
     }
 
     fun updateText(title:String, content:String, actionOne:String?, actionTwo:String?){
-        infoTextView.text = content
+        infoTextView.text = getHtml(content)
         welcomeTitleTextView.text = title
         actionOne?.apply { actionButtonOne.text = this@apply }?:run{actionButtonOne.visibility = View.GONE}
         actionTwo?.apply { actionButtonOne.text = this@apply }?:run{actionButtonTwo.visibility = View.GONE}
