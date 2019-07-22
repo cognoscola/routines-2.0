@@ -7,7 +7,6 @@ import android.os.Message
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
-import com.gorillamoa.routines.tools.animation.CircularTimer
 import com.gorillamoa.routines.tools.delayneytriangle.LivingBackground
 import java.lang.ref.WeakReference
 
