@@ -1091,8 +1091,6 @@ class LivingBackground {
         fun resetAnimationLatch(){
             animationLatch = false
         }
-
     }
-
 
 }

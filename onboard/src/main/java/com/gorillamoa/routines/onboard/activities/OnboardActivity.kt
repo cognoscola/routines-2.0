@@ -275,16 +275,21 @@ class OnboardActivity:FragmentActivity(){
                         "Call a friend", "Make a gift", "Hangout"
                 )
             }
+
             PillarChoosingFragment.Pillar.Play -> {
                 fragment = TaskChooseFragment.newInstance(
                         "Video Game", "Soccer", "Read"
                 )
-
             }
 
             PillarChoosingFragment.Pillar.Work -> {
                 fragment = TaskChooseFragment.newInstance(
-                        "Check Email", "Cut Distractions", "Less Coffee"
+                        "Work Less", "Cut Distractions", "Less Coffee"
+                )
+            }
+            else ->{
+                fragment = TaskChooseFragment.newInstance(
+                        "Work Less", "Cut Distractions", "Less Coffee"
                 )
             }
 

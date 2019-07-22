@@ -7,17 +7,20 @@ import android.os.Message
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import android.widget.TextView
+import com.gorillamoa.routines.tools.animation.CIEColor
 import com.gorillamoa.routines.tools.delayneytriangle.LivingBackground
 import java.lang.ref.WeakReference
 
-
-//TODO add functions to accept new colors
-//TODO add functionality to morph to new colors
-
-class DelauneyBackground : View {
+class DelauneyTextView:TextView{
 
 
-    private lateinit var livingBackground:LivingBackground
+    private lateinit var livingBackground: LivingBackground
+
+    private lateinit var topLeft:CIEColor
+    private lateinit var topRight:CIEColor
+    private lateinit var bottomRight:CIEColor
+    private lateinit var bottomLeft:CIEColor
 
 
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
@@ -28,19 +31,29 @@ class DelauneyBackground : View {
         setupAttributes(attrs)
     }
 
-
     private fun setupAttributes(attrs: AttributeSet?) {
+
         Log.d("tag setupAttributes","Enters")
 
-        livingBackground = LivingBackground(true, LivingBackground.Shape.Landscape,context.isWatch())
-        livingBackground.initializeBackground()
-
         // Obtain a typed array of attributes
-//        val typedArray = context.theme.obtainStyledAttributes(attrs, R.styleable.SwitchPreference,
-//                0, 0)
+        val typedArray = context.theme.obtainStyledAttributes(attrs, R.styleable.DelauneyTextView, 0, 0)
 
         // Extract custom attributes into member variables
-//        key = typedArray.getString(R.styleable.SwitchPreference_key)?:""
+        topLeft =  getCIE(typedArray.getColor(R.styleable.DelauneyTextView_topLeft,0))
+        topRight = getCIE(typedArray.getColor(R.styleable.DelauneyTextView_topRight,0))
+        bottomRight = getCIE(typedArray.getColor(R.styleable.DelauneyTextView_bottomRight,0))
+        bottomLeft = getCIE(typedArray.getColor(R.styleable.DelauneyTextView_bottomLeft,0))
+
+        livingBackground = LivingBackground(false, LivingBackground.Shape.Landscape,context.isWatch(), topLeft,topRight,bottomRight,bottomLeft)
+        livingBackground.initializeBackground()
+
+    }
+
+    private fun getCIE(color:Int):CIEColor{
+        val r = color shr 16 and 0xFF
+        val g = color shr 8 and 0xFF
+        val b = color shr 0 and 0xFF
+        return CIEColor(r.toFloat(),g.toFloat(),b.toFloat(),255f)
 
     }
 
@@ -55,20 +68,19 @@ class DelauneyBackground : View {
             livingBackground.setPresetstoAmbientMode()
         }
         updateTimer()
-
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         livingBackground.scaleBackground(w, h)
-
     }
 
     override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
+        //we'll draw the background first..
         livingBackground.drawBackground(canvas, timers = null)
+        //and then he text
+        super.onDraw(canvas)
     }
-
 
     //Handle FPS
     private val mUpdateTimeHandler = EngineHandler(this)
@@ -77,9 +89,6 @@ class DelauneyBackground : View {
         val INTERACTIVE_UPDATE_RATE_MS_15FPS = 67L //15fps
         val MSG_UPDATE_TIME = 0
     }
-
-
-
 
     /**
      * Starts/stops the [.mUpdateTimeHandler] timer based on the state of the watch face.
@@ -118,8 +127,8 @@ class DelauneyBackground : View {
         }
     }
 
-    private class EngineHandler(reference: DelauneyBackground) : Handler() {
-        private val mWeakReference: WeakReference<DelauneyBackground> = WeakReference(reference)
+    private class EngineHandler(reference: DelauneyTextView) : Handler() {
+        private val mWeakReference: WeakReference<DelauneyTextView> = WeakReference(reference)
 
         override fun handleMessage(msg: Message) {
             val engine = mWeakReference.get()

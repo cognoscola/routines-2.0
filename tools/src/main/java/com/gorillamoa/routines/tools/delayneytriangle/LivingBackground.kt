@@ -14,7 +14,7 @@ import io.github.jdiemke.triangulation.*
 import kotlin.collections.ArrayList
 
 private const val WORKING_BITMAP_WIDTH = 200
-private const val WORKING_BITMAP_HEIGHT = 200
+private const val WORKING_BITMAP_HEIGHT = 400
 private const val WORKING_BITMAP_WIDTH_MOBILE = 1080/2
 private const val WORKING_BITMAP_HEIGHT_MOBILE = 1920/2
 
@@ -24,16 +24,47 @@ private const val MAX_EDGES = 300
 private const val MIN_COMPONENTS_PER_ENTITY = 3
 private const val MAX_COMPONENTS_PER_ENTITY = 6
 
+private const val initialBackgroundAlpha = 255.0f
+
 //TODO transition between off and on smoothly (by showing edges etc..)
 //one idea is to place different 3 of 4 different bitmaps with varying alphas and just remove
 
 //TODO make the edges be same color as DARK color chosen
-
 //TODO OPTIMIZE!
 //TODO SEPERATE LOW POWER MODE FUNCTIONALITY WITH HIGH POWER MODE
 //CLEAN UP
+//TODO provide is animated feature
 //them one by one
-class LivingBackground(val isWatch:Boolean) {
+class LivingBackground(val isAnimated:Boolean = true,
+                       val shape:Shape = Shape.Square,
+                       val isWatch:Boolean,
+                       val topLeft:CIEColor = CIEColor(
+                               r = 255.0f,
+                               g = 245.0f,
+                               b = 230.0f,
+                               a = initialBackgroundAlpha
+                       ),
+                       val topRight:CIEColor = CIEColor(
+                               r= 175.0f,
+                               g = 111.0f,
+                               b = 74f,
+                               a = initialBackgroundAlpha
+                       ),
+                       val bottomRight:CIEColor = CIEColor(
+                               r = 127f,
+                               g = 39f,
+                               b = 4f,
+                               a = initialBackgroundAlpha
+                       ),
+                       val bottomLeft:CIEColor = CIEColor(
+                               r = 175f,
+                               g = 111f,
+                               b = 84f,
+                               a = initialBackgroundAlpha
+                       ))
+{
+
+
 
     @Suppress("unused")
     private val tag: String = LivingBackground::class.java.name
@@ -51,6 +82,15 @@ class LivingBackground(val isWatch:Boolean) {
     private lateinit var debugPaint: Paint
 
     private lateinit var triangulator: DelaunayTriangulator
+
+    /**
+     * This is pre-allocated memory to calculate colors
+     */
+    private val colorLeft by lazy { CIEColor(0f,0f,0f,0f) }
+    private val colorRight by lazy { CIEColor(0f,0f,0f,0f) }
+
+    private val startColor by lazy { CIEColor(0f,0f,0f,0f) }
+    private val final by lazy { CIEColor(0f,0f,0f,0f) }
 
 
     private val baseDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC)
@@ -142,37 +182,6 @@ class LivingBackground(val isWatch:Boolean) {
         }
     }
 
-    init {
-
-        topLeft.apply {
-            r = 255.0f
-            g = 245.0f
-            b = 230.0f
-            a = backgroundAlpha
-        }
-
-        bottomRight.apply {
-            r = 127f
-            g = 39f
-            b = 4f
-            a = backgroundAlpha
-        }
-
-        bottomLeft.apply {
-            r = 175f
-            g = 111f
-            b = 84f
-            a = backgroundAlpha
-        }
-
-        topRight.apply {
-            r = 175f
-            g = 111f
-            b = 84f
-            a = backgroundAlpha
-        }
-
-    }
 
     fun enableAlarm() {
         isAlarmOn = true
@@ -420,12 +429,36 @@ class LivingBackground(val isWatch:Boolean) {
         lastMeasuredTime = SystemClock.uptimeMillis()
     }
 
-    fun getWorkingWidth():Double{
-        return if(isWatch) WORKING_BITMAP_WIDTH.toDouble() else WORKING_BITMAP_WIDTH_MOBILE.toDouble()
+    fun getWorkingWidth():Double {
+
+        val width:Double = when (shape) {
+            Shape.Square -> {
+               if (isWatch) WORKING_BITMAP_WIDTH.toDouble() else WORKING_BITMAP_WIDTH_MOBILE.toDouble()
+            }
+            Shape.Portrait -> {
+                if (isWatch) WORKING_BITMAP_WIDTH.toDouble() else WORKING_BITMAP_WIDTH_MOBILE.toDouble()
+            }
+            Shape.Landscape -> {
+                if (isWatch) WORKING_BITMAP_HEIGHT.toDouble() else WORKING_BITMAP_HEIGHT_MOBILE.toDouble()
+            }
+        }
+
+        return width
     }
 
     fun getWorkingHeight():Double{
-        return if(isWatch) WORKING_BITMAP_HEIGHT.toDouble() else WORKING_BITMAP_HEIGHT_MOBILE.toDouble()
+        val height:Double = when(shape){
+            Shape.Square -> {
+                if (isWatch) WORKING_BITMAP_WIDTH.toDouble() else WORKING_BITMAP_WIDTH_MOBILE.toDouble()
+            }
+            Shape.Portrait -> {
+                if (isWatch) WORKING_BITMAP_HEIGHT.toDouble() else WORKING_BITMAP_HEIGHT_MOBILE.toDouble()
+            }
+            Shape.Landscape -> {
+                if (isWatch) WORKING_BITMAP_WIDTH.toDouble() else WORKING_BITMAP_WIDTH_MOBILE.toDouble()
+            }
+        }
+        return height
     }
 
     fun scaleBackground(width: Int, height: Int) {
@@ -597,9 +630,8 @@ class LivingBackground(val isWatch:Boolean) {
 
     private fun generateBackgroundBitmaps() {
 
-
-        val widthD = if(isWatch) WORKING_BITMAP_WIDTH.toDouble() else WORKING_BITMAP_WIDTH_MOBILE.toDouble()
-        val heightD = if(isWatch) WORKING_BITMAP_HEIGHT.toDouble() else WORKING_BITMAP_HEIGHT_MOBILE.toDouble()
+        val widthD =getWorkingWidth()
+        val heightD = getWorkingHeight()
 
         //we'll create delayney triangles
         val points = if(isWatch)61 else 122
@@ -946,43 +978,27 @@ class LivingBackground(val isWatch:Boolean) {
         //TODO END OF MORPHED
     }
 
+    fun getColorCIEBasedOnPosition(width:Float, height:Float, triangleEntity: TriangleEntity){
 
-    companion object {
-        /**
-         * This is pre-allocated memory to calculate colors
-         */
-        private val colorLeft by lazy { CIEColor(0f,0f,0f,0f) }
-        private val colorRight by lazy { CIEColor(0f,0f,0f,0f) }
-        private val topLeft by lazy { CIEColor(0f,0f,0f,0f) }
-        private val topRight by lazy { CIEColor(0f,0f,0f,0f) }
-        private val bottomLeft by lazy { CIEColor(0f,0f,0f,0f) }
-        private val bottomRight by lazy { CIEColor(0f,0f,0f,0f) }
-        private val startColor by lazy { CIEColor(0f,0f,0f,0f) }
-        private val final by lazy { CIEColor(0f,0f,0f,0f) }
+        val y= triangleEntity.getCenterY()
+        val x= triangleEntity.getCenterX()
 
-
-        fun getColorCIEBasedOnPosition(width:Float, height:Float, triangleEntity: TriangleEntity){
-
-            val y= triangleEntity.getCenterY()
-            val x= triangleEntity.getCenterX()
-
-            topLeft.lerp(bottomLeft, y / height, colorLeft)
-            topRight.lerp(bottomRight, y / height, colorRight)
-            colorLeft.lerp(colorRight, x / width, final)
-        }
-
-        fun getColorBasedOnPosition(x:Float, y:Float, width:Float, height:Float):Int{
-            topLeft.lerp(bottomLeft, y / height, colorLeft)
-            topRight.lerp(bottomRight, y / height, colorRight)
-            colorLeft.lerp(colorRight, x / width, final)
-
-            return Color.argb(final.a.roundToInt(), final.r.roundToInt(), final.g.roundToInt(), final.b.roundToInt())
-        }
+        topLeft.lerp(bottomLeft, y / height, colorLeft)
+        topRight.lerp(bottomRight, y / height, colorRight)
+        colorLeft.lerp(colorRight, x / width, final)
     }
 
+    fun getColorBasedOnPosition(x:Float, y:Float, width:Float, height:Float):Int{
+        topLeft.lerp(bottomLeft, y / height, colorLeft)
+        topRight.lerp(bottomRight, y / height, colorRight)
+        colorLeft.lerp(colorRight, x / width, final)
+        return Color.argb(final.a.roundToInt(), final.r.roundToInt(), final.g.roundToInt(), final.b.roundToInt())
+    }
 
-
-    //TODO make sure we remove the properties and make them into components later
-
-
+    public enum class Shape{
+        Square,
+        Portrait,
+        Landscape,
+    }
 }
+

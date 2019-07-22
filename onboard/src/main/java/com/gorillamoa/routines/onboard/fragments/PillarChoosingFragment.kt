@@ -20,8 +20,7 @@ class PillarChoosingFragment:Fragment(){
         Physical,
         Relationships,
         Play,
-        Work,
-        Other
+        Work
 
     }
 
@@ -43,7 +42,6 @@ class PillarChoosingFragment:Fragment(){
         relationshipButton.setOnClickListener { callback.invoke(Pillar.Relationships) }
         playButton.setOnClickListener { callback.invoke(Pillar.Play) }
         worklifeButton.setOnClickListener { callback.invoke(Pillar.Work) }
-        otherButton.setOnClickListener { callback.invoke(Pillar.Other) }
 
     }
 

@@ -94,7 +94,6 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
         taskViewModel.loadTasks()
         taskViewModel.tasks.observe(this, Observer {
             (taskListFragment as TaskListDisplayer).onListUpdated(it)
-
         })
 
 

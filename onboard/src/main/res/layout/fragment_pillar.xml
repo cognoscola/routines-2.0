@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -33,7 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="10dp"/>
 
-    <TextView
+    <com.gorillamoa.routines.tools.DelauneyTextView
         android:textColor="@color/pillar_text_color"
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -47,9 +48,14 @@
         android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
         android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
         android:id="@+id/mentalButton"
+        app:topLeft="#FFFFFF"
+        app:topRight="#32D837"
+        app:bottomRight="#249428"
+        app:bottomLeft="#DADADA"
+
         />
 
-    <TextView
+    <com.gorillamoa.routines.tools.DelauneyTextView
         android:textColor="@color/pillar_text_color"
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -62,9 +68,14 @@
         android:paddingBottom="@dimen/onboard_pillar_vertical_padding"
         android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
         android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
-        android:id="@+id/physicalButton"/>
+        android:id="@+id/physicalButton"
+        app:topLeft="#FFFFFF"
+        app:topRight="#F33C14"
+        app:bottomRight="#C22E0F"
+        app:bottomLeft="#DADADA"
+        />
 
-    <TextView
+    <com.gorillamoa.routines.tools.DelauneyTextView
         android:textColor="@color/pillar_text_color"
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -77,9 +88,14 @@
         android:paddingBottom="@dimen/onboard_pillar_vertical_padding"
         android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
         android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
-        android:id="@+id/relationshipButton"/>
+        android:id="@+id/relationshipButton"
+        app:topLeft="#FFFFFF"
+        app:topRight="#144FF3"
+        app:bottomRight="#1645CC"
+        app:bottomLeft="#DADADA"
+        />
 
-    <TextView
+    <com.gorillamoa.routines.tools.DelauneyTextView
         android:textColor="@color/pillar_text_color"
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -92,8 +108,14 @@
         android:paddingBottom="@dimen/onboard_pillar_vertical_padding"
         android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
         android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
-        android:id="@+id/playButton"/>
-    <TextView
+        android:id="@+id/playButton"
+
+        app:topLeft="#FFFFFF"
+        app:topRight="#D914F3"
+        app:bottomRight="#A20BB6"
+        app:bottomLeft="#DADADA"
+        />
+    <com.gorillamoa.routines.tools.DelauneyTextView
         android:textColor="@color/pillar_text_color"
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -107,6 +129,11 @@
         android:layout_marginBottom="@dimen/onboard_pillar_vertical_padding"
         android:layout_marginTop="@dimen/onboard_pillar_vertical_padding"
         android:id="@+id/worklifeButton"
+
+        app:topLeft="#FFFFFF"
+        app:topRight="#F3D514"
+        app:bottomRight="#B39A0E"
+        app:bottomLeft="#DADADA"
         />
 
 
