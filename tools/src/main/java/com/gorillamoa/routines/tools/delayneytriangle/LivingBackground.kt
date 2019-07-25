@@ -304,6 +304,7 @@ class LivingBackground(val grahics:Graphics = Graphics.High,
             edgeEntity.apply {
                 resetAnimationLatch()
                 if(this@LivingBackground.grahics == Graphics.High){
+                    Log.d("$tag comeOutOfAmbient","Graphics are High")
                     add(engine.createComponent(RenderComponent::class.java))
                 }
                 add(engine.createComponent(FadeInEffectComponent::class.java).apply {
@@ -415,8 +416,12 @@ class LivingBackground(val grahics:Graphics = Graphics.High,
 
         //then we update the system once, if an element has been changed its
         //redraw state will be changed to true
+
+        android.os.Trace.beginSection("livingBackgroundRender")
+
         engine.update(deltaTimeMillis/ ONE_THOUSAND_FLOAT)
 
+        android.os.Trace.endSection()
 
         var triangle = getWorkingTriangleSet().find {
             it.needsRedraw()
@@ -1130,7 +1135,6 @@ class LivingBackground(val grahics:Graphics = Graphics.High,
 
         edges.forEach { edgeEntity ->
 
-            edgeEntity.add(engine.createComponent(RenderComponent::class.java))
             edgeEntity.add(engine.createComponent(EdgeComponent::class.java))
             edgeEntity.add(engine.createComponent(AlphaComponent::class.java).apply { alpha = ZERO_INT })
 

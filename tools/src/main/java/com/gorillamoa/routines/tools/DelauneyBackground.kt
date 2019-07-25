@@ -32,7 +32,7 @@ class DelauneyBackground : View {
         Log.d("tag setupAttributes","Enters")
 
         livingBackground = LivingBackground(
-                LivingBackground.Graphics.High,
+                LivingBackground.Graphics.Low,
                 true,
                 LivingBackground.DENSITY_WATCH,
                 LivingBackground.Shape.Landscape,
@@ -54,6 +54,8 @@ class DelauneyBackground : View {
         Log.d("Background","onVisibilityChanged")
 
         if(visibility == View.VISIBLE){
+
+//            setLayerType(LAYER_TYPE_HARDWARE,null)
             livingBackground.comeOutOfAmbient()
         }else{
             livingBackground.setPresetstoAmbientMode()
@@ -98,6 +100,10 @@ class DelauneyBackground : View {
      * should only run in active mode.
      */
     private fun shouldTimerBeRunning(): Boolean {
+
+        if(!livingBackground.needsRedraw){
+//            setLayerType(LAYER_TYPE_NONE,null)
+        }
 
         return livingBackground.needsRedraw
         //TODO CHANGE THIS BACK
