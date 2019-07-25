@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
+import com.gorillamoa.routines.tools.delayneytriangle.TriangleEntity
 import kotlin.math.roundToInt
 
 class ColorChangerSystem: IteratingSystem(Family.all(ColorComponent::class.java, ColorChangerEffectComponent::class.java).get()){
@@ -50,6 +51,8 @@ class ColorChangerSystem: IteratingSystem(Family.all(ColorComponent::class.java,
                         newColor.b.roundToInt()
                 )
 
+
+
             }else{
 
                 //we're done, now remove from this family
@@ -60,6 +63,10 @@ class ColorChangerSystem: IteratingSystem(Family.all(ColorComponent::class.java,
                         changeProperties.targetColor.b.roundToInt())
                 entity.remove(ColorChangerEffectComponent::class.java)
             }
+        }
+
+        if (entity is TriangleEntity) {
+            entity.setNeedsRedraw(true)
         }
     }
 }

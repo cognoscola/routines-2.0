@@ -28,11 +28,15 @@ class DelauneyBackground : View {
         setupAttributes(attrs)
     }
 
-
     private fun setupAttributes(attrs: AttributeSet?) {
         Log.d("tag setupAttributes","Enters")
 
-        livingBackground = LivingBackground(true, LivingBackground.Shape.Landscape,context.isWatch())
+        livingBackground = LivingBackground(
+                LivingBackground.Graphics.High,
+                true,
+                LivingBackground.DENSITY_WATCH,
+                LivingBackground.Shape.Landscape,
+                context.isWatch())
         livingBackground.initializeBackground()
 
         // Obtain a typed array of attributes
@@ -54,7 +58,7 @@ class DelauneyBackground : View {
         }else{
             livingBackground.setPresetstoAmbientMode()
         }
-        updateTimer()
+        updateTimer(true)
 
     }
 
@@ -82,9 +86,9 @@ class DelauneyBackground : View {
     /**
      * Starts/stops the [.mUpdateTimeHandler] timer based on the state of the watch face.
      */
-    private fun updateTimer() {
+    private fun updateTimer(forceRedraw:Boolean = false) {
         mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME)
-        if (shouldTimerBeRunning()) {
+        if (shouldTimerBeRunning() or forceRedraw) {
             mUpdateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME)
         }
     }
@@ -95,7 +99,7 @@ class DelauneyBackground : View {
      */
     private fun shouldTimerBeRunning(): Boolean {
 
-        return true
+        return livingBackground.needsRedraw
         //TODO CHANGE THIS BACK
         //TODO ADD A CALLBACK TO LET US KNOW WHEN ANIMATION IS FINISHED!
 //            return isVisible && !mAmbient

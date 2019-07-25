@@ -14,14 +14,12 @@ import java.lang.ref.WeakReference
 
 class DelauneyTextView:TextView{
 
-
     private lateinit var livingBackground: LivingBackground
 
     private lateinit var topLeft:CIEColor
     private lateinit var topRight:CIEColor
     private lateinit var bottomRight:CIEColor
     private lateinit var bottomLeft:CIEColor
-
 
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
         setupAttributes(attrs)
@@ -44,7 +42,18 @@ class DelauneyTextView:TextView{
         bottomRight = getCIE(typedArray.getColor(R.styleable.DelauneyTextView_bottomRight,0))
         bottomLeft = getCIE(typedArray.getColor(R.styleable.DelauneyTextView_bottomLeft,0))
 
-        livingBackground = LivingBackground(false, LivingBackground.Shape.Landscape,context.isWatch(), topLeft,topRight,bottomRight,bottomLeft)
+        livingBackground = LivingBackground(
+                LivingBackground.Graphics.Low,
+                false,
+                LivingBackground.DENSITY_BUTTON,
+                LivingBackground.Shape.Specified,context.isWatch(),
+                400.0,
+                60.0,
+                topLeft,
+                topRight,
+                bottomRight,
+                bottomLeft
+        )
         livingBackground.initializeBackground()
 
     }
@@ -106,10 +115,8 @@ class DelauneyTextView:TextView{
      */
     private fun shouldTimerBeRunning(): Boolean {
 
-        return true
-        //TODO CHANGE THIS BACK
-        //TODO ADD A CALLBACK TO LET US KNOW WHEN ANIMATION IS FINISHED!
-//            return isVisible && !mAmbient
+        return livingBackground.needsRedraw
+        //TODO include ambient
     }
 
     /**

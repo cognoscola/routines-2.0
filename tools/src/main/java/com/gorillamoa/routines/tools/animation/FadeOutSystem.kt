@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
+import com.gorillamoa.routines.tools.delayneytriangle.EdgeEntity
 
 
 class FadeOutSystem:IteratingSystem(Family.all(AlphaComponent::class.java, FadeOutEffectComponent::class.java).get()){
@@ -37,7 +38,13 @@ class FadeOutSystem:IteratingSystem(Family.all(AlphaComponent::class.java, FadeO
                     entity.remove(FadeOutEffectComponent::class.java)
                 }
             }
+
         }
+
+        if (entity is EdgeEntity) {
+            entity.setNeedsRedraw(true)
+        }
+
     }
 
 

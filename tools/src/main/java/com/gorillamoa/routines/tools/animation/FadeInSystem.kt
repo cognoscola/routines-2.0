@@ -1,10 +1,11 @@
 package com.gorillamoa.routines.tools.animation
 
+import android.util.Log
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
-
+import com.gorillamoa.routines.tools.delayneytriangle.EdgeEntity
 
 
 /**
@@ -42,11 +43,19 @@ class FadeInSystem:IteratingSystem(Family.all(AlphaComponent::class.java,FadeInE
                     }
                     alpha = Math.min(alpha, TWOFIFTYFIVE)
 
+
+
                     if (alpha == TWOFIFTYFIVE) {
                         entity.remove(FadeInEffectComponent::class.java)
                     }
+
                 }
             }
+        }
+
+        if (entity is EdgeEntity) {
+            Log.d("$tag processEntity","set Redraw to true!")
+            entity.setNeedsRedraw(true)
         }
     }
 }

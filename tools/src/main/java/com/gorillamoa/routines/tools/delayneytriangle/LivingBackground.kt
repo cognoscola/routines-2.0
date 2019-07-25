@@ -24,6 +24,7 @@ private const val MAX_EDGES = 300
 private const val MIN_COMPONENTS_PER_ENTITY = 3
 private const val MAX_COMPONENTS_PER_ENTITY = 6
 
+
 private const val initialBackgroundAlpha = 255.0f
 
 //TODO transition between off and on smoothly (by showing edges etc..)
@@ -35,9 +36,72 @@ private const val initialBackgroundAlpha = 255.0f
 //CLEAN UP
 //TODO provide is animated feature
 //them one by one
-class LivingBackground(val isAnimated:Boolean = true,
+
+//TODO add a timer to start animating delayed (that way we're not drawing all things together)
+
+/**
+ *
+ * @property isAnimated Boolean
+ * @property density Int
+ * @property shape Shape
+ * @property isWatch Boolean
+ * @property width Double
+ * @property height Double
+ * @property topLeft CIEColor
+ * @property topRight CIEColor
+ * @property bottomRight CIEColor
+ * @property bottomLeft CIEColor
+ * @property tag String
+ * @property mAlarmPaint Paint
+ * @property workingBitmap Bitmap
+ * @property workingCanvas Canvas
+ * @property mBackgroundPaint Paint
+ * @property mMorphPaint Paint
+ * @property debugPaint Paint
+ * @property triangulator DelaunayTriangulator
+ * @property needsRedraw Boolean
+ * @property colorLeft CIEColor
+ * @property colorRight CIEColor
+ * @property startColor CIEColor
+ * @property final CIEColor
+ * @property baseDrawingMode Xfermode
+ * @property morphDrawingMode Xfermode
+ * @property bgDrawingMode Xfermode
+ * @property engine PooledEngine
+ * @property fadeInSystem FadeInSystem?
+ * @property renderSystem RenderSystem?
+ * @property edges ArrayList<EdgeEntity>
+ * @property triangles ArrayList<TriangleEntity>
+ * @property morphPath Path
+ * @property scaleX Float
+ * @property scaleY Float
+ * @property triangleSoup ArrayList<Triangle2D>?
+ * @property backgroundAlpha Float
+ * @property isAlarmOn Boolean
+ * @property isAlarmAlphaIncreasing Boolean
+ * @property currentTimeCounter Long
+ * @property currentAlarmAlpha Float
+ * @property TIME2MAX Float
+ * @property MAXALPHA Float
+ * @property lastMeasuredTime Long
+ * @property dt Long
+ * @property intermidiateBitmap Bitmap
+ * @property intermediatecanvas Canvas
+ * @property fadeInFinishListener EntityListener
+ * @property fadeOutFinishListener EntityListener
+ * @property colorChangeFinishListener EntityListener
+ * @constructor
+ */
+//TODO HIGH GRAPHICS
+//TODO LOW GRAPHICS
+//TODO NO ANIMATION
+class LivingBackground(val grahics:Graphics = Graphics.High,
+                       val unique:Boolean = true, //if false, we'll just fetch a pre-made triangle set from heap
+                       val density:Int = DENSITY_BUTTON, //accept any number between 3 - 100
                        val shape:Shape = Shape.Square,
                        val isWatch:Boolean,
+                       val width:Double = 0.0, //in order for these to be
+                       val height:Double =0.0,
                        val topLeft:CIEColor = CIEColor(
                                r = 255.0f,
                                g = 245.0f,
@@ -63,8 +127,14 @@ class LivingBackground(val isAnimated:Boolean = true,
                                a = initialBackgroundAlpha
                        ))
 {
+    companion object{
 
+        public val DENSITY_WATCH = 61 //low number of points
+        public val DENSITY_MOBILE = 122
+        public val DENSITY_BUTTON = 40
 
+        private var defaultSoup: TriangleSoup? = null
+    }
 
     @Suppress("unused")
     private val tag: String = LivingBackground::class.java.name
@@ -83,6 +153,8 @@ class LivingBackground(val isAnimated:Boolean = true,
 
     private lateinit var triangulator: DelaunayTriangulator
 
+    public var needsRedraw = true
+
     /**
      * This is pre-allocated memory to calculate colors
      */
@@ -91,7 +163,6 @@ class LivingBackground(val isAnimated:Boolean = true,
 
     private val startColor by lazy { CIEColor(0f,0f,0f,0f) }
     private val final by lazy { CIEColor(0f,0f,0f,0f) }
-
 
     private val baseDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC)
     private val morphDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
@@ -107,7 +178,8 @@ class LivingBackground(val isAnimated:Boolean = true,
     private var renderSystem: RenderSystem? = null
 
     val edges = ArrayList<EdgeEntity>()
-    val triangleNodes = ArrayList<TriangleEntity>()
+    val triangles = ArrayList<TriangleEntity>()
+
 
     private var morphPath = Path().apply {
         fillType = Path.FillType.EVEN_ODD
@@ -117,7 +189,7 @@ class LivingBackground(val isAnimated:Boolean = true,
 
     var scaleX = 0.0f
     var scaleY = 0.0f
-    var triangleSoup: ArrayList<Triangle2D>? = null
+//
 
     //COLORS
     private val backgroundAlpha = 255.0f
@@ -133,7 +205,6 @@ class LivingBackground(val isAnimated:Boolean = true,
 
     lateinit var  intermidiateBitmap:Bitmap
     lateinit var intermediatecanvas:Canvas
-
 
     val fadeInFinishListener = object :EntityListener{
         override fun entityAdded(entity: Entity?) {}
@@ -161,7 +232,6 @@ class LivingBackground(val isAnimated:Boolean = true,
                         ColorChangerSystem.startChanging(
                                 startColor,
                                 final, 0.369, triangleEntity, engine)
-
                     }
                 }
 
@@ -185,6 +255,18 @@ class LivingBackground(val isAnimated:Boolean = true,
         }
     }
 
+    val colorChangeFinishListener = object :EntityListener{
+        override fun entityAdded(entity: Entity?) {
+        }
+
+        override fun entityRemoved(entity: Entity?) {
+            if(entity is TriangleEntity){
+                entity.remove(RenderComponent::class.java)
+            }
+        }
+    }
+
+
 
     fun enableAlarm() {
         isAlarmOn = true
@@ -201,13 +283,13 @@ class LivingBackground(val isAnimated:Boolean = true,
      */
     fun setPresetstoAmbientMode(){
 
-        edges.forEach {
+        getWorkingEdgeSet().forEach {
             it.resetAnimationLatch()
             it.remove(RenderComponent::class.java)
             it.getComponent(AlphaComponent::class.java).alpha = 0
         }
 
-        triangleNodes.forEach {
+        getWorkingTriangleSet().forEach {
 
             it.resetAnimationLatch()
             it.remove(RenderComponent::class.java)
@@ -217,11 +299,13 @@ class LivingBackground(val isAnimated:Boolean = true,
     fun comeOutOfAmbient() {
 
         Log.d("$tag comeOutOfAmbient","Out of ambient")
-        edges.forEach { edgeEntity ->
+        getWorkingEdgeSet().forEach { edgeEntity ->
 
             edgeEntity.apply {
                 resetAnimationLatch()
-                add(engine.createComponent(RenderComponent::class.java))
+                if(this@LivingBackground.grahics == Graphics.High){
+                    add(engine.createComponent(RenderComponent::class.java))
+                }
                 add(engine.createComponent(FadeInEffectComponent::class.java).apply {
                     startDelaySecond = ((Math.min(edgeEntity.itself.a.x, edgeEntity.itself.b.x) / getWorkingWidth()) * POINT_FOUR)
                     fadeRatePerFrame = FIFTY_FIVE_INT
@@ -229,22 +313,23 @@ class LivingBackground(val isAnimated:Boolean = true,
             }
         }
 
-        triangleNodes.forEach {
+        getWorkingTriangleSet().forEach {
             it.resetAnimationLatch()
             //we'll remove any rendering of the backgrounds until we get an edge signal
          //   it.remove(RenderComponent::class.java)
         }
     }
 
+
     fun goIntoAmbient(){
         Log.d("$tag goIntoAmbient","Into Ambient")
 
-        edges.forEach {
+        getWorkingEdgeSet().forEach {
             it.resetAnimationLatch()
             it.getComponent(AlphaComponent::class.java).alpha = 0
         }
 
-        triangleNodes.forEach {
+        getWorkingTriangleSet().forEach {
 
             it.resetAnimationLatch()
             //we'll add the render component again because they should be all showing initially
@@ -291,7 +376,10 @@ class LivingBackground(val isAnimated:Boolean = true,
             style = Paint.Style.STROKE
         }
 
-        generateBackgroundBitmaps()
+
+        generateBackgroundBitmaps(edges,triangles)
+
+
 
         /* Extracts colors from background image to improve watchface style. */
         //Not using palette now since no bitmap
@@ -313,10 +401,41 @@ class LivingBackground(val isAnimated:Boolean = true,
      */
     fun draw(canvas: Canvas, deltaTimeMillis:Float){
 
+        //set everything to false after drawing?!
+        getWorkingTriangleSet().forEach {
+            it.setNeedsRedraw(false)
+        }
+
+        getWorkingEdgeSet().forEach {
+            it.setNeedsRedraw(false)
+        }
+
+
+        Log.d("$tag background","setting entities false")
+
+        //then we update the system once, if an element has been changed its
+        //redraw state will be changed to true
         engine.update(deltaTimeMillis/ ONE_THOUSAND_FLOAT)
+
+
+        var triangle = getWorkingTriangleSet().find {
+            it.needsRedraw()
+        }
+        //if we found a redraw, then just redraw everything
+        //else we can set the needs redraw variable to false
+
+        var edge = getWorkingEdgeSet().find {
+            Log.d("$tag background","checking Edge:${it.needsRedraw()}")
+            it.needsRedraw()
+        }
+
+        needsRedraw = (triangle != null).or(edge != null)
+        Log.d("$tag background","triangle${(triangle != null)} edge:${(edge != null)}")
+        Log.d("$tag background","needsRedraw:$needsRedraw")
+
+        //TODO  in future only redraw a small portion of the bg
         canvas.drawBitmap(intermidiateBitmap,0.0f,0.0f, mBackgroundPaint)
     }
-
 
     /**
      * Draw the background. There are 3 main steps:
@@ -388,7 +507,8 @@ class LivingBackground(val isAnimated:Boolean = true,
         canvas.restore()
 
         //TODO USE the Engine to show this alarm
-        canvas.save()
+        //TODO ALARM STUFFd
+        /*canvas.save()
         canvas.scale(scaleX, scaleY)
 
         if (isAlarmOn) {
@@ -400,6 +520,7 @@ class LivingBackground(val isAnimated:Boolean = true,
                     currentTimeCounter = 1000
                     isAlarmAlphaIncreasing = false
                 }
+            } else {
             } else {
                 currentTimeCounter -= dt
                 if (currentTimeCounter < 0.0) {
@@ -427,9 +548,17 @@ class LivingBackground(val isAnimated:Boolean = true,
                 canvas.drawLine(it.c.x.toFloat(), it.c.y.toFloat(), it.a.x.toFloat(), it.a.y.toFloat(), mAlarmPaint)
             }
         }
-        canvas.restore()
+        canvas.restore()*/
 
         lastMeasuredTime = SystemClock.uptimeMillis()
+    }
+
+    private fun getWorkingTriangleSet():ArrayList<TriangleEntity>{
+        return triangles
+    }
+
+    private fun getWorkingEdgeSet():ArrayList<EdgeEntity>{
+        return edges
     }
 
     fun getWorkingWidth():Double {
@@ -443,6 +572,9 @@ class LivingBackground(val isAnimated:Boolean = true,
             }
             Shape.Landscape -> {
                 if (isWatch) WORKING_BITMAP_HEIGHT.toDouble() else WORKING_BITMAP_HEIGHT_MOBILE.toDouble()
+            }
+            Shape.Specified ->{
+                return width
             }
         }
 
@@ -459,6 +591,9 @@ class LivingBackground(val isAnimated:Boolean = true,
             }
             Shape.Landscape -> {
                 if (isWatch) WORKING_BITMAP_WIDTH.toDouble() else WORKING_BITMAP_WIDTH_MOBILE.toDouble()
+            }
+            Shape.Specified ->{
+                return height
             }
         }
         return height
@@ -498,8 +633,14 @@ class LivingBackground(val isAnimated:Boolean = true,
             addSystem(ColorChangerSystem())
             addSystem(renderSystem)
 
+            //so that we're notified when an edge has finished fading in
             engine.addEntityListener(Family.one(FadeInEffectComponent::class.java).get(), fadeInFinishListener)
+
+            //so that we're notified when an object has finished fading out
             engine.addEntityListener(Family.one(FadeOutEffectComponent::class.java).get(),fadeOutFinishListener)
+
+            //so that we're notified when a triangle has finished changing colours
+            engine.addEntityListener(Family.one(ColorChangerEffectComponent::class.java).get(),colorChangeFinishListener)
         }
     }
 
@@ -570,6 +711,8 @@ class LivingBackground(val isAnimated:Boolean = true,
     }
 */
 
+
+
     private fun generateBitmapFromTriangles(width: Double, height: Double, triangles: List<Triangle2D>): Bitmap {
 
         //we'll make a gradient of 4 colors for now,
@@ -638,85 +781,145 @@ class LivingBackground(val isAnimated:Boolean = true,
     }
 
 
-    private fun generateBackgroundBitmaps() {
+    private fun generateBackgroundBitmaps(edges:ArrayList<EdgeEntity>, triangles:ArrayList<TriangleEntity>) {
 
-        val widthD =getWorkingWidth()
-        val heightD = getWorkingHeight()
+        if(unique.or(defaultSoup == null)) {
+            val widthD = getWorkingWidth()
+            val heightD = getWorkingHeight()
 
-        //we'll create delayney triangles
-        val points = if(isWatch)61 else 122
+            //we'll create delayney triangles
+            val points = density
 
-        val random = Random()
+            val random = Random()
 
-        //initialize an empty array of floating points to mark the vertices of our triangles
-        val point2ds = Vector<Vector2D>(points)
+            //initialize an empty array of floating points to mark the vertices of our triangles
+            val point2ds = Vector<Vector2D>(points)
 
-        //place points on the corners of our quad
-        point2ds.addElement(Vector2D(0.0, 0.0)) //top left
-        point2ds.addElement(Vector2D(widthD, heightD)) // bottom right
-        point2ds.addElement(Vector2D(0.0, heightD)) // bottom left
-        point2ds.addElement(Vector2D(widthD, 0.0)) //top right
+            //place points on the corners of our quad
+            point2ds.addElement(Vector2D(0.0, 0.0)) //top left
+            point2ds.addElement(Vector2D(widthD, heightD)) // bottom right
+            point2ds.addElement(Vector2D(0.0, heightD)) // bottom left
+            point2ds.addElement(Vector2D(widthD, 0.0)) //top right
 
-        val halfWidth = widthD.times(0.5)
-        val halfHeight = heightD.times(0.5)
+            val halfWidth = widthD.times(0.5)
+            val halfHeight = heightD.times(0.5)
 
-        for (i in 4 until points) {
+            for (i in 4 until points) {
 
-            //place points on the edges of the quad
-            if (i < 8) {
-                //left edge
-                point2ds.addElement(Vector2D(0.0, random.nextDouble() * heightD))
-            } else if (i < 12) {
-                //top edge
-                point2ds.addElement(Vector2D((widthD * random.nextDouble()), heightD))
-            } else if (i < 16) {
-                //right edge
-                point2ds.addElement(Vector2D(widthD, random.nextDouble() * heightD))
-            } else if (i < 20) {
-                //bottom edgeD
-                point2ds.addElement(Vector2D(widthD * random.nextDouble(), 0.0))
+                //place points on the edges of the quad
+                if (i < 8) {
+                    //left edge
+                    point2ds.addElement(Vector2D(0.0, random.nextDouble() * heightD))
+                } else if (i < 12) {
+                    //top edge
+                    point2ds.addElement(Vector2D((widthD * random.nextDouble()), heightD))
+                } else if (i < 16) {
+                    //right edge
+                    point2ds.addElement(Vector2D(widthD, random.nextDouble() * heightD))
+                } else if (i < 20) {
+                    //bottom edgeD
+                    point2ds.addElement(Vector2D(widthD * random.nextDouble(), 0.0))
 
-                //in order to disperse points more evenly across the entire quad, the quad is split into 4 quadrants
-                // and random points are generated within each quadrant
-            } else if (i < 30) {
-                //bottom left quadrant
-                point2ds.addElement(Vector2D(random.nextDouble() * halfWidth, random.nextDouble() * halfHeight))
-            } else if (i < 40) {
-                //top left quadrant
-                point2ds.addElement(Vector2D(random.nextDouble() * halfWidth, (random.nextDouble() * halfHeight) + halfHeight))
-            } else if (i < 50) {
-                //top right quadrant
-                point2ds.addElement(Vector2D((random.nextDouble() * halfWidth) + halfWidth, (random.nextDouble() * halfHeight + halfHeight)))
-            } else if (i < 60) {
-                //bottom right quadrant
-                point2ds.addElement(Vector2D((random.nextDouble() * halfWidth) + halfWidth, random.nextDouble() * halfHeight))
+                    //in order to disperse points more evenly across the entire quad, the quad is split into 4 quadrants
+                    // and random points are generated within each quadrant
+                } else if (i < 30) {
+                    //bottom left quadrant
+                    point2ds.addElement(Vector2D(random.nextDouble() * halfWidth, random.nextDouble() * halfHeight))
+                } else if (i < 40) {
+                    //top left quadrant
+                    point2ds.addElement(Vector2D(random.nextDouble() * halfWidth, (random.nextDouble() * halfHeight) + halfHeight))
+                } else if (i < 50) {
+                    //top right quadrant
+                    point2ds.addElement(Vector2D((random.nextDouble() * halfWidth) + halfWidth, (random.nextDouble() * halfHeight + halfHeight)))
+                } else if (i < 60) {
+                    //bottom right quadrant
+                    point2ds.addElement(Vector2D((random.nextDouble() * halfWidth) + halfWidth, random.nextDouble() * halfHeight))
+                }
             }
-        }
 
-        triangleSoup = try {
-            triangulator = DelaunayTriangulator(point2ds)
-            triangulator.triangulate()
-            Log.d("$tag generateBackgroundBitmaps","Created ${triangulator.triangles.size}") //SHOULD BE 98
-            triangulator.triangles as ArrayList<Triangle2D>
+            val triangleSoup = try {
+                triangulator = DelaunayTriangulator(point2ds)
+                triangulator.triangulate()
+                Log.d("$tag generateBackgroundBitmaps","Created ${triangulator.triangles.size}") //SHOULD BE 98
+                triangulator.triangleSoup
 
-        } catch (e: NotEnoughPointsException) {
-            Log.d("$tag generateBackgroundBitmaps", "Triangulation Error")
-            null
-        }
+            } catch (e: NotEnoughPointsException) {
+                Log.d("$tag generateBackgroundBitmaps", "Triangulation Error")
+                null
+            }
 
-        if (triangleSoup == null) {
-            return
+            if (triangleSoup == null) {
+                return
+            }
+
+            if(!unique){
+                defaultSoup = triangleSoup
+            }
+            generateEntities(triangleSoup,edges,triangles)
+        } else{
+            generateEntities(defaultSoup,edges,triangles)
         }
 
         //TODO IF using LOW_BATTERY MODE
 //        mBackgroundBitmap = generateBitmapFromTriangles(widthD, heightD, triangleSoup!!)
 
 
+
+
+
+
+        //TODO start of MORPHED BG
+        //we have collected our edges to draw, now we must draw the white triangle when All 3 edges are fully at full alpha.
+        //generate Morphed background
+        //if image is square, height = with, so
+        //radius = % * width /2
+
+        //100 - 15 / 100
+/*
+        val radius = (WORKING_BITMAP_WIDTH.div(2.0) - 15.0).toFloat()
+        //now find all the triangles that intersect with this circle, we do this by dividing the circle into tangents
+        //60 of them since 360/12 = 30 sections
+        val xCenter = WORKING_BITMAP_WIDTH.div(2.0)
+//        var yCenter = WORKING_BITMAP_HEIGHT.div(2.0)
+
+        val degreesPerSection = 12.0
+        val numSections = (360.0 / degreesPerSection).roundToInt()
+
+        for(pos in 1..numSections){
+//        circleTangents = List(numSections) { pos ->
+
+            //the first tangent is the line between 0 and 6 degrees:
+            val end = if (pos < numSections - 1) {
+//                start = Vector2D((radius * sin(Math.toRadians(pos * degreesPerSection))) + xCenter,
+// (radius * -cos(Math.toRadians(pos * degreesPerSection))) + xCenter)
+                Vector2D((radius * sin(Math.toRadians((pos + 1) * degreesPerSection))) + xCenter,
+                        (radius * -cos(Math.toRadians((pos + 1) * degreesPerSection))) + xCenter)
+            } else {
+//                start = Vector2D((radius * sin(Math.toRadians(pos * degreesPerSection))) + xCenter
+// radius * -cos(Math.toRadians(pos * degreesPerSection)) + xCenter)
+                Vector2D((radius * sin(Math.toRadians(0.0))) + xCenter,
+                        (radius * -cos(Math.toRadians(0.0))) + xCenter)
+            }
+            point2ds.add(end)
+        }
+
+        triangulator = DelaunayTriangulator(point2ds)
+        triangulator.triangulate()
+
+        //We morphed the background slightly, now lets create the bitmap for it.
+        morphedBitmap = generateBitmapFromTriangles(widthD, heightD, triangulator.triangles as ArrayList<Triangle2D>)
+*/
+
+
+    }
+
+    private fun generateEntities(soup:TriangleSoup?,edges:ArrayList<EdgeEntity>, triangles: ArrayList<TriangleEntity>){
+
         var noABFound = false
         var noACFound = false
         var noBCFound = false
 
-        triangulator.triangleSoup.triangles.forEach{ triangle ->
+        soup?.triangles?.forEach{ triangle ->
 
             //We'll create a triangle node so that we know which edges belong to which triangle
             //This way we can avoid searching for it, and just remember it. saves CPU usage
@@ -795,9 +998,9 @@ class LivingBackground(val isAnimated:Boolean = true,
 
             //we'll start with the triangles nodes that already exist.
             //for each triangle, check that one of our nodes is part of that triangle's edge nodes
-            triangleNodes.forEach {otherTriangleEntities ->
+            triangles.forEach { otherTriangleEntities ->
 
-               //for each triangle, check if that triangle is neighbour to this triangle.
+                //for each triangle, check if that triangle is neighbour to this triangle.
                 //check that we haven't found a neighbour first
                 triEntity.edgeEntityAB?.let {
 
@@ -922,7 +1125,7 @@ class LivingBackground(val isAnimated:Boolean = true,
             }
 
             //now add this triangle to our triangle nodes
-            triangleNodes.add(triEntity)
+            triangles.add(triEntity)
         }
 
         edges.forEach { edgeEntity ->
@@ -934,58 +1137,12 @@ class LivingBackground(val isAnimated:Boolean = true,
             engine.addEntity(edgeEntity)
         }
 
-        triangleNodes.forEach {
+        triangles.forEach {
 
             it.setTriangleColor(Color.WHITE,engine)
             engine.addEntity(it)
         }
 
-        Log.d("$tag generateBackgroundBitmaps","Edge Nodes: ${edges.size}")
-        Log.d("$tag generateBackgroundBitmaps","Triangle Nodes: ${triangleNodes.size}")
-
-        //TODO start of MORPHED BG
-        //we have collected our edges to draw, now we must draw the white triangle when All 3 edges are fully at full alpha.
-        //generate Morphed background
-        //if image is square, height = with, so
-        //radius = % * width /2
-
-        //100 - 15 / 100
-/*
-        val radius = (WORKING_BITMAP_WIDTH.div(2.0) - 15.0).toFloat()
-        //now find all the triangles that intersect with this circle, we do this by dividing the circle into tangents
-        //60 of them since 360/12 = 30 sections
-        val xCenter = WORKING_BITMAP_WIDTH.div(2.0)
-//        var yCenter = WORKING_BITMAP_HEIGHT.div(2.0)
-
-        val degreesPerSection = 12.0
-        val numSections = (360.0 / degreesPerSection).roundToInt()
-
-        for(pos in 1..numSections){
-//        circleTangents = List(numSections) { pos ->
-
-            //the first tangent is the line between 0 and 6 degrees:
-            val end = if (pos < numSections - 1) {
-//                start = Vector2D((radius * sin(Math.toRadians(pos * degreesPerSection))) + xCenter,
-// (radius * -cos(Math.toRadians(pos * degreesPerSection))) + xCenter)
-                Vector2D((radius * sin(Math.toRadians((pos + 1) * degreesPerSection))) + xCenter,
-                        (radius * -cos(Math.toRadians((pos + 1) * degreesPerSection))) + xCenter)
-            } else {
-//                start = Vector2D((radius * sin(Math.toRadians(pos * degreesPerSection))) + xCenter
-// radius * -cos(Math.toRadians(pos * degreesPerSection)) + xCenter)
-                Vector2D((radius * sin(Math.toRadians(0.0))) + xCenter,
-                        (radius * -cos(Math.toRadians(0.0))) + xCenter)
-            }
-            point2ds.add(end)
-        }
-
-        triangulator = DelaunayTriangulator(point2ds)
-        triangulator.triangulate()
-
-        //We morphed the background slightly, now lets create the bitmap for it.
-        morphedBitmap = generateBitmapFromTriangles(widthD, heightD, triangulator.triangles as ArrayList<Triangle2D>)
-*/
-
-        //TODO END OF MORPHED
     }
 
     fun getColorCIEBasedOnPosition(width:Float, height:Float, triangleEntity: TriangleEntity){
@@ -1009,6 +1166,26 @@ class LivingBackground(val isAnimated:Boolean = true,
         Square,
         Portrait,
         Landscape,
+        Specified
+    }
+
+    public enum class Graphics{
+        None,
+        Low,
+        High
+    }
+
+
+
+
+
+
+    /**
+     * Specifies the amount of time it takes to reveal the view (to animate)
+     * @param timeMillis Float
+     */
+    fun setRevealDuration(timeMillis:Float){
+
     }
 }
 

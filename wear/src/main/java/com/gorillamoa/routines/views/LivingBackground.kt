@@ -1092,5 +1092,4 @@ class LivingBackground {
             animationLatch = false
         }
     }
-
 }
