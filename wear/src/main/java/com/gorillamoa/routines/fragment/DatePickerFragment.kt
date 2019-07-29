@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.adapter.DoubleRowSelectAdapter
 import com.gorillamoa.routines.extensions.createDoubleRowPicker
-import kotlinx.android.synthetic.main.fragment_timepicker.*
+//TODO
+//import kotlinx.android.synthetic.main.fragment_timepicker.*
 import java.util.*
 
 class DatePickerFragment: Fragment(){
@@ -32,7 +34,9 @@ class DatePickerFragment: Fragment(){
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_timepicker,container,false)
+        //TODO time picker for ear, layout
+        return TextView(context)
+//        return inflater.inflate(R.layout.fragment_timepicker,container,false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -40,23 +44,24 @@ class DatePickerFragment: Fragment(){
 
         monthArray= resources.getStringArray(R.array.month_names)
 
-        displayText?.text = context?.getString(R.string.picker_date_title)
+        //TODO time picker for ear, layo
+//        displayText?.text = context?.getString(R.string.picker_date_title)
 
         setAdapterToMonth()
-
-        backwardButton.setOnClickListener {
+        //TODO time picker for ear, layo
+        /*backwardButton.setOnClickListener {
 
             timeTextView.visibility = View.INVISIBLE
             backwardButton.visibility = View.INVISIBLE
             setAdapterToMonth()
 
-        }
+        }*/
     }
 
     private fun updatePickedText(){
 
         val textToShow = "${monthArray[cal.get(Calendar.MONTH)]} ${cal.get(Calendar.DAY_OF_MONTH)} "
-        timeTextView.text =  textToShow
+//        timeTextView.text =  textToShow
         readyButtonForClick()
     }
 
@@ -67,12 +72,12 @@ class DatePickerFragment: Fragment(){
      */
     private fun readyButtonForClick(){
 
-        backwardButton.visibility = View.VISIBLE
-        timeTextView.visibility = View.VISIBLE
-        timeTextView.setOnClickListener {
+//        backwardButton.visibility = View.VISIBLE
+//        timeTextView.visibility = View.VISIBLE
+        /*timeTextView.setOnClickListener {
 
             submit?.invoke(cal)
-        }
+        }*/
     }
 
     private fun setAdapterToDaysOfMonth(month:Int){
@@ -93,18 +98,20 @@ class DatePickerFragment: Fragment(){
             else -> 30
         }){ position -> (position + 1).toString() }
 
-        buttonRecyclerView.createDoubleRowPicker(
+        //TODO
+        /*buttonRecyclerView.createDoubleRowPicker(
                 array,
                 DoubleRowSelectAdapter.STYLE_NUMBER){
             cal.set(Calendar.DAY_OF_MONTH, it.toInt() )
             updatePickedText()
-        }
+        }*/
     }
 
     private fun setAdapterToMonth(){
         //Choices
 
-        buttonRecyclerView.createDoubleRowPicker(
+        //TODO
+        /*buttonRecyclerView.createDoubleRowPicker(
                 monthArray,
                 DoubleRowSelectAdapter.STYLE_LONGTEXT){
 
@@ -117,7 +124,7 @@ class DatePickerFragment: Fragment(){
             setAdapterToDaysOfMonth(month)
 
             updatePickedText()
-        }
+        }*/
 
     }
 }

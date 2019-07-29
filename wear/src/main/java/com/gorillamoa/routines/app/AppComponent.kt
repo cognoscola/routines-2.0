@@ -1,6 +1,8 @@
 package com.gorillamoa.routines.app
 
-interface AppComponent:RemoteViewGraph{
+import com.gorillamoa.routines.notifications.RemoteViewGraph
+
+interface AppComponent: RemoteViewGraph {
 
 
 }

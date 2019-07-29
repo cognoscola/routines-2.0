@@ -42,6 +42,7 @@ class Foreground{
         val STATE_BREAKS = "break"
         val STATE_TIMER = "time"
         val STATE_ALARM = "alarm"
+        val STATE_COUNTER = "counter"
     }
 
 
@@ -99,6 +100,7 @@ class Foreground{
             }
             addState(STATE_BREAKS, R.drawable.ic_break_time)
             addState(STATE_TIMER, R.drawable.ic_hourglass)
+            addState(STATE_COUNTER, R.drawable.ic_tree_leaf_white)
             touchables.add(this)
         }
 

@@ -63,6 +63,7 @@ dependencies {
     //GSON
     implementation 'com.google.code.gson:gson:2.8.2'
     api project(path: ':notifications')
+    api project(path: ':tools')
 
 }
 

@@ -54,7 +54,7 @@ class FadeInSystem:IteratingSystem(Family.all(AlphaComponent::class.java,FadeInE
         }
 
         if (entity is EdgeEntity) {
-            Log.d("$tag processEntity","set Redraw to true!")
+//            Log.d("$tag processEntity","set Redraw to true!")
             entity.setNeedsRedraw(true)
         }
     }

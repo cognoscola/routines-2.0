@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import com.gorillamoa.routines.tools.animation.CIEColor
-import com.gorillamoa.routines.tools.delayneytriangle.LivingBackground
 import java.lang.ref.WeakReference
 
 class DelauneyTextView:TextView{
@@ -46,7 +45,7 @@ class DelauneyTextView:TextView{
                 LivingBackground.Graphics.Low,
                 false,
                 LivingBackground.DENSITY_BUTTON,
-                LivingBackground.Shape.Specified,context.isWatch(),
+                LivingBackground.Shape.Specified, context.isWatch(),
                 400.0,
                 60.0,
                 topLeft,

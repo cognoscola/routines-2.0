@@ -1,4 +1,4 @@
-package com.gorillamoa.routines.tools.delayneytriangle
+package com.gorillamoa.routines.tools
 
 import android.graphics.*
 import android.os.SystemClock
@@ -9,6 +9,8 @@ import android.os.Vibrator
 import androidx.palette.graphics.Palette
 import com.badlogic.ashley.core.*
 import com.gorillamoa.routines.tools.animation.*
+import com.gorillamoa.routines.tools.delayneytriangle.EdgeEntity
+import com.gorillamoa.routines.tools.delayneytriangle.TriangleEntity
 import com.gorillamoa.routines.tools.delayneytriangle.TriangleEntity.Companion.getTriangleToLightUpGiven
 import io.github.jdiemke.triangulation.*
 import kotlin.collections.ArrayList
@@ -95,12 +97,12 @@ private const val initialBackgroundAlpha = 255.0f
 //TODO HIGH GRAPHICS
 //TODO LOW GRAPHICS
 //TODO NO ANIMATION
-class LivingBackground(val grahics:Graphics = Graphics.High,
+class LivingBackground(val grahics: Graphics = Graphics.High,
                        val unique:Boolean = true, //if false, we'll just fetch a pre-made triangle set from heap
                        val density:Int = DENSITY_BUTTON, //accept any number between 3 - 100
-                       val shape:Shape = Shape.Square,
+                       val shape: Shape = Shape.Square,
                        val isWatch:Boolean,
-                       val width:Double = 0.0, //in order for these to be
+                       val width:Double = 0.0, //in order for these to be considered, shape must be custom!
                        val height:Double =0.0,
                        val topLeft:CIEColor = CIEColor(
                                r = 255.0f,
@@ -167,6 +169,8 @@ class LivingBackground(val grahics:Graphics = Graphics.High,
     private val baseDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC)
     private val morphDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
     private val bgDrawingMode: Xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_ATOP)
+
+    private var isComingOutOfAmbient = false
 
     //FOR animation
     private var engine= PooledEngine(
@@ -270,7 +274,6 @@ class LivingBackground(val grahics:Graphics = Graphics.High,
     }
 
 
-
     fun enableAlarm() {
         isAlarmOn = true
 
@@ -300,14 +303,16 @@ class LivingBackground(val grahics:Graphics = Graphics.High,
     }
 
     fun comeOutOfAmbient() {
-
         Log.d("$tag comeOutOfAmbient","Out of ambient")
+        isComingOutOfAmbient = true
+
         getWorkingEdgeSet().forEach { edgeEntity ->
 
             edgeEntity.apply {
                 resetAnimationLatch()
                 if(this@LivingBackground.grahics == Graphics.High){
-                    Log.d("$tag comeOutOfAmbient","Graphics are High")
+//                    Log.d("$tag comeOutOfAmbient","Graphics are High")
+                    add(engine.createComponent(RenderComponent::class.java))
                     add(engine.createComponent(RenderComponent::class.java))
                 }
                 add(engine.createComponent(FadeInEffectComponent::class.java).apply {
@@ -326,7 +331,7 @@ class LivingBackground(val grahics:Graphics = Graphics.High,
 
 
     fun goIntoAmbient(){
-        Log.d("$tag goIntoAmbient","Into Ambient")
+//        Log.d("$tag goIntoAmbient","Into Ambient")
 
         getWorkingEdgeSet().forEach {
             it.resetAnimationLatch()
@@ -343,6 +348,9 @@ class LivingBackground(val grahics:Graphics = Graphics.High,
                 fadeRatePerFrame = FORTY_FIVE_INT
             })
         }
+
+        //lets paint the canvas black
+
     }
 
     fun isAlarmEnabled() = isAlarmOn
@@ -405,6 +413,12 @@ class LivingBackground(val grahics:Graphics = Graphics.High,
      */
     fun draw(canvas: Canvas, deltaTimeMillis:Float){
 
+        if(isComingOutOfAmbient){
+            intermediatecanvas.drawColor(Color.BLACK)
+            isComingOutOfAmbient = false
+        }
+
+
         //set everything to false after drawing?!
         getWorkingTriangleSet().forEach {
             it.setNeedsRedraw(false)
@@ -414,8 +428,7 @@ class LivingBackground(val grahics:Graphics = Graphics.High,
             it.setNeedsRedraw(false)
         }
 
-
-        Log.d("$tag background","setting entities false")
+//        Log.d("$tag background","setting entities false")
 
         //then we update the system once, if an element has been changed its
         //redraw state will be changed to true
@@ -433,13 +446,13 @@ class LivingBackground(val grahics:Graphics = Graphics.High,
         //else we can set the needs redraw variable to false
 
         var edge = getWorkingEdgeSet().find {
-            Log.d("$tag background","checking Edge:${it.needsRedraw()}")
+//            Log.d("$tag background","checking Edge:${it.needsRedraw()}")
             it.needsRedraw()
         }
 
         needsRedraw = (triangle != null).or(edge != null)
-        Log.d("$tag background","triangle${(triangle != null)} edge:${(edge != null)}")
-        Log.d("$tag background","needsRedraw:$needsRedraw")
+//        Log.d("$tag background","triangle${(triangle != null)} edge:${(edge != null)}")
+//        Log.d("$tag background","needsRedraw:$needsRedraw")
 
         //TODO  in future only redraw a small portion of the bg
         canvas.drawBitmap(intermidiateBitmap,0.0f,0.0f, mBackgroundPaint)
@@ -455,7 +468,7 @@ class LivingBackground(val grahics:Graphics = Graphics.High,
                        mAmbient: Boolean = false,
                        mLowBitAmbient: Boolean = false,
                        mBurnInProtection: Boolean = false,
-                       bounds: Rect? = null,  timers:CircularTimer?) {
+                       bounds: Rect? = null,  timers:CircularTimer? =null) {
 
         dt = (SystemClock.uptimeMillis() - lastMeasuredTime) //first dt will be 0
 
@@ -848,11 +861,11 @@ class LivingBackground(val grahics:Graphics = Graphics.High,
             val triangleSoup = try {
                 triangulator = DelaunayTriangulator(point2ds)
                 triangulator.triangulate()
-                Log.d("$tag generateBackgroundBitmaps","Created ${triangulator.triangles.size}") //SHOULD BE 98
+                Log.d("$tag generateBackgroundBit","Created ${triangulator.triangles.size}") //SHOULD BE 98
                 triangulator.triangleSoup
 
             } catch (e: NotEnoughPointsException) {
-                Log.d("$tag generateBackgroundBitmaps", "Triangulation Error")
+                Log.d("$tag generateBackgroundBit", "Triangulation Error")
                 null
             }
 
@@ -921,7 +934,7 @@ class LivingBackground(val grahics:Graphics = Graphics.High,
 
     }
 
-    private fun generateEntities(soup:TriangleSoup?,edges:ArrayList<EdgeEntity>, triangles: ArrayList<TriangleEntity>){
+    private fun generateEntities(soup:TriangleSoup?, edges:ArrayList<EdgeEntity>, triangles: ArrayList<TriangleEntity>){
 
         var noABFound = false
         var noACFound = false
@@ -1181,8 +1194,6 @@ class LivingBackground(val grahics:Graphics = Graphics.High,
         Low,
         High
     }
-
-
 
 
 

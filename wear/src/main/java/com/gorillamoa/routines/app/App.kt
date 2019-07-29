@@ -8,12 +8,13 @@ import android.graphics.Color
 import android.os.Build
 import androidx.fragment.app.Fragment
 import com.google.gson.Gson
-import com.gorillamoa.routines.core.extensions.NOTIFICATION_CHANNEL_ONE
-import com.gorillamoa.routines.core.extensions.NOTIFICATION_CHANNEL_TWO
 import com.gorillamoa.routines.core.views.FragmentGraph
 import com.gorillamoa.routines.core.views.FragmentInjectorHelper
 import com.gorillamoa.routines.fragment.TaskListFragment
 import com.gorillamoa.routines.fragment.TaskViewFragment
+import com.gorillamoa.routines.notifications.NOTIFICATION_CHANNEL_ONE
+import com.gorillamoa.routines.notifications.NOTIFICATION_CHANNEL_TWO
+import com.gorillamoa.routines.notifications.RemoteInjectorHelper
 
 
 /**
@@ -36,9 +37,9 @@ class App:Application(),
 
 
     //TODO provide this VIA DAGGER!
-    override fun getGson():Gson {
+ /*   override fun getGson():Gson {
         return gsonObject
-    }
+    }*/
 
     private val gsonObject by lazy {
         return@lazy Gson()
