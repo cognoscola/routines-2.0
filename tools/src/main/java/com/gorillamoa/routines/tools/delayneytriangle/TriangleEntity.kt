@@ -18,11 +18,14 @@ class TriangleEntity(val itself: Triangle2D): Entity() {
 
     companion object {
 
-        val paint = Paint().apply {
-            color = Color.WHITE
-            style = Paint.Style.FILL
+        val paint by lazy {
+            Paint().apply {
+                color = Color.WHITE
+                style = Paint.Style.FILL
+                isAntiAlias = false
+            }
         }
-        val path = Path()
+        val path by lazy { Path()}
         val renderFunction: (Canvas, TriangleEntity) -> Any = { canvas, entity ->
 
             path.reset()
@@ -85,7 +88,6 @@ class TriangleEntity(val itself: Triangle2D): Entity() {
     }
 
     fun fadeColorFromAmbient(engine: Engine, startColor: CIEColor, final: CIEColor) {
-
 
     }
 

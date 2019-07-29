@@ -26,5 +26,4 @@ class RenderSystem(val canvas: Canvas):IteratingSystem(Family.all(RenderComponen
             }
         }
     }
-
 }

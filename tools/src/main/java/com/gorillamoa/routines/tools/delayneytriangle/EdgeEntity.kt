@@ -25,10 +25,12 @@ class EdgeEntity(var itself: Edge2D): Entity() {
 
     companion object {
 
-        val paint = Paint().apply {
-            strokeWidth = 1.0f
-            color = Color.WHITE
-            isAntiAlias = true
+        val paint by lazy{
+            Paint().apply {
+                strokeWidth = 1.0f
+                color = Color.WHITE
+                isAntiAlias = false
+            }
         }
 
         val renderFunction: (Canvas, EdgeEntity) -> Any = { canvas, entity ->

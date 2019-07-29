@@ -231,7 +231,10 @@ class LivingBackground(val grahics:Graphics = Graphics.High,
                         getColorCIEBasedOnPosition(getWorkingWidth().toFloat(), getWorkingHeight().toFloat(), triangleEntity)
                         ColorChangerSystem.startChanging(
                                 startColor,
-                                final, 0.369, triangleEntity, engine)
+                                final,
+                                0.100,
+//                                0.369,
+                                triangleEntity, engine)
                     }
                 }
 
