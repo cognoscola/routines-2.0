@@ -119,7 +119,6 @@ class OnboardActivity:FragmentActivity(){
                                 val cal = Calendar.getInstance()
                                 setWakeTimeToCalendarAndStore(cal, hour, minute, phase)
                                 alarmSetRepeatWithCal(cal, true)
-
                                 setNextFragment(OnboardState.PickTime)
                             }
                         })
@@ -287,12 +286,6 @@ class OnboardActivity:FragmentActivity(){
                         "Work Less", "Cut Distractions", "Less Coffee"
                 )
             }
-            else ->{
-                fragment = TaskChooseFragment.newInstance(
-                        "Work Less", "Cut Distractions", "Less Coffee"
-                )
-            }
-
         }
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer,fragment)

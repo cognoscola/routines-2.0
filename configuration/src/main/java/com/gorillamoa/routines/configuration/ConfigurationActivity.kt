@@ -7,9 +7,9 @@ import android.util.Log
 import com.gorillamoa.routines.onboard.activities.OnboardActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class ConfigurationActivity : AppCompatActivity() {
     @Suppress("unused")
-    private val tag:String = MainActivity::class.java.name
+    private val tag:String = ConfigurationActivity::class.java.name
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

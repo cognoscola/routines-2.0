@@ -10,8 +10,8 @@ import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
 import android.util.Log
 import android.view.SurfaceHolder
-import com.gorillamoa.routines.core.data.Task
 
+import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.ACTION_REST
 import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.ACTION_TIMER
 import com.gorillamoa.routines.views.*

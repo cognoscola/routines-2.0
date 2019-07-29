@@ -1,6 +1,6 @@
 package com.gorillamoa.routines.configuration
 
-import android.app.Application
+import Apandroid.app.Application
 import android.widget.RemoteViews
 import com.gorillamoa.routines.notifications.*
 
