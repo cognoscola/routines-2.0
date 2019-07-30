@@ -7,7 +7,6 @@ import android.os.Message
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
-import com.gorillamoa.routines.tools.delayneytriangle.LivingBackground
 import java.lang.ref.WeakReference
 
 
@@ -17,7 +16,7 @@ import java.lang.ref.WeakReference
 class DelauneyBackground : View {
 
 
-    private lateinit var livingBackground:LivingBackground
+    private lateinit var livingBackground: LivingBackground
 
 
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {

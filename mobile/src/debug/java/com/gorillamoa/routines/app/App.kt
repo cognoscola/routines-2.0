@@ -7,7 +7,9 @@ import android.content.Context
 import android.graphics.Color
 import android.os.Build
 import android.widget.RemoteViews
+import android.widget.Toast
 import com.google.gson.Gson
+import com.gorillamoa.routines.core.receiver.AlarmReceiver
 import com.gorillamoa.routines.dagger.DebugAppComponent
 import com.gorillamoa.routines.notifications.*
 
@@ -93,7 +95,20 @@ class App:BaseApplication(), RemoteInjectorHelper.RemoteGraphProvider, RemoteInj
 
             }
         }
+
+        attachCallbacks(this)
     }
 
+    private fun attachCallbacks(context: Context){
+        AlarmReceiver.setAlarmEventCallbacks(
+                object :AlarmReceiver.AlarmReceiverApi{
+                    override fun processWakeUpEvent() {
+
+                        Toast.makeText(context,"Woke up",Toast.LENGTH_SHORT).show()
+
+                    }
+                }
+        )
+    }
 
 }

@@ -1,13 +1,12 @@
 package com.gorillamoa.routines
 
 import android.app.PendingIntent
-import android.content.Intent
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.runner.AndroidJUnit4
-import androidx.test.uiautomator.By
+
 import com.gorillamoa.routines.onboard.activities.OnboardActivity
 import org.hamcrest.Matchers.startsWith
 
@@ -16,13 +15,12 @@ import org.junit.runner.RunWith
 
 import org.junit.Rule
 import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.UiObject2
-import androidx.test.uiautomator.Until
+import com.gorillamoa.routines.core.extensions.createAlarmIntent
+import com.gorillamoa.routines.core.extensions.isWakeAlarmSet
 import com.gorillamoa.routines.core.receiver.AlarmReceiver
-import org.hamcrest.Matchers.containsString
+import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.EVENT_WAKEUP
 import org.junit.Assert.fail
 import org.junit.Before
-import java.util.logging.Logger
 
 
 /**
@@ -54,7 +52,6 @@ class OnBoardTests {
         //Run the App Until we get to the Time Choose
         mActivityRule.launchActivity(null)
 
-
         Thread.sleep(5000)
 
         onView(withText(startsWith("YES"))).perform(click())
@@ -63,14 +60,21 @@ class OnBoardTests {
         Thread.sleep(2000)
         onView(withText(startsWith("6"))).perform(click())
         onView(withText(startsWith("6 am"))).perform(click())
-        Thread.sleep(1000)
+        Thread.sleep(2000)
+
+
+        if(!mActivityRule.activity.isWakeAlarmSet()){
+            fail("Alarm was not set!")
+        }
 
         mDevice!!.pressHome()
 
+        Thread.sleep(1000)
 
-        val alarmUp: Boolean = (PendingIntent.getBroadcast(mActivityRule.activity.applicationContext, 0,
-                Intent(AlarmReceiver.EVENT_WAKEUP),
+        val alarmUp: Boolean = (PendingIntent.getBroadcast(mActivityRule.activity.applicationContext, AlarmReceiver.WAKE_UP_INTENT_CODE,
+                mActivityRule.activity.createAlarmIntent().apply { action = EVENT_WAKEUP },
                 PendingIntent.FLAG_NO_CREATE) != null)
+
 
         if(!alarmUp){
             fail("alarm was not up!")
@@ -90,4 +94,6 @@ class OnBoardTests {
 
         onView(withText(containsString("M STUBBORN"))).perform(click())*/
     }
+
+
 }

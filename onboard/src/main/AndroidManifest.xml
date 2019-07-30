@@ -2,18 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.gorillamoa.routines.onboard">
 
-    <application
+    <application>
 
-        >
-        <activity android:name=".activities.OnboardConfigurationActivity">
+        <activity android:name=".activities.OnboardActivity"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
 
-        <activity android:name=".activities.OnboardActivity"/>
+        </activity>
 
     </application>
 

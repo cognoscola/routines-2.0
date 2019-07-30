@@ -12,9 +12,11 @@ import android.util.Log
 import android.view.SurfaceHolder
 
 import com.gorillamoa.routines.core.data.Task
+
+
 import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.ACTION_REST
 import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.ACTION_TIMER
-import com.gorillamoa.routines.views.*
+
 
 import java.lang.ref.WeakReference
 import java.util.*
@@ -22,9 +24,19 @@ import kotlin.math.roundToInt
 import android.content.Intent
 import com.gorillamoa.routines.activity.AlarmActivity
 import android.content.BroadcastReceiver
+import android.widget.Toast
 import com.gorillamoa.routines.core.extensions.*
+import com.gorillamoa.routines.tools.LivingBackground
+import com.gorillamoa.routines.tools.animation.SIXTY_INT
+import com.gorillamoa.routines.tools.animation.THIRTY_INT
+import com.gorillamoa.routines.tools.animation.*
 
 import com.gorillamoa.routines.utils.*
+import com.gorillamoa.routines.utils.CircularTimer
+import com.gorillamoa.routines.views.FloatingCrystal
+import com.gorillamoa.routines.views.Foreground
+import com.gorillamoa.routines.views.TimeHand
+import com.gorillamoa.routines.views.TimerView
 
 
 /**
@@ -123,8 +135,14 @@ class TaskWatchService : CanvasWatchFaceService() {
             color = Color.RED
         }
 
-        private val livingBackground = LivingBackground()
-        private val foreground=Foreground()
+        private val livingBackground =LivingBackground(
+                LivingBackground.Graphics.High,
+                true,
+                41,
+                LivingBackground.Shape.Square,
+                true
+        )
+        private val foreground= Foreground()
 
         private var mAmbient: Boolean = false
         private var mLowBitAmbient: Boolean = false
@@ -159,8 +177,8 @@ class TaskWatchService : CanvasWatchFaceService() {
         private var isTimerEnabled = false
 
         //clean the timer stuff into its own class
-        private lateinit var timerView:TimerView
-        private var timingObject=CircularTimer()
+        private lateinit var timerView: TimerView
+        private var timingObject= CircularTimer()
 
         //TODO GIVING UP FOR NOW. We'll need this to learn when to reverse the display animation
         /*val displayManager: DisplayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
@@ -347,7 +365,15 @@ class TaskWatchService : CanvasWatchFaceService() {
             applicationContext.saveAlarmRestStatus(false)
         }
 
-        /**
+        //TODO move this out as a seperate Feature library
+        //TODO on sleep alarm, record this counter
+
+        var counter:Int = 0
+        private fun incrementCounter(){
+            counter++
+            Toast.makeText(this@TaskWatchService,"$counter",Toast.LENGTH_SHORT).show()
+        }
+                /**
          * Enable a timer to go off in specified selectedMinute
          * @param selectedMinute is the selected user value according to his view
          */
@@ -695,6 +721,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                                 Foreground.STATE_ALARM -> {}
                                 Foreground.STATE_BREAKS -> { if(isTouchingCenter(x,y)) disableRestPeriods() else enableRestPeriods() }
                                 Foreground.STATE_TIMER -> {if(isTouchingCenter(x,y)) disableTimer() else enableTimer(getSelectedMinute(x,y))}
+                                Foreground.STATE_COUNTER -> {if(!isTouchingCenter(x,y)) incrementCounter()  }
                                 else ->{}
                             }
                         }
@@ -713,8 +740,6 @@ class TaskWatchService : CanvasWatchFaceService() {
             val rSquare = (mCenterX * mCenterX * CENTER_AREA_RADIUS * CENTER_AREA_RADIUS)
             return dSquare < rSquare
         }
-
-
 
         private fun getSelectedMinute(x:Int,y:Int):Int{
                 val radians = Math.atan2((x - mCenterX).toDouble(), -(y - mCenterY).toDouble())
@@ -748,9 +773,10 @@ class TaskWatchService : CanvasWatchFaceService() {
 
 
             //draw our bg
-            //TODO CALCULATE THINGS WHILE NOT UPDATING!
 
-            livingBackground.drawBackground(canvas, mAmbient, mLowBitAmbient, mBurnInProtection, bounds, timingObject)
+            //TODO living background should not take in timing object. Find another way to ring the timer
+            //timingObject
+            livingBackground.drawBackground(canvas, mAmbient, mLowBitAmbient, mBurnInProtection, bounds)
 
             if (isTimerEnabled) {
                 timerView.onDraw(canvas, timingObject)

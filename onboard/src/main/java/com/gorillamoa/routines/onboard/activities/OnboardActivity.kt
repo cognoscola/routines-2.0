@@ -115,6 +115,7 @@ class OnboardActivity:FragmentActivity(){
                         .replace(R.id.fragmentContainer, TimePickerFragment.newInstance(getString(R.string.onboard_wake_up_text)).apply {
 
                             setCallbackFunction { hour, minute, phase ->
+
                                 getForwardFunction().invoke(0)
                                 val cal = Calendar.getInstance()
                                 setWakeTimeToCalendarAndStore(cal, hour, minute, phase)

@@ -62,7 +62,8 @@ dependencies {
 
 
     //DEBUG STUFF
-    debugImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+
     debugImplementation("androidx.test:rules:$test_rules_version", {
         exclude group: 'com.android.support', module: 'support-annotations'
         exclude group: 'com.android.support', module: 'appcompat'

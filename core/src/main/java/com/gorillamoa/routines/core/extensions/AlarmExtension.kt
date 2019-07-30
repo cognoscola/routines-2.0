@@ -2,6 +2,7 @@ package com.gorillamoa.routines.core.extensions
 
 import android.app.AlarmManager
 import android.content.Context
+import android.widget.Toast
 import com.gorillamoa.routines.core.receiver.SimpleBootReceiver
 import java.util.*
 
@@ -89,6 +90,8 @@ fun Context.alarmDisableSleep(){
  */
 fun Context.alarmSetRepeatWithCal(cal:Calendar, isWake:Boolean){
     val alarmManager = getAlarmService()
+
+    Toast.makeText(this,"Set Repeat",Toast.LENGTH_SHORT).show()
 
     alarmManager.setInexactRepeating(
             AlarmManager.RTC_WAKEUP,

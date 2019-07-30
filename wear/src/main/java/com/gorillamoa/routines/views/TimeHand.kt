@@ -3,6 +3,7 @@ package com.gorillamoa.routines.views
 import android.graphics.*
 import com.gorillamoa.routines.utils.CircularTimer
 import com.gorillamoa.routines.utils.ZERO_FLOAT
+import com.gorillamoa.routines.tools.LivingBackground
 
 const val OVERLAP_AMOUNT = 0.01f
 
@@ -114,7 +115,7 @@ class TimeHand(val type:Int){
 
         when(type){
             TYPE_SECOND->{
-                breakLinePaint.color =LivingBackground.getColorBasedOnPosition(
+                breakLinePaint.color =bg.getColorBasedOnPosition(
                         CircularTimer.getXFromDegree(angleDegrees, radius + RADIUS_DISPLACEMENT_COLOR, cX),
                         CircularTimer.getYFromDegree(angleDegrees, radius + RADIUS_DISPLACEMENT_COLOR, cY),
                         bounds.width().toFloat(),
@@ -123,7 +124,7 @@ class TimeHand(val type:Int){
                 canvas.drawPath(breakLinePath!!,breakLinePaint)
             }
             TYPE_MINUTE  ->{
-                breakLinePaint.color =LivingBackground.getColorBasedOnPosition(
+                breakLinePaint.color =bg.getColorBasedOnPosition(
                         CircularTimer.getXFromDegree(angleDegrees, radius + RADIUS_DISPLACEMENT_COLOR, cX),
                         CircularTimer.getYFromDegree(angleDegrees, radius + RADIUS_DISPLACEMENT_COLOR, cY),
                         bounds.width().toFloat(),
@@ -133,7 +134,7 @@ class TimeHand(val type:Int){
             }
             TYPE_HOUR->{
 
-                bgPaint.color =LivingBackground.getColorBasedOnPosition(
+                bgPaint.color =bg.getColorBasedOnPosition(
                         CircularTimer.getXFromDegree(angleDegrees, radius + RADIUS_DISPLACEMENT_COLOR, cX),
                         CircularTimer.getYFromDegree(angleDegrees, radius + RADIUS_DISPLACEMENT_COLOR, cY),
                         bounds.width().toFloat(),
@@ -141,7 +142,7 @@ class TimeHand(val type:Int){
 
                 canvas.drawPath(bgPath!!,bgPaint)
 
-                breakLinePaint.color = LivingBackground.getColorBasedOnPosition(
+                breakLinePaint.color = bg.getColorBasedOnPosition(
                         CircularTimer.getXFromDegree(angleDegrees + DEGREE_COLOR_SEPERATION, radius, cX),
                         CircularTimer.getYFromDegree(angleDegrees + DEGREE_COLOR_SEPERATION, radius, cY),
                         bounds.width().toFloat(),
@@ -149,7 +150,7 @@ class TimeHand(val type:Int){
                 )
                 canvas.drawPath(breakLinePath!!,breakLinePaint)
 
-                breakLinePaint.color = LivingBackground.getColorBasedOnPosition(
+                breakLinePaint.color = bg.getColorBasedOnPosition(
                         CircularTimer.getXFromDegree(angleDegrees - DEGREE_COLOR_SEPERATION, radius, cX),
                         CircularTimer.getYFromDegree(angleDegrees - DEGREE_COLOR_SEPERATION, radius, cY),
                         bounds.width().toFloat(),

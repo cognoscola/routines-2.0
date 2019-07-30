@@ -3,7 +3,6 @@ package com.gorillamoa.routines.core.extensions
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
 import android.util.Log
 import com.gorillamoa.routines.core.receiver.AlarmReceiver
 import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.ACTION_SLEEP
@@ -35,7 +34,8 @@ fun Context.createAlarmPendingIntent(intent:Intent, code:Int):PendingIntent{
     return PendingIntent.getBroadcast(this,
             code,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT)
+//            0) //We don't care about extras right now
+            PendingIntent.FLAG_UPDATE_CURRENT) //change if we are carrying extras
 }
 
 fun Context.createWakeUpAlarmPendingIntent():PendingIntent{
@@ -57,7 +57,8 @@ fun Context.createSleepAlarmPendingIntent():PendingIntent{
  */
 fun Context.createAlarmIntent():Intent{
     return Intent(this, AlarmReceiver::class.java).apply {
-        putExtra(AlarmReceiver.KEY_ALARM,true)
+        addFlags(Intent.FLAG_RECEIVER_FOREGROUND) //to give forground priority
+            putExtra(AlarmReceiver.KEY_ALARM,true)
     }
 }
 
