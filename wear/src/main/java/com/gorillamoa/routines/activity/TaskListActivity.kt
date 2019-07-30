@@ -92,9 +92,11 @@ class TaskListActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackP
 
         taskViewModel = ViewModelProviders.of(this@TaskListActivity).get(TaskViewModel::class.java)
         taskViewModel.loadTasks()
-        taskViewModel.tasks.observe(this, Observer {
+
+        //TODO split
+        /*taskViewModel.tasks.observe(this, Observer {
             (taskListFragment as TaskListDisplayer).onListUpdated(it)
-        })
+        })*/
 
 
         getLocalSettings().registerOnSharedPreferenceChangeListener(preferenceListener)

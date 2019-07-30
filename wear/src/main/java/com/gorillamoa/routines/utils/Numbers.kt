@@ -1,5 +1,6 @@
 package com.gorillamoa.routines.utils
 
+/*
 const val ZERO_FLOAT = 0.0f
 const val ZERO_INT = 0
 const val ZERO_D = 0.0
@@ -28,4 +29,4 @@ const val TWOFIFTYFIVE = 255
 const val ONE_THOUSAND_INT = 1000
 const val ONE_THOUSAND_FLOAT = 1000f
 
-const val ONE_MINUTE_MILLIS_LONG = 60L * 1000L
+const val ONE_MINUTE_MILLIS_LONG = 60L * 1000L*/

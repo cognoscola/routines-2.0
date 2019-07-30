@@ -20,10 +20,9 @@ import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.Until
 import com.gorillamoa.routines.core.receiver.AlarmReceiver
 import org.hamcrest.Matchers.containsString
+import org.junit.Assert.fail
 import org.junit.Before
-
-
-
+import java.util.logging.Logger
 
 
 /**
@@ -50,7 +49,7 @@ class OnBoardTests {
     }
 
     @Test
-    fun verifyWakeUpNotificationSet() {
+    fun verifyWakeUpAlarmIsSet() {
 
         //Run the App Until we get to the Time Choose
         mActivityRule.launchActivity(null)
@@ -73,7 +72,9 @@ class OnBoardTests {
                 Intent(AlarmReceiver.EVENT_WAKEUP),
                 PendingIntent.FLAG_NO_CREATE) != null)
 
-        assert(alarmUp == true)
+        if(!alarmUp){
+            fail("alarm was not up!")
+        }
 
 
         /*onView(withText(startsWith("SEND"))).perform(click())

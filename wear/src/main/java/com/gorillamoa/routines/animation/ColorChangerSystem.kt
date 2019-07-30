@@ -24,11 +24,11 @@ class ColorChangerSystem: IteratingSystem(Family.all(ColorComponent::class.java,
                 this@apply.targetColor.b = targetColor.b
                 this@apply.targetColor.a = targetColor.a
                 timeToChangeSecond = rate
-                timeElapsed = com.gorillamoa.routines.tools.animation.ZERO_D
+                timeElapsed = ZERO_D
                 entity.add(this@apply)
             }
         }
-        private var percent = com.gorillamoa.routines.tools.animation.ZERO_FLOAT
+        private var percent =ZERO_FLOAT
     }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
