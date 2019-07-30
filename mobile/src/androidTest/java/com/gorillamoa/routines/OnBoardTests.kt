@@ -1,12 +1,30 @@
 package com.gorillamoa.routines
 
+import android.app.PendingIntent
+import android.content.Intent
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
+import androidx.test.uiautomator.By
 import com.gorillamoa.routines.onboard.activities.OnboardActivity
+import org.hamcrest.Matchers.startsWith
 
 import org.junit.Test
 import org.junit.runner.RunWith
 
 import org.junit.Rule
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiObject2
+import androidx.test.uiautomator.Until
+import com.gorillamoa.routines.core.receiver.AlarmReceiver
+import org.hamcrest.Matchers.containsString
+import org.junit.Before
+
+
+
+
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -16,11 +34,21 @@ import org.junit.Rule
 @RunWith(AndroidJUnit4::class)
 class OnBoardTests {
 
+
+    var mDevice: UiDevice? = null
+
     @get:Rule
-    public val mActivityRule:InjectedActivityBaseTest<OnboardActivity> = InjectedActivityBaseTest(
+    public val mActivityRule: InjectedActivityBaseTest<OnboardActivity> = InjectedActivityBaseTest(
             OnboardActivity::class.java,
             true, //initial touch mode
             false) //se we can configure an intent before launching
+
+    @Before
+    @Throws(Exception::class)
+    fun setUp() {
+        mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+    }
+
     @Test
     fun verifyWakeUpNotificationSet() {
 
@@ -28,6 +56,37 @@ class OnBoardTests {
         mActivityRule.launchActivity(null)
 
 
+        Thread.sleep(5000)
 
+        onView(withText(startsWith("YES"))).perform(click())
+        onView(withText(startsWith("I'M"))).perform(click())
+
+        Thread.sleep(2000)
+        onView(withText(startsWith("6"))).perform(click())
+        onView(withText(startsWith("6 am"))).perform(click())
+        Thread.sleep(1000)
+
+        mDevice!!.pressHome()
+
+
+        val alarmUp: Boolean = (PendingIntent.getBroadcast(mActivityRule.activity.applicationContext, 0,
+                Intent(AlarmReceiver.EVENT_WAKEUP),
+                PendingIntent.FLAG_NO_CREATE) != null)
+
+        assert(alarmUp == true)
+
+
+        /*onView(withText(startsWith("SEND"))).perform(click())
+
+        Thread.sleep(1000)
+
+        mDevice!!.openNotification()
+        mDevice!!.wait(Until.hasObject(By.textStartsWith("Start")), 5000)
+        val button: UiObject2 = mDevice!!.findObject(By.text("Start"))
+        button.click()
+
+        Thread.sleep(2000)
+
+        onView(withText(containsString("M STUBBORN"))).perform(click())*/
     }
 }

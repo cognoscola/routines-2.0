@@ -5,6 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import com.gorillamoa.routines.core.receiver.AlarmReceiver
+import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.ACTION_SLEEP
+import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.EVENT_WAKEUP
+import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.SLEEP_INTENT_CODE
+import com.gorillamoa.routines.core.receiver.AlarmReceiver.Companion.WAKE_UP_INTENT_CODE
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver
 
 
@@ -25,3 +30,34 @@ fun Context.createNotificationActionPendingIntentForWakeUp(action:String, tid:In
     intent.putExtra(TASK_ID,tid)
     return PendingIntent.getBroadcast(this, 0,intent, PendingIntent.FLAG_ONE_SHOT)
 }
+
+fun Context.createAlarmPendingIntent(intent:Intent, code:Int):PendingIntent{
+    return PendingIntent.getBroadcast(this,
+            code,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT)
+}
+
+fun Context.createWakeUpAlarmPendingIntent():PendingIntent{
+
+    return createAlarmPendingIntent(createAlarmIntent()
+            .apply { action = EVENT_WAKEUP }, WAKE_UP_INTENT_CODE)
+}
+
+
+fun Context.createSleepAlarmPendingIntent():PendingIntent{
+    return createAlarmPendingIntent(createAlarmIntent()
+            .apply { action = ACTION_SLEEP }, SLEEP_INTENT_CODE)
+}
+
+/**
+ * Create an alarm intent for AlarmReceiverClass
+ * @receiver Context application context
+ * @return Intent
+ */
+fun Context.createAlarmIntent():Intent{
+    return Intent(this, AlarmReceiver::class.java).apply {
+        putExtra(AlarmReceiver.KEY_ALARM,true)
+    }
+}
+

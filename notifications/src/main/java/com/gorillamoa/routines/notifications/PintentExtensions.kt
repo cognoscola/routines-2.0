@@ -32,51 +32,6 @@ import com.gorillamoa.routines.core.receiver.NotificationActionReceiver
 
 
 
-
-*/
-/**
- * The user is coming from a notification. This notification is a wake-up attempt from
- * the onboard process.
- *//*
-
-const val ACTION_TEST_WAKE_UP="N0"
-
-//TODO COMMENT THIS PAGE
-
-
-*/
-/**
- * Creates a PendingIntent for the AlarmReceiver
- *//*
-
-fun Context.createWakeUpAlarmPendingIntent():PendingIntent{
-
-    return createAlarmPendingIntent(createAlarmIntent()
-            .apply { action = EVENT_WAKEUP }, WAKE_UP_INTENT_CODE)
-}
-
-fun Context.createSleepAlarmPendingIntent():PendingIntent{
-
-    return createAlarmPendingIntent(createAlarmIntent()
-            .apply { action = ACTION_SLEEP }, SLEEP_INTENT_CODE)
-}
-
-fun Context.createAlarmPendingIntent(intent:Intent, code:Int):PendingIntent{
-    return PendingIntent.getBroadcast(this,
-            code,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT)
-}
-
-
-fun Context.createAlarmIntent():Intent{
-    return Intent(this, AlarmReceiver::class.java).apply {
-        putExtra(AlarmReceiver.KEY_ALARM,true)
-    }
-}
-
-
-
 */
 /**
  * creates the notification's main intent (when the notification is clicked)
@@ -122,8 +77,6 @@ fun Context.createNotificationMainIntentForWakeup(startingActivityName:String):P
         null
     }
 }
-
-
 
 */
 /****************************************************************

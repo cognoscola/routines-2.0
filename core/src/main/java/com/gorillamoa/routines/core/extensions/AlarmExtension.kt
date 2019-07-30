@@ -5,12 +5,6 @@ import android.content.Context
 import com.gorillamoa.routines.core.receiver.SimpleBootReceiver
 import java.util.*
 
-/**
- * A place where we can keep extensions regarding alarm
- * setting
- */
-
-//TODO comment some things
 
 /**
  * Will enable the alarm to be set despite device shutdown
@@ -21,23 +15,34 @@ fun Context.alarmEnableWakeUpPersistent(){
     SimpleBootReceiver.enableBootReceiver(this)
 }
 
+/**
+ * Enable sleep alarm to be set despite device shutdown
+ * @receiver Context
+ */
 fun Context.alarmEnableSleepPersistent(){
     alarmEnableSleep()
     SimpleBootReceiver.enableBootReceiver(this)
 }
 
+/**
+ * Disable persistent alarms
+ * @receiver Context
+ */
 fun Context.alarmDisableWakePersistent(){
     alarmDisableWakeUp()
     //don't forget to disable boot receiver
     SimpleBootReceiver.disableBootReciver(this)
 }
 
+/**
+ * disable persistent ability of alarm
+ * @receiver Context
+ */
 fun Context.alarmDisableSleepPersistent(){
     alarmDisableSleep()
     //don't forget to disable boot receiver
     SimpleBootReceiver.disableBootReciver(this)
 }
-
 
 
 /**
@@ -57,8 +62,8 @@ fun Context.alarmEnableWakeUp(){
 //TODO split
 fun Context.alarmDisableWakeUp(){
     val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-//    alarmManager.cancel(createWakeUpAlarmPendingIntent())
-//    saveAlarmWakeStatus(false)
+    alarmManager.cancel(createWakeUpAlarmPendingIntent())
+    saveAlarmWakeStatus(false)
 }
 
 fun Context.alarmEnableSleep(){
@@ -69,11 +74,9 @@ fun Context.alarmEnableSleep(){
 }
 
 fun Context.alarmDisableSleep(){
-
-    //TODO split
     val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-//    alarmManager.cancel(createWakeUpAlarmPendingIntent())
-//    saveAlarmSleepStatus(false)
+    alarmManager.cancel(createWakeUpAlarmPendingIntent())
+    saveAlarmSleepStatus(false)
 
 
 }
@@ -87,17 +90,14 @@ fun Context.alarmDisableSleep(){
 fun Context.alarmSetRepeatWithCal(cal:Calendar, isWake:Boolean){
     val alarmManager = getAlarmService()
 
-    //TODO SPLIT
-    /*alarmManager.setInexactRepeating(
+    alarmManager.setInexactRepeating(
             AlarmManager.RTC_WAKEUP,
             cal.timeInMillis,
             AlarmManager.INTERVAL_DAY,
             if(isWake){createWakeUpAlarmPendingIntent()} else{ createSleepAlarmPendingIntent()}
-    )*/
+    )
 
-    //clean
-    //TODO SPLIT
-//    if(isWake)saveAlarmWakeStatus(true)else saveAlarmSleepStatus(true)
+    if(isWake)saveAlarmWakeStatus(true)else saveAlarmSleepStatus(true)
 }
 
 fun Context.getAlarmService():AlarmManager{

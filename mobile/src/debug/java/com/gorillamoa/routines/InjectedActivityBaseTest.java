@@ -21,6 +21,7 @@ public class InjectedActivityBaseTest<T extends FragmentActivity> extends Activi
     }
 
 
+
     private Utilities utilities;
 
     public Utilities getUtilities() {

@@ -111,6 +111,8 @@ dependencies {
         exclude group: 'com.android.support', module: 'design'
         exclude module: 'recyclerview-v7'
     })
+
+    androidTestImplementation 'com.android.support.test.uiautomator:uiautomator-v18:2.1.3'
 }
 
 configurations.all {
