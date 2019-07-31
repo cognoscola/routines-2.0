@@ -4,9 +4,12 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import android.widget.RemoteViews
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import com.example.notificationsimpl.R
+import java.util.*
 
 /*
 import android.app.Notification
@@ -128,31 +131,27 @@ fun NotificationCompat.Builder.setMobileContent(smallRemoteView: RemoteViews,big
 }
 
 
-
 /**
  * Notify other devices that they should build a notification of type WAKE UP
- *//*
+ */
+fun Context._notificationShowWakeUpRemote(tasks:ArrayDeque<Long>){
 
-fun Context.notificationShowWakeUpRemote(tasks:ArrayDeque<Long>){
-
-    notificationShowRemote(tasks.joinToString(","),WAKE_UP_PATH)
+//    _notificationShowRemote(tasks.joinToString(","),WAKE_UP_PATH)
 }
 
-*/
+
 /**
  * Builds a mirrored notification both on the Local device and on
  * other connected nodes. When either is ACTIONED, the same action occurs on both devices.
  * @param tasks is the task list to show
- *//*
-
-fun Context.notificationShowWakeUpMirror(tasks:ArrayDeque<Long>){
+ */
+fun Context._notificationShowWakeUpMirror(tasks: ArrayDeque<Long>){
     Log.d("notificationRoutine","notificationShowWakeUpMirror")
 
     //Next lets build a remote notification
-    notificationShowWakeUpRemote(tasks)
+    _notificationShowWakeUpRemote(tasks)
 }
 
-*/
 /**
  * Builds a local notification
  * @param tasks is the string of tasks to display
@@ -493,18 +492,18 @@ fun Context.notificationDismissSleepLocally(){
  * GENERIC NOTIFICATION FUNCTIONS
  *********************************************************************************//*
 
-
-
 */
+
 /**
  * A generic function for showing a specific notification remotely
  * @param taskData is the task data to send over
  * @param path is the item for which the Data Layer will action upon
- *//*
-
+ */
 fun Context.notificationShowRemote(taskData:String, path:String){
 
-    val putDataReq: PutDataRequest = PutDataMapRequest.create(path).run {
+    Toast.makeText(this,"Show Remote",Toast.LENGTH_SHORT).show()
+    Log.d("notificationShowRemote","$taskData")
+  /*  val putDataReq: PutDataRequest = PutDataMapRequest.create(path).run {
         dataMap.putString(KEY_TASK_DATA, taskData )
 
         //save the time
@@ -515,9 +514,9 @@ fun Context.notificationShowRemote(taskData:String, path:String){
         asPutDataRequest()
     }
     putDataReq.setUrgent()
-    val putDataTask = Wearable.getDataClient(this).putDataItem(putDataReq)
+    val putDataTask = Wearable.getDataClient(this).putDataItem(putDataReq)*/
 }
-*/
+
 fun determineOnGoingAbility(builder: NotificationCompat.Builder, dismissable:Boolean){
 
     if (!dismissable) {

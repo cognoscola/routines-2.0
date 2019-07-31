@@ -47,20 +47,34 @@ class AlarmTests {
     }
 
     @Test
-    fun verifyWakeUpAlarmIsSet() {
+    fun verifyLogicExecutesAfterLeavingApp() {
 
         //Run the App Until we get to the Time Choose
         mActivityRule.launchActivity(null)
 
-        mDevice!!.pressHome()
+        onView(withText(startsWith("SEND"))).perform(click())
 
-        Thread.sleep(1000)
+        onView(withText(startsWith("QUIT"))).perform(click())
+
+
+        Thread.sleep(5000)
+
+/*        Thread.sleep(1000)
 
         mActivityRule.activity.sendBroadcast(mActivityRule.activity.application.createAlarmIntent().apply {
             action = EVENT_WAKEUP
-        })
+        })*/
 
-        //Verify alarm object got called
+        //TODOVerify alarm object got called using mockito function
     }
+
+    @Test
+    fun verifyShowRemoteCalledOnWakeUp(){
+
+        //TODO mock an object
+    }
+
+
+
 
 }

@@ -5,9 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
+import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
 
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
+import java.util.*
 
 /**
  * What to do when our app sounds the "wake up" alarm.
@@ -94,9 +96,15 @@ class AlarmReceiver:BroadcastReceiver(){
                         tasks?.let{
                             //TODO SPLIT
 
-                            callback?.processWakeUpEvent()?:run {
+                            if(callback == null){
+                            Log.d(tag, "WAKE UP: Null callback")
+                        }
 
-                                Toast.makeText(context,"No callback",Toast.LENGTH_SHORT).show()
+                            callback?.processWakeUpEvent(context,tasks)?: run {
+
+                                Log.d(tag,"WAKE UP: Null callback")
+
+                                val one = 1
                             }
                             //We need to send this data over to mobile, mobile will do something with it.
                             //context.sendDataToMobile
@@ -153,6 +161,6 @@ class AlarmReceiver:BroadcastReceiver(){
 
     interface AlarmReceiverApi{
 
-        fun processWakeUpEvent()
+        fun processWakeUpEvent(context: Context, tasks:ArrayDeque<Long>)
     }
 }

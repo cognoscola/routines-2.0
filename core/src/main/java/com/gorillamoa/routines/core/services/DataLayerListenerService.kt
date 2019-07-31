@@ -6,7 +6,6 @@ import android.net.Uri
 
 import android.util.Log
 import com.google.android.gms.wearable.*
-import com.google.gson.reflect.TypeToken
 import com.gorillamoa.routines.core.constants.DataLayerConstant
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
 import com.gorillamoa.routines.core.data.Task

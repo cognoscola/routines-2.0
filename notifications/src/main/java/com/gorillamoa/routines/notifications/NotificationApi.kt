@@ -3,16 +3,14 @@ package com.gorillamoa.routines.notifications
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
+import android.util.Log
 import android.widget.RemoteViews
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import com.gorillamoa.routines.notifications.impl.RoutinesNotificationBuilder
-import com.gorillamoa.routines.notifications.impl._getBuilder
-import com.gorillamoa.routines.notifications.impl._notificationShowWakeUp
+import com.example.notificationsimpl.R
+import com.gorillamoa.routines.notifications.impl.*
 import java.util.*
 
 /*
-
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
@@ -20,8 +18,6 @@ import android.text.Spanned
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import java.util.*
-
-
 */
 /** Prepare the intent for when user dismisses the notification **//*
 
@@ -48,7 +44,7 @@ fun Context.notificationShowWakeUp(tasks:String? = null,
                                    bigRemoteView:RemoteViews?= null) {
 
 
-    _notificationShowWakeUp(
+ /*   _notificationShowWakeUp(
             tasks,
             mainPendingIntent,
             dismissPendingIntent,
@@ -57,16 +53,56 @@ fun Context.notificationShowWakeUp(tasks:String? = null,
             bigRemoteView,
             NOTIFICATION_CHANNEL_ONE,
             NOTIFICATION_TAG,
-            WAKE_UP_NOTIFICATION_ID)
+            WAKE_UP_NOTIFICATION_ID)*/
+
+    val manager = getNotificationManager()
+
+    _getBuilder(NOTIFICATION_CHANNEL_ONE,false).apply {
+
+        if (isWatch()) {
+
+            setStyle(prepareBigTextStyle(
+                    tasks = tasks?:getString(R.string.notification_missing_data),
+                    title = getHtml("Today's tasks &#128170;")))
+
+            //TODO UNCOMMENT FOR WATCH
+//            addWakeUpAction(this@notificationShowWakeUp,"Start Day", ACTION_WAKE_START_DAY)
+            //addWakeUpAction(this@notificationShowWakeUp,"Edit", ACTION_START_MODIFY, WAKE_UP_NOTIFICATION_ID!!)
+        }else{
+
+            //lets add RemoteView
+            smallRemoteView?.let {
+                setCustomContentView(smallRemoteView)
+            }
+
+            bigRemoteView?.let {
+                setCustomBigContentView(bigRemoteView)
+            }
+        }
+
+        //TODO MODULE SPLIT
+        determineOnGoingAbility(this@apply,dismissable)
+
+        mainPendingIntent?.let { setContentIntent(mainPendingIntent) }
+        //TODO make the dismiss action optional, as in let user decide how a dismiss behaviour works!
+        //Give option to do nothing or to go forward or cancel
+        dismissPendingIntent?.let { setDeleteIntent(it) }
+
+        manager.notify(
+                NOTIFICATION_TAG,
+                WAKE_UP_NOTIFICATION_ID,
+                build())
+    }
 }
+
 
 
 /**
  * Notify other devices that they should build a notification of type WAKE UP
  */
 
-fun Context.notificationShowWakeUpRemote(tasks: ArrayDeque<Long>){
-//TODO complete function
+fun Context.notificationShowWakeUpRemote(tasks: ArrayDeque<Long>,path:String){
+    notificationShowRemote(tasks.joinToString(","),path)
 }
 
 /**
@@ -74,20 +110,34 @@ fun Context.notificationShowWakeUpRemote(tasks: ArrayDeque<Long>){
  * other connected nodes. When either is ACTIONED, the same action occurs on both devices.
  * @param tasks is the task list to show
  */
-fun Context.notificationShowWakeUpMirror(tasks:ArrayDeque<Long>){
-//TODO complete function
+fun Context.notificationShowWakeUpMirror(tasks:ArrayDeque<Long>,path:String){
+    notificationShowWakeUpRemote(tasks,path)
+
 }
 
 /**
  * Builds a local notification
  * @param tasks is the string of tasks to display
- *//*
+ */
+fun Context.notificationShowWakeUpLocal(tasks:String,size:Int){
+   Log.d("notificationRoutine","notificationShowWakeUpLocal")
 
-fun Context.notificationShowWakeUpLocal(tasks:List<Task>){
-//TODO complete function
+    removeAllNotificationsExceptSpecified(WAKE_UP_NOTIFICATION_ID)
+
+    notificationShowWakeUp(
+            tasks,
+            mainPendingIntent = null,
+            dismissPendingIntent = null,
+//            dismissPendingIntent = createNotificationDeleteIntentForWakeUp(),
+            //TODO CHECK IF WE SHOULD ALLOW DISMISSAL with stubborn settings
+            dismissable = false,
+            //TODO get the actual task length
+            smallRemoteView = if(!isWatch())remoteGetSmallWakeUpView(size)else null,
+            //TODO Get stringbuilder from dagger singleton
+            bigRemoteView = if(!isWatch())remoteGetLargeWakeUpView(tasks) else null
+    )
 }
 
-*/
 /**
  * Notify remote nodes that they should remove their Wake Up Notifications
  * if they are displaying one
@@ -152,8 +202,8 @@ fun Context.notificationShowTask(task: String?= null,
  * Builds a mirrored notification both on the Local device and on
  * other connected nodes. When either is ACTIONED, the same action occurs on both devices.
  * @param task is the task to show
- *//*
-
+ */
+/*
 fun Context.notificationShowTaskMirror(task:Task,history:TaskHistory?= null){
 //TODO complete function
 }
@@ -161,12 +211,19 @@ fun Context.notificationShowTaskMirror(task:Task,history:TaskHistory?= null){
 fun Context.notificationShowTaskLocal(task:Task, history:TaskHistory? = null){
 //TODO complete function
 }
+*/
 
 fun Context.removeAllNotificationsExceptSpecified(tid:Int){
-//TODO complete function
+
+//we need to make sure to only show this one TASK
+    val manager = getNotificationManager()
+    (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).activeNotifications.forEach { notification ->
+        if (notification.id != tid) {
+            manager.cancel(NOTIFICATION_TAG,notification.id)
+        }
+    }
 }
 
-*/
 /**
  * Show a task remotely
  *//*

@@ -2,6 +2,7 @@ package com.gorillamoa.routines.config.alarm
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -30,9 +31,12 @@ class AlarmConfigFragment : Fragment() {
 
         view.findViewById<Button>(R.id.sendWakeUpBroadcastButton).setOnClickListener {
 
-            val wakeUpIntent = context!!.createAlarmIntent()
-            wakeUpIntent.action = AlarmReceiver.EVENT_WAKEUP
-            activity?.sendBroadcast(wakeUpIntent)
+            Handler().postDelayed({
+                val wakeUpIntent = context!!.createAlarmIntent()
+                wakeUpIntent.action = AlarmReceiver.EVENT_WAKEUP
+                activity?.sendBroadcast(wakeUpIntent)
+            },2000)
+
         }
 
         view.findViewById<Button>(R.id.forceQuit).setOnClickListener {
