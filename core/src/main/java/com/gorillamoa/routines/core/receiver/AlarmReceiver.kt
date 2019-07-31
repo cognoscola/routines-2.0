@@ -51,7 +51,6 @@ class AlarmReceiver:BroadcastReceiver(){
 
         const val KEY_ALARM = "A"
 
-
         const val WAKE_UP_INTENT_CODE = 1
         const val SLEEP_INTENT_CODE =2
 
@@ -95,7 +94,10 @@ class AlarmReceiver:BroadcastReceiver(){
                         tasks?.let{
                             //TODO SPLIT
 
-                            callback?.processWakeUpEvent()
+                            callback?.processWakeUpEvent()?:run {
+
+                                Toast.makeText(context,"No callback",Toast.LENGTH_SHORT).show()
+                            }
                             //We need to send this data over to mobile, mobile will do something with it.
                             //context.sendDataToMobile
 
@@ -152,7 +154,5 @@ class AlarmReceiver:BroadcastReceiver(){
     interface AlarmReceiverApi{
 
         fun processWakeUpEvent()
-
     }
-
 }

@@ -29,14 +29,14 @@ import org.junit.Before
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 @RunWith(AndroidJUnit4::class)
-class OnBoardTests {
+class AlarmTests {
 
 
     var mDevice: UiDevice? = null
 
     @get:Rule
-    public val mActivityRule: InjectedActivityBaseTest<OnboardActivity> = InjectedActivityBaseTest(
-            OnboardActivity::class.java,
+    public val mActivityRule: InjectedActivityBaseTest<BaseConfigActivity> = InjectedActivityBaseTest(
+            BaseConfigActivity::class.java,
             true, //initial touch mode
             false) //se we can configure an intent before launching
 
@@ -52,47 +52,15 @@ class OnBoardTests {
         //Run the App Until we get to the Time Choose
         mActivityRule.launchActivity(null)
 
-        Thread.sleep(5000)
-
-        onView(withText(startsWith("YES"))).perform(click())
-        onView(withText(startsWith("I'M"))).perform(click())
-
-        Thread.sleep(2000)
-        onView(withText(startsWith("6"))).perform(click())
-        onView(withText(startsWith("6 am"))).perform(click())
-        Thread.sleep(2000)
-
-
-        if(!mActivityRule.activity.isWakeAlarmSet()){
-            fail("Alarm was not set!")
-        }
-
         mDevice!!.pressHome()
 
         Thread.sleep(1000)
 
-        val alarmUp: Boolean = (PendingIntent.getBroadcast(mActivityRule.activity.applicationContext, AlarmReceiver.WAKE_UP_INTENT_CODE,
-                mActivityRule.activity.createAlarmIntent().apply { action = EVENT_WAKEUP },
-                PendingIntent.FLAG_NO_CREATE) != null)
+        mActivityRule.activity.sendBroadcast(mActivityRule.activity.application.createAlarmIntent().apply {
+            action = EVENT_WAKEUP
+        })
 
-
-        if(!alarmUp){
-            fail("alarm was not up!")
-        }
-
-
-        /*onView(withText(startsWith("SEND"))).perform(click())
-
-        Thread.sleep(1000)
-
-        mDevice!!.openNotification()
-        mDevice!!.wait(Until.hasObject(By.textStartsWith("Start")), 5000)
-        val button: UiObject2 = mDevice!!.findObject(By.text("Start"))
-        button.click()
-
-        Thread.sleep(2000)
-
-        onView(withText(containsString("M STUBBORN"))).perform(click())*/
+        //Verify alarm object got called
     }
 
 }

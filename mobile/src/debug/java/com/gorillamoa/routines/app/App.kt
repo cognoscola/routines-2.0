@@ -101,9 +101,9 @@ class App:BaseApplication(), RemoteInjectorHelper.RemoteGraphProvider, RemoteInj
 
     private fun attachCallbacks(context: Context){
         AlarmReceiver.setAlarmEventCallbacks(
+
                 object :AlarmReceiver.AlarmReceiverApi{
                     override fun processWakeUpEvent() {
-
                         Toast.makeText(context,"Woke up",Toast.LENGTH_SHORT).show()
 
                     }

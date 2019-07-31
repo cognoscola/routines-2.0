@@ -40,9 +40,13 @@ class NotificationTests {
     }
 
     @Test
-    fun verifyWakeUpAlarmIsSet() {
+    fun verifyWakeUpAlarmLaunchesNotification() {
 
         //Run the App Until we get to the Time Choose
+
+
+
+
     }
 
 }

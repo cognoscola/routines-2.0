@@ -80,7 +80,6 @@ class OnboardActivity:FragmentActivity(){
             GlobalScope.launch {
 
                 delay(4000)
-
                 setNextFragment(state)
             }
         }
@@ -108,6 +107,7 @@ class OnboardActivity:FragmentActivity(){
                 )
                 state = OnboardState.TEXT2
             }
+
             OnboardState.TEXT2 -> {
 
                 (fragmentContainer as View).setOnClickListener(null)
