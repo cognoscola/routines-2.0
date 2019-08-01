@@ -1,6 +1,5 @@
 package com.gorillamoa.routines.app
 
-
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -9,11 +8,13 @@ import android.os.Build
 import android.util.Log
 import android.widget.RemoteViews
 import android.widget.Toast
-import com.google.android.gms.tasks.Task
 import com.google.gson.Gson
 import com.gorillamoa.routines.core.constants.DataLayerConstant
+import com.gorillamoa.routines.core.data.Task
+import com.gorillamoa.routines.core.extensions.getGson
+import com.gorillamoa.routines.core.extensions.isWatch
 import com.gorillamoa.routines.core.receiver.AlarmReceiver
-import com.gorillamoa.routines.dagger.DebugAppComponent
+import com.gorillamoa.routines.core.services.DataLayerListenerService
 import com.gorillamoa.routines.notifications.*
 import java.util.*
 
@@ -21,10 +22,9 @@ import java.util.*
 /**
  * We'll configure notification channels every time the app starts
  */
-class App:BaseApplication(), RemoteInjectorHelper.RemoteGraphProvider, RemoteInjectorHelper.RemoteGsonProvider
-{
+class App:BaseApplication(), RemoteInjectorHelper.RemoteGraphProvider, RemoteInjectorHelper.RemoteGsonProvider {
 
-    lateinit var graph:AppComponent
+    lateinit var graph: AppComponent
 
     override val remoteViewGraph: RemoteViewGraph
         get() = graph
@@ -44,23 +44,22 @@ class App:BaseApplication(), RemoteInjectorHelper.RemoteGraphProvider, RemoteInj
 
     override fun onCreate() {
         super.onCreate()
-        graph = object:AppComponent{
+        graph = object : AppComponent {
 
             override fun remoteGetSmallTaskView(task: String): RemoteViews {
                 return this@App.getTaskRemoteView(task)
             }
 
-            override fun remoteGetLargeTaskView(history:String): RemoteViews {
+            override fun remoteGetLargeTaskView(history: String): RemoteViews {
                 return this@App.getLargeTaskRemoteView(history)
             }
 
-
-            override fun remoteGetLargeWakeUpView(tasks:String): RemoteViews {
+            override fun remoteGetLargeWakeUpView(tasks: String): RemoteViews {
                 //TODO potentially use the new function definition
                 return this@App.getLargeWakeUpRemoteView(tasks)
             }
 
-            override fun remoteGetSmallWakeUpView(taskLength:Int): RemoteViews {
+            override fun remoteGetSmallWakeUpView(taskLength: Int): RemoteViews {
                 return this@App.createWakeUpRemoteView(taskLength)
             }
 
@@ -81,16 +80,16 @@ class App:BaseApplication(), RemoteInjectorHelper.RemoteGraphProvider, RemoteInj
             val channelDescriptorText = "Routines Tasks for Channel"
 
 
-            NotificationChannel(NOTIFICATION_CHANNEL_ONE,channelName, NotificationManager.IMPORTANCE_DEFAULT).apply {
+            NotificationChannel(NOTIFICATION_CHANNEL_ONE, channelName, NotificationManager.IMPORTANCE_DEFAULT).apply {
                 enableLights(true)
                 lightColor = Color.RED
                 enableVibration(true)
-                 description = channelDescriptorText
+                description = channelDescriptorText
                 (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(this)
 
             }
 
-            NotificationChannel(NOTIFICATION_CHANNEL_TWO,channelName, NotificationManager.IMPORTANCE_HIGH).apply {
+            NotificationChannel(NOTIFICATION_CHANNEL_TWO, channelName, NotificationManager.IMPORTANCE_HIGH).apply {
                 enableLights(true)
                 lightColor = Color.RED
                 enableVibration(true)
@@ -103,17 +102,38 @@ class App:BaseApplication(), RemoteInjectorHelper.RemoteGraphProvider, RemoteInj
         attachCallbacks()
     }
 
-    private fun attachCallbacks(){
+    private fun attachCallbacks() {
         AlarmReceiver.setAlarmEventCallbacks(
 
-                object :AlarmReceiver.AlarmReceiverApi{
-                    override fun processWakeUpEvent(context: Context,tasks:ArrayDeque<Long>) {
-                        Toast.makeText(context,"Woke up",Toast.LENGTH_SHORT).show()
-                        Log.d("attachCallbacks","a background task")
-                        notificationShowWakeUpMirror(tasks,DataLayerConstant.WAKE_UP_PATH)
+                object : AlarmReceiver.AlarmReceiverApi {
+                    override fun processWakeUpEvent(context: Context, tasks: ArrayDeque<Long>) {
+                        Toast.makeText(context, "Woke up", Toast.LENGTH_SHORT).show()
+                        Log.d("attachCallbacks", "a background task")
+                        notificationShowWakeUpMirror(tasks, DataLayerConstant.WAKE_UP_PATH)
                     }
                 }
         )
+
+        RoutinesNotificationBuilder.remoteNotificationApi =
+
+                object : RoutinesNotificationBuilder.NotificationRemoteApi {
+                    override fun notificationShowRemote(context: Context, task: String, path: String) {
+                        DataLayerListenerService.executeGenericDataTransfer(context, task, path)
+                    }
+
+                    override fun notificationDismissWakeUpRemote(context: Context) {
+                        DataLayerListenerService.dismissWakeUpMirror(context)
+                    }
+                }
+
+        DataLayerListenerService.dataLayerApi =
+
+                object : DataLayerListenerService.DataLayerApi {
+
+                    override fun receivedWakeUpPath(context: Context, tasks: List<Task>) {
+                        context.notificationShowWakeUpLocal(context.getGson().toJson(tasks), tasks.size, context.isWatch())
+                    }
+                }
     }
 
 }

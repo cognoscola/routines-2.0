@@ -23,7 +23,7 @@
         android:id="@+id/bigContent"
         android:layout_below="@id/title"/>
 
-<!--    <include layout="@layout/remote_group_expand_collapse"
+    <include layout="@layout/remote_group_expand_collapse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toStartOf="@+id/startGroup"/>
@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:id="@+id/startGroup"/>-->
+        android:id="@+id/startGroup"/>
 
 
 </RelativeLayout>

@@ -3,6 +3,7 @@ package com.gorillamoa.routines.core.data
 import android.content.Context
 import androidx.annotation.WorkerThread
 import com.gorillamoa.routines.core.coroutines.Coroutines
+import com.gorillamoa.routines.core.extensions.getGson
 import com.gorillamoa.routines.core.services.DataLayerListenerService
 import java.util.*
 
@@ -26,19 +27,21 @@ class DataRepository(
      *****************************************/
     fun insertMirror(context: Context, task: Task){
         Coroutines.ioThenMain({insert(task)}){ tid ->
-            DataLayerListenerService.insertRemotely(context,task.apply { id = tid  })
+            task.apply { id = tid  }
+            DataLayerListenerService.insertRemotely(context,context.getGson().toJson(task))
         }
     }
 
     fun updateMirror(context: Context,task: Task){
+
         Coroutines.ioThenMain({update(task)}){
-            DataLayerListenerService.updateRemotely(context,task)
+            DataLayerListenerService.updateRemotely(context,context.getGson().toJson(task))
         }
     }
 
     fun deleteMirror(context: Context,task: Task){
         Coroutines.ioThenMain({delete(task)}){
-            DataLayerListenerService.deleteRemotely(context,task)
+            DataLayerListenerService.deleteRemotely(context,context.getGson().toJson(task))
         }
     }
 

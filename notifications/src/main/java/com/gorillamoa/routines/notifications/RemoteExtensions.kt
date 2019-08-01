@@ -3,8 +3,6 @@ package com.gorillamoa.routines.notifications
 
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
-import android.util.Log
 import android.widget.RemoteViews
 /*
 import com.gorillamoa.routines.MobileNotificationBehaviourReceiver.Companion.ACTION_TASK_EXPAND
@@ -16,12 +14,10 @@ import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companio
 import com.gorillamoa.routines.core.scheduler.TaskScheduler
 
 */
-import android.graphics.Paint
 /*import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
 import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_DONE
 import com.gorillamoa.routines.core.receiver.NotificationActionReceiver.Companion.ACTION_TASK_UNCOMPLETE*/
-import com.gorillamoa.routines.notifications.impl.getHtml
 
 /**
  * Creates a remote view specifically designed (dimension wise) for a large sized notification.
@@ -52,7 +48,7 @@ fun Context.createWakeUpRemoteView(taskLength:Int): RemoteViews {
 
     val remoteViews = RemoteViews(packageName, R.layout.remote_wakeup)
     remoteViews.setTextViewText(R.id.title, getHtml(getString(R.string.wake_up_title)))
-    remoteViews.setTextViewText(R.id.description, getHtml(getString(R.string.wake_up_description, taskLength )))
+    remoteViews.setTextViewText(R.id.description, getHtml(getString(R.string.wake_up_description, taskLength)))
     remoteViews.setImageViewResource(R.id.behaviourImage, R.drawable.ic_expand_more_black_24dp)
 
     return remoteViews

@@ -6,6 +6,7 @@ import android.net.Uri
 
 import android.util.Log
 import com.google.android.gms.wearable.*
+import com.google.android.gms.wearable.PutDataRequest.WEAR_URI_SCHEME
 import com.gorillamoa.routines.core.constants.DataLayerConstant
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_DATA
 import com.gorillamoa.routines.core.data.Task
@@ -25,6 +26,7 @@ import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_PR
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.KEY_TASK_HISTORY_DATA
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.PROGRESS_PATH
 import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.TASK_PATH
+import com.gorillamoa.routines.core.constants.DataLayerConstant.Companion.WAKE_UP_PATH
 
 import com.gorillamoa.routines.core.coroutines.Coroutines
 import com.gorillamoa.routines.core.data.TaskHistory
@@ -51,24 +53,26 @@ class DataLayerListenerService:WearableListenerService(){
 
     companion object {
 
+        var dataLayerApi:DataLayerApi? = null
+
         //TODO we need to monitor the data layer isWakeUpShowing variable. whenever it changes we just behave accordingly
 
-        fun insertRemotely(context: Context, task: Task) {
+        fun insertRemotely(context: Context, task: String) {
             executeGenericDataTransfer(context,task,if (context.isWatch()) DATA_TASK_MOBILE_INSERT_PATH else DATA_TASK_WEAR_INSERT_PATH)
         }
 
-        fun deleteRemotely(context: Context,task: Task){
+        fun deleteRemotely(context: Context,task: String){
             executeGenericDataTransfer(context,task,if (context.isWatch()) DATA_TASK_MOBILE_DELETE_PATH else DATA_TASK_WEAR_DELETE_PATH)
         }
 
-        fun updateRemotely(context: Context,task: Task){
+        fun updateRemotely(context: Context,task: String){
             executeGenericDataTransfer(context,task,if (context.isWatch()) DATA_TASK_MOBILE_UPDATE_PATH else DATA_TASK_WEAR_UPDATE_PATH)
         }
 
-        fun executeGenericDataTransfer(context: Context,task: Task,path:String){
+        fun executeGenericDataTransfer(context: Context,task: String,path:String){
             val putDataReq: PutDataRequest = PutDataMapRequest.create(path)
                     .run {
-                        dataMap.putString(KEY_TASK_DATA, context.getGson().toJson(task)) //save the time
+                        dataMap.putString(KEY_TASK_DATA, task) //save the time
                         dataMap.putString(DataLayerConstant.KEY_TIME, getTimeInstant())
                         asPutDataRequest()
                     }
@@ -122,7 +126,12 @@ class DataLayerListenerService:WearableListenerService(){
 
         fun endDayMirror(context:Context){
 
-            val dataItemUri = Uri.Builder().scheme(PutDataRequest.WEAR_URI_SCHEME).path(PROGRESS_PATH).build()
+            val dataItemUri = Uri.Builder().scheme(WEAR_URI_SCHEME).path(PROGRESS_PATH).build()
+            Wearable.getDataClient(context).deleteDataItems(dataItemUri)
+        }
+
+        fun dismissWakeUpMirror(context: Context){
+            val dataItemUri = Uri.Builder().scheme(WEAR_URI_SCHEME).path(WAKE_UP_PATH).build()
             Wearable.getDataClient(context).deleteDataItems(dataItemUri)
         }
 
@@ -156,8 +165,8 @@ class DataLayerListenerService:WearableListenerService(){
 
                         Coroutines.ioThenMain({getDataRepository().getTaskByIds(unCompletedList)}){tasks->
                             tasks?.let {
-                                //TODO SPLIT
-//                                notificationShowWakeUpLocal(tasks)
+
+                                dataLayerApi?.receivedWakeUpPath(this@DataLayerListenerService,tasks)
                             }
                         }
 
@@ -355,8 +364,10 @@ class DataLayerListenerService:WearableListenerService(){
 
     override fun onConnectedNodes(nodes: MutableList<Node>?) {
         super.onConnectedNodes(nodes)
+    }
 
-
+    interface DataLayerApi{
+        fun receivedWakeUpPath(context: Context,tasks:List<Task>)
     }
 
 }

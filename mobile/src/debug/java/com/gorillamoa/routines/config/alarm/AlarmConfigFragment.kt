@@ -31,12 +31,9 @@ class AlarmConfigFragment : Fragment() {
 
         view.findViewById<Button>(R.id.sendWakeUpBroadcastButton).setOnClickListener {
 
-            Handler().postDelayed({
-                val wakeUpIntent = context!!.createAlarmIntent()
-                wakeUpIntent.action = AlarmReceiver.EVENT_WAKEUP
-                activity?.sendBroadcast(wakeUpIntent)
-            },2000)
-
+            val wakeUpIntent = context!!.createAlarmIntent()
+            wakeUpIntent.action = AlarmReceiver.EVENT_WAKEUP
+            activity?.sendBroadcast(wakeUpIntent)
         }
 
         view.findViewById<Button>(R.id.forceQuit).setOnClickListener {

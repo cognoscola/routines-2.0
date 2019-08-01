@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import com.gorillamoa.routines.core.data.Task
 import com.gorillamoa.routines.core.extensions.*
 
 import com.gorillamoa.routines.core.scheduler.TaskScheduler

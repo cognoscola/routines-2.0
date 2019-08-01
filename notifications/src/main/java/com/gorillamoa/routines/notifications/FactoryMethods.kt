@@ -1,28 +1,28 @@
-package com.gorillamoa.routines.notifications.impl
+package com.gorillamoa.routines.notifications
 
 import android.app.NotificationManager
+import android.app.UiModeManager
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Build
 import android.text.Html
 import android.text.Spanned
 import androidx.core.app.NotificationCompat
-import com.example.notificationsimpl.R
 
 /**
  * All of these methods return building blocks for making a notification
  */
-
 /**
  * gets a builder object
  * @receiver Context
  * @param channel String
  * @return NotificationCompat.Builder
  */
-fun Context._getBuilder(channel:String,isWatch:Boolean): RoutinesNotificationBuilder{
+fun Context.getBuilder(channel:String,isWatch:Boolean): RoutinesNotificationBuilder {
 
     //TODO UNCOMMENTAND DELETE ABOVE
-    //provide builder via dagger
-    return RoutinesNotificationBuilder(this,channel,isWatch)
+    //TODO provide builder via dagger
+    return RoutinesNotificationBuilder(this, channel, isWatch)
 
             //TODO show weather in one icon in the notification title
             .setContentTitle(getHtml("Good morning! &#127780"))
@@ -43,7 +43,6 @@ fun prepareBigTextStyle(tasks:String,title:Spanned):NotificationCompat.BigTextSt
             .setBigContentTitle(title)
             .bigText(getHtml(tasks))
 }
-
 
 /**
  * Gets the Notification manager
