@@ -1,5 +1,6 @@
 package com.gorillamoa.routines.onboard.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -44,7 +45,6 @@ class TimePickerFragment: Fragment(){
 
             }
         }
-
     }
 
 
@@ -105,13 +105,26 @@ class TimePickerFragment: Fragment(){
 
         backwardButton.setOnClickListener {
 
-            if (hour != -1) {
-                hour = -1
-                minute = 0
-                timeTextView.visibility = View.INVISIBLE
-                backwardButton.visibility = View.INVISIBLE
-                ((buttonRecyclerView as RecyclerView).adapter as TimePickerAdapter).setHourState()
-            }
+            reset()
+        }
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        reset()
+    }
+
+    fun reset(){
+        if (hour != -1) {
+            hour = -1
+            minute = 0
+            timeTextView.visibility = View.INVISIBLE
+            backwardButton.visibility = View.INVISIBLE
+            ((buttonRecyclerView as RecyclerView).adapter as TimePickerAdapter).setHourState()
         }
     }
 

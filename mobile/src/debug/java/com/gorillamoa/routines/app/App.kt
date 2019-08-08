@@ -11,11 +11,11 @@ import android.widget.Toast
 import com.google.gson.Gson
 import com.gorillamoa.routines.core.constants.DataLayerConstant
 import com.gorillamoa.routines.core.data.Task
-import com.gorillamoa.routines.core.extensions.getGson
-import com.gorillamoa.routines.core.extensions.isWatch
+import com.gorillamoa.routines.core.extensions.*
 import com.gorillamoa.routines.core.receiver.AlarmReceiver
 import com.gorillamoa.routines.core.services.DataLayerListenerService
 import com.gorillamoa.routines.notifications.*
+import com.gorillamoa.routines.tools.counter.counterReset
 import java.util.*
 
 
@@ -111,6 +111,11 @@ class App:BaseApplication(), RemoteInjectorHelper.RemoteGraphProvider, RemoteInj
                         Log.d("attachCallbacks", "a background task")
                         notificationShowWakeUpMirror(tasks, DataLayerConstant.WAKE_UP_PATH)
                     }
+
+                    override fun processSleepEvent(context: Context) {
+
+                        counterReset()
+                    }
                 }
         )
 
@@ -135,5 +140,6 @@ class App:BaseApplication(), RemoteInjectorHelper.RemoteGraphProvider, RemoteInj
                     }
                 }
     }
+
 
 }

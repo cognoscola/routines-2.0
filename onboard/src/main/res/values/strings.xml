@@ -18,6 +18,9 @@
     </string>
 
     <string name="onboard_title_03">Planing</string>
+
+    <string name="onboard_title_05">Reflecting</string>
+    <string name="onboard_title_finish">Done!</string>
     <string name="onboard_welcome_03">
 
         “An intelligent plan is the first step to success. The man who plans knows where he is going, knows what progress he is making and has a pretty good idea when he will arrive.”
@@ -33,6 +36,25 @@
         Are you Stubborn?
 
     </string>
+
+    <string name="onboard_done_description">
+
+        "Drop by drop the cup is slowly filled. Don't strive for perfection. Have patience and enjoy the process and soon you will find yourself a master without even trying."
+        \n\n\n
+        Your task for today is ready! Be sure to tick it off before you sleep!
+
+    </string>
+
+    <string name="onboard_description_5">
+
+        The last thing to do is to pick a time on which to reflect on your achievements of the day.
+        This will help you appreciate how amazing you already are, which is vital in the process
+        of self-discovery. Pick a time to reflect. It should ideally be right before bed.
+
+    </string>
+
+    <string name="onboard_pick_time">Pick Time</string>
+    <string name="onboard_close">On with my day</string>
 
     <string name="onboard_choice_01_04">I\'m Stubborn</string>
     <string name="onboard_choice_02_04">I prefer to dismiss Notifications</string>

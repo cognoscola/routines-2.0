@@ -43,10 +43,13 @@ class OnboardActivity:FragmentActivity(){
         Splash,
         TEXT1,
         TEXT2,
-        PickTime,
+        PickWakeUp,
+        PickSleep,
         TEXT3,
         TEXT4,
-        Text6
+        Pillars,
+        TEXT5,
+        FINISH
     }
 
     private var state:OnboardState = OnboardState.Splash
@@ -120,15 +123,15 @@ class OnboardActivity:FragmentActivity(){
                                 val cal = Calendar.getInstance()
                                 setWakeTimeToCalendarAndStore(cal, hour, minute, phase)
                                 alarmSetRepeatWithCal(cal, true)
-                                setNextFragment(OnboardState.PickTime)
+                                setNextFragment(OnboardState.PickWakeUp)
                             }
                         })
                         .commit()
-                state = OnboardState.PickTime
-
+                state = OnboardState.PickWakeUp
             }
-            OnboardState.PickTime -> {
 
+
+            OnboardState.PickWakeUp ->{
                 setTextFragment(
                         getString(R.string.onboard_title_03),
                         getString(R.string.onboard_welcome_03),
@@ -155,8 +158,29 @@ class OnboardActivity:FragmentActivity(){
                         .replace(R.id.fragmentContainer,PillarChoosingFragment.newInstance())
                         .commit()
 
+                state = OnboardState.Pillars
             }
 
+            OnboardState.Pillars ->{
+
+                setTextFragment(
+                        getString(R.string.onboard_title_05),
+                        getString(R.string.onboard_description_5),
+                        getString(R.string.onboard_pick_time),null
+                )
+                state = OnboardState.TEXT5
+            }
+
+            OnboardState.TEXT5 ->{
+
+                setTextFragment(
+                        getString(R.string.onboard_title_finish),
+                        getString(R.string.onboard_done_description),
+                        getString(R.string.onboard_close),null
+                )
+                state = OnboardState.FINISH
+
+            }
         }
     }
 
@@ -192,6 +216,28 @@ class OnboardActivity:FragmentActivity(){
 
     fun getForwardFunction() = { argument:Int ->
 
+        if(state == OnboardState.FINISH){
+            finish()
+        }
+
+        if(state == OnboardState.TEXT5){
+            (fragmentContainer as View).setOnClickListener(null)
+            supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, TimePickerFragment.newInstance(getString(R.string.onboard_sleep_text)).apply {
+
+                        setCallbackFunction { hour, minute, phase ->
+
+                            val cal = Calendar.getInstance()
+                            setSleepTimeToCalendarAndStore(cal, hour, minute, phase)
+                            alarmSetRepeatWithCal(cal, false)
+                            setNextFragment(OnboardState.TEXT5)
+                        }
+                    })
+                    .commit()
+            state = OnboardState.PickSleep
+
+        }
+
         if (state == OnboardState.TEXT4) {
             //capture the argument
             if (argument == InformationFragment.KEY_STUBBORN) {
@@ -210,13 +256,13 @@ class OnboardActivity:FragmentActivity(){
                     name = "This is your morning reminder!"
             ))
             dummyArrray.add(Task(
-                    name = "This list of tasks for the day"
+                    name = "Its a list of tasks for the day"
             ))
             dummyArrray.add(Task(
                     name = "Be sure to review this everyday!"
             ))
             dummyArrray.add(Task(
-                    name = "<b>Click Start to Finish!</b>"
+                    name = "<b>Click Start to Return to the App!</b>"
             ))
 
             /**
@@ -229,9 +275,12 @@ class OnboardActivity:FragmentActivity(){
 
             val smallWakeupView = createWakeUpRemoteView(dummyArrray.size)
             smallWakeupView.setIntentToStartButton(createNotificationActionPendingIntentForWakeUp(ACTION_WAKE_START_DAY, WAKE_UP_NOTIFICATION_ID))
+            smallWakeupView.setViewVisibility(R.id.edit, View.GONE)
 
             val largeWakeupView = createLargeWakeUpRemoteView(StringBuilder().stringifyTasks(dummyArrray, if(isWatch())25 else 40))
             largeWakeupView.setIntentToStartButton(createNotificationActionPendingIntentForWakeUp(ACTION_WAKE_START_DAY, WAKE_UP_NOTIFICATION_ID))
+            //we'll make sure we don't draw the edit buttons
+            largeWakeupView.setViewVisibility(R.id.edit, View.GONE)
 
             notificationShowWakeUp(
                     StringBuilder().stringifyTasks(dummyArrray,if(isWatch())25 else 40),
@@ -302,11 +351,16 @@ class OnboardActivity:FragmentActivity(){
         //TODO create the specified task
         //TODO start task view activity
 
-        val activity = Class.forName("com.gorillamoa.routines.details.DetailsActivity")
-        val newIntent  = Intent(this, activity)
-        newIntent.putExtra("task_name",task)
-        startActivityForResult(newIntent,1000)
+//        val activity = Class.forName("com.gorillamoa.routines.details.DetailsActivity")
+//        val newIntent  = Intent(this, activity)
+//        newIntent.putExtra("task_name",task)
+//        startActivityForResult(newIntent,1000)
+
+        setTextFragment(
+
+                getString(R.string.onboard_title_05),
+                getString(R.string.onboard_description_5),
+                getString(R.string.onboard_pick_time),null)
+              this.state = OnboardState.TEXT5
     }
-
-
 }

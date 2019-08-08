@@ -122,6 +122,7 @@ class AlarmReceiver:BroadcastReceiver(){
 //                    context.notificationShowSleep()
                     TaskScheduler.endDay(context)
 
+                    callback?.processSleepEvent(context)
                 }
 
                 ACTION_REST -> {
@@ -161,5 +162,7 @@ class AlarmReceiver:BroadcastReceiver(){
     interface AlarmReceiverApi{
 
         fun processWakeUpEvent(context: Context, tasks:ArrayDeque<Long>)
+
+        fun processSleepEvent(context: Context)
     }
 }

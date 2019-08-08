@@ -71,33 +71,36 @@ fun Context.alarmEnableSleep(){
 
     val cal = Calendar.getInstance()
     setSavedSleepTimeToCalendar(cal)
-    alarmSetRepeatWithCal(cal,true)
+    alarmSetRepeatWithCal(cal,false)
 }
 
+/**
+ *
+ * @receiver Context
+ */
 fun Context.alarmDisableSleep(){
     val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
     alarmManager.cancel(createWakeUpAlarmPendingIntent())
     saveAlarmSleepStatus(false)
 
-
 }
-
 
 /**
  * Set the repeating alarm with the given calendar
  * @param cal is the calendar object containing information about when to set alarm
- * @param isWake determines wether this alarm will be a wake up or a sleep notification
+ * @param isWake determines if this alarm will be a wake up or a sleep notification
  */
 fun Context.alarmSetRepeatWithCal(cal:Calendar, isWake:Boolean){
     val alarmManager = getAlarmService()
-
-    Toast.makeText(this,"Set Repeat",Toast.LENGTH_SHORT).show()
 
     alarmManager.setInexactRepeating(
             AlarmManager.RTC_WAKEUP,
             cal.timeInMillis,
             AlarmManager.INTERVAL_DAY,
-            if(isWake){createWakeUpAlarmPendingIntent()} else{ createSleepAlarmPendingIntent()}
+            if(isWake){
+                createWakeUpAlarmPendingIntent()} else{
+                createSleepAlarmPendingIntent()
+            }
     )
 
     if(isWake)saveAlarmWakeStatus(true)else saveAlarmSleepStatus(true)

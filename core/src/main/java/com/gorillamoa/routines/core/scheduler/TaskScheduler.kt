@@ -465,6 +465,13 @@ class TaskScheduler{
 
             context.saveTaskLists(uncompleted,completed)
             context.saveOrder(order)
+
+            //now we'll reset the user's tools numbers
+
+            //reset the counter
+            
+
+
         }
 
         fun showNext(context:Context){

@@ -30,6 +30,7 @@ import com.gorillamoa.routines.tools.LivingBackground
 import com.gorillamoa.routines.tools.animation.SIXTY_INT
 import com.gorillamoa.routines.tools.animation.THIRTY_INT
 import com.gorillamoa.routines.tools.animation.*
+import com.gorillamoa.routines.tools.counter.counterIncrementValue
 
 import com.gorillamoa.routines.utils.*
 import com.gorillamoa.routines.utils.CircularTimer
@@ -365,14 +366,7 @@ class TaskWatchService : CanvasWatchFaceService() {
             applicationContext.saveAlarmRestStatus(false)
         }
 
-        //TODO move this out as a seperate Feature library
-        //TODO on sleep alarm, record this counter
 
-        var counter:Int = 0
-        private fun incrementCounter(){
-            counter++
-            Toast.makeText(this@TaskWatchService,"$counter",Toast.LENGTH_SHORT).show()
-        }
                 /**
          * Enable a timer to go off in specified selectedMinute
          * @param selectedMinute is the selected user value according to his view
@@ -699,6 +693,7 @@ class TaskWatchService : CanvasWatchFaceService() {
 
                     Log.d("$tag onTapCommand","processEntity TAP COMMAND")
 
+
                     /**Disable any triggers any time the user interacts with the app
                     This prevents the app from being stuck in a state where the alarm is never fired
                     because the setting is always stuck on true, and yet we can't disable it
@@ -721,7 +716,7 @@ class TaskWatchService : CanvasWatchFaceService() {
                                 Foreground.STATE_ALARM -> {}
                                 Foreground.STATE_BREAKS -> { if(isTouchingCenter(x,y)) disableRestPeriods() else enableRestPeriods() }
                                 Foreground.STATE_TIMER -> {if(isTouchingCenter(x,y)) disableTimer() else enableTimer(getSelectedMinute(x,y))}
-                                Foreground.STATE_COUNTER -> {if(!isTouchingCenter(x,y)) incrementCounter()  }
+                                Foreground.STATE_COUNTER -> {if(!isTouchingCenter(x,y)) counterIncrementValue(true)}
                                 else ->{}
                             }
                         }

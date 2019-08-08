@@ -3,10 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="256dp"
+    android:layout_height="wrap_content"
     tools:background="#555555"
     android:padding="9dp"
     android:background="@color/notification_bg_color">
+
+    <!--
+    android:layout_height="256dp"
+    -->
 
     <TextView
         android:layout_width="wrap_content"
@@ -23,10 +27,10 @@
         android:id="@+id/bigContent"
         android:layout_below="@id/title"/>
 
-    <include layout="@layout/remote_group_expand_collapse"
+    <!--<include layout="@layout/remote_group_expand_collapse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toStartOf="@+id/startGroup"/>
+        android:layout_toStartOf="@+id/startGroup"/>-->
 
     <include layout="@layout/remote_group_start_edit"
         android:layout_width="wrap_content"

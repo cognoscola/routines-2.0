@@ -14,6 +14,7 @@ import kotlin.collections.ArrayList
 private const val LOCAL_SETTINGS ="local_app_settings"
 private const val isWakeAlarmActive= "isWakeAlarmActive"
 private const val isSleepAlarmActive= "isSleepAlarmActive"
+
 const val isRestAlarmActive = "isRestAlarmActive"
 
 const val isTimerAlarmActive = "isTimerAlarmActive"
@@ -401,5 +402,7 @@ fun Context.getAllTaskShowing():Array<StatusBarNotification>{
    return(getSystemService(NOTIFICATION_SERVICE) as NotificationManager).activeNotifications
 //    return getNotificationManager().activeNotifications
 }
+
+
 
 
