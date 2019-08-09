@@ -32,14 +32,14 @@ enum class TaskType{
 
 
     /**
-     * The user didn't specify a type, which means that the task is likely a one-time
+     * The user didn't specify a habit or goal, which means that the task is likely a one-time
      * task. Or not really that important. There is no deadline or expectation formed from the user
      * so we don't really need to worry about rescheduling these tasks.
      * We should, however, encourage the user to upgrade this task to a habit or goal, in case
      * they wrote it down in a hurry.. If they do nothing, it was probably negligible.
      * (not that important to them)
      */
-    TYPE_UNKNOWN,
+    TYPE_TASK,
 
     /**
      * This is a special type for when we want the user to execute a particular action inside

@@ -161,7 +161,7 @@ class OnboardActivity:FragmentActivity(){
                 state = OnboardState.Pillars
             }
 
-            OnboardState.Pillars ->{
+            OnboardState.Pillars -> {
 
                 setTextFragment(
                         getString(R.string.onboard_title_05),
@@ -171,7 +171,7 @@ class OnboardActivity:FragmentActivity(){
                 state = OnboardState.TEXT5
             }
 
-            OnboardState.TEXT5 ->{
+            OnboardState.TEXT5 -> {
 
                 setTextFragment(
                         getString(R.string.onboard_title_finish),
@@ -351,16 +351,16 @@ class OnboardActivity:FragmentActivity(){
         //TODO create the specified task
         //TODO start task view activity
 
-//        val activity = Class.forName("com.gorillamoa.routines.details.DetailsActivity")
-//        val newIntent  = Intent(this, activity)
-//        newIntent.putExtra("task_name",task)
-//        startActivityForResult(newIntent,1000)
+        val activity = Class.forName("com.gorillamoa.routines.details.DetailsActivity")
+        val newIntent  = Intent(this, activity)
+        newIntent.putExtra("task_name",task)
+        startActivityForResult(newIntent,1000)
 
-        setTextFragment(
+      /*  setTextFragment(
 
                 getString(R.string.onboard_title_05),
                 getString(R.string.onboard_description_5),
                 getString(R.string.onboard_pick_time),null)
-              this.state = OnboardState.TEXT5
+              this.state = OnboardState.TEXT5*/
     }
 }

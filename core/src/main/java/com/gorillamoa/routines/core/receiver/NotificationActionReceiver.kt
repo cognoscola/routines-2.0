@@ -71,7 +71,7 @@ class NotificationActionReceiver:BroadcastReceiver(){
                             }
                         }
                     }else{
-                        Log.e("onReceive","Something wont wrong Completeing task! UH OH")
+                        Log.e("onReceive","Something went wrong while completing tasks! UH OH")
                     }
                 }
 
@@ -82,7 +82,7 @@ class NotificationActionReceiver:BroadcastReceiver(){
                         val history = context.getHistoryFromString(intent.getStringExtra(KEY_TASK_HISTORY_DATA))
 
                         //TODO SPLIT
-//                        context.notificationShowTaskMirror(task,history)
+                        //context.notificationShowTaskMirror(task,history)
 
                     }else{
 

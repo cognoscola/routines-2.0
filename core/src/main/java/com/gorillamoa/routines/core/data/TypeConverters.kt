@@ -13,11 +13,11 @@ class TypeConverters {
 
         return when (value) {
 
-            0 -> TaskType.TYPE_UNKNOWN
+            0 -> TaskType.TYPE_TASK
             1 -> TaskType.TYPE_HABIT
             2 -> TaskType.TYPE_GOAL
             3 -> TaskType.TYPE_SPECIAL
-            else -> TaskType.TYPE_UNKNOWN
+            else -> TaskType.TYPE_TASK
         }
     }
 
@@ -25,7 +25,7 @@ class TypeConverters {
     fun TypeToInt(type: TaskType): Int? {
         return when (type) {
 
-            TaskType.TYPE_UNKNOWN -> 0
+            TaskType.TYPE_TASK -> 0
             TaskType.TYPE_GOAL -> 2
             TaskType.TYPE_HABIT -> 1
             TaskType.TYPE_SPECIAL -> 3

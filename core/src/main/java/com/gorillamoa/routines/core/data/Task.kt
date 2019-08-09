@@ -14,11 +14,13 @@ data class Task(
         @PrimaryKey(autoGenerate = true)
         var id:Long? = null,
 
-        val type: TaskType = TaskType.TYPE_UNKNOWN,
+        val type: TaskType = TaskType.TYPE_TASK,
         val name:String,
         val description:String? = null,
-        val frequency:Float = 1.0f,
-        val date:Long = 0L
+        val frequency:Float = 1.0f, // pulse/range
+        val date:Long = 0L,
+        val range:Long = 0L,//how often
+        val pulse:Long = 0L //how many times
 
         //TODO add addittional options
         //TODO add history

@@ -28,7 +28,7 @@ import kotlinx.coroutines.CoroutineScope
 @Database(entities = [
     Task::class,
     TaskHistory::class,
-    DayHistory::class], version = 3)
+    DayHistory::class], version = 4)
 @TypeConverters(com.gorillamoa.routines.core.data.TypeConverters::class)
 abstract class TaskDatabase:RoomDatabase(){
 

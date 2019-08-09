@@ -60,13 +60,15 @@ a day if possible" />
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/description_type"
-            android:gravity="center_vertical"/>
+            android:gravity="center_vertical"
+            />
 
 
         <Spinner
             android:layout_width="0dp"
             android:layout_height="40dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:id="@+id/typeSpinner"/>
 
     </LinearLayout>
 
@@ -108,7 +110,8 @@ a day if possible" />
         <Spinner
             android:layout_width="0dp"
             android:layout_height="40dp"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:id="@+id/rangeSpinner">
 
         </Spinner>
 

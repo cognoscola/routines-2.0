@@ -3,10 +3,8 @@ package com.gorillamoa.routines.config.alarm
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import com.gorillamoa.routines.R
 import com.gorillamoa.routines.core.extensions.createAlarmIntent
@@ -36,6 +34,20 @@ class AlarmConfigFragment : Fragment() {
             activity?.sendBroadcast(wakeUpIntent)
         }
 
+        view.findViewById<Button>(R.id.detailsButton).setOnClickListener {
+
+            val activity = Class.forName("com.gorillamoa.routines.details.DetailsActivity")
+            val newIntent  = Intent(context, activity).apply{
+                putExtra("task_name","A test Task")
+                putExtra("task_description", "This is a test quick task description")
+                putExtra("task_pulse", 5L)
+                putExtra("task_range", 7L)//week
+                putExtra("task_type",  2)
+            }
+
+            startActivityForResult(newIntent,1000)
+        }
+
         view.findViewById<Button>(R.id.forceQuit).setOnClickListener {
 
             activity!!.finish()
@@ -47,5 +59,6 @@ class AlarmConfigFragment : Fragment() {
 
 
     }
+
 
 }

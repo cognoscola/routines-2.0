@@ -3,7 +3,10 @@
     package="com.gorillamoa.routines.details">
 
     <application>
-        <activity android:name=".DetailsActivity"></activity>
+        <activity
+            android:theme="@style/Theme.AppCompat"
+            android:name=".DetailsActivity">
+        </activity>
     </application>
 
 </manifest>
