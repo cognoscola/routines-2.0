@@ -5,3 +5,4 @@ FrequencyPickerFragment  - used by Wear Module
 - wear/adapter/DoubleRowSelectAdapter
 - wear/adapter/SimplePickerAdapter
 - wear/other/DetectableLinearSnapHelper
+- wear/adapter/OffsetItemDecoration
