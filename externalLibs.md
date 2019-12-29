@@ -8,3 +8,4 @@ FrequencyPickerFragment  - used by Wear Module
 - wear/adapter/OffsetItemDecoration
 
 -core/extensions/AlarmExtensions
+-core/receiver/SimpleBootReceiver
