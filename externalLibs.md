@@ -7,5 +7,9 @@ FrequencyPickerFragment  - used by Wear Module
 - wear/other/DetectableLinearSnapHelper
 - wear/adapter/OffsetItemDecoration
 
--core/extensions/AlarmExtensions
--core/receiver/SimpleBootReceiver
+- core/extensions/AlarmExtensions
+- core/receiver/SimpleBootReceiver
+- core/receiver/AlarmReceiver
+- core/extensions /PintentExtensions
+- core/extensions/ PreferenceExtensions
+- core/ extensions/CalendarExntesions
