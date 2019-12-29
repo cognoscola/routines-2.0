@@ -6,3 +6,5 @@ FrequencyPickerFragment  - used by Wear Module
 - wear/adapter/SimplePickerAdapter
 - wear/other/DetectableLinearSnapHelper
 - wear/adapter/OffsetItemDecoration
+
+-core/extensions/AlarmExtensions
